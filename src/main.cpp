@@ -1,4 +1,4 @@
-#include "main.h"
+#include "SCC/main.h"
 
 int main() {
   return 0;
