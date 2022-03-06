@@ -36,3 +36,6 @@
 
 # logs
 *.log
+
+# CMake
+cmake-build-debug
