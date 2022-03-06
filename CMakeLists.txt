@@ -6,4 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 include_directories(include)
 add_executable(SCC
-        src/main.cpp)
+        src/main.cpp
+        src/conf.cpp
+        src/lexical_analyzer.cpp
+        src/ast_handler.cpp
+        src/query_assembler.cpp)

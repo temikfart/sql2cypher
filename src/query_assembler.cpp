@@ -1,1 +1,1 @@
-#include "query_assembler.h"
+#include "SCC/query_assembler.h"
