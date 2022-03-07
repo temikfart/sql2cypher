@@ -27,7 +27,7 @@ Log::Log() {
   filename_ = time_to_log_name(get_timestamp());
   std_output_.open("../log/" + filename_, ios::out);
 }
-void Log::add_log(LogLevel level, string msg) {
+void Log::add_log(LogLevel level, const string& msg) {
   ostringstream output;
   output << "[" << log_levels_.at(level) << "]\t"
          << get_timestamp() << " " << msg;
@@ -39,5 +39,8 @@ void Log::add_log(LogLevel level, string msg) {
 }
 LogLevel Log::get_log_level() const {
   return log_level_;
+}
+void Log::set_log_level(LogLevel level) {
+  log_level_ = level;
 }
 Log::~Log() = default;

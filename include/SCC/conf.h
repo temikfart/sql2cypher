@@ -44,8 +44,9 @@ private:
   std::string time_to_log_name(std::string timestamp);
 public:
   Log();
-  void add_log(LogLevel level = INFO, std::string msg = "\n");
+  void add_log(LogLevel level, const std::string& msg);
   LogLevel get_log_level() const;
+  void set_log_level(LogLevel level);
   ~Log();
 };
 
