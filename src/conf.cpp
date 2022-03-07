@@ -12,8 +12,7 @@ void configure() {
 string Log::get_timestamp() {
   time_t now;
   time(&now);
-  int kMSK_TimeZone = 3;
-  now += kMSK_TimeZone * 3600;
+  now += 3 * 3600;    // UTC+3 -- MSC
   char buf[sizeof "2011-10-08T07:07:09"];
   strftime(buf, sizeof buf, "%FT%T", gmtime(&now));
   
@@ -28,12 +27,15 @@ Log::Log() {
   filename_ = time_to_log_name(get_timestamp());
   std_output_.open("../log/" + filename_, ios::out);
 }
-ofstream& Log::add_log(LogLevel level) {
+void Log::add_log(LogLevel level, string msg) {
   ostringstream output;
-  output << "[" << log_levels_.at(level) << "]\t" << get_timestamp() << " ";
-  std_output_ << output.str();
+  output << "[" << log_levels_.at(level) << "]\t"
+         << get_timestamp() << " " << msg;
   
-  return std_output_;
+  std_output_ << output.str();
+  if (log_level_ >= level) {
+    cout << output.str();
+  }
 }
 LogLevel Log::get_log_level() const {
   return log_level_;
