@@ -16,30 +16,16 @@ class Node {
   std::vector<Node*> children_;
 
 public:
-  Node(const N_type type): type_(type) {}
-  ~Node() {
-    for(auto & node_ptr : children_) {
-      delete node_ptr;
-    }
-  }
+  Node(const N_type type);
+  ~Node();
 
-  N_type get_type () {
-    return type_;
-  }
+  N_type get_type();
 
-  void add_children(Node* node) {
-    children_.push_back(node);
-  }
-  Node* get_children (int node_num) {
-    if (node_num > children_.size()) {
-      LOG(ERROR, "Node number too big")
-      return nullptr;
-    }
-    return children_[node_num];
-  }
-  size_t get_children_amount () {
-    return children_.size();
-  }
+  void add_children(Node* node);
+  Node* get_children (int node_num);
+  size_t get_children_amount ();
+
+  virtual void print_data() = 0;
 };
 
 class IntNode: public Node {
@@ -49,6 +35,10 @@ public:
 
   int get_data() const {
     return data_;
+  }
+
+  void print_data() override {
+    std::cout << data_ << " ";
   }
 };
 
@@ -60,6 +50,10 @@ public:
   char get_data() {
     return data_;
   }
+
+  void print_data() override {
+    std::cout << data_ << " ";
+  }
 };
 
 class StringNode: public Node {
@@ -69,6 +63,19 @@ public:
 
   std::string get_data() {
     return data_;
+  }
+
+  void print_data() override {
+    std::cout << data_ << " ";
+  }
+};
+
+class RootNode: public Node {
+public:
+  RootNode(): Node (N_type::ROOT) {}
+
+  void print_data() override {
+    std::cout << "ROOT" << " ";
   }
 };
 

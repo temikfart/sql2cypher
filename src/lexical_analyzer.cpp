@@ -1,26 +1,43 @@
 #include "SCC/lexical_analyzer.h"
 
+//-------------------Node------------------------
+
+Node::Node(const N_type type): type_(type) {}
+
+Node::~Node() {
+  for(auto & node_ptr : children_) {
+    delete node_ptr;
+  }
+}
+
+N_type Node::get_type() {
+  return type_;
+}
+
+Node* Node::get_children (int node_num) {
+  if (node_num > children_.size()) {
+    LOG(ERROR, "Node number too big")
+    return nullptr;
+  }
+  return children_[node_num];
+}
+
+void Node::add_children(Node* node) {
+  children_.push_back(node);
+}
+
+size_t Node::get_children_amount () {
+  return children_.size();
+}
+
+//-----------------------------------------------
+
 namespace Tree {
   void PrintTreeRecursive(Node *node) {
-    switch (node->get_type()) {
-      case DIGIT:
-        std::cout << ((IntNode *) node)->get_data() << " "; //TODO: learn about casts
-        break;
-      case OPERATOR:
-        std::cout << ((CharNode *) node)->get_data() << " ";
-        break;
-      case STRING:
-        std::cout << ((StringNode *) node)->get_data() << " ";
-        break;
-      case ROOT:
-        std::cout << "ROOT" << " ";
-        break;
-    }
+    node->print_data();
 
     if (node->get_children_amount() == 0)
       return;
-    else
-      std::cout << std::endl;
 
     for (int i = 0; i < node->get_children_amount(); i++) {
       PrintTreeRecursive(node->get_children(i));
@@ -31,16 +48,16 @@ namespace Tree {
 using SNode = Node*;
 
 void test_tree_func() {
-  auto root = new Node(N_type::ROOT);
+  Node* root = new RootNode();
 
-  root->add_children((SNode)(new IntNode(125)));
-  root->add_children((Node*)(new CharNode('+')));
-  root->add_children((Node*)(new StringNode("le cringe")));
-  root->add_children((Node*)(new IntNode(125)));
+  root->add_children(new IntNode(125));
+  root->add_children(new CharNode('+'));
+  root->add_children(new StringNode("le cringe"));
+  root->add_children(new IntNode(125));
 
   Node* child_node = root->get_children(0);
 
-  child_node->add_children((Node*)(new StringNode("lol")));
+  child_node->add_children(new StringNode("lol"));
 
   Tree::PrintTreeRecursive(root);
 }
