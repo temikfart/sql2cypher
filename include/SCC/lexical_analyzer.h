@@ -1,99 +1,79 @@
 #pragma once
+
+#include "SCC/conf.h"
 #include <iostream>
 #include <vector>
 
-//union data_t {
-//  int digit;
-//  char character;
-//  std::string string;
-//};
-
-enum DataType {
-  INT,
-  CHAR,
+enum N_type {
+  ROOT,
+  DIGIT,
+  OPERATOR,
   STRING
 };
 
 class Node {
-public:
-  int type_;
-  int data_;
+  const N_type type_;
   std::vector<Node*> children_;
 
-  Node(int value = 0): data_(value) {}
+public:
+  Node(const N_type type): type_(type) {}
   ~Node() {
     for(auto & node_ptr : children_) {
       delete node_ptr;
     }
   }
 
-  Node* get_children(int child_num) {
-    if (child_num > children_.size()) {
-      std::cout << "get_children: wrong size" << std::endl;
+  N_type get_type () {
+    return type_;
+  }
+
+  void add_children(Node* node) {
+    children_.push_back(node);
+  }
+  Node* get_children (int node_num) {
+    if (node_num > children_.size()) {
+      LOG(ERROR, "Node number too big")
       return nullptr;
     }
-    return children_[child_num];
+    return children_[node_num];
   }
-
-  int get_data() {
-    return data_;
-  }
-  void add_children(int value = 0){
-    children_.push_back(new Node);
-    children_.back()->data_ = value;
-  }
-
-//  virtual void add_children(int value = 0);
-
-  void PrintTree() {
-    PrintTreeRecursive(this);
-    std::cout << std::endl;
-  }
-  void PrintTreeRecursive(Node* node) {
-    std::cout <<"node_data("<< node->data_ << ") ";
-    if (node->children_.empty())
-      return;
-    std::cout << std::endl;
-    for (auto &node_prt: node->children_) {
-      PrintTreeRecursive(node_prt);
-    }
+  size_t get_children_amount () {
+    return children_.size();
   }
 };
 
-//class IntNode: public Node {
-//  int data_;
-//
-//  int get_data() {
-//    return data_;
-//  }
-//
-//  void add_children(int value = 0) override{
-//    children_.push_back(new Node);
-//  }
-//};
+class IntNode: public Node {
+  int data_;
+public:
+  IntNode(int value): Node (N_type::DIGIT), data_(value) {}
 
-//class Tree: public Node {
-//public:
-//  Node* root_;
-//
-//  Tree(int value = 0) : Node(value), root_(new Node(value)) {} //why do we need to init Node(value)
-//  ~Tree() {
-//    delete root_;
-//  }
-//
-//  void PrintTree() {
-//    PrintTreeRecursive(root_);
-//    std::cout << std::endl;
-//  }
-//
-//  void PrintTreeRecursive(Node* node) {
-//    if(node->children_.empty())
-//      return;
-//    std::cout << node->data_ << " " << std::endl;
-//    for(auto & node_prt : node->children_) {
-//      PrintTreeRecursive(node_prt);
-//    }
-//  }
-//};
+  int get_data() const {
+    return data_;
+  }
+};
+
+class CharNode: public Node {
+  char data_;
+public:
+  CharNode(char ch): Node (N_type::OPERATOR), data_(ch) {}
+
+  char get_data() {
+    return data_;
+  }
+};
+
+class StringNode: public Node {
+  std::string data_;
+public:
+  StringNode(std::string&& string): Node (N_type::STRING), data_(string) {}
+
+  std::string get_data() {
+    return data_;
+  }
+};
+
+namespace Tree {
+  void PrintTreeRecursive(Node* node);
+};
 
 void test_tree_func();

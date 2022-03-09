@@ -6,6 +6,6 @@ int main() {
   LOG(INFO, "System started")
 
   test_tree_func();
-  
+
   return 0;
 }
