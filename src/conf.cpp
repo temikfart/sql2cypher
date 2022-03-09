@@ -13,6 +13,7 @@ void Configure(int argc, char* argv[]) {
   } else {
     // TODO: Parse config.ini
   }
+  config.Start();
 
   LOG(TRACE, "Configuration is completed");
 }
@@ -54,7 +55,7 @@ void Log::ValidateLogLevel(std::string& level) const {
 
 Log::Log() {
   filename_ = TimeToLogName(get_timestamp());
-  std_output_.open("../log/" + filename_, ios::out);
+  output_.open("../log/" + filename_, ios::out);
 }
 void Log::add_log(LogLevel level, const string& msg) {
   ValidateLogLevel(level);
@@ -62,7 +63,7 @@ void Log::add_log(LogLevel level, const string& msg) {
   output << "[" << log_lvl2str_.at(level) << "]\t"
          << get_timestamp() << " " << msg;
   
-  std_output_ << output.str();
+  output_ << output.str();
   if (log_level_ >= level) {
     cout << output.str();
   }
@@ -84,41 +85,71 @@ LogLevel Log::StringToLogLevel(string& level) {
 Log::~Log() = default;
 
 
+bool Config::IsFileExists(string& path) {
+  struct stat buffer{};
+  return (stat(path.c_str(), &buffer) == 0);
+}
+bool Config::IsFileExists(const ofstream& f) {
+  return f.good();
+}
 void Config::ValidateMode(SCCMode mode) const {
-  try {
-    if (SCCMode::MODE_COUNT <= mode) {
-      throw invalid_argument("incorrect SCC mode: " + to_string(mode));
-    }
-  } catch (invalid_argument& ex) {
-    LOG(ERROR, ex.what());
+  if (SCCMode::MODE_COUNT <= mode) {
+    LOG(ERROR, "incorrect SCC mode: " << to_string(mode));
     exit(EXIT_FAILURE);
   }
   LOG(DEBUG, "mode is valid");
 }
 void Config::ValidateMode(string& mode) const {
-  try {
-    if (str2modes_.count(mode) == 0) {
-      throw invalid_argument("invalid SCC mode: " + mode);
-    }
-  } catch (invalid_argument& ex) {
-    LOG(ERROR, ex.what());
+  if (str2modes_.count(mode) == 0) {
+    LOG(ERROR, "invalid SCC mode: " << mode);
     exit(EXIT_FAILURE);
   }
   LOG(DEBUG, "mode is valid");
 }
 void Config::ValidateSQLPath(string& sql_path) const{
-  // TODO: use <boost/filesystem.hpp>
+  if (!IsFileExists(sql_path)) {
+    LOG(ERROR, "SQL file does not exist: " << sql_path);
+    exit(EXIT_FAILURE);
+  }
   LOG(DEBUG, "SQL path is valid");
 }
 void Config::ValidateCypherPath(string& cypher_path) const {
-  // TODO: use <boost/filesystem.hpp>
+  if (!IsFileExists(output_)) {
+    LOG(ERROR, "Cypher file does not exist: " << cypher_path);
+    exit(EXIT_FAILURE);
+  }
   LOG(DEBUG, "Cypher path is valid");
 }
-Config::Config() {
-  mode_ = SCCMode::INTERACTIVE;
-  sql_path_ = "../resources/sql_queries.sql";
-  cypher_path_ = "../resources/cypher_queries.cypher";
+bool Config::IsFlagSet(OptFlag flag) {
+  return is_config_set_.at(flag_to_config_.at(flag));
 }
+void Config::ValidateSetFlag(OptFlag flag) {
+  if (IsFlagSet(flag)) {
+    LOG(ERROR, "conflicting flags");
+    exit(EXIT_FAILURE);
+  }
+}
+void Config::SetFlag(OptFlag flag) {
+  is_config_set_[flag_to_config_.at(flag)] = true;
+}
+
+Config::Config() {
+  string cwf_path = __FILE__;
+  string cwf = cwf_path.substr(cwf_path.find_last_of('/') + 1);
+  string path = cwf_path.substr(0, cwf_path.find(cwf));
+
+  mode_ = SCCMode::INTERACTIVE;
+  sql_path_ = cypher_path_ = path;
+  sql_path_ += "../resources/sql_queries.sql";
+  cypher_path_ += "../resources/cypher_queries.cypher";
+}
+void Config::Start() {
+  input_.open(sql_path_, ios::in);
+  output_.open(cypher_path_, ios::out);
+  ValidateCypherPath(cypher_path_);
+  // TODO: implement SCC mode behavior.
+}
+
 void Config::set_mode(SCCMode mode) {
   ValidateMode(mode);
   mode_ = mode;
@@ -128,18 +159,25 @@ void Config::set_sql_path(std::string& new_sql_path) {
   sql_path_ = new_sql_path;
 }
 void Config::set_cypher_path(std::string& new_cypher_path) {
-  ValidateCypherPath(new_cypher_path);
   cypher_path_ = new_cypher_path;
 }
+
 SCCMode Config::get_mode() const {
   return mode_;
 }
-std::string Config::get_sql_path() const {
+string Config::get_sql_path() const {
   return sql_path_;
 }
-std::string Config::get_cypher_path() const {
+string Config::get_cypher_path() const {
   return cypher_path_;
 }
+ifstream& Config::Input() {
+  return input_;
+}
+ofstream& Config::Output() {
+  return output_;
+}
+
 SCCMode Config::StringToSCCMode(std::string& mode) {
   for_each(begin(mode), end(mode),
            [](char& c) {
@@ -148,7 +186,10 @@ SCCMode Config::StringToSCCMode(std::string& mode) {
   ValidateMode(mode);
   return str2modes_.at(mode);
 }
-
+string Config::SCCModeToString(SCCMode mode) {
+  ValidateMode(mode);
+  return modes2str_.at(mode);
+}
 void Config::GetConsoleArguments(int argc, char* const* argv) {
   LOG(DEBUG, "parsing console arguments...");
 
@@ -171,17 +212,22 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
                              short_options,
                              long_options,
                              nullptr)) != -1) {
+    auto OF_flag = static_cast<OptFlag>(flag);
     switch (flag) {
       case OptFlag::fDAEMON:
-        LOG(TRACE, "set SCC mode = DAEMON");
+        ValidateSetFlag(OF_flag);
+        LOG(TRACE, "set SCC mode = " << config.SCCModeToString(SCCMode::DAEMON));
         config.set_mode(SCCMode::DAEMON);
+        SetFlag(OF_flag);
         break;
       case OptFlag::fHELP:
         LOG(INFO, "TODO: Get help");
         exit(EXIT_SUCCESS);
       case OptFlag::fINTERACTIVE:
-        LOG(TRACE, "set SCC mode = INTERACTIVE");
+        ValidateSetFlag(OF_flag);
+        LOG(TRACE, "set SCC mode = " << config.SCCModeToString(SCCMode::INTERACTIVE));
         config.set_mode(SCCMode::INTERACTIVE);
+        SetFlag(OF_flag);
         break;
       case OptFlag::fLOG:
         LOG(TRACE, "set log level = " << optarg);
@@ -191,25 +237,31 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
         }
         break;
       case OptFlag::fMODE:
+        ValidateSetFlag(OF_flag);
         LOG(TRACE, "set SCC mode = " << optarg);
         {
           string tmp_mode = optarg;
           config.set_mode(config.StringToSCCMode(tmp_mode));
         }
+        SetFlag(OF_flag);
         break;
       case OptFlag::fSQL:
+        ValidateSetFlag(OF_flag);
         LOG(TRACE, "set SQL path = " << optarg);
         {
           string tmp = optarg;
           config.set_sql_path(tmp);
         }
+        SetFlag(OF_flag);
         break;
       case OptFlag::fCYPHER:
+        ValidateSetFlag(OF_flag);
         LOG(TRACE, "set Cypher path = " << optarg);
         {
           string tmp = optarg;
           config.set_cypher_path(tmp);
         }
+        SetFlag(OF_flag);
         break;
       default:
         char f = short_options[optind+1];
@@ -223,4 +275,9 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
     }
   }
   LOG(DEBUG, "all console arguments are parsed");
+}
+
+Config::~Config() {
+  input_.close();
+  output_.close();
 }

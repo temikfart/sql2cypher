@@ -4,6 +4,6 @@ int main(int argc, char* argv[]) {
   LOG(INFO, "Starting system...");
   Configure(argc, argv);
   LOG(INFO, "System started");
-  
+
   return 0;
 }
