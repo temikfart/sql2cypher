@@ -1,4 +1,5 @@
 #pragma once
 
 #include <iostream>
-#include "SCC/conf.h"
+#include "SCC/config.h"
+#include "SCC/log.h"
