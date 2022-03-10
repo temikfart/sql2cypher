@@ -5,7 +5,7 @@ int main() {
   configure();
   LOG(INFO, "System started")
 
-  test_tree_func();
+  Tree::TestTree();
 
   return 0;
 }

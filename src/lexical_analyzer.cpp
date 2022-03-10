@@ -30,24 +30,64 @@ size_t Node::get_children_amount () {
   return children_.size();
 }
 
-//-----------------------------------------------
+//-------------------IntNode---------------------
 
-namespace Tree {
-  void PrintTreeRecursive(Node *node) {
-    node->print_data();
+IntNode::IntNode(int value): Node (N_type::NUMBER), data_(value) {}
 
-    if (node->get_children_amount() == 0)
-      return;
+int IntNode::get_data() const {
+  return data_;
+}
 
-    for (int i = 0; i < node->get_children_amount(); i++) {
-      PrintTreeRecursive(node->get_children(i));
-    }
+void IntNode::PrintData() {
+  std::cout << data_ << " ";
+}
+
+//-------------------CharNode--------------------
+
+CharNode::CharNode(char ch): Node (N_type::OPERATOR), data_(ch) {}
+
+char CharNode::get_data() {
+  return data_;
+}
+
+void CharNode::PrintData() {
+  std::cout << data_ << " ";
+}
+
+//-------------------StringNode------------------
+
+StringNode::StringNode(std::string&& string): Node (N_type::WORD), data_(string) {}
+
+std::string StringNode::get_data() {
+  return data_;
+}
+
+void StringNode::PrintData(){
+  std::cout << data_ << " ";
+}
+
+//-------------------RootNode--------------------
+
+RootNode::RootNode(): Node (N_type::ROOT) {}
+
+void RootNode::PrintData() {
+  std::cout << "ROOT" << " ";
+}
+
+//-------------------Tree------------------------
+
+void Tree::PrintTreeRecursive(Node *node) {
+  node->PrintData();
+
+  if (node->get_children_amount() == 0)
+    return;
+
+  for (int i = 0; i < node->get_children_amount(); i++) {
+    PrintTreeRecursive(node->get_children(i));
   }
 }
 
-using SNode = Node*;
-
-void test_tree_func() {
+void Tree::TestTree() {
   Node* root = new RootNode();
 
   root->add_children(new IntNode(125));
@@ -60,4 +100,6 @@ void test_tree_func() {
   child_node->add_children(new StringNode("lol"));
 
   Tree::PrintTreeRecursive(root);
+
+  delete root;
 }
