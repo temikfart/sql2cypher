@@ -14,9 +14,9 @@ N_type Node::get_type() {
   return type_;
 }
 
-Node* Node::get_children (int node_num) {
+Node* Node::get_children (size_t node_num) {
   if (node_num > children_.size()) {
-    LOG(ERROR, "Node number too big")
+    LOG(ERROR, "Node number too big");
     return nullptr;
   }
   return children_[node_num];
@@ -30,9 +30,16 @@ size_t Node::get_children_amount () {
   return children_.size();
 }
 
-//-------------------IntNode---------------------
+//-------------------NumNode---------------------
 template <typename Data_T>
 NumNode<Data_T>::NumNode(Data_T value): Node (N_type::NUMBER), data_(value) {}
+
+template <typename Data_T>
+NumNode<Data_T>::~NumNode() {
+    for(auto & node_ptr : children_) {
+        delete node_ptr;
+    }
+}
 
 template <typename Data_T>
 Data_T NumNode<Data_T>::get_data() const {
@@ -48,6 +55,12 @@ void NumNode<Data_T>::PrintData() {
 
 CharNode::CharNode(char ch): Node (N_type::OPERATOR), data_(ch) {}
 
+CharNode::~CharNode() {
+    for (auto &node_ptr: children_) {
+        delete node_ptr;
+    }
+}
+
 char CharNode::get_data() {
   return data_;
 }
@@ -59,6 +72,11 @@ void CharNode::PrintData() {
 //-------------------StringNode------------------
 
 StringNode::StringNode(std::string&& string): Node (N_type::WORD), data_(string) {}
+StringNode::~StringNode() {
+    for (auto &node_ptr: children_) {
+        delete node_ptr;
+    }
+}
 
 std::string StringNode::get_data() {
   return data_;
@@ -71,6 +89,11 @@ void StringNode::PrintData(){
 //-------------------RootNode--------------------
 
 RootNode::RootNode(): Node (N_type::ROOT) {}
+RootNode::~RootNode() {
+    for (auto &node_ptr: children_) {
+        delete node_ptr;
+    }
+}
 
 void RootNode::PrintData() {
   std::cout << "ROOT" << " ";
@@ -84,7 +107,7 @@ void Tree::PrintTreeRecursive(Node *node) {
   if (node->get_children_amount() == 0)
     return;
 
-  for (int i = 0; i < node->get_children_amount(); i++) {
+  for (size_t i = 0; i < node->get_children_amount(); i++) {
     PrintTreeRecursive(node->get_children(i));
   }
 }
