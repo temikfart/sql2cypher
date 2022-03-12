@@ -91,6 +91,9 @@ public:
   std::string get_sql_path() const;
   std::string get_cypher_path() const;
   std::ifstream& ReadSQL();
+  char GetLastSymbolSQL(); //TODO: attention: added by Roman
+  char CheckLastSymbolSQL(); //TODO: attention: added by Roman
+  bool IsEofInSQL(); //TODO: attention: added by Roman
   std::ofstream& WriteCypher();
   SCCMode StringToSCCMode(std::string& mode) const;
   std::string SCCModeToString(SCCMode mode) const;

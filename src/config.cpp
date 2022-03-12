@@ -107,6 +107,15 @@ string Config::get_cypher_path() const {
 ifstream& Config::ReadSQL() {
   return input_;
 }
+char Config::GetLastSymbolSQL() {
+  return (char)input_.get();
+}//TODO: attention: added by Roman
+char Config::CheckLastSymbolSQL() {
+  return (char)input_.peek();
+} //TODO: attention: added by Roman
+bool Config::IsEofInSQL() {
+  return input_.eof();
+}  //TODO: attention: added by Roman
 ofstream& Config::WriteCypher() {
   return output_;
 }
