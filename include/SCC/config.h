@@ -40,11 +40,11 @@ class Config: public Log {
 public:
   SCCMode mode_ = SCCMode::INTERACTIVE;
   
-  std::map<std::string, SCCMode> str2modes_ = {
+  const std::map<std::string, SCCMode> str2modes_ = {
     {"INTERACTIVE", SCCMode::INTERACTIVE},
     {"DAEMON",      SCCMode::DAEMON},
   };
-  std::map<SCCMode, std::string> modes2str_ = {
+  const std::map<SCCMode, std::string> modes2str_ = {
     {SCCMode::INTERACTIVE,  "INTERACTIVE"},
     {SCCMode::DAEMON,       "DAEMON"}
   };
@@ -61,7 +61,7 @@ public:
           {ConfigIsSet::ConfSQL,    false},
           {ConfigIsSet::ConfCYPHER, false},
   };
-  std::map<OptFlag, ConfigIsSet> flag_to_config_ = {
+  const std::map<OptFlag, ConfigIsSet> flag_to_config_ = {
           {OptFlag::fDAEMON,      ConfigIsSet::ConfMODE},
           {OptFlag::fINTERACTIVE, ConfigIsSet::ConfMODE},
           {OptFlag::fLOG,         ConfigIsSet::ConfLOG},
