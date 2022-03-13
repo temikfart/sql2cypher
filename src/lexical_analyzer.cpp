@@ -3,7 +3,7 @@
 //-------------------Tokenizer-------------------
 
 Tokenizer::~Tokenizer() {
-  for(auto token: tokens_array_)
+  for (auto token: tokens_array_)
     delete token;
 }
 
@@ -38,7 +38,7 @@ void Tokenizer::Tokenize() {
       break;
     } else {
       std::ostringstream message;
-      message << "Unknown symbol at string " << string_number;
+      message << "Unknown symbol \'" << another_symbol << "\' at string " << string_number;
       LOG(ERROR, message.str());
       exit(EXIT_FAILURE);
     }
@@ -51,8 +51,14 @@ void Tokenizer::GetNumber() {
 
   while (isdigit(config.CheckLastSymbolSQL()))
     data = 10.0 * data + config.GetLastSymbolSQL() - '0';
-  if (config.CheckLastSymbolSQL() == '.')
+
+  if (config.CheckLastSymbolSQL() == '.') {
     config.GetLastSymbolSQL();
+  } else {
+    tokens_array_.push_back(new IntNumNode((int)data));
+    return;
+  }
+
   while (isdigit(config.CheckLastSymbolSQL())) {
     data = 10.0 * data + config.GetLastSymbolSQL() - '0';
     power *= 10.0;
@@ -95,14 +101,10 @@ bool Tokenizer::IsPunctuation(char symbol) {
   return Tokenizer::IsCharacterFromArray(symbol, ":;,\'\"");
 }
 
-bool Tokenizer::IsCharacterFromArray(char ch, const std::string& array)
-{
+bool Tokenizer::IsCharacterFromArray(char ch, const std::string& array) {
   for(auto op: array)
     if (ch == op)
       return true;
 
   return false;
 }
-
-//-----------------------------------------------
-

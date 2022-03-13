@@ -52,7 +52,7 @@ public:
 };
 
 class FloatNumNode: public Node {
-  int data_;
+  double data_;
 public:
   explicit FloatNumNode(double value, DataType type = DataType::FLOAT_NUMBER);
   ~FloatNumNode() override;

@@ -8,7 +8,7 @@ int main(int argc, char* argv[]) {
 //  Tree::TestTree();
   Tokenizer tokenizer;
   tokenizer.Tokenize();
-  tokenizer.PrintTokens();
+//  tokenizer.PrintTokens();
 
   return 0;
 }

@@ -90,7 +90,16 @@ void CharNode::PrintData() {
   std::cout << data_ << " ";
 }
 void CharNode::PrintType() {
-  std::cout << "CHAR ";
+  switch (type_) {
+    case DataType::BRACKET:
+      std::cout << "BRACKET ";
+      break;
+    case DataType::FLOAT_NUMBER:
+      std::cout << "PUNCTUATION ";
+      break;
+    default:
+      std::cout << "WRONG_TYPE_FOR_THIS_NODE ";
+  }
 }
 
 //-------------------StringNode------------------
@@ -109,8 +118,18 @@ std::string StringNode::get_data() const{
 void StringNode::PrintData(){
   std::cout << data_ << " ";
 }
+
 void StringNode::PrintType() {
-  std::cout << "WORD ";
+  switch (type_) {
+    case DataType::WORD:
+      std::cout << "WORD ";
+      break;
+    case DataType::OPERATOR:
+      std::cout << "OPERATOR ";
+      break;
+    default:
+      std::cout << "WRONG_TYPE_FOR_THIS_NODE ";
+  }
 }
 
 //-------------------RootNode--------------------
