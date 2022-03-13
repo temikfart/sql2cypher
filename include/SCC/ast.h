@@ -28,9 +28,6 @@ public:
   size_t get_children_amount ();
   void AddChild(Node* node);
 
-//  virtual char get_data() = 0;
-//  virtual std::string get_data() = 0;  TODO: How to make get_data virtual method?
-
   virtual void PrintData() = 0;
   virtual void PrintType() = 0;
 
@@ -92,7 +89,7 @@ public:
 
 class RootNode: public Node {
 public:
-  RootNode(DataType type = DataType::ROOT);
+  explicit RootNode(DataType type = DataType::ROOT);
   ~RootNode() override;
 
   void PrintData() override;
