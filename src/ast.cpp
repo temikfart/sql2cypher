@@ -2,12 +2,12 @@
 
 //-------------------Node------------------------
 
-Node::Node(NodeType type): type_(type) {}
+Node::Node(DataType type): type_(type) {}
 Node::~Node() {
     LOG(DEBUG, "Node destructor is called");
 }
 
-NodeType Node::get_type() {
+DataType Node::get_type() {
   return type_;
 }
 Node* Node::get_child (size_t node_num) {
@@ -30,37 +30,53 @@ void Node::ValidateGetChild(size_t node_num) {
 }
 void Node::ValidateAddChild(Node* node){
   if (node == nullptr) {
-    LOG(ERROR, "node is nullptr");
+    LOG(ERROR, "Node is nullptr");
     exit(EXIT_FAILURE);
   }
 }
 
-//-------------------NumNode---------------------
-template <typename Data_T>
-NumNode<Data_T>::NumNode(Data_T value): Node (NodeType::NUMBER), data_(value) {}
-template <typename Data_T>
-NumNode<Data_T>::~NumNode() {
-    LOG(DEBUG, "NumNode destructor is called");
+//-------------------IntNumNode---------------------
+IntNumNode::IntNumNode(int value, DataType type): Node (type), data_(value) {}
+IntNumNode::~IntNumNode() {
     for(auto & node_ptr : children_) {
         delete node_ptr;
     }
 }
 
-template <typename Data_T>
-Data_T NumNode<Data_T>::get_data() const {
+int IntNumNode::get_data() const {
   return data_;
 }
 
-template <typename Data_T>
-void NumNode<Data_T>::PrintData() {
+void IntNumNode::PrintData() {
   std::cout << data_ << " ";
+}
+void IntNumNode::PrintType() {
+  std::cout << "INT_NUMBER ";
+}
+
+//-------------------FloatNumNode---------------------
+FloatNumNode::FloatNumNode(double value, DataType type): Node (type), data_(value) {}
+FloatNumNode::~FloatNumNode() {
+  for(auto & node_ptr : children_) {
+    delete node_ptr;
+  }
+}
+
+double FloatNumNode::get_data() const {
+  return data_;
+}
+
+void FloatNumNode::PrintData() {
+  std::cout << data_ << " ";
+}
+void FloatNumNode::PrintType() {
+  std::cout << "FLOAT_NUMBER ";
 }
 
 //-------------------CharNode--------------------
 
-CharNode::CharNode(char ch): Node (NodeType::OPERATOR), data_(ch) {}
+CharNode::CharNode(char ch, DataType type): Node (type), data_(ch) {}
 CharNode::~CharNode() {
-    LOG(DEBUG, "CharNode destructor is called");
     for (auto &node_ptr: children_) {
         delete node_ptr;
     }
@@ -73,12 +89,14 @@ char CharNode::get_data() const {
 void CharNode::PrintData() {
   std::cout << data_ << " ";
 }
+void CharNode::PrintType() {
+  std::cout << "CHAR ";
+}
 
 //-------------------StringNode------------------
 
-StringNode::StringNode(std::string&& string): Node (NodeType::WORD), data_(string) {}
+StringNode::StringNode(std::string&& string, DataType type): Node (type), data_(string) {}
 StringNode::~StringNode() {
-    LOG(DEBUG, "StringNode destructor is called");
     for (auto &node_ptr: children_) {
         delete node_ptr;
     }
@@ -91,12 +109,14 @@ std::string StringNode::get_data() const{
 void StringNode::PrintData(){
   std::cout << data_ << " ";
 }
+void StringNode::PrintType() {
+  std::cout << "WORD ";
+}
 
 //-------------------RootNode--------------------
 
-RootNode::RootNode(): Node (NodeType::ROOT) {}
+RootNode::RootNode(DataType type): Node (type) {}
 RootNode::~RootNode() {
-    LOG(DEBUG, "RootNode destructor is called");
     for (auto &node_ptr: children_) {
         delete node_ptr;
     }
@@ -104,6 +124,9 @@ RootNode::~RootNode() {
 
 void RootNode::PrintData() {
   std::cout << "ROOT" << " ";
+}
+void RootNode::PrintType() {
+  std::cout << "ROOT ";
 }
 
 //-------------------Tree------------------------
@@ -122,12 +145,13 @@ void Tree::PrintTreeRecursive(Node *node) {
 void Tree::TestTree() {
   Node* root = new RootNode();
 
-  root->AddChild(new NumNode<int>(1));
-  root->AddChild(new CharNode('?'));
-  root->AddChild(new StringNode("string"));
+  root->AddChild(new IntNumNode(1));
+  root->AddChild(new CharNode('?',  DataType::OPERATOR));
+  root->AddChild(new StringNode("string", DataType::WORD));
+  root->AddChild(new IntNumNode(1));
 
   Node* child_node = root->get_child(0);
-  std::cout << std::endl << static_cast<NumNode<int>*>(child_node)->get_data() << std::endl;
+  std::cout << std::endl << static_cast<IntNumNode*>(child_node)->get_data() << std::endl;
 
   Tree::PrintTreeRecursive(root);
 

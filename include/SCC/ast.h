@@ -4,23 +4,26 @@
 #include <iostream>
 #include <vector>
 
-enum NodeType {
+enum DataType {
   ROOT,
-  NUMBER,
+  INT_NUMBER,
+  FLOAT_NUMBER,
+  BRACKET,
+  PUNCTUATION,
   OPERATOR,
   WORD
 };
 
 class Node {
 protected:
-  const NodeType type_;
+  const DataType type_;
   std::vector<Node*> children_;
 
 public:
-  explicit Node(NodeType type);
+  explicit Node(DataType type);
   virtual ~Node();
 
-  NodeType get_type();
+  DataType get_type();
   Node* get_child (size_t node_num);
   size_t get_children_amount ();
   void AddChild(Node* node);
@@ -28,52 +31,72 @@ public:
 //  virtual char get_data() = 0;
 //  virtual std::string get_data() = 0;  TODO: How to make get_data virtual method?
 
+  virtual void PrintData() = 0;
+  virtual void PrintType() = 0;
+
+private:
   void ValidateGetChild(size_t node_num);
   void ValidateAddChild(Node* node);
-
-  virtual void PrintData() = 0;
 };
 
-template <typename Data_T>
-class NumNode: public Node {
-  Data_T data_;
+class IntNumNode: public Node {
+  int data_;
 public:
-  explicit NumNode(Data_T value);
-  ~NumNode() override;
+  explicit IntNumNode(int value, DataType type = DataType::INT_NUMBER);
+  ~IntNumNode() override;
 
-  Data_T get_data() const;
+  int get_data() const;
 
   void PrintData() override;
+  void PrintType() override;
+};
+
+class FloatNumNode: public Node {
+  int data_;
+public:
+  explicit FloatNumNode(double value, DataType type = DataType::FLOAT_NUMBER);
+  ~FloatNumNode() override;
+
+  double get_data() const;
+
+  void PrintData() override;
+  void PrintType() override;
+
 };
 
 class CharNode: public Node {
   char data_;
 public:
-  explicit CharNode(char ch);
+  explicit CharNode(char ch, DataType type);
   ~CharNode() override;
 
   char get_data() const;
 
   void PrintData() override;
+  void PrintType() override;
+
 };
 
 class StringNode: public Node {
   std::string data_;
 public:
-  explicit StringNode(std::string&& string);
+  explicit StringNode(std::string&& string, DataType type);
   ~StringNode() override;
 
   std::string get_data() const;
 
   void PrintData() override;
+  void PrintType() override;
+
 };
 
 class RootNode: public Node {
 public:
-  RootNode();
+  RootNode(DataType type = DataType::ROOT);
   ~RootNode() override;
 
   void PrintData() override;
+  void PrintType() override;
 };
 
 namespace Tree {
