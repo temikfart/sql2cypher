@@ -17,9 +17,14 @@ add_executable(SCC
 
 
 include(FetchContent)
+#FetchContent_Declare(
+#        googletest
+#        URL https://github.com/google/googletest/archive/e2239ee6043f73722e7aa812a459f54a28552929.zip
+#)
 FetchContent_Declare(
         googletest
-        URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG        e2239ee6043f73722e7aa812a459f54a28552929 # release-1.10.0
 )
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -30,11 +35,13 @@ enable_testing()
 set(TestExec SCC_Test_System)
 include_directories(include)
 add_executable(${TestExec}
-        test/config_test/config_test.cpp src/config.cpp src/log.cpp)
+        test/config_test/config_test.cpp src/config.cpp src/log.cpp
+        test/log_test/log_test.cpp src/log.cpp)
 
 target_link_libraries(
         ${TestExec}
         gtest_main
+        gmock
 )
 
 include(GoogleTest)

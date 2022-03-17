@@ -19,6 +19,7 @@
 } while(true)
 
 enum LogLevel {
+  SILENT,
   FATAL,
   ERROR,
   INFO,
@@ -34,18 +35,20 @@ private:
   LogLevel log_level_ = LogLevel::INFO;
   
   std::map<LogLevel, std::string> lvl2str_ = {
-    {LogLevel::FATAL, "FATAL"},
-    {LogLevel::ERROR, "ERROR"},
-    {LogLevel::INFO,  "INFO"},
-    {LogLevel::TRACE, "TRACE"},
-    {LogLevel::DEBUG, "DEBUG"}
+    {LogLevel::SILENT,  "SILENT"},
+    {LogLevel::FATAL,   "FATAL"},
+    {LogLevel::ERROR,   "ERROR"},
+    {LogLevel::INFO,    "INFO"},
+    {LogLevel::TRACE,   "TRACE"},
+    {LogLevel::DEBUG,   "DEBUG"},
   };
   std::map<std::string, LogLevel> str2lvl_ = {
-    {"FATAL", LogLevel::FATAL},
-    {"ERROR", LogLevel::ERROR},
-    {"INFO",  LogLevel::INFO},
-    {"TRACE", LogLevel::TRACE},
-    {"DEBUG", LogLevel::DEBUG}
+    {"SILENT",  LogLevel::SILENT},
+    {"FATAL",   LogLevel::FATAL},
+    {"ERROR",   LogLevel::ERROR},
+    {"INFO",    LogLevel::INFO},
+    {"TRACE",   LogLevel::TRACE},
+    {"DEBUG",   LogLevel::DEBUG}
   };
   
   std::string GetLogPath() const;
@@ -56,10 +59,10 @@ private:
   
 public:
   Log();
-  void AddLog(LogLevel level, const std::string& msg);
+  void AddLog(LogLevel level, const std::string msg);
   LogLevel get_log_level() const;
   void set_log_level(LogLevel level);
-  LogLevel StringToLogLevel(std::string& level) const;
+  LogLevel StringToLogLevel(std::string level) const;
   ~Log();
 };
 
