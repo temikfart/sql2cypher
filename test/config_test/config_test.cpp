@@ -1,65 +1,125 @@
 #include "gtest/gtest.h"
+#include "gmock/gmock.h"
 #include "SCC/config.h"
 
-TEST(SetGetConfigTests, DefaultModeTest) {
+using namespace testing;
+
+TEST(SetGetConfigTests, DefaultConfigTest) {
   Config tConf;
   
   EXPECT_EQ(SCCMode::INTERACTIVE, tConf.get_mode())
     << "default mode should be INTERACTIVE";
-}
-TEST(SetGetConfigTests, SetGetModeTest) {
-  Config tConf;
-  
-  SCCMode tType = SCCMode::INTERACTIVE;
-  tConf.set_mode(tType);
-  ASSERT_EQ(tType, tConf.get_mode());
-  
-  tType = SCCMode::DAEMON;
-  tConf.set_mode(tType);
-  ASSERT_EQ(tType, tConf.get_mode());
-}
-//TODO: catch EXIT_FAILURE from ValidateMode()
-TEST(SetGetConfigTests, DISABLED_InvalidModeTest) {
-  Config tConf;
-  
-  SCCMode tType = SCCMode::SCCMODE_COUNT;
-  tConf.set_mode(tType);
-  ASSERT_NE(tType, tConf.get_mode())
-    << "SCCMODE_COUNT should not be set";
-  
-  int t = SCCMode::SCCMODE_COUNT + 5;
-  tConf.set_mode(static_cast<SCCMode>(t));
-  ASSERT_NE(t, tConf.get_mode())
-    << "invalid mode should not be set";
-}
 
-TEST(SetGetConfigTests, DefaultSQLPathTest) {
-  Config tConf;
-  
-  std::string default_SQL_path =
-    tConf.GetConfigPath() + "../resources/sql_queries.sql";
-  EXPECT_EQ(default_SQL_path, tConf.get_sql_path())
-    << "default SQL path should be";
+  const std::string ConfigPath = tConf.GetConfigPath();
+  std::string SQL_path = ConfigPath + "../resources/sql_queries.sql";
+  std::string Cypher_path = ConfigPath + "../resources/cypher_queries.cypher";
+
+  EXPECT_EQ(SQL_path, tConf.get_sql_path())
+    << "default sql_path should be \"" << SQL_path << "\"";
+  EXPECT_EQ(Cypher_path, tConf.get_cypher_path())
+    << "default cypher_path should be \"" << Cypher_path << "\"";
 }
-TEST(SetGetConfigTests, SetGetSQLPathTest) {
+TEST(SetGetConfigTests, ValidModeTest) {
   Config tConf;
-  
-  std::string tSQL_path = tConf.GetConfigPath();
-  tSQL_path += "../resources/config_test_resources/";
-  
-  std::string tSQL_path_1 = tSQL_path + "test_sql_queries.sql";
-  tConf.set_sql_path(tSQL_path_1);
-  ASSERT_EQ(tSQL_path_1, tConf.get_sql_path());
+
+  tConf.set_mode(SCCMode::INTERACTIVE);
+  EXPECT_EQ(SCCMode::INTERACTIVE, tConf.get_mode());
+
+  tConf.set_mode(SCCMode::DAEMON);
+  EXPECT_EQ(SCCMode::DAEMON, tConf.get_mode());
 }
-// TODO: catch EXIT_FAILURE from ValidateSQLPath()
-TEST(SetGetConfigTests, DISABLED_InvalidSQLPathTest) {
+TEST(SetGetConfigTests, InvalidModeTest) {
   Config tConf;
-  
-  std::string tSQL_path = tConf.GetConfigPath();
-  tSQL_path += "../resources/config_test_resources/";
-  
-  std::string tSQL_path_2 = tSQL_path + "unexisting.sql";
-  tConf.set_sql_path(tSQL_path_2);
-  ASSERT_NE(tSQL_path_2, tConf.get_sql_path())
-    << "invalid SQL path should not be set";
+
+  EXPECT_EXIT(tConf.set_mode(SCCMode::SCCMODE_COUNT),
+              ExitedWithCode(EXIT_FAILURE),
+              "")
+    << "SCCMODE_COUNT should not be set";
+
+  EXPECT_EXIT(tConf.set_mode(SCCMode(100500)),
+              ExitedWithCode(EXIT_FAILURE),
+              "")
+    << "100500 mode should not be set";
 }
+TEST(SetGetConfigTests, SQLPathTest) {
+  Config tConf;
+
+  std::string SQL_path = tConf.GetConfigPath()
+                         + "../resources/config_test_resources/";
+  std::string Valid_SQL_path = SQL_path + "test_sql_queries.sql";
+  std::string Invalid_SQL_path = SQL_path + "invalid.sql";
+
+  tConf.set_sql_path(Valid_SQL_path);
+  EXPECT_EQ(Valid_SQL_path, tConf.get_sql_path())
+                << Valid_SQL_path << " should be set as SQL path";
+
+  EXPECT_EXIT(tConf.set_sql_path(Invalid_SQL_path),
+              ExitedWithCode(EXIT_FAILURE),
+              "")
+                << Invalid_SQL_path
+                << " does not exist, so should not be set as SQL path";
+}
+TEST(SetGetConfigTests, CypherPathTest) {
+  Config tConf;
+
+  std::string Cypher_path = tConf.GetConfigPath()
+                            + "../resources/config_test_resources/";
+  std::string Valid_Cypher_path = Cypher_path + "test_cypher_queries.cypher";
+
+  tConf.set_cypher_path(Valid_Cypher_path);
+  EXPECT_EQ(Valid_Cypher_path, tConf.get_cypher_path())
+                << Valid_Cypher_path << " should be set as Cypher path";
+}
+TEST(ConvertConfigTests, ValidStringToModeTest) {
+  Config tConf;
+
+  EXPECT_THAT(tConf.StringToSCCMode("InteRaCTivE"),
+              Eq(SCCMode::INTERACTIVE));
+  EXPECT_THAT(tConf.StringToSCCMode("DaeMOn"),
+              Eq(SCCMode::DAEMON));
+}
+TEST(ConvertConfigTests, InvalidStringToModeTest) {
+  Config tConf;
+
+  EXPECT_EXIT(tConf.StringToSCCMode(""),
+              ExitedWithCode(EXIT_FAILURE),
+              "")
+    << "empty string should not be converted to SCC mode";
+
+  EXPECT_EXIT(tConf.StringToSCCMode("Inter"),
+              ExitedWithCode(EXIT_FAILURE),
+              "")
+    << "\"Inter\" should not be converted to SCC mode";
+
+  EXPECT_EXIT(tConf.StringToSCCMode("DAEMO"),
+              ExitedWithCode(EXIT_FAILURE),
+              "")
+    << "\"DAEMO\" should not be converted to SCC mode";
+}
+TEST(ConvertConfigTests, ValidModeToStringTest) {
+  Config tConf;
+
+  EXPECT_THAT(tConf.SCCModeToString(SCCMode::INTERACTIVE),
+              Eq("INTERACTIVE"));
+  EXPECT_THAT(tConf.SCCModeToString(SCCMode::DAEMON),
+              Eq("DAEMON"));
+}
+TEST(ConvertConfigTests, InvalidModeToStringTest) {
+  Config tConf;
+
+  EXPECT_EXIT(tConf.SCCModeToString(SCCMode::SCCMODE_COUNT),
+              ExitedWithCode(EXIT_FAILURE),
+              "")
+    << "SCCMODE_COUNT should not be converted to string";
+
+  EXPECT_EXIT(tConf.SCCModeToString((SCCMode)(100500)),
+              ExitedWithCode(EXIT_FAILURE),
+              "")
+    << "100500 should not be converted to string";
+}
+// TODO: come up with tests for GetConsoleArguments() method.
+//TEST(GetConsoleArgumentsTests, WithoutArguments) {}
+//TEST(GetConsoleArgumentsTests, ValidSingleArgumentTest) {}
+//TEST(GetConsoleArgumentsTests, InvalidSingleArgumentTest) {}
+//TEST(GetConsoleArgumentsTests, ValidMultipleArgumentTest) {}
+//TEST(GetConsoleArgumentsTests, DuplicatedArgumentTest) {}

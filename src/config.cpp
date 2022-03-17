@@ -17,13 +17,6 @@ void Configure(int argc, char* argv[]) {
   LOG(TRACE, "Configuration is completed");
 }
 
-string Config::GetConfigPath() const {
-  string cwf_path = __FILE__;
-  string cwf = cwf_path.substr(cwf_path.find_last_of('/') + 1);
-  string path = cwf_path.substr(0, cwf_path.find(cwf));
-  
-  return path;
-}
 bool Config::IsFileExists(string& path) {
   struct stat buffer{};
   return (stat(path.c_str(), &buffer) == 0);
@@ -88,11 +81,11 @@ void Config::set_mode(SCCMode mode) {
   this->ValidateMode(mode);
   mode_ = mode;
 }
-void Config::set_sql_path(string& new_sql_path) {
+void Config::set_sql_path(string new_sql_path) {
   this->ValidateSQLPath(new_sql_path);
   sql_path_ = new_sql_path;
 }
-void Config::set_cypher_path(string& new_cypher_path) {
+void Config::set_cypher_path(string new_cypher_path) {
   cypher_path_ = new_cypher_path;
 }
 SCCMode Config::get_mode() const {
@@ -104,13 +97,20 @@ string Config::get_sql_path() const {
 string Config::get_cypher_path() const {
   return cypher_path_;
 }
+string Config::GetConfigPath() const {
+  string cwf_path = __FILE__;
+  string cwf = cwf_path.substr(cwf_path.find_last_of('/') + 1);
+  string path = cwf_path.substr(0, cwf_path.find(cwf));
+
+  return path;
+}
 ifstream& Config::ReadSQL() {
   return input_;
 }
 ofstream& Config::WriteCypher() {
   return output_;
 }
-SCCMode Config::StringToSCCMode(string& mode) const {
+SCCMode Config::StringToSCCMode(string mode) const {
   for_each(begin(mode), end(mode),
            [](char& c) {
     c = (char)::toupper(c);
