@@ -37,7 +37,7 @@ enum ConfigIsSet {
 };
 
 class Config: public Log {
-public:
+private:
   SCCMode mode_ = SCCMode::INTERACTIVE;
   
   std::map<std::string, SCCMode> str2modes_ = {
