@@ -10,7 +10,7 @@ TEST(SetGetLogTests, DefaultLogLevelTest) {
   EXPECT_EQ(LogLevel::INFO, tLog.get_log_level())
     << "default log level should be \'INFO\'";
 }
-TEST(SetGetLogTests, SetGetValidValuesTest) {
+TEST(SetGetLogTests, ValidValuesTest) {
   Log tLog;
   tLog.set_log_level(LogLevel::SILENT);
 
@@ -21,7 +21,7 @@ TEST(SetGetLogTests, SetGetValidValuesTest) {
   tLog.set_log_level(LL::TRACE);
   EXPECT_EQ(LL::TRACE, tLog.get_log_level());
 }
-TEST(SetGetLogTests, SetGetInvalidValuesTest) {
+TEST(SetGetLogTests, InvalidValuesTest) {
   Log tLog;
   tLog.set_log_level(LogLevel::SILENT);
 
@@ -39,12 +39,12 @@ TEST(ConvertLogTests, ValidStringToLevelTest) {
   Log tLog;
   tLog.set_log_level(LogLevel::SILENT);
 
-  EXPECT_THAT(tLog.StringToLogLevel("silENT"), LogLevel::SILENT);
-  EXPECT_THAT(tLog.StringToLogLevel("faTaL"), LogLevel::FATAL);
-  EXPECT_THAT(tLog.StringToLogLevel("ERROR"), LogLevel::ERROR);
-  EXPECT_THAT(tLog.StringToLogLevel("info"), LogLevel::INFO);
-  EXPECT_THAT(tLog.StringToLogLevel("TrAcE"), LogLevel::TRACE);
-  EXPECT_THAT(tLog.StringToLogLevel("DebuG"), LogLevel::DEBUG);
+  EXPECT_THAT(tLog.StringToLogLevel("silENT"), Eq(LogLevel::SILENT));
+  EXPECT_THAT(tLog.StringToLogLevel("faTaL"), Eq(LogLevel::FATAL));
+  EXPECT_THAT(tLog.StringToLogLevel("ERROR"), Eq(LogLevel::ERROR));
+  EXPECT_THAT(tLog.StringToLogLevel("info"), Eq(LogLevel::INFO));
+  EXPECT_THAT(tLog.StringToLogLevel("TrAcE"), Eq(LogLevel::TRACE));
+  EXPECT_THAT(tLog.StringToLogLevel("DebuG"), Eq(LogLevel::DEBUG));
 }
 TEST(ConvertLogTests, InvalidStringToLevelTest) {
   Log tLog;
