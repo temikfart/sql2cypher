@@ -1,18 +1,14 @@
 #pragma once
 
+#include <sstream>
 #include "SCC/ast.h"
 #include "SCC/config.h"
 #include "SCC/log.h"
-#include <sstream>
-
-enum TokensConstants {
-
-};
 
 class Tokenizer {
-  std::vector<Node*> tokens_array_;
+  std::vector<std::shared_ptr<Node>> tokens_array_;
 public:
-  ~Tokenizer();
+//  ~Tokenizer(); //TODO: come up how to make destructor
 
   void PrintTokens();
   void Tokenize();

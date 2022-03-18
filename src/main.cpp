@@ -1,4 +1,5 @@
 #include "SCC/main.h"
+#include <vector>
 
 int main(int argc, char* argv[]) {
   LOG(INFO, "Starting system...");
@@ -7,7 +8,7 @@ int main(int argc, char* argv[]) {
 
   Tokenizer tokenizer;
   tokenizer.Tokenize();
-//  tokenizer.PrintTokens();
+  tokenizer.PrintTokens();
 
   return 0;
 }
