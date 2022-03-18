@@ -2,16 +2,16 @@
 
 //-------------------Tokenizer-------------------
 
-Tokenizer::~Tokenizer() {
-  for (auto token: tokens_array_)
-    delete token;
-}
+//Tokenizer::~Tokenizer() {
+//  for (auto token: tokens_array_)
+//    delete token;
+//}
 
 void Tokenizer::PrintTokens() {
   for(auto token: tokens_array_) {
-    std::cout <<"data: ", token->PrintData();
+    std::cout <<"data: ", token->PrintData(std::cout);
     std::cout << "| ";
-    std::cout << "type: ", token->PrintType();
+    std::cout << "type: ", token->PrintType(std::cout);
     std::cout << std::endl;
   }
   std::cout << std::endl;
@@ -19,11 +19,11 @@ void Tokenizer::PrintTokens() {
 void Tokenizer::Tokenize() {
   int string_number = 1;
   while(true) {
-    char another_symbol = config.CheckLastSymbolSQL();
+    char another_symbol = config.GetSQLSymb();
     if (std::isspace(another_symbol)) {
       if (another_symbol == '\n')
         string_number++;
-      config.GetLastSymbolSQL();
+      config.GetSQLSymb();
     } else if (std::isdigit(another_symbol)) {
       this->GetNumber();
     } else if (std::isalpha(another_symbol)) {
@@ -38,7 +38,8 @@ void Tokenizer::Tokenize() {
       break;
     } else {
       std::ostringstream message;
-      message << "Unknown symbol \'" << another_symbol << "\' at string " << string_number;
+      message << "Unknown symbol \'" << another_symbol
+        << "\' at string " << string_number;
       LOG(ERROR, message.str());
       exit(EXIT_FAILURE);
     }
@@ -49,46 +50,50 @@ void Tokenizer::GetNumber() {
   double data = 0.0;
   double power = 1.0;
 
-  while (isdigit(config.CheckLastSymbolSQL()))
-    data = 10.0 * data + config.GetLastSymbolSQL() - '0';
+  while (isdigit(config.GetSQLSymb()))
+    data = 10.0 * data + config.GetSQLSymb() - '0';
 
-  if (config.CheckLastSymbolSQL() == '.') {
-    config.GetLastSymbolSQL();
+  if (config.GetSQLSymb() == '.') {
+    config.GetSQLSymb();
   } else {
-    tokens_array_.push_back(new IntNumNode((int)data));
+    tokens_array_.push_back(std::make_shared<IntNumNode>((int)data));
     return;
   }
 
-  while (isdigit(config.CheckLastSymbolSQL())) {
-    data = 10.0 * data + config.GetLastSymbolSQL() - '0';
+  while (isdigit(config.GetSQLSymb())) {
+    data = 10.0 * data + config.GetSQLSymb() - '0';
     power *= 10.0;
   }
   data = data / power;
 
-  tokens_array_.push_back(new FloatNumNode(data));
+  tokens_array_.push_back(std::make_shared<FloatNumNode>(data));
 }
 void Tokenizer::GetWord() {
   std::ostringstream data;
 
-  char another_symbol = config.CheckLastSymbolSQL();
-  while (isalpha(another_symbol) || isdigit(another_symbol) || another_symbol == '_') {
-    data << config.GetLastSymbolSQL();
-    another_symbol = config.CheckLastSymbolSQL();
+  char another_symbol = config.GetSQLSymb();
+  while (isalpha(another_symbol) || isdigit(another_symbol)
+         || another_symbol == '_') {
+    data << config.GetSQLSymb();
+    another_symbol = config.GetSQLSymb();
   }
 
-  tokens_array_.push_back(new StringNode(data.str(), DataType::WORD));
+  tokens_array_.push_back(std::make_shared<StringNode>(data.str(),
+                                                       DataType::WORD));
 }
 void Tokenizer::GetOperator() {
   std::ostringstream data;
 
-  data << config.GetLastSymbolSQL();
-  while (IsOperator(config.CheckLastSymbolSQL()))
-    data << config.GetLastSymbolSQL();
+  data << config.GetSQLSymb();
+  while (IsOperator(config.GetSQLSymb()))
+    data << config.GetSQLSymb();
 
-  tokens_array_.push_back(new StringNode(data.str(), DataType::OPERATOR));
+  tokens_array_.push_back(std::make_shared<StringNode>(data.str(),
+                                                       DataType::OPERATOR));
 }
 void Tokenizer::GetCharacter(DataType type) {
-  tokens_array_.push_back(new CharNode(config.GetLastSymbolSQL(), type));
+  tokens_array_.push_back(std::make_shared<CharNode>(config.GetSQLSymb(),
+                                                       type));
 }
 
 bool Tokenizer::IsOperator(char symbol) {
@@ -102,9 +107,10 @@ bool Tokenizer::IsPunctuation(char symbol) {
 }
 
 bool Tokenizer::IsCharacterFromArray(char ch, const std::string& array) {
-  for(auto op: array)
+  for (auto op: array) {
     if (ch == op)
       return true;
+  }
 
   return false;
 }

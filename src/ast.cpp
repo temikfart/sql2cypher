@@ -3,176 +3,151 @@
 //-------------------Node------------------------
 
 Node::Node(DataType type): type_(type) {}
-Node::~Node() {
-    LOG(DEBUG, "Node destructor is called");
-}
 
 DataType Node::get_type() {
   return type_;
 }
-Node* Node::get_child (size_t node_num) {
-  this->ValidateGetChild(node_num);
+std::shared_ptr<Node> Node::get_child (size_t node_num) {
+  this->ValidateChildNumber(node_num);
   return children_[node_num];
 }
 size_t Node::get_children_amount () {
   return children_.size();
 }
-void Node::AddChild(Node* node) {
-  this->ValidateAddChild(node);
+void Node::AddChild(std::shared_ptr<Node> const& node) {
+//  this->ValidateAddChild(node); //TODO: how to validate shared_ptr
   children_.push_back(node);
 }
 
-void Node::ValidateGetChild(size_t node_num) {
-  if (node_num > children_.size()) {
+void Node::ValidateChildNumber(size_t node_num) {
+  if (node_num >= children_.size()) {
     LOG(ERROR, "Node number too big");
-    exit(EXIT_FAILURE);
-  }
-}
-void Node::ValidateAddChild(Node* node){
-  if (node == nullptr) {
-    LOG(ERROR, "Node is nullptr");
     exit(EXIT_FAILURE);
   }
 }
 
 //-------------------IntNumNode---------------------
 IntNumNode::IntNumNode(int value, DataType type): Node (type), data_(value) {}
-IntNumNode::~IntNumNode() {
-    for(auto & node_ptr : children_) {
-        delete node_ptr;
-    }
-}
 
 int IntNumNode::get_data() const {
   return data_;
 }
 
-void IntNumNode::PrintData() {
-  std::cout << data_ << " ";
+void IntNumNode::PrintData(std::ostream &stream) {
+  stream << data_;
 }
-void IntNumNode::PrintType() {
-  std::cout << "INT_NUMBER ";
+void IntNumNode::PrintType(std::ostream &stream) {
+  stream << "INT_NUMBER";
 }
 
 //-------------------FloatNumNode---------------------
-FloatNumNode::FloatNumNode(double value, DataType type): Node (type), data_(value) {}
-FloatNumNode::~FloatNumNode() {
-  for(auto & node_ptr : children_) {
-    delete node_ptr;
-  }
-}
+FloatNumNode::FloatNumNode(double value, DataType type): Node (type),
+                                                         data_(value) {}
 
 double FloatNumNode::get_data() const {
   return data_;
 }
 
-void FloatNumNode::PrintData() {
-  std::cout << data_ << " ";
+void FloatNumNode::PrintData(std::ostream &stream) {
+  stream << data_;
 }
-void FloatNumNode::PrintType() {
-  std::cout << "FLOAT_NUMBER ";
+void FloatNumNode::PrintType(std::ostream &stream) {
+  stream << "FLOAT_NUMBER ";
 }
 
 //-------------------CharNode--------------------
 
 CharNode::CharNode(char ch, DataType type): Node (type), data_(ch) {}
-CharNode::~CharNode() {
-    for (auto &node_ptr: children_) {
-        delete node_ptr;
-    }
-}
 
 char CharNode::get_data() const {
   return data_;
 }
 
-void CharNode::PrintData() {
-  std::cout << data_ << " ";
+void CharNode::PrintData(std::ostream &stream) {
+  stream << data_;
 }
-void CharNode::PrintType() {
+void CharNode::PrintType(std::ostream &stream) {
   switch (type_) {
     case DataType::BRACKET:
-      std::cout << "BRACKET ";
+      stream << "BRACKET";
       break;
     case DataType::FLOAT_NUMBER:
-      std::cout << "PUNCTUATION ";
+      stream << "PUNCTUATION";
       break;
     default:
-      std::cout << "WRONG_TYPE_FOR_THIS_NODE ";
+      stream << "WRONG_TYPE_FOR_THIS_NODE";
   }
 }
 
 //-------------------StringNode------------------
 
-StringNode::StringNode(std::string&& string, DataType type): Node (type), data_(string) {}
-StringNode::~StringNode() {
-    for (auto &node_ptr: children_) {
-        delete node_ptr;
-    }
-}
+StringNode::StringNode(std::string&& string, DataType type): Node (type),
+                                                             data_(string) {}
 
 std::string StringNode::get_data() const{
   return data_;
 }
 
-void StringNode::PrintData(){
-  std::cout << data_ << " ";
+void StringNode::PrintData(std::ostream &stream) {
+  stream << data_;
 }
 
-void StringNode::PrintType() {
+void StringNode::PrintType(std::ostream &stream) {
   switch (type_) {
     case DataType::WORD:
-      std::cout << "WORD ";
+      stream << "WORD";
       break;
     case DataType::OPERATOR:
-      std::cout << "OPERATOR ";
+      stream << "OPERATOR";
       break;
     default:
-      std::cout << "WRONG_TYPE_FOR_THIS_NODE ";
+      stream << "WRONG_TYPE_FOR_THIS_NODE";
   }
 }
 
 //-------------------RootNode--------------------
 
 RootNode::RootNode(DataType type): Node (type) {}
-RootNode::~RootNode() {
-    for (auto &node_ptr: children_) {
-        delete node_ptr;
-    }
-}
 
-void RootNode::PrintData() {
-  std::cout << "ROOT" << " ";
+void RootNode::PrintData(std::ostream &stream) {
+  stream << "ROOT";
 }
-void RootNode::PrintType() {
-  std::cout << "ROOT ";
+void RootNode::PrintType(std::ostream &stream) {
+  stream << "ROOT";
 }
 
 //-------------------Tree------------------------
 
-void Tree::PrintTreeRecursive(Node *node) {
-  node->PrintData();
-  std::cout << std::endl;
+void Tree::PrintTreeRecursive(std::shared_ptr<Node> const &node,
+                              std::ostream &stream) {
+  node->PrintData(stream);
+  stream << std::endl;
 
   if (node->get_children_amount() == 0)
     return;
 
   for (size_t i = 0; i < node->get_children_amount(); i++) {
-    PrintTreeRecursive(node->get_child(i));
+    PrintTreeRecursive(node->get_child(i), std::cout);
   }
 }
 void Tree::TestTree() {
-  Node* root = new RootNode();
 
-  root->AddChild(new IntNumNode(1));
-  root->AddChild(new CharNode('?',  DataType::OPERATOR));
-  root->AddChild(new StringNode("string", DataType::WORD));
-  root->AddChild(new IntNumNode(1));
+  std::vector<std::shared_ptr<Node>> Nodes;
+  Nodes.push_back(std::make_shared<IntNumNode>(5));
+  Nodes.push_back(std::make_shared<IntNumNode>(6));
+  Nodes.push_back(std::make_shared<StringNode>("Hello",
+                                               DataType::WORD));
 
-  Node* child_node = root->get_child(0);
-  std::cout << std::endl << static_cast<IntNumNode*>(child_node)->get_data() << std::endl;
+  std::shared_ptr<IntNumNode> root = std::make_shared<IntNumNode>(5);
+  std::shared_ptr<IntNumNode> child1 = std::make_shared<IntNumNode>(10);
+  std::shared_ptr<StringNode> child2 = std::make_shared<StringNode>
+    ("Hello", DataType::WORD);
+  root->AddChild(child1);
+  root->AddChild(child2);
 
-  Tree::PrintTreeRecursive(root);
+  std::cout << root->get_data() << std::endl;
+  std::cout << child1->get_data() << std::endl;
+  std::cout << child2->get_data() << std::endl;
 
-  delete root;
+  root->get_data();
 }

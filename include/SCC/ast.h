@@ -1,8 +1,9 @@
 #pragma once
 
-#include "SCC/config.h"
 #include <iostream>
 #include <vector>
+#include <memory>
+#include "SCC/config.h"
 
 enum DataType {
   ROOT,
@@ -17,47 +18,45 @@ enum DataType {
 class Node {
 protected:
   const DataType type_;
-  std::vector<Node*> children_;
+  std::vector<std::shared_ptr<Node>> children_;
 
 public:
   explicit Node(DataType type);
-  virtual ~Node();
+//  virtual ~Node();
 
   DataType get_type();
-  Node* get_child (size_t node_num);
+  std::shared_ptr<Node> get_child (size_t node_num);
   size_t get_children_amount ();
-  void AddChild(Node* node);
+  void AddChild(std::shared_ptr<Node> const& node);
 
-  virtual void PrintData() = 0;
-  virtual void PrintType() = 0;
+  virtual void PrintData(std::ostream &stream) = 0;
+  virtual void PrintType(std::ostream &stream) = 0;
 
 private:
-  void ValidateGetChild(size_t node_num);
-  void ValidateAddChild(Node* node);
+  void ValidateChildNumber(size_t node_num);
+//  void ValidateAddChild(Node* node);
 };
 
 class IntNumNode: public Node {
   int data_;
 public:
   explicit IntNumNode(int value, DataType type = DataType::INT_NUMBER);
-  ~IntNumNode() override;
 
   int get_data() const;
 
-  void PrintData() override;
-  void PrintType() override;
+  void PrintData(std::ostream &stream) override;
+  void PrintType(std::ostream &stream) override;
 };
 
 class FloatNumNode: public Node {
   double data_;
 public:
   explicit FloatNumNode(double value, DataType type = DataType::FLOAT_NUMBER);
-  ~FloatNumNode() override;
 
   double get_data() const;
 
-  void PrintData() override;
-  void PrintType() override;
+  void PrintData(std::ostream &stream) override;
+  void PrintType(std::ostream &stream) override;
 
 };
 
@@ -65,12 +64,11 @@ class CharNode: public Node {
   char data_;
 public:
   explicit CharNode(char ch, DataType type);
-  ~CharNode() override;
 
   char get_data() const;
 
-  void PrintData() override;
-  void PrintType() override;
+  void PrintData(std::ostream &stream) override;
+  void PrintType(std::ostream &stream) override;
 
 };
 
@@ -78,26 +76,25 @@ class StringNode: public Node {
   std::string data_;
 public:
   explicit StringNode(std::string&& string, DataType type);
-  ~StringNode() override;
 
   std::string get_data() const;
 
-  void PrintData() override;
-  void PrintType() override;
+  void PrintData(std::ostream &stream) override;
+  void PrintType(std::ostream &stream) override;
 
 };
 
 class RootNode: public Node {
 public:
   explicit RootNode(DataType type = DataType::ROOT);
-  ~RootNode() override;
 
-  void PrintData() override;
-  void PrintType() override;
+  void PrintData(std::ostream &stream) override;
+  void PrintType(std::ostream &stream) override;
 };
 
 namespace Tree {
-  void PrintTreeRecursive(Node* node);
+  void
+  PrintTreeRecursive(std::shared_ptr<Node> const &node, std::ostream &stream);
 
   void TestTree();
 };

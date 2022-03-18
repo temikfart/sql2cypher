@@ -14,4 +14,4 @@ add_executable(SCC
         src/syntax_analyzer.cpp
         src/ast_handler.cpp
         src/query_assembler.cpp
-        src/ast.cpp)
+        src/ast.cpp test/ast_test.cpp)
