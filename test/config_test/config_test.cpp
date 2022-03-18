@@ -2,6 +2,9 @@
 #include "gmock/gmock.h"
 #include "SCC/config.h"
 
+#include <cstdlib>
+#include <cstring>
+
 using namespace testing;
 
 TEST(SetGetConfigTests, DefaultConfigTest) {
@@ -30,6 +33,7 @@ TEST(SetGetConfigTests, ValidModeTest) {
 }
 TEST(SetGetConfigTests, InvalidModeTest) {
   Config tConf;
+  SCC_log.set_log_level(LogLevel::SILENT);
 
   EXPECT_EXIT(tConf.set_mode(SCCMode::SCCMODE_COUNT),
               ExitedWithCode(EXIT_FAILURE),
@@ -43,6 +47,7 @@ TEST(SetGetConfigTests, InvalidModeTest) {
 }
 TEST(SetGetConfigTests, SQLPathTest) {
   Config tConf;
+  SCC_log.set_log_level(LogLevel::SILENT);
 
   std::string SQL_path = tConf.GetConfigPath()
                          + "../resources/config_test_resources/";
@@ -70,6 +75,7 @@ TEST(SetGetConfigTests, CypherPathTest) {
   EXPECT_EQ(Valid_Cypher_path, tConf.get_cypher_path())
                 << Valid_Cypher_path << " should be set as Cypher path";
 }
+
 TEST(ConvertConfigTests, ValidStringToModeTest) {
   Config tConf;
 
@@ -117,9 +123,157 @@ TEST(ConvertConfigTests, InvalidModeToStringTest) {
               "")
     << "100500 should not be converted to string";
 }
+
 // TODO: come up with tests for GetConsoleArguments() method.
-//TEST(GetConsoleArgumentsTests, WithoutArguments) {}
-//TEST(GetConsoleArgumentsTests, ValidSingleArgumentTest) {}
+class GetConsoleArgumentsTests : public ::testing::Test {
+protected:
+  Config tConf;
+  SCCMode def_mode;
+  std::string def_sql_path;
+  std::string def_cypher_path;
+  LogLevel def_log_level;
+
+  int argc = 1;
+  char* argv[10];
+
+
+  void SetUp() override {
+    def_mode = tConf.get_mode();
+    def_sql_path = tConf.get_sql_path();
+    def_cypher_path = tConf.get_cypher_path();
+    def_log_level = SCC_log.get_log_level();
+
+    for (auto & i : argv) {
+      i = nullptr;
+      i = (char*)(malloc(20));
+    }
+  }
+  void TearDown() override {
+    for (auto & i : argv) {
+      free(i);
+    }
+  }
+};
+TEST_F(GetConsoleArgumentsTests, WithoutArguments) {
+  argc = 1;
+  strcpy(argv[0], "./SCC");
+
+  tConf.GetConsoleArguments(argc, argv);
+
+  EXPECT_THAT(tConf.get_mode(), Eq(def_mode));
+  EXPECT_THAT(tConf.get_sql_path(), Eq(def_sql_path));
+  EXPECT_THAT(tConf.get_cypher_path(), Eq(def_cypher_path));
+  EXPECT_THAT(SCC_log.get_log_level(), Eq(def_log_level));
+}
+
+TEST_F(GetConsoleArgumentsTests, ValidModeFlagTest1) {
+  SCC_log.set_log_level(LogLevel::SILENT);
+
+  argc = 2;
+  strcpy(argv[0], "./SCC");
+  strcpy(argv[1], "--mode=inTEracTIVE");
+
+  tConf.GetConsoleArguments(argc, argv);
+
+  EXPECT_THAT(tConf.get_mode(), Eq(SCCMode::INTERACTIVE));
+  EXPECT_THAT(tConf.get_sql_path(), Eq(def_sql_path));
+  EXPECT_THAT(tConf.get_cypher_path(), Eq(def_cypher_path));
+  EXPECT_THAT(SCC_log.get_log_level(), Eq(LogLevel::SILENT));
+}
+//TEST_F(GetConsoleArgumentsTests, InvalidModeFlagTest1) {
+//  SCC_log.set_log_level(LogLevel::SILENT);
+//
+//  argc = 2;
+//  strcpy(argv[0], "./SCC");
+//  strcpy(argv[1], "--mode=inTEracT");
+//
+//  EXPECT_EXIT(tConf.GetConsoleArguments(argc, argv),
+//              ExitedWithCode(EXIT_FAILURE),
+//              "")
+//    << "\"inTEracT\" is an invalid mode";
+//}
+//TEST_F(GetConsoleArgumentsTests, ValidModeFlagTest2) {
+//  SCC_log.set_log_level(LogLevel::SILENT);
+//
+//  argc = 3;
+//  strcpy(argv[0], "./SCC");
+//  strcpy(argv[1], "--mode");
+//  strcpy(argv[2], "dAeMON");
+//
+//  tConf.GetConsoleArguments(argc, argv);
+//
+//  EXPECT_THAT(tConf.get_mode(), Eq(SCCMode::DAEMON));
+//  EXPECT_THAT(tConf.get_sql_path(), Eq(def_sql_path));
+//  EXPECT_THAT(tConf.get_cypher_path(), Eq(def_cypher_path));
+//  EXPECT_THAT(SCC_log.get_log_level(), Eq(LogLevel::SILENT));
+//}
+//TEST_F(GetConsoleArgumentsTests, InvalidModeFlagTest2) {
+//  SCC_log.set_log_level(LogLevel::SILENT);
+//
+//  argc = 3;
+//  strcpy(argv[0], "./SCC");
+//  strcpy(argv[1], "--mode");
+//
+//  EXPECT_EXIT(tConf.GetConsoleArguments(argc, argv),
+//              ExitedWithCode(EXIT_FAILURE),
+//              "")
+//    << "flag --mode must have an argument";
+//}
+//TEST_F(GetConsoleArgumentsTests, ValidModeFlagTest3) {
+//  SCC_log.set_log_level(LogLevel::SILENT);
+//
+//  argc = 2;
+//  strcpy(argv[0], "./SCC");
+//  strcpy(argv[1], "-m=interactive");
+//
+//  tConf.GetConsoleArguments(argc, argv);
+//
+//  EXPECT_THAT(tConf.get_mode(), Eq(SCCMode::INTERACTIVE));
+//  EXPECT_THAT(tConf.get_sql_path(), Eq(def_sql_path));
+//  EXPECT_THAT(tConf.get_cypher_path(), Eq(def_cypher_path));
+//  EXPECT_THAT(SCC_log.get_log_level(), Eq(LogLevel::SILENT));
+//}
+//TEST_F(GetConsoleArgumentsTests, InvalidModeFlagTest3) {
+//  SCC_log.set_log_level(LogLevel::SILENT);
+//
+//  argc = 2;
+//  strcpy(argv[0], "./SCC");
+//  strcpy(argv[1], "-m=nteractive");
+//
+//
+//  EXPECT_EXIT(tConf.GetConsoleArguments(argc, argv),
+//              ExitedWithCode(EXIT_FAILURE),
+//              "")
+//    << "\"nteractive\" is an invalid mode";
+//}
+//TEST_F(GetConsoleArgumentsTests, ValidModeFlagTest4) {
+//  SCC_log.set_log_level(LogLevel::SILENT);
+//
+//  argc = 3;
+//  strcpy(argv[0], "./SCC");
+//  strcpy(argv[1], "-m");
+//  strcpy(argv[2], "DAEMON");
+//
+//  tConf.GetConsoleArguments(argc, argv);
+//
+//  EXPECT_THAT(tConf.get_mode(), Eq(SCCMode::DAEMON));
+//  EXPECT_THAT(tConf.get_sql_path(), Eq(def_sql_path));
+//  EXPECT_THAT(tConf.get_cypher_path(), Eq(def_cypher_path));
+//  EXPECT_THAT(SCC_log.get_log_level(), Eq(LogLevel::SILENT));
+//}
+//TEST_F(GetConsoleArgumentsTests, InvalidModeFlagTest4) {
+//  SCC_log.set_log_level(LogLevel::SILENT);
+//
+//  argc = 3;
+//  strcpy(argv[0], "./SCC");
+//  strcpy(argv[1], "-m");
+//
+//  EXPECT_EXIT(tConf.GetConsoleArguments(argc, argv),
+//              ExitedWithCode(EXIT_FAILURE),
+//              "")
+//    << "flag -m must have an argument";
+//}
+
 //TEST(GetConsoleArgumentsTests, InvalidSingleArgumentTest) {}
 //TEST(GetConsoleArgumentsTests, ValidMultipleArgumentTest) {}
 //TEST(GetConsoleArgumentsTests, DuplicatedArgumentTest) {}
