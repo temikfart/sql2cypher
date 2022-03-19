@@ -73,10 +73,10 @@ private:
   static bool IsFileExists(const std::string& path);
   static bool IsFileExists(const std::ofstream& f);
   void ValidateMode(SCCMode mode) const;
-  void ValidateInputStream(const std::ifstream& input);
   void ValidateMode(const std::string& mode) const;
   void ValidateSQLPath(const std::string& sql_path) const;
   void ValidateCypherPath(const std::string& cypher_path) const;
+  void ValidateInputStream(const std::ifstream& input) const;
   bool IsFlagSet(OptFlag flag) const;
   void ValidateSetFlag(OptFlag flag) const;
   void SetFlag(OptFlag flag);

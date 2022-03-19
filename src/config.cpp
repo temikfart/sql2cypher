@@ -52,7 +52,7 @@ void Config::ValidateCypherPath(const string& cypher_path) const {
   }
   LOG(DEBUG, "Cypher path is valid");
 }
-void Config::ValidateInputStream(std::ifstream const& input) {
+void Config::ValidateInputStream(const std::ifstream& input) const {
   if (!input.is_open()) {
     LOG(ERROR, "input file stream is invalid");
     exit(EXIT_FAILURE);
