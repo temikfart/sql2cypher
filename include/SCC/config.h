@@ -76,6 +76,7 @@ private:
   void ValidateMode(const std::string& mode) const;
   void ValidateSQLPath(const std::string& sql_path) const;
   void ValidateCypherPath(const std::string& cypher_path) const;
+  void ValidateInputStream(const std::ifstream& input) const;
   bool IsFlagSet(OptFlag flag) const;
   void ValidateSetFlag(OptFlag flag) const;
   void SetFlag(OptFlag flag);
@@ -91,6 +92,8 @@ public:
   std::string get_cypher_path() const;
   std::string GetConfigPath() const;
   std::ifstream& ReadSQL();
+  char GetSQLSymb();
+  char PeekSQLSymb();
   std::ofstream& WriteCypher();
   SCCMode StringToSCCMode(std::string mode) const;
   std::string SCCModeToString(SCCMode mode) const;

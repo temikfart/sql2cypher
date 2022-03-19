@@ -52,6 +52,13 @@ void Config::ValidateCypherPath(const string& cypher_path) const {
   }
   LOG(DEBUG, "Cypher path is valid");
 }
+void Config::ValidateInputStream(const std::ifstream& input) const {
+  if (!input.is_open()) {
+    LOG(ERROR, "input file stream is invalid");
+    exit(EXIT_FAILURE);
+  }
+  LOG(DEBUG, "input file stream is valid");
+}
 bool Config::IsFlagSet(OptFlag flag) const {
   return is_config_set_.at(flag_to_config_.at(flag));
 }
@@ -105,7 +112,16 @@ string Config::GetConfigPath() const {
   return path;
 }
 ifstream& Config::ReadSQL() {
+  ValidateInputStream(input_);
   return input_;
+}
+char Config::GetSQLSymb() {
+  ValidateInputStream(input_);
+  return (char)input_.get();
+}
+char Config::PeekSQLSymb() {
+  ValidateInputStream(input_);
+  return (char)input_.peek();
 }
 ofstream& Config::WriteCypher() {
   return output_;
