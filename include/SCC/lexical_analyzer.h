@@ -19,6 +19,7 @@ private:
   void GetOperator();
   void GetCharacter(DataType type);
 
+public: //TODO:
   static bool IsOperator(char symbol);
   static bool IsBracket(char symbol);
   static bool IsPunctuation(char symbol);

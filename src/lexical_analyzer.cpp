@@ -102,14 +102,12 @@ bool Tokenizer::IsPunctuation(char symbol) {
 }
 
 bool Tokenizer::IsCharacterFromArray(char ch, const std::string& array) {
-  for (auto op : array) {
-    if (ch == op)
-      return true;
-  }
-  // TODO: check this code:
-//  std::any_of(array.begin(), array.end(), [](char op) {
-//    return (ch == op)
-//  });
-
-  return false;
+//  for (auto op : array) {
+//    if (ch == op)
+//      return true;
+//  }
+  //TODO: check this code:
+  return std::any_of(array.begin(), array.end(), [ch](char op) {
+    return (ch == op);
+  });
 }

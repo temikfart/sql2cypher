@@ -34,6 +34,7 @@ public:
 private:
   void ValidateChildNumber(size_t node_num) const;
   void ValidateAddChild(std::shared_ptr<Node> const& node) const;
+  virtual void ValidateType() const = 0;
 };
 
 class IntNumNode: public Node {
@@ -45,6 +46,9 @@ public:
 
   void PrintData(std::ostream &stream) override;
   void PrintType(std::ostream &stream) override;
+
+private:
+  void ValidateType() const override;
 };
 
 class FloatNumNode: public Node {
@@ -57,6 +61,8 @@ public:
   void PrintData(std::ostream &stream) override;
   void PrintType(std::ostream &stream) override;
 
+private:
+  void ValidateType() const override;
 };
 
 class CharNode: public Node {
@@ -69,6 +75,8 @@ public:
   void PrintData(std::ostream &stream) override;
   void PrintType(std::ostream &stream) override;
 
+private:
+  void ValidateType() const override;
 };
 
 class StringNode: public Node {
@@ -81,14 +89,19 @@ public:
   void PrintData(std::ostream &stream) override;
   void PrintType(std::ostream &stream) override;
 
+private:
+  void ValidateType() const override;
 };
 
 class RootNode: public Node {
 public:
-  explicit RootNode(DataType type = DataType::ROOT);
+  explicit RootNode();
 
   void PrintData(std::ostream &stream) override;
   void PrintType(std::ostream &stream) override;
+
+private:
+  void ValidateType() const override;
 };
 
 namespace Tree {

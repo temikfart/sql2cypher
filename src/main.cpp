@@ -7,7 +7,9 @@ int main(int argc, char* argv[]) {
 
   Tokenizer tokenizer;
   tokenizer.Tokenize();
-  tokenizer.PrintTokens();
+//  tokenizer.PrintTokens();
+
+  std::shared_ptr<IntNumNode> root = std::make_shared<IntNumNode>(5, DataType::WORD);
 
   return 0;
 }

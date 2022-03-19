@@ -21,11 +21,10 @@ void Node::AddChild(std::shared_ptr<Node> const& node) {
 
 void Node::ValidateChildNumber(size_t node_num) const {
   if (node_num >= children_.size()) {
-    LOG(ERROR, "Node number too big");
+    LOG(ERROR, "node number too big");
     exit(EXIT_FAILURE);
   }
 }
-
 void Node::ValidateAddChild(std::shared_ptr<Node> const& node) const {
   if (node == nullptr) {
     LOG(ERROR, "nullptr can not be added to the tree");
@@ -36,7 +35,9 @@ void Node::ValidateAddChild(std::shared_ptr<Node> const& node) const {
 
 //-------------------IntNumNode---------------------
 IntNumNode::IntNumNode(int value, DataType type)
-  : Node (type), data_(value) {}
+  : Node (type), data_(value) {
+  this->ValidateType();
+}
 
 
 int IntNumNode::get_data() const {
@@ -50,9 +51,18 @@ void IntNumNode::PrintType(std::ostream &stream) {
   stream << "INT_NUMBER";
 }
 
+void IntNumNode::ValidateType() const {
+  if (this->type_ != DataType::INT_NUMBER) {
+    LOG(ERROR, "wrong type for IntNumNode");
+    exit(EXIT_FAILURE);
+  }
+}
+
 //-------------------FloatNumNode---------------------
 FloatNumNode::FloatNumNode(double value, DataType type)
-  : Node (type), data_(value) {}
+  : Node (type), data_(value) {
+  this->ValidateType();
+}
 
 double FloatNumNode::get_data() const {
   return data_;
@@ -65,10 +75,19 @@ void FloatNumNode::PrintType(std::ostream &stream) {
   stream << "FLOAT_NUMBER";
 }
 
+void FloatNumNode::ValidateType() const {
+  if (this->type_ != DataType::FLOAT_NUMBER) {
+    LOG(ERROR, "wrong type for FloatNumNode");
+    exit(EXIT_FAILURE);
+  }
+}
+
 //-------------------CharNode--------------------
 
 CharNode::CharNode(char ch, DataType type)
-  : Node (type), data_(ch) {}
+  : Node (type), data_(ch) {
+  this->ValidateType();
+}
 
 char CharNode::get_data() const {
   return data_;
@@ -86,15 +105,26 @@ void CharNode::PrintType(std::ostream &stream) {
       stream << "PUNCTUATION";
       break;
     default:
-      // TODO: Add LOG(ERROR, msg) + exit;
-      stream << "WRONG_TYPE_FOR_THIS_NODE";
+      LOG(ERROR, "wrong type for CharNode, "
+                 "something wrong with validation of type");
+      exit(EXIT_FAILURE);
+  }
+}
+
+void CharNode::ValidateType() const {
+  if (this->type_ != DataType::BRACKET
+      && this->type_ != DataType::PUNCTUATION) {
+    LOG(ERROR, "wrong type for CharNode");
+    exit(EXIT_FAILURE);
   }
 }
 
 //-------------------StringNode------------------
 
 StringNode::StringNode(std::string&& string, DataType type)
-  : Node (type), data_(string) {}
+  : Node (type), data_(string) {
+  this->ValidateType();
+}
 
 std::string StringNode::get_data() const{
   return data_;
@@ -113,20 +143,37 @@ void StringNode::PrintType(std::ostream &stream) {
       stream << "OPERATOR";
       break;
     default:
-      // TODO: Add LOG(ERROR, msg) + exit;
-      stream << "WRONG_TYPE_FOR_THIS_NODE";
+      LOG(ERROR, "wrong type for StringNode, "
+                 "something wrong with validation of type");
+      exit(EXIT_FAILURE);
+  }
+}
+
+void StringNode::ValidateType() const {
+  if (this->type_ != DataType::WORD && this->type_ != DataType::OPERATOR) {
+    LOG(ERROR, "wrong type for StringNode");
+    exit(EXIT_FAILURE);
   }
 }
 
 //-------------------RootNode--------------------
 
-RootNode::RootNode(DataType type) : Node (type) {}
+RootNode::RootNode()  : Node(DataType::ROOT) {
+  this->ValidateType();
+}
 
 void RootNode::PrintData(std::ostream &stream) {
   stream << "ROOT";
 }
 void RootNode::PrintType(std::ostream &stream) {
   stream << "ROOT";
+}
+
+void RootNode::ValidateType() const {
+  if (this->type_ != DataType::ROOT) {
+    LOG(ERROR, "wrong type for RootNode");
+    exit(EXIT_FAILURE);
+  }
 }
 
 //-------------------Tree------------------------
