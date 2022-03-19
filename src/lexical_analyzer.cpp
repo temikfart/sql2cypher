@@ -10,7 +10,7 @@
 void Tokenizer::PrintTokens() {
   for(auto token: tokens_array_) {
     std::cout <<"data: ", token->PrintData(std::cout);
-    std::cout << "| ";
+    std::cout << " | ";
     std::cout << "type: ", token->PrintType(std::cout);
     std::cout << std::endl;
   }
@@ -19,7 +19,7 @@ void Tokenizer::PrintTokens() {
 void Tokenizer::Tokenize() {
   int string_number = 1;
   while(true) {
-    char another_symbol = config.GetSQLSymb();
+    char another_symbol = config.PeekSQLSymb();
     if (std::isspace(another_symbol)) {
       if (another_symbol == '\n')
         string_number++;
@@ -50,17 +50,17 @@ void Tokenizer::GetNumber() {
   double data = 0.0;
   double power = 1.0;
 
-  while (isdigit(config.GetSQLSymb()))
+  while (isdigit(config.PeekSQLSymb()))
     data = 10.0 * data + config.GetSQLSymb() - '0';
 
-  if (config.GetSQLSymb() == '.') {
+  if (config.PeekSQLSymb() == '.') {
     config.GetSQLSymb();
   } else {
     tokens_array_.push_back(std::make_shared<IntNumNode>((int)data));
     return;
   }
 
-  while (isdigit(config.GetSQLSymb())) {
+  while (isdigit(config.PeekSQLSymb())) {
     data = 10.0 * data + config.GetSQLSymb() - '0';
     power *= 10.0;
   }
@@ -71,11 +71,11 @@ void Tokenizer::GetNumber() {
 void Tokenizer::GetWord() {
   std::ostringstream data;
 
-  char another_symbol = config.GetSQLSymb();
+  char another_symbol = config.PeekSQLSymb();
   while (isalpha(another_symbol) || isdigit(another_symbol)
          || another_symbol == '_') {
     data << config.GetSQLSymb();
-    another_symbol = config.GetSQLSymb();
+    another_symbol = config.PeekSQLSymb();
   }
 
   tokens_array_.push_back(std::make_shared<StringNode>(data.str(),
@@ -85,7 +85,7 @@ void Tokenizer::GetOperator() {
   std::ostringstream data;
 
   data << config.GetSQLSymb();
-  while (IsOperator(config.GetSQLSymb()))
+  while (IsOperator(config.PeekSQLSymb()))
     data << config.GetSQLSymb();
 
   tokens_array_.push_back(std::make_shared<StringNode>(data.str(),

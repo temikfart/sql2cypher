@@ -29,6 +29,7 @@ void Node::ValidateChildNumber(size_t node_num) {
 //-------------------IntNumNode---------------------
 IntNumNode::IntNumNode(int value, DataType type): Node (type), data_(value) {}
 
+
 int IntNumNode::get_data() const {
   return data_;
 }
@@ -71,7 +72,7 @@ void CharNode::PrintType(std::ostream &stream) {
     case DataType::BRACKET:
       stream << "BRACKET";
       break;
-    case DataType::FLOAT_NUMBER:
+    case DataType::PUNCTUATION:
       stream << "PUNCTUATION";
       break;
     default:
