@@ -28,7 +28,7 @@ string Log::TimeToLogName(string timestamp) const {
 void Log::ValidateLogLevel(LogLevel level) const {
   if (LogLevel::LOG_LEVEL_COUNT <= level) {
     // TODO: resolve this log
-    cout << "incorrect SCC log level: " << to_string(level);
+    cerr << "incorrect SCC log level: " << to_string(level) << endl;
     exit(EXIT_FAILURE);
   }
 }
@@ -44,7 +44,7 @@ Log::Log() {
   filename_ = this->TimeToLogName(this->get_timestamp());
   output_.open(this->GetLogPath(), ios::out);
 }
-void Log::AddLog(LogLevel level, const string& msg) {
+void Log::AddLog(LogLevel level, const string msg) {
   this->ValidateLogLevel(level);
   
   ostringstream output;
@@ -63,7 +63,7 @@ void Log::set_log_level(LogLevel level) {
   this->ValidateLogLevel(level);
   log_level_ = level;
 }
-LogLevel Log::StringToLogLevel(string& level) const {
+LogLevel Log::StringToLogLevel(string level) const {
   for_each(begin(level), end(level),
            [](char& c) {
              c = (char)::toupper(c);
