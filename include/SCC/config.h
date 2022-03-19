@@ -70,12 +70,12 @@ private:
           {OptFlag::fSQL,         ConfigIsSet::ConfCYPHER}
   };
 
-  static bool IsFileExists(std::string& path);
+  static bool IsFileExists(const std::string& path);
   static bool IsFileExists(const std::ofstream& f);
   void ValidateMode(SCCMode mode) const;
-  void ValidateMode(std::string& mode) const;
-  void ValidateSQLPath(std::string& sql_path) const;
-  void ValidateCypherPath(std::string& cypher_path) const;
+  void ValidateMode(const std::string& mode) const;
+  void ValidateSQLPath(const std::string& sql_path) const;
+  void ValidateCypherPath(const std::string& cypher_path) const;
   bool IsFlagSet(OptFlag flag) const;
   void ValidateSetFlag(OptFlag flag) const;
   void SetFlag(OptFlag flag);
@@ -84,8 +84,8 @@ public:
   Config();
   void Start();
   void set_mode(SCCMode mode);
-  void set_sql_path(std::string new_sql_path);
-  void set_cypher_path(std::string new_cypher_path);
+  void set_sql_path(const std::string& new_sql_path);
+  void set_cypher_path(const std::string& new_cypher_path);
   SCCMode get_mode() const;
   std::string get_sql_path() const;
   std::string get_cypher_path() const;
