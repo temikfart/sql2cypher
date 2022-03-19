@@ -6,10 +6,10 @@
 #include "SCC/log.h"
 
 class Tokenizer {
+private:
   std::vector<std::shared_ptr<Node>> tokens_array_;
+  
 public:
-//  ~Tokenizer(); //TODO: come up how to make destructor
-
   void PrintTokens();
   void Tokenize();
 

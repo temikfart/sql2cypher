@@ -1,5 +1,4 @@
 #include "SCC/main.h"
-#include <vector>
 
 int main(int argc, char* argv[]) {
   LOG(INFO, "Starting system...");

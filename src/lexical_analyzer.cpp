@@ -2,14 +2,9 @@
 
 //-------------------Tokenizer-------------------
 
-//Tokenizer::~Tokenizer() {
-//  for (auto token: tokens_array_)
-//    delete token;
-//}
-
 void Tokenizer::PrintTokens() {
-  for(auto token: tokens_array_) {
-    std::cout <<"data: ", token->PrintData(std::cout);
+  for(const auto& token: tokens_array_) {
+    std::cout << "data: ", token->PrintData(std::cout);
     std::cout << " | ";
     std::cout << "type: ", token->PrintType(std::cout);
     std::cout << std::endl;
@@ -78,8 +73,8 @@ void Tokenizer::GetWord() {
     another_symbol = config.PeekSQLSymb();
   }
 
-  tokens_array_.push_back(std::make_shared<StringNode>(data.str(),
-                                                       DataType::WORD));
+  tokens_array_.push_back(
+    std::make_shared<StringNode>(data.str(),DataType::WORD));
 }
 void Tokenizer::GetOperator() {
   std::ostringstream data;
@@ -88,12 +83,12 @@ void Tokenizer::GetOperator() {
   while (IsOperator(config.PeekSQLSymb()))
     data << config.GetSQLSymb();
 
-  tokens_array_.push_back(std::make_shared<StringNode>(data.str(),
-                                                       DataType::OPERATOR));
+  tokens_array_.push_back(
+    std::make_shared<StringNode>(data.str(), DataType::OPERATOR));
 }
 void Tokenizer::GetCharacter(DataType type) {
-  tokens_array_.push_back(std::make_shared<CharNode>(config.GetSQLSymb(),
-                                                       type));
+  tokens_array_.push_back(
+    std::make_shared<CharNode>(config.GetSQLSymb(), type));
 }
 
 bool Tokenizer::IsOperator(char symbol) {
@@ -107,10 +102,14 @@ bool Tokenizer::IsPunctuation(char symbol) {
 }
 
 bool Tokenizer::IsCharacterFromArray(char ch, const std::string& array) {
-  for (auto op: array) {
+  for (auto op : array) {
     if (ch == op)
       return true;
   }
+  // TODO: check this code:
+//  std::any_of(array.begin(), array.end(), [](char op) {
+//    return (ch == op)
+//  });
 
   return false;
 }

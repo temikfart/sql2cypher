@@ -22,7 +22,6 @@ protected:
 
 public:
   explicit Node(DataType type);
-//  virtual ~Node();
 
   DataType get_type();
   std::shared_ptr<Node> get_child (size_t node_num);
@@ -33,8 +32,8 @@ public:
   virtual void PrintType(std::ostream &stream) = 0;
 
 private:
-  void ValidateChildNumber(size_t node_num);
-//  void ValidateAddChild(Node* node);
+  void ValidateChildNumber(size_t node_num) const;
+  void ValidateAddChild(std::shared_ptr<Node> const& node) const;
 };
 
 class IntNumNode: public Node {
@@ -93,8 +92,6 @@ public:
 };
 
 namespace Tree {
-  void
-  PrintTreeRecursive(std::shared_ptr<Node> const &node, std::ostream &stream);
-
-  void TestTree();
+  void PrintTreeRecursive(std::shared_ptr<Node> const &node,
+                          std::ostream &stream);
 };

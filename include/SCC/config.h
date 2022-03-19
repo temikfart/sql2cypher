@@ -77,7 +77,7 @@ private:
   void ValidateMode(std::string& mode) const;
   void ValidateSQLPath(std::string& sql_path) const;
   void ValidateCypherPath(std::string& cypher_path) const;
-  void ValidateInputFileStream(std::ifstream const& input);
+  void ValidateInputStream(std::ifstream const& input);
   bool IsFlagSet(OptFlag flag) const;
   void ValidateSetFlag(OptFlag flag) const;
   void SetFlag(OptFlag flag);
