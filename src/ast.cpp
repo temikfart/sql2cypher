@@ -1,5 +1,7 @@
 #include "SCC/ast.h"
 
+#include <utility>
+
 //-------------------Node------------------------
 
 Node::Node(DataType type) : type_(type) {}
@@ -7,13 +9,14 @@ Node::Node(DataType type) : type_(type) {}
 DataType Node::get_type() {
   return type_;
 }
-std::shared_ptr<Node> Node::get_child (size_t node_num) {
+std::shared_ptr<Node>& Node::get_child (size_t node_num) {
   this->ValidateChildNumber(node_num);
   return children_[node_num];
 }
 size_t Node::get_children_amount () {
   return children_.size();
 }
+
 void Node::AddChild(std::shared_ptr<Node> const& node) {
   this->ValidateAddChild(node);
   children_.push_back(node);
@@ -39,10 +42,18 @@ IntNumNode::IntNumNode(int value, DataType type)
   this->ValidateType();
 }
 
-
 int IntNumNode::get_data() const {
   return data_;
 }
+void IntNumNode::set_data(const int &data, DataType type) {
+  data_ = data;
+  type_ = type;
+  ValidateType();
+}
+void IntNumNode::set_data(const int &data) {
+  data_ = data;
+}
+
 
 void IntNumNode::PrintData(std::ostream &stream) {
   stream << data_;
@@ -66,6 +77,14 @@ FloatNumNode::FloatNumNode(double value, DataType type)
 
 double FloatNumNode::get_data() const {
   return data_;
+}
+void FloatNumNode::set_data(const double &data, DataType type) {
+  data_ = data;
+  type_ = type;
+  ValidateType();
+}
+void FloatNumNode::set_data(const double &data) {
+  data_ = data;
 }
 
 void FloatNumNode::PrintData(std::ostream &stream) {
@@ -91,6 +110,15 @@ CharNode::CharNode(char ch, DataType type)
 
 char CharNode::get_data() const {
   return data_;
+}
+void CharNode::set_data(const char &data, DataType type) {
+  data_ = data;
+  type_ = type;
+  ValidateType();
+}
+void CharNode::set_data(const char &data) {
+  data_ = data;
+
 }
 
 void CharNode::PrintData(std::ostream &stream) {
@@ -121,19 +149,26 @@ void CharNode::ValidateType() const {
 
 //-------------------StringNode------------------
 
-StringNode::StringNode(std::string&& string, DataType type)
-  : Node (type), data_(string) {
+StringNode::StringNode(std::string string, DataType type)
+  : Node (type), data_(std::move(string)) {
   this->ValidateType();
 }
 
 std::string StringNode::get_data() const{
   return data_;
 }
+void StringNode::set_data(const std::string &data, DataType type) {
+  data_ = data;
+  type_ = type;
+  ValidateType();
+}
+void StringNode::set_data(const std::string &data) {
+  data_ = data;
+}
 
 void StringNode::PrintData(std::ostream &stream) {
   stream << data_;
 }
-
 void StringNode::PrintType(std::ostream &stream) {
   switch (type_) {
     case DataType::WORD:

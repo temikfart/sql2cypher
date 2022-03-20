@@ -17,15 +17,16 @@ enum DataType {
 
 class Node {
 protected:
-  const DataType type_;
+  DataType type_;
   std::vector<std::shared_ptr<Node>> children_;
 
 public:
   explicit Node(DataType type);
 
   DataType get_type();
-  std::shared_ptr<Node> get_child (size_t node_num);
+  std::shared_ptr<Node>& get_child (size_t node_num);
   size_t get_children_amount ();
+
   void AddChild(std::shared_ptr<Node> const& node);
 
   virtual void PrintData(std::ostream &stream) = 0;
@@ -43,6 +44,8 @@ public:
   explicit IntNumNode(int value, DataType type = DataType::INT_NUMBER);
 
   int get_data() const;
+  void set_data(const int &data, DataType type);
+  void set_data(const int &data);
 
   void PrintData(std::ostream &stream) override;
   void PrintType(std::ostream &stream) override;
@@ -57,6 +60,8 @@ public:
   explicit FloatNumNode(double value, DataType type = DataType::FLOAT_NUMBER);
 
   double get_data() const;
+  void set_data(const double &data, DataType type);
+  void set_data(const double &data);
 
   void PrintData(std::ostream &stream) override;
   void PrintType(std::ostream &stream) override;
@@ -71,6 +76,9 @@ public:
   explicit CharNode(char ch, DataType type);
 
   char get_data() const;
+  void set_data(const char &data, DataType type);
+  void set_data(const char &data);
+
 
   void PrintData(std::ostream &stream) override;
   void PrintType(std::ostream &stream) override;
@@ -82,9 +90,11 @@ private:
 class StringNode: public Node {
   std::string data_;
 public:
-  explicit StringNode(std::string&& string, DataType type);
+  explicit StringNode(std::string string, DataType type);
 
   std::string get_data() const;
+  void set_data(const std::string &data, DataType type);
+  void set_data(const std::string &data);
 
   void PrintData(std::ostream &stream) override;
   void PrintType(std::ostream &stream) override;
