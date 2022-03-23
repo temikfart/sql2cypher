@@ -17,7 +17,7 @@ Keep this in mind when using our product.
 
 #### Table of contents
 
-1. [Opportunities. What queries can be converted?](#Opportunities.-What-queries-can-be-converted?)
+1. [Opportunities. What queries can be converted?](#Opportunities.-What-queries-can-be-converted)
 2. [Operating principle](#Operating-principle)
 3. [Installation](#Installation)
    1. [Linux](#Linux)
@@ -28,7 +28,7 @@ Keep this in mind when using our product.
    2. [Usage](#Usage)
       1. [Configuration via file](#Configuration-via-file)
       2. [Configuration via console flags](#Configuration-via-console-flags)
-5. [How to conduct testing?](#How-to-conduct-testing?)
+5. [How to conduct testing?](#How-to-conduct-testing)
    1. [GoogleTest](#GoogleTest)
    2. [Write your own unit-tests](#Write-your-own-unit-tests)
 6. [Documentation](#Documentation)
