@@ -7,6 +7,7 @@ on:
     - develop
   pull_request:
     types: [opened, closed]
+  workflow_dispatch:
 
 jobs:
   build-linux:
