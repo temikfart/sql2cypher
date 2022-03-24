@@ -22,4 +22,4 @@ jobs:
       run: cd build/ && make
       
     - name: Test
-      run: ctest
+      run: cd build/ && ctest
