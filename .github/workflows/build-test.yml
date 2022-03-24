@@ -18,5 +18,8 @@ jobs:
     - name: Build
       run: cmake -S . -B build
       
+    - name: Make
+      run: cd build/ && make
+      
     - name: Test
-      run: cd build/ && ctest
+      run: ctest
