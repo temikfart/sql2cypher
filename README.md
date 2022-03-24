@@ -1,4 +1,5 @@
 # SCC
+[![Build test](https://github.com/temikfart/sql2cypher/actions/workflows/build-test.yml/badge.svg)](https://github.com/temikfart/sql2cypher/actions/workflows/build-test.yml)
 ---
 ### SQL to Cypher QL Converter
 
