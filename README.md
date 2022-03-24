@@ -17,7 +17,7 @@ Keep this in mind when using our product.
 
 #### Table of contents
 
-1. [Opportunities. What queries can be converted?](#Opportunities.-What-queries-can-be-converted?)
+1. [Opportunities. What queries can be converted?](#Opportunities.-What-queries-can-be-converted)
 2. [Operating principle](#Operating-principle)
 3. [Installation](#Installation)
    1. [Linux](#Linux)
@@ -28,7 +28,7 @@ Keep this in mind when using our product.
    2. [Usage](#Usage)
       1. [Configuration via file](#Configuration-via-file)
       2. [Configuration via console flags](#Configuration-via-console-flags)
-5. [How to conduct testing?](#How-to-conduct-testing?)
+5. [How to conduct testing?](#How-to-conduct-testing)
    1. [GoogleTest](#GoogleTest)
    2. [Write your own unit-tests](#Write-your-own-unit-tests)
 6. [Documentation](#Documentation)
@@ -63,7 +63,25 @@ etc.
 ## Operating principle
 
 ---
-_Text..._
+Every SQL query from the input file goes through the following path:
+1. **Tokenization** _(Parsing on the tokens with own type, like as `word`, `operator`, etc.);_
+
+This step is the common parsing.
+The query will be introduce as tokens array at the end of tokenization.
+
+3. **Syntax Analyses** _(Analyzer introduces tokens array into AST);_
+
+**SCC** analyses tokens array via recursive descent and builds AST of the query.
+
+4. **AST handler** _(Preparing the AST to translation);_
+
+It is an intermediate step between the Analysis and Translation.
+The handler leads the AST to the correct introduction for the translation.
+
+5. **Query Assembler** _(AST analysing and translation into CQL)._
+
+Translation.
+The Assembler analyses the AST and searches for constructions for translation.
 
 ## Installation
 
@@ -114,7 +132,7 @@ _Text..._
 -d, --daemon        Starts the SCC in daemon mode.
                     (logs will be printed in the special log files into "log/")
 --log=lvl           Sets logging level to "lvl".
-                    Acceptable levels: FATAL, ERROR, INFO, TRACE, DEBUG.
+                    Acceptable levels: SILENT, FATAL, ERROR, INFO, TRACE, DEBUG.
 --sql=path          Pointer to the file with SQL queries, which will be converted.
 --cypher=path       Pointer to the file, where will be converted cypher queries.
 ```
