@@ -1,15 +1,20 @@
 #pragma once
 
 #include <sstream>
+#include <deque>
 #include "SCC/ast.h"
 #include "SCC/config.h"
 #include "SCC/log.h"
 
 class Tokenizer {
 private:
-  std::vector<std::shared_ptr<Node>> tokens_array_;
+  std::deque<std::shared_ptr<Node>> tokens_array_;
   
 public:
+  std::shared_ptr<Node>& peek_last_token();
+  std::shared_ptr<Node>& peek_first_token();
+  std::shared_ptr<Node> get_first_token();
+
   void PrintTokens();
   void Tokenize();
 
@@ -19,7 +24,7 @@ private:
   void GetOperator();
   void GetCharacter(DataType type);
 
-public: //TODO:
+public:
   static bool IsOperator(char symbol);
   static bool IsBracket(char symbol);
   static bool IsPunctuation(char symbol);

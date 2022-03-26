@@ -2,6 +2,18 @@
 
 //-------------------Tokenizer-------------------
 
+std::shared_ptr<Node>& Tokenizer::peek_last_token() {
+  return tokens_array_.back();
+}
+std::shared_ptr<Node>& Tokenizer::peek_first_token() {
+  return tokens_array_.front();
+}
+std::shared_ptr<Node> Tokenizer::get_first_token() {
+  std::shared_ptr<Node> node = tokens_array_.front();
+  tokens_array_.pop_front();
+  return node;
+}
+
 void Tokenizer::PrintTokens() {
   for(const auto& token: tokens_array_) {
     std::cout << "data: ", token->PrintData(std::cout);
@@ -102,11 +114,6 @@ bool Tokenizer::IsPunctuation(char symbol) {
 }
 
 bool Tokenizer::IsCharacterFromArray(char ch, const std::string& array) {
-//  for (auto op : array) {
-//    if (ch == op)
-//      return true;
-//  }
-  //TODO: check this code:
   return std::any_of(array.begin(), array.end(), [ch](char op) {
     return (ch == op);
   });
