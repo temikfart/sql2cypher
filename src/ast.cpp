@@ -4,8 +4,15 @@
 
 Node::Node(DataType type) : type_(type) {}
 
+void Node::set_st_type(StatementType type) {
+  this->ValidateStType(type);
+  st_type_ = type;
+}
 DataType Node::get_type() {
   return type_;
+}
+StatementType Node::get_st_type() {
+  return st_type_;
 }
 std::shared_ptr<Node> Node::get_child (size_t node_num) {
   this->ValidateChildNumber(node_num);
@@ -31,6 +38,13 @@ void Node::ValidateAddChild(std::shared_ptr<Node> const& node) const {
     exit(EXIT_FAILURE);
   }
   LOG(DEBUG, "adding node is valid");
+}
+void Node::ValidateStType(StatementType type) {
+  if (StatementType::StTypeCount <= type) {
+    LOG(ERROR, "incorrect StatementType: " << type);
+    exit(EXIT_FAILURE);
+  }
+  LOG(DEBUG, "StatementType is valid");
 }
 
 //-------------------IntNumNode---------------------

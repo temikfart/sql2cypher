@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include "SCC/config.h"
+#include "SCC/syntax_analyzer.h"
 
 enum DataType {
   ROOT,
@@ -18,12 +19,15 @@ enum DataType {
 class Node {
 protected:
   const DataType type_;
+  StatementType st_type_ = StatementType::EMPTY_TYPE;
   std::vector<std::shared_ptr<Node>> children_;
 
 public:
   explicit Node(DataType type);
 
+  void set_st_type(StatementType type);
   DataType get_type();
+  StatementType get_st_type();
   std::shared_ptr<Node> get_child (size_t node_num);
   size_t get_children_amount ();
   void AddChild(std::shared_ptr<Node> const& node);
@@ -34,6 +38,7 @@ public:
 private:
   void ValidateChildNumber(size_t node_num) const;
   void ValidateAddChild(std::shared_ptr<Node> const& node) const;
+  void ValidateStType(StatementType type);
   virtual void ValidateType() const = 0;
 };
 
