@@ -5,6 +5,7 @@
 //-------------------Node------------------------
 
 Node::Node(DataType type) : type_(type) {}
+Node::~Node() {}
 
 DataType Node::get_type() {
   return type_;

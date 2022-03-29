@@ -22,6 +22,7 @@ protected:
 
 public:
   explicit Node(DataType type);
+  virtual ~Node();
 
   DataType get_type();
   std::shared_ptr<Node>& get_child (size_t node_num);
