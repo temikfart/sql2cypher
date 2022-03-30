@@ -8,18 +8,24 @@ void Node::set_st_type(StatementType type) {
   this->ValidateStType(type);
   st_type_ = type;
 }
+void Node::set_parent(std::shared_ptr<Node>& node) {
+  parent_ = node;
+}
 DataType Node::get_type() {
   return type_;
 }
 StatementType Node::get_st_type() {
   return st_type_;
 }
-std::shared_ptr<Node> Node::get_child (size_t node_num) {
+std::shared_ptr<Node>& Node::get_child (size_t node_num) {
   this->ValidateChildNumber(node_num);
   return children_[node_num];
 }
 size_t Node::get_children_amount () {
   return children_.size();
+}
+std::shared_ptr<Node>& Node::get_parent() {
+  return parent_;
 }
 void Node::AddChild(std::shared_ptr<Node> const& node) {
   this->ValidateAddChild(node);
@@ -41,7 +47,7 @@ void Node::ValidateAddChild(std::shared_ptr<Node> const& node) const {
 }
 void Node::ValidateStType(StatementType type) {
   if (StatementType::StTypeCount <= type) {
-    LOG(ERROR, "incorrect StatementType: " << type);
+    LOG(ERROR, "invalid StatementType: " << type);
     exit(EXIT_FAILURE);
   }
   LOG(DEBUG, "StatementType is valid");

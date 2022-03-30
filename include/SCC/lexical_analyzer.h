@@ -12,6 +12,7 @@ private:
 public:
   void PrintTokens();
   void Tokenize();
+  std::vector<std::shared_ptr<Node>> get_tokens_array() const;
 
 private:
   void GetNumber();
@@ -19,7 +20,7 @@ private:
   void GetOperator();
   void GetCharacter(DataType type);
 
-public: //TODO:
+public:
   static bool IsOperator(char symbol);
   static bool IsBracket(char symbol);
   static bool IsPunctuation(char symbol);

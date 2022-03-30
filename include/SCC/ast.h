@@ -4,7 +4,23 @@
 #include <vector>
 #include <memory>
 #include "SCC/config.h"
-#include "SCC/syntax_analyzer.h"
+
+enum StatementType {
+  EMPTY_TYPE,
+  Program,
+  query,
+  ddlStatement,
+  dmlStatement,
+  alterTableStatement,
+  createDatabaseStatement,
+  createTableStatement,
+  dropDatabaseStatement,
+  dropTableStatement,
+  deleteStatement,
+  insertStatement,
+  updateStatement,
+  StTypeCount
+};
 
 enum DataType {
   ROOT,
@@ -20,16 +36,19 @@ class Node {
 protected:
   const DataType type_;
   StatementType st_type_ = StatementType::EMPTY_TYPE;
+  std::shared_ptr<Node> parent_ = nullptr;
   std::vector<std::shared_ptr<Node>> children_;
 
 public:
   explicit Node(DataType type);
 
   void set_st_type(StatementType type);
+  void set_parent(std::shared_ptr<Node>& parent);
   DataType get_type();
   StatementType get_st_type();
-  std::shared_ptr<Node> get_child (size_t node_num);
+  std::shared_ptr<Node>& get_child (size_t node_num);
   size_t get_children_amount ();
+  std::shared_ptr<Node>& get_parent();
   void AddChild(std::shared_ptr<Node> const& node);
 
   virtual void PrintData(std::ostream &stream) = 0;

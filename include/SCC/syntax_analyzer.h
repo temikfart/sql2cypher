@@ -8,45 +8,27 @@
 #include "SCC/log.h"
 #include "SCC/ast.h"
 
-enum StatementType {
-  EMPTY_TYPE,
-  Program,
-  query,
-  ddlStatement,
-  dmlStatement,
-//  alterTableStatement,
-//  createDatabaseStatement,
-//  createTableStatement,
-//  dropDatabaseStatement,
-//  dropTableStatement,
-//  deleteStatement,
-//  insertStatement,
-//  updateStatement
-  StTypeCount
-};
-
 class SyntaxAnalyzer {
-  using NodePtr = std::shared_ptr<Node>;
 public:
-  NodePtr Analyze(std::deque<NodePtr> tokens_array) {
-    tokens_array_ = std::move(tokens_array);
-    
-    return this->General();
-  }
+  std::shared_ptr<Node> Analyze(
+      std::deque<std::shared_ptr<Node>> tokens_array);
 
 private:
-  std::deque<NodePtr> tokens_array_;
-  
+  std::deque<std::shared_ptr<Node>> tokens_array_;
+
   /* Grammar rules */
-  // TODO: fix AST implementation. Can't return nothing except Node type
-//  std::shared_ptr<Node> General() {
-//    std::shared_ptr<IntNumNode> root = std::make_shared<IntNumNode>(5);
-//
-//    root->set_st_type(StatementType::query);
-//
-//    return root;
-//  }
-//  NodePtr GetDL() {
-//    std::
-//  }
+  std::shared_ptr<Node> General();
+  std::shared_ptr<Node> GetDL();
+  std::shared_ptr<Node> GetDDLSt();
+  std::shared_ptr<Node> GetDMLSt();
+  std::shared_ptr<Node> GetCreateDatabaseSt();
+  std::shared_ptr<Node> GetCreateTableSt();
+  std::shared_ptr<Node> GetAlterTableSt();
+  std::shared_ptr<Node> GetDropDatabaseSt();
+  std::shared_ptr<Node> GetDropTableSt();
+  std::shared_ptr<Node> GetInsertSt();
+  std::shared_ptr<Node> GetDeleteSt();
+  std::shared_ptr<Node> GetUpdateSt();
+
+  void ValidateIsFirstWord(std::shared_ptr<Node>& node) const;
 };

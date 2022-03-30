@@ -9,5 +9,10 @@ int main(int argc, char* argv[]) {
   tokenizer.Tokenize();
 //  tokenizer.PrintTokens();
 
+  SyntaxAnalyzer syntax_analyzer;
+
+//  std::shared_ptr<Node> AST =
+//      syntax_analyzer.Analyze(tokenizer.get_tokens_array());
+
   return 0;
 }
