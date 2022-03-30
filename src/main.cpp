@@ -9,5 +9,8 @@ int main(int argc, char* argv[]) {
   tokenizer.Tokenize();
   tokenizer.PrintTokens();
 
+  config.CloseOutputFile();
+  config.CloseInputFile();
+
   return 0;
 }

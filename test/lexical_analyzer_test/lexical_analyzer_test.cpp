@@ -28,10 +28,14 @@ TEST(CheckFunctionsTests, IsPunctuationTest) {
 }
 
 class TokenizerTests : public ::testing::Test {
-public:
+protected:
   Tokenizer tTokenizer;
-};
 
+  void TearDown() override {
+    config.CloseInputFile();
+    config.CloseOutputFile();
+  }
+};
 TEST_F(TokenizerTests, IntNumTest) {
   config.set_sql_path(config.GetConfigPath() +
                       "../resources/lexical_analyzer_test/int_num_test.sql");
@@ -42,14 +46,13 @@ TEST_F(TokenizerTests, IntNumTest) {
   EXPECT_EQ(51241235, (std::static_pointer_cast<IntNumNode>
     (tTokenizer.get_first_token()))->get_data());
 }
+TEST_F(TokenizerTests, FloatNumTest) {
+  config.set_sql_path(config.GetConfigPath() +
+                      "../resources/lexical_analyzer_test/float_num_test.sql");
+  config.Start();
 
-//TEST_F(TokenizerTests, FloatNumTest) { //TODO: fix cypher opening file
-//  config.set_sql_path(config.GetConfigPath() +
-//                      "../resources/lexical_analyzer_test/float_num_test.sql");
-//  config.Start();
-//
-//  tTokenizer.Tokenize();
-//
-//  EXPECT_DOUBLE_EQ(34623458.13249874081, (std::static_pointer_cast<FloatNumNode>
-//    (tTokenizer.get_first_token()))->get_data());
-//}
+  tTokenizer.Tokenize();
+
+  EXPECT_DOUBLE_EQ(34623458.13249874081, (std::static_pointer_cast<FloatNumNode>
+    (tTokenizer.get_first_token()))->get_data());
+}
