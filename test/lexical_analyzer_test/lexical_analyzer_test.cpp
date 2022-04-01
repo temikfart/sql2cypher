@@ -43,8 +43,9 @@ TEST_F(TokenizerTests, IntNumTest) {
 
   tTokenizer.Tokenize();
 
-  EXPECT_EQ(51241235, (std::static_pointer_cast<IntNumNode>
-    (tTokenizer.get_first_token()))->get_data());
+  std::shared_ptr<IntNumNode> node = std::make_shared<IntNumNode>(51241235);
+
+  EXPECT_TRUE(Node::IsNodesEqual(node, tTokenizer.get_first_token()));
 }
 TEST_F(TokenizerTests, FloatNumTest) {
   config.set_sql_path(config.GetConfigPath() +
@@ -53,6 +54,59 @@ TEST_F(TokenizerTests, FloatNumTest) {
 
   tTokenizer.Tokenize();
 
-  EXPECT_DOUBLE_EQ(34623458.13249874081, (std::static_pointer_cast<FloatNumNode>
-    (tTokenizer.get_first_token()))->get_data());
+  std::shared_ptr<FloatNumNode> node =
+      std::make_shared<FloatNumNode>(34623458.13249874081);
+
+  EXPECT_TRUE(Node::IsNodesEqual(node, tTokenizer.get_first_token()));
 }
+TEST_F(TokenizerTests, CharNodeTest) {
+  config.set_sql_path(config.GetConfigPath() +
+      "../resources/lexical_analyzer_test/char_test.sql");
+  config.Start();
+
+  tTokenizer.Tokenize();
+
+  std::shared_ptr<CharNode> node0 =
+      std::make_shared<CharNode>('{', DataType::BRACKET);
+  EXPECT_TRUE(Node::IsNodesEqual(node0, tTokenizer.get_first_token()));
+
+  std::shared_ptr<CharNode> node1 =
+      std::make_shared<CharNode>('}', DataType::BRACKET);
+  EXPECT_TRUE(Node::IsNodesEqual(node1, tTokenizer.get_first_token()));
+
+  std::shared_ptr<CharNode> node2 =
+      std::make_shared<CharNode>(',', DataType::PUNCTUATION);
+  EXPECT_TRUE(Node::IsNodesEqual(node2, tTokenizer.get_first_token()));
+
+  std::shared_ptr<CharNode> node3 =
+      std::make_shared<CharNode>(';', DataType::PUNCTUATION);
+  EXPECT_TRUE(Node::IsNodesEqual(node3, tTokenizer.get_first_token()));
+}
+TEST_F(TokenizerTests, StringNodeTest) {
+  config.set_sql_path(config.GetConfigPath() +
+      "../resources/lexical_analyzer_test/string_test.sql");
+  config.Start();
+
+  tTokenizer.Tokenize();
+
+  std::shared_ptr<StringNode> node0 =
+      std::make_shared<StringNode>("TheString_12", DataType::WORD);
+  EXPECT_TRUE(Node::IsNodesEqual(node0, tTokenizer.get_first_token()));
+
+  std::shared_ptr<StringNode> node1 =
+      std::make_shared<StringNode>("=", DataType::OPERATOR);
+  EXPECT_TRUE(Node::IsNodesEqual(node1, tTokenizer.get_first_token()));
+
+  std::shared_ptr<StringNode> node2 =
+      std::make_shared<StringNode>(">=", DataType::OPERATOR);
+  EXPECT_TRUE(Node::IsNodesEqual(node2, tTokenizer.get_first_token()));
+}
+TEST_F(TokenizerTests, InvalidTest) {
+  config.set_sql_path(config.GetConfigPath() +
+      "../resources/lexical_analyzer_test/invalid_test.sql");
+  config.Start();
+
+  EXPECT_EXIT(tTokenizer.Tokenize(), ExitedWithCode(EXIT_FAILURE) , "")
+    << "№ is an invalid character";
+}
+

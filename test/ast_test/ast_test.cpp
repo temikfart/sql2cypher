@@ -479,3 +479,23 @@ TEST_F(GeneralNodeTests, InvalidGetChildrenAmountTest) {
   EXPECT_EXIT(root->get_child(-1), ExitedWithCode(EXIT_FAILURE), "")
     << "child number bigger than child amount";
 }
+TEST_F(GeneralNodeTests, ComprassionOperatorTest) {
+//  std::shared_ptr<RootNode> root1 = root; //TODO: how to copy data from root to root1 without making them related
+
+  std::shared_ptr<RootNode> root1 = std::make_shared<RootNode>();
+  root1->AddChild(node0);
+  root1->AddChild(node1);
+  root1->AddChild(node2);
+  root1->AddChild(node3);
+  EXPECT_TRUE(Node::IsNodesEqual(root1, root));
+
+  root1->AddChild(std::make_shared<IntNumNode>(5));
+  EXPECT_FALSE(Node::IsNodesEqual(root1, root));
+
+  root->AddChild(node0);
+  EXPECT_TRUE(Node::IsNodesEqual(root1, root));
+
+  std::dynamic_pointer_cast<IntNumNode>
+      (root1->get_child(4))->set_data(100);
+  EXPECT_FALSE(Node::IsNodesEqual(root1, root));
+}

@@ -24,11 +24,13 @@ public:
   explicit Node(DataType type);
   virtual ~Node();
 
-  DataType get_type();
+  DataType get_type() const;
   std::shared_ptr<Node>& get_child (size_t node_num);
-  size_t get_children_amount ();
+  size_t get_children_amount () const;
 
   void AddChild(std::shared_ptr<Node> const& node);
+  static bool IsNodesEqual(const std::shared_ptr<Node>& node1,
+                           const std::shared_ptr<Node>& node2);
 
   virtual void PrintData(std::ostream &stream) = 0;
   virtual void PrintType(std::ostream &stream) = 0;
@@ -119,3 +121,9 @@ namespace Tree {
   void PrintTreeRecursive(std::shared_ptr<Node> const &node,
                           std::ostream &stream);
 };
+
+//bool operator== (std::shared_ptr<Node> const& lhs, //TODO: decide how to implement operator== for shared_ptr<Node>
+//                 std::shared_ptr<Node> const& rhs);
+//
+//bool operator!= (std::shared_ptr<Node> const& lhs,
+//                 std::shared_ptr<Node> const& rhs);

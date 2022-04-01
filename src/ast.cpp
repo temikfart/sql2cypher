@@ -7,20 +7,69 @@
 Node::Node(DataType type) : type_(type) {}
 Node::~Node() {}
 
-DataType Node::get_type() {
+DataType Node::get_type() const {
   return type_;
 }
 std::shared_ptr<Node>& Node::get_child (size_t node_num) {
   this->ValidateChildNumber(node_num);
   return children_[node_num];
 }
-size_t Node::get_children_amount () {
+size_t Node::get_children_amount () const {
   return children_.size();
 }
 
 void Node::AddChild(std::shared_ptr<Node> const& node) {
   this->ValidateAddChild(node);
   children_.push_back(node);
+}
+bool Node::IsNodesEqual(const std::shared_ptr<Node>& node1,
+                         const std::shared_ptr<Node>& node2) {
+  if (node1->get_type() != node2->get_type() ||
+      node1->get_children_amount() != node2->get_children_amount()) { //TODO: add parent ptr comparison
+    return false;
+  }
+
+  switch (node1->get_type()) {
+    case DataType::ROOT:
+      break;
+    case DataType::INT_NUMBER:
+    {
+      int data1 = std::dynamic_pointer_cast<IntNumNode>(node1)->get_data();
+      int data2 = std::dynamic_pointer_cast<IntNumNode>(node2)->get_data();
+    }
+      if (std::dynamic_pointer_cast<IntNumNode>(node1)->get_data() !=
+          std::dynamic_pointer_cast<IntNumNode>(node2)->get_data()) {
+        return false;
+      }
+      break;
+    case DataType::FLOAT_NUMBER:
+      if (std::dynamic_pointer_cast<FloatNumNode>(node1)->get_data() !=
+          std::dynamic_pointer_cast<FloatNumNode>(node2)->get_data()) {
+        return false;
+      }
+      break;
+    case DataType::PUNCTUATION: case DataType::BRACKET: //TODO: decide how to check node type: make a functions or make a new field node_type_
+      if (std::dynamic_pointer_cast<CharNode>(node1)->get_data() !=
+          std::dynamic_pointer_cast<CharNode>(node2)->get_data()) {
+        return false;
+      }
+      break;
+    case DataType::WORD: case DataType::OPERATOR:
+      if (std::dynamic_pointer_cast<StringNode>(node1)->get_data() !=
+          std::dynamic_pointer_cast<StringNode>(node2)->get_data()) {
+        return false;
+      }
+      break;
+  }
+
+  size_t children_amount = node1->get_children_amount();
+  for (size_t i = 0; i < children_amount; i++) {
+    if (!IsNodesEqual(node1->get_child(i),
+                      node2->get_child(i)))
+      return false;
+  }
+
+  return true;
 }
 
 void Node::ValidateChildNumber(size_t node_num) const {
@@ -226,3 +275,53 @@ void Tree::PrintTreeRecursive(std::shared_ptr<Node> const &node,
     PrintTreeRecursive(node->get_child(i), std::cout);
   }
 }
+
+//bool operator== (std::shared_ptr<Node> const& lhs,
+//                 std::shared_ptr<Node> const& rhs) {
+//  if (lhs->get_type() != rhs->get_type() ||
+//      lhs->get_children_amount() != rhs->get_children_amount()) {
+//    return false;
+//  }
+//
+//  switch (lhs->get_type()) {
+//    case DataType::ROOT:
+//      return true;
+//    case DataType::INT_NUMBER:
+//      if (std::dynamic_pointer_cast<IntNumNode>(lhs)->get_data() !=
+//          std::dynamic_pointer_cast<IntNumNode>(rhs)->get_data()) {
+//        return false;
+//      }
+//      break;
+//    case DataType::FLOAT_NUMBER:
+//      if (std::dynamic_pointer_cast<FloatNumNode>(lhs)->get_data() !=
+//          std::dynamic_pointer_cast<FloatNumNode>(rhs)->get_data()) {
+//        return false;
+//      }
+//      break;
+//    case DataType::PUNCTUATION: case DataType::BRACKET:
+//      if (std::dynamic_pointer_cast<CharNode>(lhs)->get_data() !=
+//          std::dynamic_pointer_cast<CharNode>(rhs)->get_data()) {
+//        return false;
+//      }
+//      break;
+//    case DataType::WORD: case DataType::OPERATOR:
+//      if (std::dynamic_pointer_cast<StringNode>(lhs)->get_data() !=
+//          std::dynamic_pointer_cast<StringNode>(rhs)->get_data()) {
+//        return false;
+//      }
+//      break;
+//  }
+//
+//  size_t children_amount = lhs->get_children_amount();
+//  for (size_t i = 0; i < children_amount; i++) {
+//    if (!(lhs->get_child(i) == rhs->get_child(i)))
+//      return false;
+//  }
+//
+//  return true;
+//}
+//
+//bool operator!= (std::shared_ptr<Node> const& lhs,
+//                 std::shared_ptr<Node> const& rhs) {
+//  return !(lhs == rhs);
+//}
