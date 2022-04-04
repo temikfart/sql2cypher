@@ -228,6 +228,34 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
   }
   LOG(DEBUG, "all console arguments are parsed");
 }
+void Config::CloseOutputFile() {
+  LOG(DEBUG, "closing output file...");
+  if (output_.is_open()) {
+    output_.close();
+    if (output_.good()) {
+      LOG(DEBUG, "output file closed successfully");
+    } else {
+      LOG(ERROR, "output file close error");
+      exit(EXIT_FAILURE);
+    }
+  } else {
+    LOG(DEBUG, "output file is already closed");
+  }
+}
+void Config::CloseInputFile() {
+  LOG(DEBUG, "closing input file...");
+  if (input_.is_open()) {
+    input_.close();
+    if (input_.good() || input_.eof()) {
+      LOG(DEBUG, "input file closed successfully");
+    } else {
+      LOG(ERROR, "input file close error");
+      exit(EXIT_FAILURE);
+    }
+  } else {
+    LOG(DEBUG, "input file is already closed");
+  }
+}
 
 Config::~Config() {
   input_.close();
