@@ -28,7 +28,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDL() {
   auto first_token = tokens_array_.front();
   std::shared_ptr<StringNode> key_word_node;
 
-  this->ValidateIsFirstWord(first_token);
+  this->ValidateIsWord(first_token);
   key_word_node = std::dynamic_pointer_cast<StringNode>(first_token);
 
   std::string key_word = key_word_node->get_data();
@@ -64,7 +64,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDDLSt() {
   if (tokens_array_.empty()) {
     return node;
   }
-  this->ValidateIsFirstWord(tokens_array_.front());
+  this->ValidateIsWord(tokens_array_.front());
   std::shared_ptr<StringNode> second_key_word_node =
       std::dynamic_pointer_cast<StringNode>(tokens_array_.front());
   tokens_array_.pop_front();
@@ -82,7 +82,6 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDDLSt() {
 
   if (is_CREATE) {                            // CREATE
     if (is_DATABASE) {
-      child->set_st_type(StatementType::createDatabaseStatement);
       child = this->GetCreateDatabaseSt();
     } else if (is_TABLE) {
       child->set_st_type(StatementType::createTableStatement);
@@ -143,13 +142,17 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDMLSt() {
 
 // DDL
 std::shared_ptr<Node> SyntaxAnalyzer::GetCreateDatabaseSt() {
-  std::shared_ptr<Node> node;
+  std::shared_ptr<Node> node, database_name;
+  node->set_st_type(StatementType::createDatabaseStatement);
 
-  if (tokens_array_.empty()) {
-    return node;
+  if (!tokens_array_.empty()) {
+    this->ValidateIsWord(tokens_array_.front());
+    database_name = this->GetName();
+    node->AddChild(database_name);
+    database_name->set_parent(node);
+  } else {
+    LOG(ERROR, "databaseName is missed");
   }
-
-  node = this->GetName();
 
   return node;
 }
@@ -253,32 +256,64 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetExpression() {
   return node;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetName() {
-  std::shared_ptr<Node> node, child;
+  std::shared_ptr<Node> node, identifier, next_identifiers;
+  node->set_st_type(StatementType::name);
 
-  node = std::dynamic_pointer_cast<Node>(tokens_array_.front());
+  identifier = std::dynamic_pointer_cast<Node>(tokens_array_.front());
+  identifier->set_st_type(StatementType::identifier);
   tokens_array_.pop_front();
+  this->ValidateIsWord(identifier);
 
   if (!tokens_array_.empty()) {
-    child = std::dynamic_pointer_cast<Node>(tokens_array_.front());
-    if (SyntaxAnalyzer::IsPunctuation(child)) {
-      // TODO:
+    next_identifiers = std::dynamic_pointer_cast<Node>(tokens_array_.front());
+    if (IsDot(next_identifiers)) {
+      next_identifiers = this->GetIdentifiers();
+      node->AddChild(next_identifiers);
+      next_identifiers->set_parent(node);
     }
   }
 
-  return node;
-}
-std::shared_ptr<Node> SyntaxAnalyzer::GetIdentifier(){
-  std::shared_ptr<Node> node;
+  node->AddChild(identifier);
+  identifier->set_parent(node);
 
   return node;
 }
+std::shared_ptr<Node> SyntaxAnalyzer::GetIdentifiers(){
+  std::shared_ptr<Node> dot, identifier, next_identifiers;
 
-void SyntaxAnalyzer::ValidateIsFirstWord(std::shared_ptr<Node> &node) const {
+  dot = std::dynamic_pointer_cast<Node>(tokens_array_.front());
+  tokens_array_.pop_front();
+  dot->set_st_type(StatementType::delimiter_dot);
+
+  if (tokens_array_.empty()) {
+    LOG(ERROR, "Bad name, which ends on dot");
+    return nullptr;
+  } else {
+    identifier = std::dynamic_pointer_cast<Node>(tokens_array_.front());
+    tokens_array_.pop_front();
+    identifier->set_st_type(StatementType::identifier);
+    dot->AddChild(identifier);
+    identifier->set_parent(dot);
+  }
+
+  if (!tokens_array_.empty()) {
+    next_identifiers = std::dynamic_pointer_cast<Node>(tokens_array_.front());
+    if (IsDot(next_identifiers)) {
+      next_identifiers = this->GetIdentifiers();
+      dot->AddChild(next_identifiers);
+      next_identifiers->set_parent(dot);
+    }
+  }
+
+  return dot;
+}
+
+void SyntaxAnalyzer::ValidateIsWord(std::shared_ptr<Node> &node) const {
   if (node->get_type() == DataType::WORD) {
-    LOG(ERROR, "the first token is not a key word of DDL or DML");
+    LOG(ERROR, "token is not a word");
     exit(EXIT_FAILURE);
   }
-  LOG(DEBUG, "the first token is a key word (valid token)");
+  LOG(DEBUG, "token is a word");
 }
 
 bool SyntaxAnalyzer::IsPunctuation(std::shared_ptr<Node> &node) {
@@ -291,11 +326,11 @@ bool SyntaxAnalyzer::IsPunctuation(std::shared_ptr<Node> &node) {
   }
 }
 
-//bool SyntaxAnalyzer::IsDot(std::shared_ptr<Node> &node) {
-//  if (SyntaxAnalyzer::IsPunctuation(node)) {
-//    if (node->get_subtype() == DataSubType::Dot) {
-//      return true;
-//    }
-//  }
-//  return false;
-//}
+bool SyntaxAnalyzer::IsDot(std::shared_ptr<Node> &node) {
+  if (SyntaxAnalyzer::IsPunctuation(node)) {
+    if (node->get_type() == DataType::DOT) {
+      return true;
+    }
+  }
+  return false;
+}

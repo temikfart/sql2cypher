@@ -19,6 +19,9 @@ enum StatementType {
   deleteStatement,
   insertStatement,
   updateStatement,
+  name,
+  identifier,
+  delimiter_dot,
   StTypeCount
 };
 
@@ -27,7 +30,12 @@ enum DataType {
   INT_NUMBER,
   FLOAT_NUMBER,
   BRACKET,
+  // Brackets
   PUNCTUATION,
+  // Punctuation
+  DOT,
+  COMMA,
+  //
   OPERATOR,
   WORD
 };
