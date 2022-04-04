@@ -7,7 +7,10 @@ int main(int argc, char* argv[]) {
 
   Tokenizer tokenizer;
   tokenizer.Tokenize();
-//  tokenizer.PrintTokens();
+  tokenizer.PrintTokens();
 
+  config.CloseOutputFile();
+  config.CloseInputFile();
+  
   return 0;
 }

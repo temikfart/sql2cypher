@@ -98,6 +98,8 @@ public:
   SCCMode StringToSCCMode(std::string mode) const;
   std::string SCCModeToString(SCCMode mode) const;
   void GetConsoleArguments(int argc, char* const* argv);
+  void CloseOutputFile();
+  void CloseInputFile();
   ~Config();
 };
 
