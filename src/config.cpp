@@ -80,7 +80,6 @@ Config::Config() {
 }
 void Config::Start() {
   input_.open(sql_path_, ios::in);
-//  std::cout << input_.is_open() << std::endl;
   output_.open(cypher_path_, ios::out);
   ValidateCypherPath(cypher_path_);
   // TODO: implement SCC mode behavior.

@@ -32,7 +32,7 @@ enable_testing()
 set(TestExec SCC_Test_System)
 include_directories(include)
 add_executable(${TestExec}
-        test/config_test/config_test.cpp src/config.cpp src/log.cpp
+        test/config_test/config_test.cpp src/config.cpp
         test/log_test/log_test.cpp src/log.cpp
         test/ast_test/ast_test.cpp src/ast.cpp
         test/lexical_analyzer_test/lexical_analyzer_test.cpp src/lexical_analyzer.cpp)

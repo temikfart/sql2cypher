@@ -33,10 +33,6 @@ bool Node::IsNodesEqual(const std::shared_ptr<Node>& node1,
     case DataType::ROOT:
       break;
     case DataType::INT_NUMBER:
-    {
-      int data1 = std::dynamic_pointer_cast<IntNumNode>(node1)->get_data();
-      int data2 = std::dynamic_pointer_cast<IntNumNode>(node2)->get_data();
-    }
       if (std::dynamic_pointer_cast<IntNumNode>(node1)->get_data() !=
           std::dynamic_pointer_cast<IntNumNode>(node2)->get_data()) {
         return false;
@@ -89,7 +85,7 @@ void Node::ValidateAddChild(std::shared_ptr<Node> const& node) const {
 //-------------------IntNumNode---------------------
 IntNumNode::IntNumNode(int value, DataType type)
   : Node (type), data_(value) {
-  this->ValidateType();
+  this->ValidateType(type);
 }
 
 int IntNumNode::get_data() const {
@@ -97,8 +93,8 @@ int IntNumNode::get_data() const {
 }
 void IntNumNode::set_data(const int &data, DataType type) {
   data_ = data;
+  this->ValidateType(type);
   type_ = type;
-  ValidateType();
 }
 void IntNumNode::set_data(const int &data) {
   data_ = data;
@@ -112,17 +108,18 @@ void IntNumNode::PrintType(std::ostream &stream) {
   stream << "INT_NUMBER";
 }
 
-void IntNumNode::ValidateType() const {
-  if (this->type_ != DataType::INT_NUMBER) {
-    LOG(ERROR, "wrong type for IntNumNode");
+void IntNumNode::ValidateType(DataType type) const {
+  if (type != DataType::INT_NUMBER) {
+    LOG(ERROR, "invalid type for IntNumNode: " << type);
     exit(EXIT_FAILURE);
   }
+  LOG(DEBUG, "valid type for IntNumNode");
 }
 
 //-------------------FloatNumNode---------------------
 FloatNumNode::FloatNumNode(double value, DataType type)
   : Node (type), data_(value) {
-  this->ValidateType();
+  this->ValidateType(type);
 }
 
 double FloatNumNode::get_data() const {
@@ -130,8 +127,8 @@ double FloatNumNode::get_data() const {
 }
 void FloatNumNode::set_data(const double &data, DataType type) {
   data_ = data;
+  this->ValidateType(type);
   type_ = type;
-  ValidateType();
 }
 void FloatNumNode::set_data(const double &data) {
   data_ = data;
@@ -144,18 +141,19 @@ void FloatNumNode::PrintType(std::ostream &stream) {
   stream << "FLOAT_NUMBER";
 }
 
-void FloatNumNode::ValidateType() const {
-  if (this->type_ != DataType::FLOAT_NUMBER) {
-    LOG(ERROR, "wrong type for FloatNumNode");
+void FloatNumNode::ValidateType(DataType type) const {
+  if (type != DataType::FLOAT_NUMBER) {
+    LOG(ERROR, "invalid type for FloatNumNode: " << type);
     exit(EXIT_FAILURE);
   }
+  LOG(DEBUG, "valid type for FloatNumNode");
 }
 
 //-------------------CharNode--------------------
 
 CharNode::CharNode(char ch, DataType type)
   : Node (type), data_(ch) {
-  this->ValidateType();
+  this->ValidateType(type);
 }
 
 char CharNode::get_data() const {
@@ -163,12 +161,11 @@ char CharNode::get_data() const {
 }
 void CharNode::set_data(const char &data, DataType type) {
   data_ = data;
+  this->ValidateType(type);
   type_ = type;
-  ValidateType();
 }
 void CharNode::set_data(const char &data) {
   data_ = data;
-
 }
 
 void CharNode::PrintData(std::ostream &stream) {
@@ -189,19 +186,21 @@ void CharNode::PrintType(std::ostream &stream) {
   }
 }
 
-void CharNode::ValidateType() const {
-  if (this->type_ != DataType::BRACKET
-      && this->type_ != DataType::PUNCTUATION) {
-    LOG(ERROR, "wrong type for CharNode");
+void CharNode::ValidateType(DataType type) const {
+  bool is_BRACKET = type == DataType::BRACKET;
+  bool is_PUNCTUATION = type == DataType::PUNCTUATION;
+  if (!(is_BRACKET || is_PUNCTUATION)) {
+    LOG(ERROR, "invalid type for CharNode: " << type);
     exit(EXIT_FAILURE);
   }
+  LOG(DEBUG, "valid type for CharNode");
 }
 
 //-------------------StringNode------------------
 
 StringNode::StringNode(std::string string, DataType type)
   : Node (type), data_(std::move(string)) {
-  this->ValidateType();
+  this->ValidateType(type);
 }
 
 std::string StringNode::get_data() const{
@@ -209,8 +208,8 @@ std::string StringNode::get_data() const{
 }
 void StringNode::set_data(const std::string &data, DataType type) {
   data_ = data;
+  this->ValidateType(type);
   type_ = type;
-  ValidateType();
 }
 void StringNode::set_data(const std::string &data) {
   data_ = data;
@@ -234,17 +233,20 @@ void StringNode::PrintType(std::ostream &stream) {
   }
 }
 
-void StringNode::ValidateType() const {
-  if (this->type_ != DataType::WORD && this->type_ != DataType::OPERATOR) {
-    LOG(ERROR, "wrong type for StringNode");
+void StringNode::ValidateType(DataType type) const {
+  bool is_WORD = type == DataType::WORD;
+  bool is_OPERATOR = type == DataType::OPERATOR;
+  if (!(is_WORD || is_OPERATOR)) {
+    LOG(ERROR, "invalid type for StringNode: " << type);
     exit(EXIT_FAILURE);
   }
+  LOG(DEBUG, "valid type for StringNode");
 }
 
 //-------------------RootNode--------------------
 
 RootNode::RootNode()  : Node(DataType::ROOT) {
-  this->ValidateType();
+  this->ValidateType(DataType::ROOT);
 }
 
 void RootNode::PrintData(std::ostream &stream) {
@@ -254,11 +256,12 @@ void RootNode::PrintType(std::ostream &stream) {
   stream << "ROOT";
 }
 
-void RootNode::ValidateType() const {
-  if (this->type_ != DataType::ROOT) {
-    LOG(ERROR, "wrong type for RootNode");
+void RootNode::ValidateType(DataType type) const {
+  if (type != DataType::ROOT) {
+    LOG(ERROR, "invalid type for RootNode: " << type);
     exit(EXIT_FAILURE);
   }
+  LOG(DEBUG, "valid type for RootNode");
 }
 
 //-------------------Tree------------------------
