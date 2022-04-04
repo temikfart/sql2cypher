@@ -84,7 +84,6 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDDLSt() {
     if (is_DATABASE) {
       child = this->GetCreateDatabaseSt();
     } else if (is_TABLE) {
-      child->set_st_type(StatementType::createTableStatement);
       child = this->GetCreateTableSt();
     }
   } else if (is_ALTER) {                      // ALTER
@@ -157,7 +156,35 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetCreateDatabaseSt() {
   return node;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetCreateTableSt() {
-  std::shared_ptr<Node> node;
+  std::shared_ptr<Node> node, tableName, content;
+  node->set_st_type(StatementType::createTableStatement);
+
+  if (!tokens_array_.empty()) {
+    this->ValidateIsWord(tokens_array_.front());
+    tableName = this->GetName();
+    node->AddChild(tableName);
+    tableName->set_parent(node);
+  }
+
+  if (!tokens_array_.empty()) {
+    this->ValidateIsRoundBracket(tokens_array_.front());
+    tokens_array_.pop_front();
+  } else {
+    // Error
+  }
+
+  if (!tokens_array_.empty()) {
+    // TODO: Get list of ColDef or Constaint
+  } else {
+    // Error
+  }
+
+  if (!tokens_array_.empty()) {
+    this->ValidateIsRoundBracket(tokens_array_.front());
+    tokens_array_.pop_front();
+  } else {
+    // Error
+  }
 
   return node;
 }
@@ -315,6 +342,13 @@ void SyntaxAnalyzer::ValidateIsWord(std::shared_ptr<Node> &node) const {
   }
   LOG(DEBUG, "token is a word");
 }
+void SyntaxAnalyzer::ValidateIsRoundBracket(std::shared_ptr<Node> &node) const {
+  if (!SyntaxAnalyzer::IsRoundBracket(node)) {
+    LOG(ERROR, "token is not a round bracket");
+    exit(EXIT_FAILURE);
+  }
+  LOG(DEBUG, "token is a round bracket");
+}
 
 bool SyntaxAnalyzer::IsPunctuation(std::shared_ptr<Node> &node) {
   if (node->get_type() == DataType::PUNCTUATION) {
@@ -329,6 +363,14 @@ bool SyntaxAnalyzer::IsPunctuation(std::shared_ptr<Node> &node) {
 bool SyntaxAnalyzer::IsDot(std::shared_ptr<Node> &node) {
   if (SyntaxAnalyzer::IsPunctuation(node)) {
     if (node->get_type() == DataType::DOT) {
+      return true;
+    }
+  }
+  return false;
+}
+bool SyntaxAnalyzer::IsRoundBracket(std::shared_ptr<Node> &node) {
+  if (SyntaxAnalyzer::IsPunctuation(node)) {
+    if (node->get_type() == DataType::ROUND_BRACKET) {
       return true;
     }
   }

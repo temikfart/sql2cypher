@@ -55,8 +55,10 @@ private:
   std::shared_ptr<Node> GetIdentifiers();
 
   void ValidateIsWord(std::shared_ptr<Node> &node) const;
+  void ValidateIsRoundBracket(std::shared_ptr<Node> &node) const;
 
   static bool IsPunctuation(std::shared_ptr<Node> &node);
 
   static bool IsDot(std::shared_ptr<Node> &node);
+  static bool IsRoundBracket(std::shared_ptr<Node> &node);
 };

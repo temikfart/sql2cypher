@@ -31,6 +31,7 @@ enum DataType {
   FLOAT_NUMBER,
   BRACKET,
   // Brackets
+  ROUND_BRACKET,
   PUNCTUATION,
   // Punctuation
   DOT,
