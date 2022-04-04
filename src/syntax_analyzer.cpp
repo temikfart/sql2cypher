@@ -141,8 +141,15 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDMLSt() {
   return node;
 }
 
+// DDL
 std::shared_ptr<Node> SyntaxAnalyzer::GetCreateDatabaseSt() {
   std::shared_ptr<Node> node;
+
+  if (tokens_array_.empty()) {
+    return node;
+  }
+
+  node = this->GetName();
 
   return node;
 }
@@ -167,6 +174,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDropTableSt() {
   return node;
 }
 
+// DML
 std::shared_ptr<Node> SyntaxAnalyzer::GetInsertSt() {
   std::shared_ptr<Node> node;
 
@@ -183,8 +191,14 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetUpdateSt() {
   return node;
 }
 
+// Basic
 std::shared_ptr<Node> SyntaxAnalyzer::GetColumnDefinition() {
   std::shared_ptr<Node> node;
+
+  // name -- datatype -- [] -- ,
+  if (tokens_array_.empty()) {
+
+  }
 
   return node;
 }
@@ -239,6 +253,21 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetExpression() {
   return node;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetName() {
+  std::shared_ptr<Node> node, child;
+
+  node = std::dynamic_pointer_cast<Node>(tokens_array_.front());
+  tokens_array_.pop_front();
+
+  if (!tokens_array_.empty()) {
+    child = std::dynamic_pointer_cast<Node>(tokens_array_.front());
+    if (SyntaxAnalyzer::IsPunctuation(child)) {
+      // TODO:
+    }
+  }
+
+  return node;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetIdentifier(){
   std::shared_ptr<Node> node;
 
   return node;
@@ -251,3 +280,22 @@ void SyntaxAnalyzer::ValidateIsFirstWord(std::shared_ptr<Node> &node) const {
   }
   LOG(DEBUG, "the first token is a key word (valid token)");
 }
+
+bool SyntaxAnalyzer::IsPunctuation(std::shared_ptr<Node> &node) {
+  if (node->get_type() == DataType::PUNCTUATION) {
+    LOG(DEBUG, "token does not apply to punctuation: " << node->get_type());
+    return false;
+  } else {
+    LOG(DEBUG, "token applies to punctuation");
+    return true;
+  }
+}
+
+//bool SyntaxAnalyzer::IsDot(std::shared_ptr<Node> &node) {
+//  if (SyntaxAnalyzer::IsPunctuation(node)) {
+//    if (node->get_subtype() == DataSubType::Dot) {
+//      return true;
+//    }
+//  }
+//  return false;
+//}

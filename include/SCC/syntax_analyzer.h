@@ -52,5 +52,9 @@ private:
   std::shared_ptr<Node> GetExpression();
   std::shared_ptr<Node> GetName();
 
-  void ValidateIsFirstWord(std::shared_ptr<Node>& node) const;
+  void ValidateIsFirstWord(std::shared_ptr<Node> &node) const;
+
+  static bool IsPunctuation(std::shared_ptr<Node> &node);
+
+//  static bool IsDot(std::shared_ptr<Node> &node);
 };
