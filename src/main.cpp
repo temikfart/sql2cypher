@@ -11,6 +11,6 @@ int main(int argc, char* argv[]) {
 
   config.CloseOutputFile();
   config.CloseInputFile();
-
+  
   return 0;
 }

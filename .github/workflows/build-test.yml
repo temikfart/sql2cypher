@@ -1,0 +1,25 @@
+name: 'Build test'
+
+on:
+  push:
+    branches:
+    - main
+    - develop
+  pull_request:
+    types: [opened, closed]
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Build
+      run: cmake -S . -B build
+      
+    - name: Make
+      run: cd build/ && make
+      
+    - name: Test
+      run: cd build/ && ctest
