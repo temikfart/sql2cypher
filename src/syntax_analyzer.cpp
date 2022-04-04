@@ -183,6 +183,67 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetUpdateSt() {
   return node;
 }
 
+std::shared_ptr<Node> SyntaxAnalyzer::GetColumnDefinition() {
+  std::shared_ptr<Node> node;
+
+  return node;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetDataType() {
+  std::shared_ptr<Node> node;
+
+  return node;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetTableConstraint()  {
+  std::shared_ptr<Node> node;
+
+  return node;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetPrimaryKey() {
+  std::shared_ptr<Node> node;
+
+  return node;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetForeignKey() {
+  std::shared_ptr<Node> node;
+
+  return node;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetCondition() {
+  std::shared_ptr<Node> node;
+
+  return node;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetORCondition() {
+  std::shared_ptr<Node> node;
+
+  return node;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetANDCondition() {
+  std::shared_ptr<Node> node;
+
+  return node;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetNOTCondition() {
+  std::shared_ptr<Node> node;
+
+  return node;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetPredicate() {
+  std::shared_ptr<Node> node;
+
+  return node;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetExpression() {
+  std::shared_ptr<Node> node;
+
+  return node;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetName() {
+  std::shared_ptr<Node> node;
+
+  return node;
+}
+
 void SyntaxAnalyzer::ValidateIsFirstWord(std::shared_ptr<Node> &node) const {
   if (node->get_type() == DataType::WORD) {
     LOG(ERROR, "the first token is not a key word of DDL or DML");

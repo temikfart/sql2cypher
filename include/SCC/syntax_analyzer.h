@@ -8,6 +8,13 @@
 #include "SCC/log.h"
 #include "SCC/ast.h"
 
+enum SQLDataType {
+  SQL_int,
+  SQL_float,
+  SQL_char,
+  SQL_varchar
+};
+
 class SyntaxAnalyzer {
 public:
   std::shared_ptr<Node> Analyze(
@@ -31,6 +38,19 @@ private:
   std::shared_ptr<Node> GetInsertSt();
   std::shared_ptr<Node> GetDeleteSt();
   std::shared_ptr<Node> GetUpdateSt();
+
+  std::shared_ptr<Node> GetColumnDefinition();
+  std::shared_ptr<Node> GetDataType();
+  std::shared_ptr<Node> GetTableConstraint();
+  std::shared_ptr<Node> GetPrimaryKey();
+  std::shared_ptr<Node> GetForeignKey();
+  std::shared_ptr<Node> GetCondition();
+  std::shared_ptr<Node> GetORCondition();
+  std::shared_ptr<Node> GetANDCondition();
+  std::shared_ptr<Node> GetNOTCondition();
+  std::shared_ptr<Node> GetPredicate();
+  std::shared_ptr<Node> GetExpression();
+  std::shared_ptr<Node> GetName();
 
   void ValidateIsFirstWord(std::shared_ptr<Node>& node) const;
 };
