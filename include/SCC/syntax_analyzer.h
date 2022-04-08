@@ -8,13 +8,6 @@
 #include "SCC/log.h"
 #include "SCC/ast.h"
 
-enum SQLDataType {
-  SQL_int,
-  SQL_float,
-  SQL_char,
-  SQL_varchar
-};
-
 class SyntaxAnalyzer {
 public:
   std::shared_ptr<Node> Analyze(
@@ -39,6 +32,7 @@ private:
   std::shared_ptr<Node> GetDeleteSt();
   std::shared_ptr<Node> GetUpdateSt();
 
+  std::shared_ptr<Node> GetTableDefinition();
   std::shared_ptr<Node> GetColumnDefinition();
   std::shared_ptr<Node> GetDataType();
   std::shared_ptr<Node> GetTableConstraint();
@@ -51,8 +45,11 @@ private:
   std::shared_ptr<Node> GetPredicate();
   std::shared_ptr<Node> GetExpression();
   std::shared_ptr<Node> GetName();
-
+  std::shared_ptr<Node> GetIdentifier();
   std::shared_ptr<Node> GetIdentifiers();
+
+  template <typename GetFunc>
+  std::shared_ptr<Node> GetListOf(GetFunc GetArg);
 
   void ValidateIsWord(std::shared_ptr<Node> &node) const;
   void ValidateIsRoundBracket(std::shared_ptr<Node> &node) const;

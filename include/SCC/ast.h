@@ -11,17 +11,35 @@ enum StatementType {
   query,
   ddlStatement,
   dmlStatement,
+
+  // DDL statements
   alterTableStatement,
   createDatabaseStatement,
   createTableStatement,
   dropDatabaseStatement,
   dropTableStatement,
+
+  // DML statements
   deleteStatement,
   insertStatement,
   updateStatement,
+
+  // Basic statement
+  tableDefinition,
+  columnDefinition,
+  tableConstraint,
+  primaryKey,
+  foreignKey,
   name,
   identifier,
   delimiter_dot,
+
+  // SQL datatypes
+  SQL_int,
+  SQL_float,
+  SQL_char,
+  SQL_varchar,
+
   StTypeCount
 };
 
