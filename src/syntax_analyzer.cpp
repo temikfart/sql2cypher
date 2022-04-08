@@ -18,16 +18,14 @@ std::shared_ptr<Node> SyntaxAnalyzer::General() {
 
   // TODO: root = program with a lot of queries as descendants
   child = this->GetDL();
-
-  root->AddChild(child);
-  child->set_parent(root);
+  SyntaxAnalyzer::MakeKinship(root, child);
 
   return root;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetDL() {
   std::shared_ptr<Node> node = nullptr;
 
-  auto first_token = tokens_array_.front();
+  auto first_token = this->peek_first_token();
   this->ValidateIsWord(first_token);
 
   std::shared_ptr<StringNode> key_word_node =
@@ -59,17 +57,17 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDDLSt() {
 
   // Get first token
   std::shared_ptr<StringNode> first_key_word_node =
-      std::dynamic_pointer_cast<StringNode>(tokens_array_.front());
-  tokens_array_.pop_front();
+      std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
+  this->pop_first_token();
 
   // Get second token
   if (tokens_array_.empty()) {
     return node;
   }
-  this->ValidateIsWord(tokens_array_.front());
+  this->ValidateIsWord(this->peek_first_token());
   std::shared_ptr<StringNode> second_key_word_node =
-      std::dynamic_pointer_cast<StringNode>(tokens_array_.front());
-  tokens_array_.pop_front();
+      std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
+  this->pop_first_token();
 
   // Define next rule
   std::string fst_kw = first_key_word_node->get_data();
@@ -101,8 +99,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDDLSt() {
     }
   }
 
-  child->set_parent(node);
-  node->AddChild(child);
+  SyntaxAnalyzer::MakeKinship(node, child);
 
   return node;
 }
@@ -112,8 +109,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDMLSt() {
 
   // Get first token
   std::shared_ptr<StringNode> key_word_node =
-      std::dynamic_pointer_cast<StringNode>(tokens_array_.front());
-  tokens_array_.pop_front();
+      std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
+  this->pop_first_token();
 
   // Define next rule
   std::string fst_kw = key_word_node->get_data();
@@ -129,8 +126,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDMLSt() {
     LOG(ERROR, "unknown DML statement");
   }
 
-  child->set_parent(node);
-  node->AddChild(child);
+  SyntaxAnalyzer::MakeKinship(node, child);
 
   return node;
 }
@@ -143,11 +139,10 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetCreateDatabaseSt() {
   if (tokens_array_.empty()) {
     LOG(ERROR, "databaseName is missed");
   } else {
-    this->ValidateIsWord(tokens_array_.front());
+    this->ValidateIsWord(this->peek_first_token());
     database_name = this->GetName();
 
-    node->AddChild(database_name);
-    database_name->set_parent(node);
+    SyntaxAnalyzer::MakeKinship(node, database_name);
   }
 
   return node;
@@ -161,19 +156,18 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetCreateTableSt() {
     return node;
   } else {
     // Get tableName
-    this->ValidateIsWord(tokens_array_.front());
+    this->ValidateIsWord(this->peek_first_token());
     table_name = this->GetName();
 
-    node->AddChild(table_name);
-    table_name->set_parent(node);
+    SyntaxAnalyzer::MakeKinship(node, table_name);
   }
 
   if (tokens_array_.empty()) {
     LOG(ERROR, "opening round bracket is missed");
     return node;
   } else {
-    this->ValidateIsRoundBracket(tokens_array_.front()); // TODO: open bracket?
-    tokens_array_.pop_front();
+    this->ValidateIsOpeningRoundBracket(this->peek_first_token()); // TODO: open bracket?
+    this->pop_first_token();
   }
 
   if (tokens_array_.empty()) {
@@ -182,15 +176,14 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetCreateTableSt() {
   } else {
     table_definition = this->GetTableDefinition();
 
-    node->AddChild(table_definition);
-    table_definition->set_parent(node);
+    SyntaxAnalyzer::MakeKinship(node, table_definition);
   }
 
   if (tokens_array_.empty()) {
     LOG(ERROR, "closing round bracket is missed");
   } else {
-    this->ValidateIsRoundBracket(tokens_array_.front());
-    tokens_array_.pop_front();
+    this->ValidateIsClosingRoundBracket(this->peek_first_token());
+    this->pop_first_token();
   }
 
   return node;
@@ -209,11 +202,10 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDropDatabaseSt() {
   if (tokens_array_.empty()) {
     LOG(ERROR, "databaseName is missed");
   } else {
-    this->ValidateIsWord(tokens_array_.front());
+    this->ValidateIsWord(this->peek_first_token());
     database_name = this->GetName();
 
-    node->AddChild(database_name);
-    database_name->set_parent(node);
+    SyntaxAnalyzer::MakeKinship(node, database_name);
   }
 
   if (!tokens_array_.empty()) {
@@ -230,11 +222,10 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDropTableSt() {
   if (tokens_array_.empty()) {
     LOG(ERROR, "tableName is missed");
   } else {
-    this->ValidateIsWord(tokens_array_.front());
+    this->ValidateIsWord(peek_first_token());
     table_name = this->GetName();
 
-    node->AddChild(table_name);
-    table_name->set_parent(node);
+    SyntaxAnalyzer::MakeKinship(node, table_name);
   }
 
   if (!tokens_array_.empty()) {
@@ -267,19 +258,16 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetUpdateSt() {
 // Basic
 std::shared_ptr<Node> SyntaxAnalyzer::GetTableDefinition() {
   std::shared_ptr<Node> node, argument, separator;
-  std::shared_ptr<Node> comma =
-      std::dynamic_pointer_cast<Node>(
-          std::make_shared<CharNode>(',', DataType::COMMA));
 
-  this->ValidateIsWord(tokens_array_.front());
+  this->ValidateIsWord(this->peek_first_token());
   std::shared_ptr<StringNode> key_word_node =
-      std::dynamic_pointer_cast<StringNode>(tokens_array_.front());
+      std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
 
   std::string key_word = key_word_node->get_data();
   bool is_tableConstraint =
       key_word == "CONSTRAINT"
-      || key_word == "PRIMARY"
-      || key_word == "FOREIGN";
+          || key_word == "PRIMARY"
+          || key_word == "FOREIGN";
 
   if (is_tableConstraint) {
     argument = this->GetTableConstraint();
@@ -287,15 +275,13 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableDefinition() {
     argument = this->GetColumnDefinition();
   }
 
-  node->AddChild(argument);
-  argument->set_parent(node);
+  SyntaxAnalyzer::MakeKinship(node, argument);
 
   if (!tokens_array_.empty()) {
-    if (Node::IsNodesEqual(tokens_array_.front(), comma)) {
+    if (SyntaxAnalyzer::IsComma(this->peek_first_token())) {
       separator = this->GetTableDefinition();
 
-      node->AddChild(separator);
-      separator->set_parent(node);
+      SyntaxAnalyzer::MakeKinship(node, separator);
     }
   }
 
@@ -307,8 +293,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetColumnDefinition() {
 
   // Get columnName
   column_name = this->GetIdentifier();
-  node->AddChild(column_name);
-  column_name->set_parent(node);
+  SyntaxAnalyzer::MakeKinship(node, column_name);
 
   // Get datatype
   if (tokens_array_.empty()) {
@@ -317,8 +302,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetColumnDefinition() {
   } else {
     datatype = this->GetDataType();
 
-    node->AddChild(datatype);
-    datatype->set_parent(node);
+    SyntaxAnalyzer::MakeKinship(node, datatype);
   }
 
   // Get other options
@@ -329,11 +313,11 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetColumnDefinition() {
   return node;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetDataType() {
-  this->ValidateIsWord(tokens_array_.front());
+  this->ValidateIsWord(this->peek_first_token());
 
   std::shared_ptr<StringNode> node =
-      std::dynamic_pointer_cast<StringNode>(tokens_array_.front());
-  tokens_array_.pop_front();
+      std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
+  this->pop_first_token();
 
   std::string datatype = node->get_data();
   StatementType SQL_datatype;
@@ -354,27 +338,24 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableConstraint() {
   std::shared_ptr<Node> node, constraint_name, key;
   node->set_st_type(StatementType::tableConstraint);
 
-  this->ValidateIsWord(tokens_array_.front());
-  std::shared_ptr<StringNode> key_word_node =
-      std::dynamic_pointer_cast<StringNode>(tokens_array_.front());
+  this->ValidateIsWord(this->peek_first_token());
+  std::shared_ptr<Node> key_word_node = this->peek_first_token();
 
-  std::string key_word = key_word_node->get_data();
+  std::string key_word =
+      std::dynamic_pointer_cast<StringNode>(key_word_node)->get_data();
   bool is_full_construction = key_word == "CONSTRAINT";
   if (is_full_construction) {
-    tokens_array_.pop_front();
-    node->AddChild(std::dynamic_pointer_cast<Node>(key_word_node));
-    key_word_node->set_parent(node);
+    this->pop_first_token();
+    SyntaxAnalyzer::MakeKinship(node, key_word_node);
 
     if (tokens_array_.empty()) {
       LOG(ERROR, "constraint name is missed");
       return node;
     } else {
-      this->ValidateIsWord(tokens_array_.front());
-      constraint_name = tokens_array_.front();
-      tokens_array_.pop_front();
+      this->ValidateIsWord(this->peek_first_token());
+      constraint_name = this->get_first_token();
 
-      node->AddChild(constraint_name);
-      constraint_name->set_parent(node);
+      SyntaxAnalyzer::MakeKinship(node, constraint_name);
     }
   }
 
@@ -384,10 +365,10 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableConstraint() {
     return node;
   } else {
     // Get PRIMARY | FOREIGN
-    this->ValidateIsWord(tokens_array_.front());
+    this->ValidateIsWord(this->peek_first_token());
     std::shared_ptr<StringNode> kind_of_constraint_node =
-        std::dynamic_pointer_cast<StringNode>(tokens_array_.front());
-    tokens_array_.pop_front();
+        std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
+    this->pop_first_token();
     std::string kind_of_key = kind_of_constraint_node->get_data();
 
     // Get KEY
@@ -395,10 +376,10 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableConstraint() {
       LOG(ERROR, "invalid constraint definition");
       return node;
     }
-    this->ValidateIsWord(tokens_array_.front());
+    this->ValidateIsWord(this->peek_first_token());
     std::shared_ptr<StringNode> KEY_key_word =
-        std::dynamic_pointer_cast<StringNode>(tokens_array_.front());
-    tokens_array_.pop_front();
+        std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
+    this->pop_first_token();
 
     if (kind_of_key == "PRIMARY") {
       key = this->GetPrimaryKey();
@@ -409,14 +390,13 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableConstraint() {
       return node;
     }
 
-    node->AddChild(key);
-    key->set_parent(node);
+    SyntaxAnalyzer::MakeKinship(node, key);
   }
 
   return node;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetPrimaryKey() {
-  std::shared_ptr<Node> node, column_name;
+  std::shared_ptr<Node> node, column_name, separator;
   node->set_st_type(StatementType::primaryKey);
 
   // Get PRIMARY KEY
@@ -424,8 +404,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetPrimaryKey() {
     LOG(ERROR, "opening round bracket is missed");
     return node;
   } else {
-    this->ValidateIsRoundBracket(tokens_array_.front()); // TODO: open bracket?
-    tokens_array_.pop_front();
+    this->ValidateIsOpeningRoundBracket(this->peek_first_token()); // TODO: open bracket?
+    this->pop_first_token();
   }
 
   if (tokens_array_.empty()) {
@@ -434,23 +414,30 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetPrimaryKey() {
   } else {
     column_name = this->GetIdentifier();
 
-    node->AddChild(column_name);
-    column_name->set_parent(node);
+    SyntaxAnalyzer::MakeKinship(node, column_name);
+
+    // Get listOf(column_names)
+    if (!tokens_array_.empty()) {
+      if (SyntaxAnalyzer::IsComma(this->peek_first_token())) {
+        separator = this->GetListOf(StatementType::identifier);
+
+        SyntaxAnalyzer::MakeKinship(node, separator);
+      }
+    }
   }
 
   if (tokens_array_.empty()) {
     LOG(ERROR, "closing round bracket is missed");
     return node;
   } else {
-    this->ValidateIsRoundBracket(tokens_array_.front());
-    tokens_array_.pop_front();
+    this->ValidateIsClosingRoundBracket(this->peek_first_token());
+    this->pop_first_token();
   }
-  // TODO: get listOf columnNames
 
   return node;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetForeignKey() {
-  std::shared_ptr<Node> node, column_name;
+  std::shared_ptr<Node> node, column_name, separator, reference;
   node->set_st_type(StatementType::foreignKey);
 
   // Get FOREIGN KEY
@@ -458,8 +445,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetForeignKey() {
     LOG(ERROR, "opening round bracket is missed");
     return node;
   } else {
-    this->ValidateIsRoundBracket(tokens_array_.front()); // TODO: open bracket?
-    tokens_array_.pop_front();
+    this->ValidateIsOpeningRoundBracket(this->peek_first_token()); // TODO: open bracket?
+    this->pop_first_token();
   }
 
   if (tokens_array_.empty()) {
@@ -468,22 +455,96 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetForeignKey() {
   } else {
     column_name = this->GetIdentifier();
 
-    node->AddChild(column_name);
-    column_name->set_parent(node);
+    SyntaxAnalyzer::MakeKinship(node, column_name);
+
+    // Get listOf(column_names)
+    if (!tokens_array_.empty()) {
+      if (SyntaxAnalyzer::IsComma(this->peek_first_token())) {
+        separator = this->GetListOf(StatementType::identifier);
+
+        SyntaxAnalyzer::MakeKinship(node, separator);
+      }
+    }
   }
 
   if (tokens_array_.empty()) {
     LOG(ERROR, "closing round bracket is missed");
     return node;
   } else {
-    this->ValidateIsRoundBracket(tokens_array_.front());
-    tokens_array_.pop_front();
+    this->ValidateIsClosingRoundBracket(this->peek_first_token());
+    this->pop_first_token();
   }
 
-  // Get Referenced column
-  // TODO:
+  // Get Reference
+  if (tokens_array_.empty()) {
+    LOG(ERROR, "reference is missed");
+    return node;
+  } else {
+    reference = this->GetReference();
+
+    SyntaxAnalyzer::MakeKinship(node, reference);
+  }
 
   return node;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetReference() {
+  std::shared_ptr<Node> reference, ref_table_name;
+
+  // Get REFERENCES
+  this->ValidateIsWord(this->peek_first_token());
+  std::shared_ptr<StringNode> ref_key_word_node =
+      std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
+  std::string ref_key_word = ref_key_word_node->get_data();
+
+  if (ref_key_word != "REFERENCES") {
+    LOG(ERROR, "incorrect reference");
+    return reference;
+  }
+
+  reference = get_first_token();
+  reference->set_st_type(StatementType::reference);
+
+  // Get referenced table or columns
+  if (tokens_array_.empty()) {
+    LOG(ERROR, "tableName is missed");
+    return reference;
+  } else {
+    ref_table_name = this->GetName();
+
+    SyntaxAnalyzer::MakeKinship(reference, ref_table_name);
+  }
+
+  // Get columns if present
+  if (!tokens_array_.empty()) {
+    std::shared_ptr<Node> ref_column_name, next_ref_column_names;
+
+    if (SyntaxAnalyzer::IsOpeningRoundBracket(this->peek_first_token())) {
+      this->pop_first_token();
+    }
+
+    if (tokens_array_.empty()) {
+      LOG(ERROR, "invalid foreign key: incorrect list of columnNames");
+      return reference;
+    } else {
+      ref_column_name = this->GetName();
+
+      SyntaxAnalyzer::MakeKinship(reference, ref_column_name);
+
+      if (tokens_array_.empty()) {
+        LOG(ERROR, "invalid foreign key: incorrect list of columnNames");
+        return reference;
+      } else {
+        if (SyntaxAnalyzer::IsComma(this->peek_first_token())) {
+          next_ref_column_names =
+              this->GetListOf(StatementType::identifier);
+
+          SyntaxAnalyzer::MakeKinship(reference, next_ref_column_names);
+        }
+      }
+    }
+  }
+
+  return reference;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetCondition() {
   std::shared_ptr<Node> node;
@@ -519,30 +580,27 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetName() {
   std::shared_ptr<Node> node, identifier, next_identifiers;
   node->set_st_type(StatementType::name);
 
-  identifier = std::dynamic_pointer_cast<Node>(tokens_array_.front());
-  identifier->set_st_type(StatementType::identifier);
-  tokens_array_.pop_front();
   this->ValidateIsWord(identifier);
+  identifier = this->get_first_token();
+  identifier->set_st_type(StatementType::identifier);
 
   if (!tokens_array_.empty()) {
-    next_identifiers = std::dynamic_pointer_cast<Node>(tokens_array_.front());
-    if (IsDot(next_identifiers)) {
+    next_identifiers =
+        std::dynamic_pointer_cast<Node>(this->peek_first_token());
+    if (SyntaxAnalyzer::IsDot(next_identifiers)) {
       next_identifiers = this->GetIdentifiers();
-      node->AddChild(next_identifiers);
-      next_identifiers->set_parent(node);
+
+      SyntaxAnalyzer::MakeKinship(node, next_identifiers);
     }
   }
 
-  node->AddChild(identifier);
-  identifier->set_parent(node);
+  SyntaxAnalyzer::MakeKinship(node, identifier);
 
   return node;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetIdentifier() {
-  std::shared_ptr<Node> identifier = tokens_array_.front();
-  tokens_array_.pop_front();
-  this->ValidateIsWord(identifier);
-
+  this->ValidateIsWord(this->peek_first_token());
+  std::shared_ptr<Node> identifier = this->get_first_token();
   identifier->set_st_type(StatementType::identifier);
 
   return identifier;
@@ -550,44 +608,38 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetIdentifier() {
 std::shared_ptr<Node> SyntaxAnalyzer::GetIdentifiers() {
   std::shared_ptr<Node> dot, identifier, next_identifiers;
 
-  dot = std::dynamic_pointer_cast<Node>(tokens_array_.front());
-  tokens_array_.pop_front();
+  dot = this->get_first_token();
   dot->set_st_type(StatementType::delimiter_dot);
 
   if (tokens_array_.empty()) {
     LOG(ERROR, "Bad name, which ends on dot");
     return nullptr;
   } else {
-    identifier = std::dynamic_pointer_cast<Node>(tokens_array_.front());
-    tokens_array_.pop_front();
+    identifier = this->get_first_token();
     identifier->set_st_type(StatementType::identifier);
-    dot->AddChild(identifier);
-    identifier->set_parent(dot);
+
+    SyntaxAnalyzer::MakeKinship(dot, identifier);
   }
 
   if (!tokens_array_.empty()) {
-    next_identifiers = std::dynamic_pointer_cast<Node>(tokens_array_.front());
-    if (IsDot(next_identifiers)) {
+    next_identifiers = this->peek_first_token();
+    if (SyntaxAnalyzer::IsDot(next_identifiers)) {
       next_identifiers = this->GetIdentifiers();
-      dot->AddChild(next_identifiers);
-      next_identifiers->set_parent(dot);
+
+      SyntaxAnalyzer::MakeKinship(dot, next_identifiers);
     }
   }
 
   return dot;
 }
 
-template<typename GetFunc>
-std::shared_ptr<Node> SyntaxAnalyzer::GetListOf(GetFunc GetArg) {
+std::shared_ptr<Node> SyntaxAnalyzer::GetListOf(
+    StatementType get_function_type) {
   std::shared_ptr<Node> argument, separator, next_separator;
-  std::shared_ptr<Node> comma =
-      std::dynamic_pointer_cast<Node>(
-          std::make_shared<CharNode>(',', DataType::COMMA));
 
   // Get separator (comma)
-  separator = tokens_array_.front();
-  tokens_array_.pop_front();
-  if (!Node::IsNodesEqual(separator, comma)) {
+  separator = this->get_first_token();
+  if (!SyntaxAnalyzer::IsComma(separator)) {
     LOG(ERROR, "separator for the listOf is not a comma");
     return separator;
   }
@@ -596,17 +648,29 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetListOf(GetFunc GetArg) {
     LOG(ERROR, "argument is missed");
     return separator;
   } else {
-    argument = GetArg();
+    switch (get_function_type) {
+      case StatementType::identifier:
+        argument = this->GetIdentifier();
+        break;
+      case StatementType::columnDefinition:
+        argument = this->GetColumnDefinition();
+        break;
+      case StatementType::tableConstraint:
+        argument = this->GetTableConstraint();
+        break;
+      default:
+        LOG(ERROR, "unknown statement type for the listOf");
+        break;
+    }
 
-    separator->AddChild(argument);
-    argument->set_parent(separator);
+    SyntaxAnalyzer::MakeKinship(separator, argument);
   }
 
   if (!tokens_array_.empty()) {
-    if (Node::IsNodesEqual(tokens_array_.front(), comma)) {
-      next_separator = this->GetListOf(GetArg);
-      separator->AddChild(next_separator);
-      next_separator->set_parent(separator);
+    if (SyntaxAnalyzer::IsComma(this->peek_first_token())) {
+      next_separator = GetListOf(get_function_type);
+
+      SyntaxAnalyzer::MakeKinship(separator, next_separator);
     }
   }
 
@@ -620,16 +684,25 @@ void SyntaxAnalyzer::ValidateIsWord(std::shared_ptr<Node> &node) const {
   }
   LOG(DEBUG, "token is a word");
 }
-void SyntaxAnalyzer::ValidateIsRoundBracket(std::shared_ptr<Node> &node) const {
-  if (!SyntaxAnalyzer::IsRoundBracket(node)) {
-    LOG(ERROR, "token is not a round bracket");
+void SyntaxAnalyzer::ValidateIsOpeningRoundBracket(
+    std::shared_ptr<Node> &node) const {
+  if (!SyntaxAnalyzer::IsOpeningRoundBracket(node)) {
+    LOG(ERROR, "token is not a opening round bracket");
     exit(EXIT_FAILURE);
   }
-  LOG(DEBUG, "token is a round bracket");
+  LOG(DEBUG, "token is a opening round bracket");
+}
+void SyntaxAnalyzer::ValidateIsClosingRoundBracket(
+    std::shared_ptr<Node> &node) const {
+  if (!SyntaxAnalyzer::IsClosingRoundBracket(node)) {
+    LOG(ERROR, "token is not a closing round bracket");
+    exit(EXIT_FAILURE);
+  }
+  LOG(DEBUG, "token is a closing round bracket");
 }
 
 bool SyntaxAnalyzer::IsPunctuation(std::shared_ptr<Node> &node) {
-  if (node->get_type() == DataType::PUNCTUATION) {
+  if (node->get_type() != DataType::PUNCTUATION) {
     LOG(DEBUG, "token does not apply to punctuation: " << node->get_type());
     return false;
   } else {
@@ -639,18 +712,59 @@ bool SyntaxAnalyzer::IsPunctuation(std::shared_ptr<Node> &node) {
 }
 
 bool SyntaxAnalyzer::IsDot(std::shared_ptr<Node> &node) {
-  if (SyntaxAnalyzer::IsPunctuation(node)) {
-    if (node->get_type() == DataType::DOT) {
-      return true;
-    }
-  }
-  return false;
+  std::shared_ptr<Node> dot =
+      std::dynamic_pointer_cast<Node>(
+          std::make_shared<CharNode>('.', DataType::DOT));
+  return Node::IsNodesEqual(dot, node);
 }
-bool SyntaxAnalyzer::IsRoundBracket(std::shared_ptr<Node> &node) {
-  if (SyntaxAnalyzer::IsPunctuation(node)) {
-    if (node->get_type() == DataType::ROUND_BRACKET) {
-      return true;
-    }
-  }
-  return false;
+bool SyntaxAnalyzer::IsComma(std::shared_ptr<Node> &node) {
+  std::shared_ptr<Node> comma =
+      std::dynamic_pointer_cast<Node>(
+          std::make_shared<CharNode>(',', DataType::COMMA));
+  return Node::IsNodesEqual(comma, node);
+}
+bool SyntaxAnalyzer::IsOpeningRoundBracket(std::shared_ptr<Node> &node) {
+  // Opening Round Bracket
+  std::shared_ptr<Node> ORB =
+      std::dynamic_pointer_cast<Node>(
+          std::make_shared<CharNode>(
+              '(', DataType::OpeningRoundBracket));
+  return Node::IsNodesEqual(ORB, node);
+}
+bool SyntaxAnalyzer::IsClosingRoundBracket(std::shared_ptr<Node> &node) {
+  // Closing Round Bracket
+  std::shared_ptr<Node> CRB =
+      std::dynamic_pointer_cast<Node>(
+          std::make_shared<CharNode>(
+              ')', DataType::ClosingRoundBracket));
+  return Node::IsNodesEqual(CRB, node);
+}
+
+void SyntaxAnalyzer::MakeKinship(std::shared_ptr<Node>& parent,
+                                 std::shared_ptr<Node>& child) {
+  parent->AddChild(child);
+  child->set_parent(parent);
+}
+
+std::shared_ptr<Node>& SyntaxAnalyzer::peek_first_token() {
+  return tokens_array_.front();
+}
+std::shared_ptr<Node>& SyntaxAnalyzer::peek_last_token() {
+  return tokens_array_.back();
+}
+std::shared_ptr<Node> SyntaxAnalyzer::get_first_token() {
+  std::shared_ptr<Node> node = tokens_array_.front();
+  tokens_array_.pop_front();
+  return node;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::get_last_token() {
+  std::shared_ptr<Node> node = tokens_array_.back();
+  tokens_array_.pop_back();
+  return node;
+}
+void SyntaxAnalyzer::pop_first_token() {
+  tokens_array_.pop_front();
+}
+void SyntaxAnalyzer::pop_last_token() {
+  tokens_array_.pop_back();
 }

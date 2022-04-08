@@ -69,6 +69,9 @@ bool Node::IsNodesEqual(const std::shared_ptr<Node>& node1,
         return false;
       }
       break;
+    default:
+      LOG(ERROR, "invalid Datatype: " << node1->get_type());
+      exit(EXIT_FAILURE);
   }
 
   size_t children_amount = node1->get_children_amount();

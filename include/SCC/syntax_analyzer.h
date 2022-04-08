@@ -38,6 +38,7 @@ private:
   std::shared_ptr<Node> GetTableConstraint();
   std::shared_ptr<Node> GetPrimaryKey();
   std::shared_ptr<Node> GetForeignKey();
+  std::shared_ptr<Node> GetReference();
   std::shared_ptr<Node> GetCondition();
   std::shared_ptr<Node> GetORCondition();
   std::shared_ptr<Node> GetANDCondition();
@@ -48,14 +49,26 @@ private:
   std::shared_ptr<Node> GetIdentifier();
   std::shared_ptr<Node> GetIdentifiers();
 
-  template <typename GetFunc>
-  std::shared_ptr<Node> GetListOf(GetFunc GetArg);
+  std::shared_ptr<Node> GetListOf(StatementType get_function_type);
 
   void ValidateIsWord(std::shared_ptr<Node> &node) const;
-  void ValidateIsRoundBracket(std::shared_ptr<Node> &node) const;
+  void ValidateIsOpeningRoundBracket(std::shared_ptr<Node> &node) const;
+  void ValidateIsClosingRoundBracket(std::shared_ptr<Node> &node) const;
 
   static bool IsPunctuation(std::shared_ptr<Node> &node);
 
   static bool IsDot(std::shared_ptr<Node> &node);
-  static bool IsRoundBracket(std::shared_ptr<Node> &node);
+  static bool IsComma(std::shared_ptr<Node> &node);
+  static bool IsOpeningRoundBracket(std::shared_ptr<Node> &node);
+  static bool IsClosingRoundBracket(std::shared_ptr<Node> &node);
+
+  static void MakeKinship(std::shared_ptr<Node>& parent,
+                          std::shared_ptr<Node>& child);
+
+  std::shared_ptr<Node>& peek_first_token();
+  std::shared_ptr<Node>& peek_last_token();
+  std::shared_ptr<Node> get_first_token();
+  std::shared_ptr<Node> get_last_token();
+  void pop_first_token();
+  void pop_last_token();
 };

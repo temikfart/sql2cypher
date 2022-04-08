@@ -24,12 +24,13 @@ enum StatementType {
   insertStatement,
   updateStatement,
 
-  // Basic statement
+  // Basic statements
   tableDefinition,
   columnDefinition,
   tableConstraint,
   primaryKey,
   foreignKey,
+  reference,
   name,
   identifier,
   delimiter_dot,
@@ -50,6 +51,8 @@ enum DataType {
   BRACKET,
   // Brackets
   ROUND_BRACKET,
+  OpeningRoundBracket,
+  ClosingRoundBracket,
   PUNCTUATION,
   // Punctuation
   DOT,
