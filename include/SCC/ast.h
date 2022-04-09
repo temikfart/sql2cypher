@@ -31,6 +31,12 @@ enum StatementType {
   primaryKey,
   foreignKey,
   reference,
+  condition,
+  ORcondition,
+  ANDcondition,
+  NOTcondition,
+  predicate,
+  expression,
   name,
   identifier,
   delimiter_dot,
@@ -49,15 +55,7 @@ enum DataType {
   INT_NUMBER,
   FLOAT_NUMBER,
   BRACKET,
-  // Brackets
-  ROUND_BRACKET,
-  OpeningRoundBracket,
-  ClosingRoundBracket,
   PUNCTUATION,
-  // Punctuation
-  DOT,
-  COMMA,
-  //
   OPERATOR,
   WORD
 };
@@ -174,9 +172,3 @@ namespace Tree {
   void PrintTreeRecursive(std::shared_ptr<Node> const &node,
                           std::ostream &stream);
 };
-
-//bool operator== (std::shared_ptr<Node> const& lhs, //TODO: decide how to implement operator== for shared_ptr<Node>
-//                 std::shared_ptr<Node> const& rhs);
-//
-//bool operator!= (std::shared_ptr<Node> const& lhs,
-//                 std::shared_ptr<Node> const& rhs);

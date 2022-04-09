@@ -45,28 +45,46 @@ private:
   std::shared_ptr<Node> GetNOTCondition();
   std::shared_ptr<Node> GetPredicate();
   std::shared_ptr<Node> GetExpression();
+  std::shared_ptr<Node> GetString();
+  std::shared_ptr<Node> GetMathExpression();
+//std::shared_ptr<Node> SyntaxAnalyzer::GetMathSum();
+//std::shared_ptr<Node> SyntaxAnalyzer::GetMathProduct();
+//std::shared_ptr<Node> SyntaxAnalyzer::GetMathPower();
+//std::shared_ptr<Node> SyntaxAnalyzer::GetMathValue();
   std::shared_ptr<Node> GetName();
   std::shared_ptr<Node> GetIdentifier();
   std::shared_ptr<Node> GetIdentifiers();
 
-  std::shared_ptr<Node> GetListOf(StatementType get_function_type);
+  std::shared_ptr<Node> GetListOf(
+      StatementType get_function_type);
 
+  void ValidateNotEmpty() const;
   void ValidateIsWord(std::shared_ptr<Node> &node) const;
   void ValidateIsOpeningRoundBracket(std::shared_ptr<Node> &node) const;
   void ValidateIsClosingRoundBracket(std::shared_ptr<Node> &node) const;
+  void ValidateIsSingleQuote(std::shared_ptr<Node> &node) const;
+  void ValidateIsDoubleQuote(std::shared_ptr<Node> &node) const;
 
+  static bool IsBracket(std::shared_ptr<Node> &node);
   static bool IsPunctuation(std::shared_ptr<Node> &node);
+  static bool IsWord(std::shared_ptr<Node> &node);
+  static bool IsOperator(std::shared_ptr<Node> &node);
 
   static bool IsDot(std::shared_ptr<Node> &node);
   static bool IsComma(std::shared_ptr<Node> &node);
   static bool IsOpeningRoundBracket(std::shared_ptr<Node> &node);
   static bool IsClosingRoundBracket(std::shared_ptr<Node> &node);
+  static bool IsSingleQuote(std::shared_ptr<Node> &node);
+  static bool IsDoubleQuote(std::shared_ptr<Node> &node);
+  static bool IsUnaryOperator(std::shared_ptr<Node> &node);
+  static bool IsBinaryOperator(std::shared_ptr<Node> &node);
+  static bool IsSemicolon(std::shared_ptr<Node> &node);
 
   static void MakeKinship(std::shared_ptr<Node>& parent,
                           std::shared_ptr<Node>& child);
 
-  std::shared_ptr<Node>& peek_first_token();
-  std::shared_ptr<Node>& peek_last_token();
+  std::shared_ptr<Node>& peek_first_token() const;
+  std::shared_ptr<Node>& peek_last_token() const;
   std::shared_ptr<Node> get_first_token();
   std::shared_ptr<Node> get_last_token();
   void pop_first_token();
