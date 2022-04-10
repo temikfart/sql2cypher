@@ -107,13 +107,13 @@ void Tokenizer::GetCharacter(DataType type) {
 }
 
 bool Tokenizer::IsOperator(char symbol) {
-  return Tokenizer::IsCharacterFromArray(symbol, "+-*/!=<>");
+  return Tokenizer::IsCharacterFromArray(symbol, "+-*/^!=<>");
 }
 bool Tokenizer::IsBracket(char symbol) {
   return Tokenizer::IsCharacterFromArray(symbol, "(){}[]");
 }
 bool Tokenizer::IsPunctuation(char symbol) {
-  return Tokenizer::IsCharacterFromArray(symbol, ":;,\'\"");
+  return Tokenizer::IsCharacterFromArray(symbol, ":;.,\'\"");
 }
 
 bool Tokenizer::IsCharacterFromArray(char ch, const std::string& array) {

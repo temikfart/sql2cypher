@@ -221,9 +221,41 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetCreateTableSt() {
   return node;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetAlterTableSt() {
-  std::shared_ptr<Node> node;
+  std::shared_ptr<Node> node, table_name, action, argument;
   node = std::dynamic_pointer_cast<Node>(std::make_shared<RootNode>());
   node->set_st_type(StatementType::alterTableStatement);
+
+  this->ValidateIsWord(this->peek_first_token());
+  table_name = this->GetName();
+
+  SyntaxAnalyzer::MakeKinship(node, table_name);
+
+  // Get action (ADD | DROP)
+  if (tokens_array_.empty()) {
+    LOG(ERROR, "invalid alter table query: action is missed");
+    return node;
+  }
+
+  this->ValidateIsWord(this->peek_first_token());
+  action = this->get_first_token();
+  std::string action_str =
+      std::dynamic_pointer_cast<StringNode>(action)->get_data();
+
+  if (tokens_array_.empty()) {
+    LOG(ERROR, "invalid alter table query:");
+    return node;
+  } else {
+    if (action_str == "ADD") {
+      argument = this->GetTableDefinition();
+    } else if (action_str == "DROP") {
+      argument = this->GetDropList();
+    } else {
+      LOG(ERROR, "invalid alter table query: incorrect action \'"
+          << action_str << "\'");
+      return node;
+    }
+    SyntaxAnalyzer::MakeKinship(node, argument);
+  }
 
   return node;
 }
@@ -327,6 +359,54 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableDefinition() {
 
   return node;
 }
+std::shared_ptr<Node> SyntaxAnalyzer::GetDropList() {
+  std::shared_ptr<Node> node, argument, separator;
+  node = std::dynamic_pointer_cast<Node>(
+      std::make_shared<RootNode>());
+  node->set_st_type(StatementType::dropList);
+
+  this->ValidateIsWord(this->peek_first_token());
+  std::shared_ptr<StringNode> key_word_node =
+      std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
+
+  std::string key_word = key_word_node->get_data();
+  bool is_tableConstraint = key_word == "CONSTRAINT";
+  bool is_column = key_word == "COLUMN";
+
+  if (is_tableConstraint || is_column) {
+    argument = this->get_first_token();
+
+    if (tokens_array_.empty()) {
+      LOG(ERROR, "invalid drop list: constraint or column_name is missed");
+      return node;
+    }
+
+    if (is_tableConstraint) {
+      argument->set_st_type(StatementType::constraint);
+    } else {
+      argument->set_st_type(StatementType::column);
+    }
+    SyntaxAnalyzer::MakeKinship(node, argument);
+
+    std::shared_ptr<Node> next_arguments =
+        this->GetListOf(StatementType::identifier);
+
+    SyntaxAnalyzer::MakeKinship(node, next_arguments);
+  } else {
+    LOG(ERROR, "invalid drop list: incorrect key word \'" << key_word << "\'");
+    return node;
+  }
+
+  if (!tokens_array_.empty()) {
+    if (SyntaxAnalyzer::IsComma(this->peek_first_token())) {
+      separator = this->GetDropList();
+
+      SyntaxAnalyzer::MakeKinship(node, separator);
+    }
+  }
+
+  return node;
+}
 std::shared_ptr<Node> SyntaxAnalyzer::GetColumnDefinition() {
   std::shared_ptr<Node> node, column_name, datatype;
   node = std::dynamic_pointer_cast<Node>(std::make_shared<RootNode>());
@@ -362,7 +442,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDataType() {
 
   std::string datatype = node->get_data();
   StatementType SQL_datatype;
-  if (datatype == "int") { SQL_datatype = StatementType::SQL_int; }
+  if (datatype == "int" || datatype == "integer") { SQL_datatype = StatementType::SQL_int; }
   else if (datatype == "float") { SQL_datatype = StatementType::SQL_float; }
   else if (datatype == "char") { SQL_datatype = StatementType::SQL_char; }
   else if (datatype == "varchar") { SQL_datatype = StatementType::SQL_varchar; }
@@ -591,28 +671,49 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetReference() {
   return reference;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetCondition() {
-  std::shared_ptr<Node> node;
-  node = this->GetORCondition();
+  std::shared_ptr<Node> node, OR_condition;
+  node = std::dynamic_pointer_cast<Node>(std::make_shared<RootNode>());
   node->set_st_type(StatementType::condition);
 
-  /* LogExpr        <-- OR
-   * OR             <-- AND-condition ('OR' AND-condition)*
-   * AND-condition  <-- NOT-condition ('AND' NOT-condition)*
-   * NOT-condition  <-- Predicate ('NOT' NOT-condition)?
-   * Predicate      <-- Expr / '(' LogExpr ')'                  */
+  OR_condition = this->GetORCondition();
+
+  SyntaxAnalyzer::MakeKinship(node, OR_condition);
 
   return node;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetORCondition() {
-  std::shared_ptr<Node> AND_condition;
+  std::shared_ptr<Node> node, AND_condition, next_AND_conditions;
+  node = std::dynamic_pointer_cast<Node>(std::make_shared<RootNode>());
+  node->set_st_type(StatementType::ORcondition);
 
-  // TODO: Get it recursively
   AND_condition = this->GetANDCondition();
 
-  return AND_condition;
+  SyntaxAnalyzer::MakeKinship(node, AND_condition);
+
+  if (!tokens_array_.empty()) {
+    if (SyntaxAnalyzer::IsWord(this->peek_first_token())) {
+      std::shared_ptr<StringNode> tmp =
+          std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
+      if (tmp->get_data() == "OR") {
+        this->pop_first_token();
+
+        if (tokens_array_.empty()) {
+          LOG(ERROR, "invalid OR-condition: AND-condition "
+                     "after the \'OR\' operator is missed");
+          return node;
+        } else {
+          next_AND_conditions = this->GetANDCondition();
+
+          SyntaxAnalyzer::MakeKinship(node, next_AND_conditions);
+        }
+      }
+    }
+  }
+
+  return node;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetANDCondition() {
-  std::shared_ptr<Node> node, NOT_condition, AND_operator, next_NOT_conditions;
+  std::shared_ptr<Node> node, NOT_condition, next_NOT_conditions;
   node = std::dynamic_pointer_cast<Node>(std::make_shared<RootNode>());
   node->set_st_type(StatementType::ANDcondition);
 
@@ -625,19 +726,18 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetANDCondition() {
       std::shared_ptr<StringNode> tmp =
           std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
       if (tmp->get_data() == "AND") {
-        AND_operator = this->get_first_token();
+        this->pop_first_token();
 
-        SyntaxAnalyzer::MakeKinship(node, AND_operator);
+        if (tokens_array_.empty()) {
+          LOG(ERROR, "invalid AND-condition: NOT-condition "
+                     "after the \\'AND\\' operator is missed");
+          return node;
+        } else {
+          next_NOT_conditions = this->GetNOTCondition();
+
+          SyntaxAnalyzer::MakeKinship(node, next_NOT_conditions);
+        }
       }
-
-      // TODO: Get NOT-conditions recursively
-//      if (tokens_array_.empty()) {
-//        LOG(ERROR, "invalid AND-condition: missed "
-//                   "NOT-condition after the \'AND\' operator");
-//        return node;
-//      } else {
-//        next_NOT_conditions =
-//      }
     }
   }
 
@@ -709,11 +809,6 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetExpression() {
   std::shared_ptr<Node> node;
   node = std::dynamic_pointer_cast<Node>(std::make_shared<RootNode>());
   node->set_st_type(StatementType::expression);
-
-  /* Word?      --> GetName
-   * Operator?  --> GetUnaryOperator
-   * Bracket?   --> (, GetExpression, )
-   * else:      --> GetMathExpression   */
 
   // Is it [table_name.] column ?
   if (SyntaxAnalyzer::IsWord(this->peek_first_token())) {
@@ -861,12 +956,140 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetMathExpression() {
    * Power      <-- Value ('^' Power)?
    * Value      <-- [0-9]+ / '(' MathExpr ')'                   */
 
+  node = this->GetMathSum();
+
   return node;
 }
-//std::shared_ptr<Node> SyntaxAnalyzer::GetMathSum();
-//std::shared_ptr<Node> SyntaxAnalyzer::GetMathProduct();
-//std::shared_ptr<Node> SyntaxAnalyzer::GetMathPower();
-//std::shared_ptr<Node> SyntaxAnalyzer::GetMathValue();
+std::shared_ptr<Node> SyntaxAnalyzer::GetMathSum() {
+  std::shared_ptr<Node> product_1, op_node, product_2;
+
+  product_1 = this->GetMathProduct();
+
+  if (!tokens_array_.empty()) {
+    while (SyntaxAnalyzer::IsOperator(this->peek_first_token())) {
+      // Get ("+" | "-")
+      op_node = this->get_first_token();
+      std::string operator_str =
+          std::dynamic_pointer_cast<StringNode>(op_node)->get_data();
+      if (operator_str != "+" || operator_str != "-") {
+        LOG(ERROR, "invalid Math expression: wrong operator \'"
+            << operator_str << "\'");
+        return product_1;
+      }
+
+      // Get next powers
+      if (tokens_array_.empty()) {
+        LOG(ERROR, "invalid Math expression: second operand for the \'"
+            << operator_str << "\' is missed");
+        return product_1;
+      } else {
+        product_2 = this->GetMathProduct();
+      }
+
+      SyntaxAnalyzer::MakeKinship(op_node, product_1);
+      SyntaxAnalyzer::MakeKinship(op_node, product_2);
+      product_1 = op_node;
+
+      if (tokens_array_.empty()) {
+        break;
+      }
+    }
+  }
+
+  return product_1;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetMathProduct() {
+  std::shared_ptr<Node> power_1, op_node, power_2;
+
+  power_1 = this->GetMathPower();
+
+  if (!tokens_array_.empty()) {
+    while (SyntaxAnalyzer::IsOperator(this->peek_first_token())) {
+      // Get ("*" | "/")
+      op_node = this->get_first_token();
+      std::string operator_str =
+          std::dynamic_pointer_cast<StringNode>(op_node)->get_data();
+      if (operator_str != "*" || operator_str != "/") {
+        LOG(ERROR, "invalid Math expression: wrong operator \'"
+            << operator_str << "\'");
+        return power_1;
+      }
+
+      // Get next powers
+      if (tokens_array_.empty()) {
+        LOG(ERROR, "invalid Math expression: second operand for the \'"
+            << operator_str << "\' is missed");
+        return power_1;
+      } else {
+        power_2 = this->GetMathPower();
+      }
+
+      SyntaxAnalyzer::MakeKinship(op_node, power_1);
+      SyntaxAnalyzer::MakeKinship(op_node, power_2);
+      power_1 = op_node;
+
+      if (tokens_array_.empty()) {
+        break;
+      }
+    }
+  }
+
+  return power_1;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetMathPower() {
+  std::shared_ptr<Node> power, degree_op, degree;
+
+  power = this->GetMathValue();
+
+  if (!tokens_array_.empty()) {
+    if (SyntaxAnalyzer::IsOperator(this->peek_first_token())) {
+      std::shared_ptr<StringNode> op_node =
+          std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
+      if (op_node->get_data() == "^") {
+        degree_op = this->get_first_token();
+
+        if (tokens_array_.empty()) {
+          LOG(ERROR, "invalid Math expression: degree is missed");
+          return power;
+        } else {
+          degree = this->GetMathPower();
+
+          SyntaxAnalyzer::MakeKinship(degree_op, power);
+          SyntaxAnalyzer::MakeKinship(degree_op, degree);
+
+          return degree_op;
+        }
+      }
+    }
+  }
+
+  return power;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetMathValue() {
+  std::shared_ptr<Node> value;
+
+  if (SyntaxAnalyzer::IsNumber(this->peek_first_token())) {
+    value = this->get_first_token();
+  } else if (SyntaxAnalyzer::IsOpeningRoundBracket(this->peek_first_token())) {
+    this->pop_first_token();
+
+    if (tokens_array_.empty()) {
+      LOG(ERROR, "invalid Math expression: closing round bracket is missed");
+      return value;
+    } else {
+      value = this->GetMathExpression();
+    }
+
+    if (SyntaxAnalyzer::IsClosingRoundBracket(this->peek_first_token())) {
+      this->pop_first_token();
+    } else {
+      LOG(ERROR, "invalid Math expression: closing round bracket is missed");
+      return value;
+    }
+  }
+
+  return value;
+}
 std::shared_ptr<Node> SyntaxAnalyzer::GetName() {
   std::shared_ptr<Node> node, identifier, next_identifiers;
   node = std::dynamic_pointer_cast<Node>(std::make_shared<RootNode>());
@@ -1034,6 +1257,17 @@ bool SyntaxAnalyzer::IsWord(std::shared_ptr<Node> &node) {
     return true;
   }
 }
+bool SyntaxAnalyzer::IsNumber(std::shared_ptr<Node> &node) {
+  bool is_int = node->get_type() != DataType::INT_NUMBER;
+  bool is_float = node->get_type() != DataType::FLOAT_NUMBER;
+  if (!is_int && !is_float) {
+    LOG(DEBUG, "token is not a number: " << node->get_type());
+    return false;
+  } else {
+    LOG(DEBUG, "token is a number");
+    return true;
+  }
+}
 bool SyntaxAnalyzer::IsOperator(std::shared_ptr<Node> &node) {
   if (node->get_type() != DataType::OPERATOR) {
     LOG(DEBUG, "token is not a operator: " << node->get_type());
@@ -1097,10 +1331,9 @@ bool SyntaxAnalyzer::IsBinaryOperator(std::shared_ptr<Node> &node) {
   if (node->get_type() == DataType::OPERATOR) {
     std::string data = std::dynamic_pointer_cast<StringNode>(node)->get_data();
     std::vector<std::string> bin_operators = {
-        "=",  "=", "<>",
-        "!=", ">", ">=",
-        "!>", "<", "<=",
-        "!<"
+        "=", "<>", "!=",
+        ">", ">=", "!>",
+        "<", "<=", "!<"
     };
     if (std::find(bin_operators.begin(),
                   bin_operators.end(),

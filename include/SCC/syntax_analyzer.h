@@ -33,6 +33,7 @@ private:
   std::shared_ptr<Node> GetUpdateSt();
 
   std::shared_ptr<Node> GetTableDefinition();
+  std::shared_ptr<Node> GetDropList();
   std::shared_ptr<Node> GetColumnDefinition();
   std::shared_ptr<Node> GetDataType();
   std::shared_ptr<Node> GetTableConstraint();
@@ -47,10 +48,10 @@ private:
   std::shared_ptr<Node> GetExpression();
   std::shared_ptr<Node> GetString();
   std::shared_ptr<Node> GetMathExpression();
-//std::shared_ptr<Node> SyntaxAnalyzer::GetMathSum();
-//std::shared_ptr<Node> SyntaxAnalyzer::GetMathProduct();
-//std::shared_ptr<Node> SyntaxAnalyzer::GetMathPower();
-//std::shared_ptr<Node> SyntaxAnalyzer::GetMathValue();
+  std::shared_ptr<Node> GetMathSum();
+  std::shared_ptr<Node> GetMathProduct();
+  std::shared_ptr<Node> GetMathPower();
+  std::shared_ptr<Node> GetMathValue();
   std::shared_ptr<Node> GetName();
   std::shared_ptr<Node> GetIdentifier();
   std::shared_ptr<Node> GetIdentifiers();
@@ -68,6 +69,7 @@ private:
   static bool IsBracket(std::shared_ptr<Node> &node);
   static bool IsPunctuation(std::shared_ptr<Node> &node);
   static bool IsWord(std::shared_ptr<Node> &node);
+  static bool IsNumber(std::shared_ptr<Node> &node);
   static bool IsOperator(std::shared_ptr<Node> &node);
 
   static bool IsDot(std::shared_ptr<Node> &node);
