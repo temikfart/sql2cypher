@@ -33,6 +33,8 @@ private:
   std::shared_ptr<Node> GetUpdateSt();
 
   std::shared_ptr<Node> GetTableDefinition();
+  std::shared_ptr<Node> GetTableDefinitionList();
+  std::shared_ptr<Node> GetDropListDefinition();
   std::shared_ptr<Node> GetDropList();
   std::shared_ptr<Node> GetColumnDefinition();
   std::shared_ptr<Node> GetDataType();
