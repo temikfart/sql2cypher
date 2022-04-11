@@ -27,8 +27,8 @@ enum StatementType {
   // Basic statements
   tableDefinition,
   dropList,
-  constraint,
-  column,
+  dropConstraint,
+  dropColumn,
   columnDefinition,
   tableConstraint,
   primaryKey,
