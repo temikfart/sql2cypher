@@ -287,6 +287,27 @@ void RootNode::ValidateType(DataType type) const {
   LOG(DEBUG, "valid type for RootNode");
 }
 
+//-------------------ServiceNode--------------------
+
+ServiceNode::ServiceNode() : Node(DataType::SERVICE) {
+  this->ValidateType(DataType::SERVICE);
+}
+
+void ServiceNode::PrintData(std::ostream &stream) {
+  stream << "SERVICE";
+}
+void ServiceNode::PrintType(std::ostream &stream) {
+  stream << "SERVICE";
+}
+
+void ServiceNode::ValidateType(DataType type) const {
+  if (type != DataType::SERVICE) {
+    LOG(ERROR, "invalid type for ServiceNode: " << type);
+    exit(EXIT_FAILURE);
+  }
+  LOG(DEBUG, "valid type for ServiceNode");
+}
+
 //-------------------Tree------------------------
 
 void Tree::PrintTreeRecursive(std::shared_ptr<Node> const &node,

@@ -61,6 +61,7 @@ enum StatementType {
 
 enum DataType {
   ROOT,
+  SERVICE,
   INT_NUMBER,
   FLOAT_NUMBER,
   BRACKET,
@@ -169,6 +170,17 @@ private:
 class RootNode: public Node {
 public:
   explicit RootNode();
+
+  void PrintData(std::ostream &stream) override;
+  void PrintType(std::ostream &stream) override;
+
+private:
+  void ValidateType(DataType type) const override;
+};
+
+class ServiceNode: public Node {
+public:
+  explicit ServiceNode();
 
   void PrintData(std::ostream &stream) override;
   void PrintType(std::ostream &stream) override;
