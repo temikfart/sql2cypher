@@ -59,7 +59,7 @@ private:
   
 public:
   Log();
-  void AddLog(LogLevel level, const std::string msg);
+  void AddLog(LogLevel level, const std::string& msg);
   LogLevel get_log_level() const;
   void set_log_level(LogLevel level);
   LogLevel StringToLogLevel(std::string level) const;

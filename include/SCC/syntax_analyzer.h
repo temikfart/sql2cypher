@@ -47,6 +47,7 @@ private:
   // Gets listOf dropColumns and dropConstraints
   std::shared_ptr<Node> GetDropListDefinition();
   std::shared_ptr<Node> GetDropList();
+  std::shared_ptr<Node> GetDropObject();
 
   // DML Statements
 

@@ -12,37 +12,43 @@ enum StatementType {
   ddlStatement,
   dmlStatement,
 
-  // DDL statements
+  // DDL Statements
   alterTableStatement,
   createDatabaseStatement,
   createTableStatement,
   dropDatabaseStatement,
   dropTableStatement,
 
-  // DML statements
+  // DDL Basic Statements
+  tableDefinition,
+  columnDefinition,
+  tableConstraint,
+  dropList,
+  dropConstraint,
+  dropColumn,
+
+  // DML Statements
   deleteStatement,
   insertStatement,
   updateStatement,
 
-  // Basic statements
-  tableDefinition,
-  dropList,
-  dropConstraint,
-  dropColumn,
-  columnDefinition,
-  tableConstraint,
-  primaryKey,
-  foreignKey,
-  reference,
+  // DML Basic Statements
   condition,
   ORcondition,
   ANDcondition,
   NOTcondition,
   predicate,
   expression,
+
+  // Basic Statements
+  primaryKey,
+  foreignKey,
+  reference,
   name,
   identifier,
   delimiter_dot,
+  delimiter_comma,
+  delimiter_semicolon,
 
   // SQL datatypes
   SQL_int,
