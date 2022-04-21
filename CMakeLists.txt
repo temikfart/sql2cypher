@@ -14,8 +14,8 @@ add_executable(SCC
         src/lexical_analyzer.cpp
         src/syntax_analyzer.cpp
         src/ast_handler.cpp
-        src/query_assembler.cpp)
-
+        src/query_assembler.cpp
+        src/tree_dump.cpp)
 
 include(FetchContent)
 FetchContent_Declare(
