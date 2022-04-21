@@ -81,6 +81,10 @@ TEST_F(TokenizerTests, CharNodeTest) {
   std::shared_ptr<CharNode> node3 =
       std::make_shared<CharNode>(';', DataType::PUNCTUATION);
   EXPECT_TRUE(Node::IsNodesEqual(node3, tTokenizer.get_first_token()));
+
+  std::shared_ptr<CharNode> node4 =
+      std::make_shared<CharNode>('.', DataType::PUNCTUATION);
+  EXPECT_TRUE(Node::IsNodesEqual(node4, tTokenizer.get_first_token()));
 }
 TEST_F(TokenizerTests, StringNodeTest) {
   config.set_sql_path(config.GetConfigPath() +
@@ -100,6 +104,10 @@ TEST_F(TokenizerTests, StringNodeTest) {
   std::shared_ptr<StringNode> node2 =
       std::make_shared<StringNode>(">=", DataType::OPERATOR);
   EXPECT_TRUE(Node::IsNodesEqual(node2, tTokenizer.get_first_token()));
+
+  std::shared_ptr<StringNode> node3 =
+      std::make_shared<StringNode>("^", DataType::OPERATOR);
+  EXPECT_TRUE(Node::IsNodesEqual(node3, tTokenizer.get_first_token()));
 }
 TEST_F(TokenizerTests, InvalidTest) {
   config.set_sql_path(config.GetConfigPath() +
