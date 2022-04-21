@@ -25,7 +25,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::Analyze(
     }
 
     if (!tokens_array_.empty()) {
-      LOG(TRACE, "array is not empty");
+      LOG(ERROR, "array is not empty");
+      exit(EXIT_FAILURE);
     }
 
     return root;
@@ -54,12 +55,9 @@ std::shared_ptr<Node> SyntaxAnalyzer::General() {
 
   return separator;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetDL() {
-  std::shared_ptr<Node> query;
-  query = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
-  query->set_st_type(StatementType::query);
+StatementType SyntaxAnalyzer::GetDLStType() {
+  StatementType DLStType;
 
-  this->ValidateIsWord(this->peek_first_token());
   std::string key_word =
       std::dynamic_pointer_cast<StringNode>(
           this->peek_first_token())->get_data();
@@ -82,20 +80,43 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDL() {
                                 return (key_word == st);
                               });
 
-  if (is_ddlSt) { query = this->GetDDLSt(); }
-  else if (is_dmlSt) { query = this->GetDMLSt(); }
-  else {
-    LOG(TRACE, "tokens array does not contain DDL or DML query");
-    return query;
+  if (is_ddlSt) {
+    DLStType = StatementType::ddlStatement;
+  } else if (is_dmlSt) {
+    DLStType = StatementType::dmlStatement;
+  } else {
+    LOG(ERROR,
+        "unknown DL: tokens array does not contain DDL or DML query");
+    exit(EXIT_FAILURE);
   }
+
+  return DLStType;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetDL() {
+  std::shared_ptr<Node> query, statement;
+  query = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+  query->set_st_type(StatementType::query);
+
+  this->ValidateIsWord(this->peek_first_token());
+
+  switch (this->GetDLStType()) {
+    case StatementType::ddlStatement:
+      statement = this->GetDDLSt();
+      break;
+    case StatementType::dmlStatement:
+      statement = this->GetDMLSt();
+      break;
+    default:
+      LOG(ERROR, "unknown DL");
+      exit(EXIT_FAILURE);
+  }
+  SyntaxAnalyzer::MakeKinship(query, statement);
 
   return query;
 }
 
-std::shared_ptr<Node> SyntaxAnalyzer::GetDDLSt() {
-  std::shared_ptr<Node> node, statement;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
-  node->set_st_type(StatementType::ddlStatement);
+StatementType SyntaxAnalyzer::GetDDLStType() {
+  StatementType DDLStType = StatementType::StTypeCount; // invalid value
 
   // Get first token
   std::string fst_kw =
@@ -106,7 +127,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDDLSt() {
   // Get second token
   if (tokens_array_.empty()) {
     LOG(ERROR, "invalid DDL query: second key word is missed");
-    return node;
+    exit(EXIT_FAILURE);
   }
   this->ValidateIsWord(this->peek_first_token());
   std::string snd_kw =
@@ -116,7 +137,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDDLSt() {
 
   if (tokens_array_.empty()) {
     LOG(ERROR, "body of the DDL statement is missed");
-    return node;
+    exit(EXIT_FAILURE);
   }
 
   // Define next rule
@@ -129,34 +150,60 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDDLSt() {
 
   // Invoke necessary rule
   if (is_CREATE) {
-    if (is_DATABASE) { statement = this->GetCreateDatabaseSt(); }
-    else if (is_TABLE) { statement = this->GetCreateTableSt(); }
+    if (is_DATABASE) { DDLStType = StatementType::createDatabaseStatement; }
+    else if (is_TABLE) { DDLStType = StatementType::createTableStatement; }
     else {
       LOG(ERROR, "unknown CREATE DDL statement");
-      return node;
+      exit(EXIT_FAILURE);
     }
   } else if (is_ALTER) {
-    if (is_TABLE) { statement = this->GetAlterTableSt(); }
+    if (is_TABLE) { DDLStType = StatementType::alterTableStatement; }
     else {
       LOG(ERROR, "unknown ALTER DDL statement");
-      return node;
+      exit(EXIT_FAILURE);
     }
   } else if (is_DROP) {
-    if (is_DATABASE) { statement = this->GetDropDatabaseSt(); }
-    else if (is_TABLE) { statement = this->GetDropTableSt(); }
+    if (is_DATABASE) { DDLStType = StatementType::dropDatabaseStatement; }
+    else if (is_TABLE) { DDLStType = StatementType::dropTableStatement; }
     else {
       LOG(ERROR, "unknown DROP DDL statement");
-      return node;
+      exit(EXIT_FAILURE);
     }
+  }
+
+  return DDLStType;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetDDLSt() {
+  std::shared_ptr<Node> node, statement;
+  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+  node->set_st_type(StatementType::ddlStatement);
+
+  switch (this->GetDDLStType()) {
+    case StatementType::createDatabaseStatement:
+      statement = this->GetCreateDatabaseSt();
+      break;
+    case StatementType::createTableStatement:
+      statement = this->GetCreateTableSt();
+      break;
+    case StatementType::alterTableStatement:
+      statement = this->GetAlterTableSt();
+      break;
+    case StatementType::dropDatabaseStatement:
+      statement = this->GetDropDatabaseSt();
+      break;
+    case StatementType::dropTableStatement:
+      statement = this->GetDropTableSt();
+      break;
+    default:
+      LOG(ERROR, "unknown DDL statement");
+      exit(EXIT_FAILURE);
   }
   SyntaxAnalyzer::MakeKinship(node, statement);
 
   return node;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetDMLSt() {
-  std::shared_ptr<Node> node, statement;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
-  node->set_st_type(StatementType::dmlStatement);
+StatementType SyntaxAnalyzer::GetDMLStType() {
+  StatementType DMLStType = StatementType::StTypeCount; // invalid value
 
   // Get first token
   std::string fst_kw =
@@ -169,12 +216,34 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDMLSt() {
   bool is_DELETE = fst_kw == "DELETE";
   bool is_INSERT = fst_kw == "INSERT";
 
-  if (is_UPDATE) { statement = this->GetUpdateSt(); }
-  else if (is_DELETE) { statement = this->GetDeleteSt(); }
-  else if (is_INSERT) { statement = this->GetInsertSt(); }
+  if (is_UPDATE) { DMLStType = StatementType::updateStatement; }
+  else if (is_DELETE) { DMLStType = StatementType::deleteStatement; }
+  else if (is_INSERT) { DMLStType = StatementType::insertStatement; }
   else {
-    LOG(ERROR, "unknown DML statement");
-    return node;
+    LOG(ERROR, "unknown DML statement type");
+    exit(EXIT_FAILURE);
+  }
+
+  return DMLStType;
+}
+std::shared_ptr<Node> SyntaxAnalyzer::GetDMLSt() {
+  std::shared_ptr<Node> node, statement;
+  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+  node->set_st_type(StatementType::dmlStatement);
+
+  switch (this->GetDMLStType()) {
+    case StatementType::updateStatement:
+      statement = this->GetUpdateSt();
+      break;
+    case StatementType::deleteStatement:
+      statement = this->GetDeleteSt();
+      break;
+    case StatementType::insertStatement:
+      statement = this->GetInsertSt();
+      break;
+    default:
+      LOG(ERROR, "unknown DML statement");
+      exit(EXIT_FAILURE);
   }
   SyntaxAnalyzer::MakeKinship(node, statement);
 
@@ -240,7 +309,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetCreateTableSt() {
   return node;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetAlterTableSt() {
-  std::shared_ptr<Node> node, table_name, action, argument;
+  std::shared_ptr<Node> node, table_name, action_str_node, argument;
   node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::alterTableStatement);
 
@@ -254,27 +323,31 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetAlterTableSt() {
     return node;
   }
   this->ValidateIsWord(this->peek_first_token());
-  action = this->get_first_token();
-  SyntaxAnalyzer::MakeKinship(node, action);
+  action_str_node = this->get_first_token();
+
+  std::shared_ptr<Node> action =
+      std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
 
   if (tokens_array_.empty()) {
     LOG(ERROR, "invalid alter table query:");
     return node;
-  } else {
-    this->ValidateIsWord(this->peek_first_token());
-    std::string action_str =
-        std::dynamic_pointer_cast<StringNode>(action)->get_data();
-    if (action_str == "ADD") {
-      argument = this->GetTableDefinition();
-    } else if (action_str == "DROP") {
-      argument = this->GetDropListDefinition();
-    } else {
-      LOG(ERROR, "invalid alter table query: incorrect action \'"
-          << action_str << "\'");
-      return node;
-    }
-    SyntaxAnalyzer::MakeKinship(action, argument);
   }
+  this->ValidateIsWord(this->peek_first_token());
+  std::string action_str =
+      std::dynamic_pointer_cast<StringNode>(action_str_node)->get_data();
+  if (action_str == "ADD") {
+    action->set_st_type(StatementType::alterActionADD);
+    argument = this->GetTableDefinition();
+  } else if (action_str == "DROP") {
+    action->set_st_type(StatementType::alterActionDROP);
+    argument = this->GetDropListDefinition();
+  } else {
+    LOG(ERROR, "invalid alter table query: incorrect action \'"
+        << action_str << "\'");
+    return node;
+  }
+  SyntaxAnalyzer::MakeKinship(node, action);
+  SyntaxAnalyzer::MakeKinship(action, argument);
 
   return node;
 }
@@ -332,43 +405,21 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableDefinition() {
   node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::tableDefinition);
 
-  std::string key_word =
-      std::dynamic_pointer_cast<StringNode>(
-          this->peek_first_token())->get_data();
-  bool is_tableConstraint =
-      key_word == "CONSTRAINT"
-          || key_word == "PRIMARY"
-          || key_word == "FOREIGN";
-
-  if (is_tableConstraint) {
-    argument = this->GetTableConstraint();
-  } else {
-    argument = this->GetColumnDefinition();
-  }
+  argument = this->GetTableDefinitionObject();
   SyntaxAnalyzer::MakeKinship(node, argument);
 
   if (!tokens_array_.empty()) {
     if (SyntaxAnalyzer::IsComma(this->peek_first_token())) {
-      separator = this->GetTableDefinitionList();
+      separator = this->GetListOf(StatementType::tableDefinition);
       SyntaxAnalyzer::MakeKinship(node, separator);
     }
   }
 
   return node;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetTableDefinitionList() {
-  std::shared_ptr<Node> separator, argument, next_arguments;
-  this->pop_first_token();
-  separator = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
-  separator->set_st_type(StatementType::delimiter_comma);
+std::shared_ptr<Node> SyntaxAnalyzer::GetTableDefinitionObject() {
+  std::shared_ptr<Node> argument;
 
-  if (tokens_array_.empty()) {
-    LOG(ERROR, "invalid table definition: "
-               "argument after the separator is missed");
-    return separator;
-  }
-
-  this->ValidateIsWord(this->peek_first_token());
   std::string key_word =
       std::dynamic_pointer_cast<StringNode>(
           this->peek_first_token())->get_data();
@@ -382,16 +433,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableDefinitionList() {
   } else {
     argument = this->GetColumnDefinition();
   }
-  SyntaxAnalyzer::MakeKinship(separator, argument);
 
-  if (!tokens_array_.empty()) {
-    if (SyntaxAnalyzer::IsComma(this->peek_first_token())) {
-      next_arguments = this->GetTableDefinitionList();
-      SyntaxAnalyzer::MakeKinship(separator, next_arguments);
-    }
-  }
-
-  return separator;
+  return argument;
 }
 
 std::shared_ptr<Node> SyntaxAnalyzer::GetColumnDefinition() {
@@ -428,20 +471,23 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableConstraint() {
   table_constraint->set_st_type(StatementType::tableConstraint);
 
   // Get full form if present
-  std::shared_ptr<Node> key_word_node = this->peek_first_token();
   std::string key_word =
-      std::dynamic_pointer_cast<StringNode>(key_word_node)->get_data();
+      std::dynamic_pointer_cast<StringNode>(
+          this->peek_first_token())->get_data();
   if (key_word == "CONSTRAINT") {
     this->pop_first_token();
-    SyntaxAnalyzer::MakeKinship(table_constraint, key_word_node);
+    std::shared_ptr<Node> constraint_kw =
+        std::dynamic_pointer_cast<ServiceNode>(
+            std::make_shared<ServiceNode>());
+    constraint_kw->set_st_type(StatementType::kw_constraint);
+    SyntaxAnalyzer::MakeKinship(table_constraint, constraint_kw);
 
     if (tokens_array_.empty()) {
       LOG(ERROR, "constraint name is missed");
       return table_constraint;
-    } else {
-      constraint_name = this->GetIdentifier();
-      SyntaxAnalyzer::MakeKinship(key_word_node, constraint_name);
     }
+    constraint_name = this->GetIdentifier();
+    SyntaxAnalyzer::MakeKinship(constraint_kw, constraint_name);
   }
 
   // Get PRIMARY | FOREIGN KEY
@@ -450,13 +496,13 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableConstraint() {
     return table_constraint;
   }
 
-  // Get PRIMARY | FOREIGN
+  // Get 'PRIMARY' | 'FOREIGN' key word
   this->ValidateIsWord(this->peek_first_token());
   std::string kind_of_key =
       std::dynamic_pointer_cast<StringNode>(
           this->get_first_token())->get_data();
 
-  // Get KEY
+  // Get 'KEY' key word
   if (tokens_array_.empty()) {
     LOG(ERROR, "invalid constraint definition: \'KEY\' is missed");
     return table_constraint;
@@ -466,7 +512,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableConstraint() {
       std::dynamic_pointer_cast<StringNode>(
           this->get_first_token())->get_data();
   if (KEY_kw != "KEY") {
-    LOG(ERROR, "incorrect word (KEY): " << KEY_kw);
+    LOG(ERROR, "expected \'KEY\', got \'" << KEY_kw << "\'");
     return table_constraint;
   }
 
@@ -508,7 +554,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDropListDefinition() {
 std::shared_ptr<Node> SyntaxAnalyzer::GetDropList() {
   std::shared_ptr<Node> separator, objects, next_objects;
   this->pop_first_token();
-  separator = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+  separator =
+      std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
   separator->set_st_type(StatementType::delimiter_comma);
 
   this->ValidateIsWord(this->peek_first_token());
@@ -632,22 +679,21 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetORCondition() {
 
   SyntaxAnalyzer::MakeKinship(node, AND_condition);
 
-  if (!tokens_array_.empty()) {
-    if (SyntaxAnalyzer::IsWord(this->peek_first_token())) {
-      std::shared_ptr<StringNode> tmp =
-          std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
-      if (tmp->get_data() == "OR") {
-        this->pop_first_token();
+  if (!tokens_array_.empty()
+      && SyntaxAnalyzer::IsWord(this->peek_first_token())) {
+    std::shared_ptr<StringNode> tmp =
+        std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
+    if (tmp->get_data() == "OR") {
+      this->pop_first_token();
 
-        if (tokens_array_.empty()) {
-          LOG(ERROR, "invalid OR-condition: AND-condition "
-                     "after the \'OR\' operator is missed");
-          return node;
-        } else {
-          next_AND_conditions = this->GetANDCondition();
+      if (tokens_array_.empty()) {
+        LOG(ERROR, "invalid OR-condition: AND-condition "
+                   "after the \'OR\' operator is missed");
+        return node;
+      } else {
+        next_AND_conditions = this->GetANDCondition();
 
-          SyntaxAnalyzer::MakeKinship(node, next_AND_conditions);
-        }
+        SyntaxAnalyzer::MakeKinship(node, next_AND_conditions);
       }
     }
   }
@@ -1055,11 +1101,10 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetForeignKey() {
     SyntaxAnalyzer::MakeKinship(foreign_key, column_name);
 
     // Get listOf(column_names)
-    if (!tokens_array_.empty()) {
-      if (SyntaxAnalyzer::IsComma(this->peek_first_token())) {
-        separator = this->GetListOf(StatementType::identifier);
-        SyntaxAnalyzer::MakeKinship(foreign_key, separator);
-      }
+    if (!tokens_array_.empty()
+        && SyntaxAnalyzer::IsComma(this->peek_first_token())) {
+      separator = this->GetListOf(StatementType::identifier);
+      SyntaxAnalyzer::MakeKinship(foreign_key, separator);
     }
   }
 
@@ -1108,11 +1153,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetReference() {
   }
 
   // Get columns if present
-  if (!tokens_array_.empty()) {
-    if (!SyntaxAnalyzer::IsOpeningRoundBracket(this->peek_first_token())) {
-      return reference;
-    }
-
+  if (!tokens_array_.empty()
+      && SyntaxAnalyzer::IsOpeningRoundBracket(this->peek_first_token())) {
     std::shared_ptr<Node> ref_column_name, next_ref_column_names;
 
     this->ValidateIsOpeningRoundBracket(this->peek_first_token());
@@ -1160,12 +1202,16 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetString() {
     LOG(ERROR, "invalid expression: invalid string");
     return node;
   }
-  std::shared_ptr<StringNode> str;
+  std::shared_ptr<StringNode> str =
+      std::make_shared<StringNode>("", DataType::STRING);
   while (!SyntaxAnalyzer::IsSingleQuote(this->peek_first_token())
       || !SyntaxAnalyzer::IsDoubleQuote(this->peek_first_token())) {
     std::shared_ptr<Node> tmp = this->get_first_token();
     DataType tmp_type = tmp->get_type();
-    std::string new_data = str->get_data() + " ";
+    std::string new_data;
+    if (!str->get_data().empty()) {
+      new_data = str->get_data() + " ";
+    }
     switch (tmp_type) {
       case DataType::INT_NUMBER:
         new_data += std::to_string(
@@ -1215,6 +1261,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetName() {
   name->set_st_type(StatementType::name);
 
   identifier = this->GetIdentifier();
+  SyntaxAnalyzer::MakeKinship(name, identifier);
 
   if (!tokens_array_.empty()) {
     if (SyntaxAnalyzer::IsDot(this->peek_first_token())) {
@@ -1223,7 +1270,6 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetName() {
     }
   }
 
-  SyntaxAnalyzer::MakeKinship(name, identifier);
 
   return name;
 }
@@ -1254,10 +1300,12 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetIdentifiers() {
 std::shared_ptr<Node> SyntaxAnalyzer::GetIdentifier() {
   this->ValidateIsWord(this->peek_first_token());
   std::shared_ptr<Node> identifier;
-  this->pop_first_token();
   identifier =
       std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
   identifier->set_st_type(StatementType::identifier);
+
+  std::shared_ptr<Node> argument = this->get_first_token();
+  SyntaxAnalyzer::MakeKinship(identifier, argument);
 
   return identifier;
 }
@@ -1276,19 +1324,28 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetListOf(
     return separator;
   }
   switch (get_function_type) {
-    case StatementType::identifier:argument = this->GetIdentifier();
+    case StatementType::identifier:
+      argument = this->GetIdentifier();
       break;
-    case StatementType::columnDefinition:this->ValidateIsWord(this->peek_first_token());
+    case StatementType::tableDefinition:
+      this->ValidateIsWord(this->peek_first_token());
+      argument = this->GetTableDefinitionObject();
+      break;
+    case StatementType::columnDefinition:
+      this->ValidateIsWord(this->peek_first_token());
       argument = this->GetColumnDefinition();
       break;
-    case StatementType::tableConstraint:this->ValidateIsWord(this->peek_first_token());
+    case StatementType::tableConstraint:
+      this->ValidateIsWord(this->peek_first_token());
       argument = this->GetTableConstraint();
       break;
-    case StatementType::name:this->ValidateIsWord(this->peek_first_token());
+    case StatementType::name:
+      this->ValidateIsWord(this->peek_first_token());
       argument = this->GetName();
       break;
-    default:LOG(ERROR, "unknown statement type for the listOf");
-      break;
+    default:
+      LOG(ERROR, "unknown statement type for the listOf");
+      exit(EXIT_FAILURE);
   }
   SyntaxAnalyzer::MakeKinship(separator, argument);
 

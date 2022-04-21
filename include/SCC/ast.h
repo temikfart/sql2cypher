@@ -23,6 +23,8 @@ enum StatementType {
   tableDefinition,
   columnDefinition,
   tableConstraint,
+  alterActionADD,
+  alterActionDROP,
   dropList,
   dropConstraint,
   dropColumn,
@@ -50,6 +52,9 @@ enum StatementType {
   delimiter_comma,
   delimiter_semicolon,
 
+  // Other key words
+  kw_constraint,
+
   // SQL datatypes
   SQL_int,
   SQL_float,
@@ -67,7 +72,8 @@ enum DataType {
   BRACKET,
   PUNCTUATION,
   OPERATOR,
-  WORD
+  WORD,
+  STRING
 };
 
 class Node {

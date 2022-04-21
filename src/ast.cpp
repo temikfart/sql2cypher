@@ -259,7 +259,8 @@ void StringNode::PrintType(std::ostream &stream) {
 void StringNode::ValidateType(DataType type) const {
   bool is_WORD = type == DataType::WORD;
   bool is_OPERATOR = type == DataType::OPERATOR;
-  if (!(is_WORD || is_OPERATOR)) {
+  bool is_STRING = type == DataType::STRING;
+  if (!(is_WORD || is_OPERATOR || is_STRING)) {
     LOG(ERROR, "invalid type for StringNode: " << type);
     exit(EXIT_FAILURE);
   }

@@ -19,11 +19,15 @@ private:
   // Start
 
   std::shared_ptr<Node> General();
+  StatementType GetDLStType();
   std::shared_ptr<Node> GetDL();
 
   // Define language (DDL | DML)
 
+  StatementType GetDDLStType();
   std::shared_ptr<Node> GetDDLSt();
+
+  StatementType GetDMLStType();
   std::shared_ptr<Node> GetDMLSt();
 
   // DDL Statements
@@ -39,7 +43,7 @@ private:
   // Gets tableDefinition, which consist
   // of tableConstraints and columnDefinitions
   std::shared_ptr<Node> GetTableDefinition();
-  std::shared_ptr<Node> GetTableDefinitionList();
+  std::shared_ptr<Node> GetTableDefinitionObject();
 
   std::shared_ptr<Node> GetColumnDefinition();
   std::shared_ptr<Node> GetTableConstraint();
