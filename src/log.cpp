@@ -44,7 +44,7 @@ Log::Log() {
   filename_ = this->TimeToLogName(this->get_timestamp());
   output_.open(this->GetLogPath(), ios::out);
 }
-void Log::AddLog(LogLevel level, const string msg) {
+void Log::AddLog(LogLevel level, const string& msg) {
   this->ValidateLogLevel(level);
   
   ostringstream output;

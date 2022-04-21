@@ -14,7 +14,7 @@
   new_log << path.substr(path.find_last_of('/') + 1)            \
     << ": " << __FUNCTION__ << "(): " << __LINE__ << ": "       \
     << msg << std::endl;                                        \
-  SCC_log.AddLog(level, std::move(new_log.str()));              \
+  SCC_log.AddLog(level, new_log.str());                         \
   break;                                                        \
 } while(true)
 
@@ -59,7 +59,7 @@ private:
   
 public:
   Log();
-  void AddLog(LogLevel level, const std::string msg);
+  void AddLog(LogLevel level, const std::string& msg);
   LogLevel get_log_level() const;
   void set_log_level(LogLevel level);
   LogLevel StringToLogLevel(std::string level) const;

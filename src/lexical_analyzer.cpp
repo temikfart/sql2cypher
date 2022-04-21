@@ -52,6 +52,9 @@ void Tokenizer::Tokenize() {
     }
   }
 }
+std::deque<std::shared_ptr<Node>> Tokenizer::get_tokens_array() const {
+  return tokens_array_;
+}
 
 void Tokenizer::GetNumber() {
   double data = 0.0;

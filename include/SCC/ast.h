@@ -5,29 +5,95 @@
 #include <memory>
 #include "SCC/config.h"
 
+enum StatementType {
+  EMPTY_TYPE,
+  Program,
+  query,
+  ddlStatement,
+  dmlStatement,
+
+  // DDL Statements
+  alterTableStatement,
+  createDatabaseStatement,
+  createTableStatement,
+  dropDatabaseStatement,
+  dropTableStatement,
+
+  // DDL Basic Statements
+  tableDefinition,
+  columnDefinition,
+  tableConstraint,
+  alterActionADD,
+  alterActionDROP,
+  dropList,
+  dropConstraint,
+  dropColumn,
+
+  // DML Statements
+  deleteStatement,
+  insertStatement,
+  updateStatement,
+
+  // DML Basic Statements
+  condition,
+  ORcondition,
+  ANDcondition,
+  NOTcondition,
+  predicate,
+  expression,
+
+  // Basic Statements
+  primaryKey,
+  foreignKey,
+  reference,
+  name,
+  identifier,
+  delimiter_dot,
+  delimiter_comma,
+  delimiter_semicolon,
+
+  // Other key words
+  kw_constraint,
+
+  // SQL datatypes
+  SQL_int,
+  SQL_float,
+  SQL_char,
+  SQL_varchar,
+
+  StTypeCount
+};
+
 enum DataType {
   ROOT,
+  SERVICE,
   INT_NUMBER,
   FLOAT_NUMBER,
   BRACKET,
   PUNCTUATION,
   OPERATOR,
-  WORD
+  WORD,
+  STRING
 };
 
 class Node {
 protected:
   DataType type_;
+  StatementType st_type_ = StatementType::EMPTY_TYPE;
+  std::shared_ptr<Node> parent_ = nullptr;
   std::vector<std::shared_ptr<Node>> children_;
 
 public:
   explicit Node(DataType type);
   virtual ~Node();
 
+  void set_st_type(StatementType type);
+  void set_parent(std::shared_ptr<Node>& parent);
   DataType get_type() const;
+  StatementType get_st_type();
   std::shared_ptr<Node>& get_child (size_t node_num);
-  size_t get_children_amount () const;
-
+  size_t get_children_amount() const;
+  std::shared_ptr<Node>& get_parent();
   void AddChild(std::shared_ptr<Node> const& node);
   static bool IsNodesEqual(const std::shared_ptr<Node>& node1,
                            const std::shared_ptr<Node>& node2);
@@ -38,6 +104,7 @@ public:
 private:
   void ValidateChildNumber(size_t node_num) const;
   void ValidateAddChild(std::shared_ptr<Node> const& node) const;
+  void ValidateStType(StatementType type);
   virtual void ValidateType(DataType type) const = 0;
 };
 
@@ -117,13 +184,18 @@ private:
   void ValidateType(DataType type) const override;
 };
 
+class ServiceNode: public Node {
+public:
+  explicit ServiceNode();
+
+  void PrintData(std::ostream &stream) override;
+  void PrintType(std::ostream &stream) override;
+
+private:
+  void ValidateType(DataType type) const override;
+};
+
 namespace Tree {
   void PrintTreeRecursive(std::shared_ptr<Node> const &node,
                           std::ostream &stream);
 };
-
-//bool operator== (std::shared_ptr<Node> const& lhs, //TODO: decide how to implement operator== for shared_ptr<Node>
-//                 std::shared_ptr<Node> const& rhs);
-//
-//bool operator!= (std::shared_ptr<Node> const& lhs,
-//                 std::shared_ptr<Node> const& rhs);

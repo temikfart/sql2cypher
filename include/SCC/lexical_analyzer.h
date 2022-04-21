@@ -17,6 +17,7 @@ public:
 
   void PrintTokens();
   void Tokenize();
+  std::deque<std::shared_ptr<Node>> get_tokens_array() const;
 
 private:
   void GetNumber();

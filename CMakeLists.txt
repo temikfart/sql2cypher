@@ -8,13 +8,13 @@ add_compile_options(-Wall -Wextra)
 include_directories(include)
 add_executable(SCC
         src/main.cpp
-        src/config.cpp
         src/log.cpp
+        src/config.cpp
+        src/ast.cpp
         src/lexical_analyzer.cpp
         src/syntax_analyzer.cpp
         src/ast_handler.cpp
-        src/query_assembler.cpp
-        src/ast.cpp)
+        src/query_assembler.cpp)
 
 
 include(FetchContent)

@@ -7,6 +7,16 @@
 Node::Node(DataType type) : type_(type) {}
 Node::~Node() {}
 
+void Node::set_st_type(StatementType type) {
+  this->ValidateStType(type);
+  st_type_ = type;
+}
+void Node::set_parent(std::shared_ptr<Node>& node) {
+  parent_ = node;
+}
+StatementType Node::get_st_type() {
+  return st_type_;
+}
 DataType Node::get_type() const {
   return type_;
 }
@@ -16,6 +26,9 @@ std::shared_ptr<Node>& Node::get_child (size_t node_num) {
 }
 size_t Node::get_children_amount () const {
   return children_.size();
+}
+std::shared_ptr<Node>& Node::get_parent() {
+  return parent_;
 }
 
 void Node::AddChild(std::shared_ptr<Node> const& node) {
@@ -56,6 +69,9 @@ bool Node::IsNodesEqual(const std::shared_ptr<Node>& node1,
         return false;
       }
       break;
+    default:
+      LOG(ERROR, "invalid Datatype: " << node1->get_type());
+      exit(EXIT_FAILURE);
   }
 
   size_t children_amount = node1->get_children_amount();
@@ -80,6 +96,13 @@ void Node::ValidateAddChild(std::shared_ptr<Node> const& node) const {
     exit(EXIT_FAILURE);
   }
   LOG(DEBUG, "adding node is valid");
+}
+void Node::ValidateStType(StatementType type) {
+  if (StatementType::StTypeCount <= type) {
+    LOG(ERROR, "invalid StatementType: " << type);
+    exit(EXIT_FAILURE);
+  }
+  LOG(DEBUG, "StatementType is valid");
 }
 
 //-------------------IntNumNode---------------------
@@ -236,7 +259,8 @@ void StringNode::PrintType(std::ostream &stream) {
 void StringNode::ValidateType(DataType type) const {
   bool is_WORD = type == DataType::WORD;
   bool is_OPERATOR = type == DataType::OPERATOR;
-  if (!(is_WORD || is_OPERATOR)) {
+  bool is_STRING = type == DataType::STRING;
+  if (!(is_WORD || is_OPERATOR || is_STRING)) {
     LOG(ERROR, "invalid type for StringNode: " << type);
     exit(EXIT_FAILURE);
   }
@@ -264,6 +288,27 @@ void RootNode::ValidateType(DataType type) const {
   LOG(DEBUG, "valid type for RootNode");
 }
 
+//-------------------ServiceNode--------------------
+
+ServiceNode::ServiceNode() : Node(DataType::SERVICE) {
+  this->ValidateType(DataType::SERVICE);
+}
+
+void ServiceNode::PrintData(std::ostream &stream) {
+  stream << "SERVICE";
+}
+void ServiceNode::PrintType(std::ostream &stream) {
+  stream << "SERVICE";
+}
+
+void ServiceNode::ValidateType(DataType type) const {
+  if (type != DataType::SERVICE) {
+    LOG(ERROR, "invalid type for ServiceNode: " << type);
+    exit(EXIT_FAILURE);
+  }
+  LOG(DEBUG, "valid type for ServiceNode");
+}
+
 //-------------------Tree------------------------
 
 void Tree::PrintTreeRecursive(std::shared_ptr<Node> const &node,
@@ -278,53 +323,3 @@ void Tree::PrintTreeRecursive(std::shared_ptr<Node> const &node,
     PrintTreeRecursive(node->get_child(i), std::cout);
   }
 }
-
-//bool operator== (std::shared_ptr<Node> const& lhs,
-//                 std::shared_ptr<Node> const& rhs) {
-//  if (lhs->get_type() != rhs->get_type() ||
-//      lhs->get_children_amount() != rhs->get_children_amount()) {
-//    return false;
-//  }
-//
-//  switch (lhs->get_type()) {
-//    case DataType::ROOT:
-//      return true;
-//    case DataType::INT_NUMBER:
-//      if (std::dynamic_pointer_cast<IntNumNode>(lhs)->get_data() !=
-//          std::dynamic_pointer_cast<IntNumNode>(rhs)->get_data()) {
-//        return false;
-//      }
-//      break;
-//    case DataType::FLOAT_NUMBER:
-//      if (std::dynamic_pointer_cast<FloatNumNode>(lhs)->get_data() !=
-//          std::dynamic_pointer_cast<FloatNumNode>(rhs)->get_data()) {
-//        return false;
-//      }
-//      break;
-//    case DataType::PUNCTUATION: case DataType::BRACKET:
-//      if (std::dynamic_pointer_cast<CharNode>(lhs)->get_data() !=
-//          std::dynamic_pointer_cast<CharNode>(rhs)->get_data()) {
-//        return false;
-//      }
-//      break;
-//    case DataType::WORD: case DataType::OPERATOR:
-//      if (std::dynamic_pointer_cast<StringNode>(lhs)->get_data() !=
-//          std::dynamic_pointer_cast<StringNode>(rhs)->get_data()) {
-//        return false;
-//      }
-//      break;
-//  }
-//
-//  size_t children_amount = lhs->get_children_amount();
-//  for (size_t i = 0; i < children_amount; i++) {
-//    if (!(lhs->get_child(i) == rhs->get_child(i)))
-//      return false;
-//  }
-//
-//  return true;
-//}
-//
-//bool operator!= (std::shared_ptr<Node> const& lhs,
-//                 std::shared_ptr<Node> const& rhs) {
-//  return !(lhs == rhs);
-//}
