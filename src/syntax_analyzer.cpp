@@ -1165,7 +1165,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetReference() {
       return reference;
     } else {
       ref_column_name = this->GetIdentifier();
-      SyntaxAnalyzer::MakeKinship(ref_table_name, ref_column_name);
+      SyntaxAnalyzer::MakeKinship(reference, ref_column_name);
 
       if (tokens_array_.empty()) {
         LOG(ERROR, "invalid reference: closing round bracket is missed");
@@ -1174,7 +1174,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetReference() {
         if (SyntaxAnalyzer::IsComma(this->peek_first_token())) {
           next_ref_column_names =
               this->GetListOf(StatementType::identifier);
-          SyntaxAnalyzer::MakeKinship(ref_table_name, next_ref_column_names);
+          SyntaxAnalyzer::MakeKinship(reference, next_ref_column_names);
         }
       }
     }

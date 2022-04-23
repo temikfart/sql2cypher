@@ -19,8 +19,9 @@ public:
 
 private:
   std::shared_ptr<Node> ast_;
-  std::ofstream &out_ = config.WriteCypher();
+  std::ofstream& out_ = config.WriteCypher();
   int constraint_counter = 0;
+  int relationship_counter = 0;
 
   void TranslateProgram(std::shared_ptr<Node> node);
   void TranslateQuery(std::shared_ptr<Node> node);
@@ -34,18 +35,23 @@ private:
   void TranslateDropDatabase(std::shared_ptr<Node> node);
   void TranslateDropTable(std::shared_ptr<Node> node);
 
+  void TranslateAlterTableActionAdd(std::shared_ptr<Node> action_node,
+                                    std::string& table_name);
+  void TranslateAlterTableActionDrop(std::shared_ptr<Node> action_node,
+                                     std::string& table_name);
+
   std::vector<StdProperty> TranslateListOfColumnDefinitions(
       std::shared_ptr<Node> node);
   StdProperty TranslateColumnDefinition(std::shared_ptr<Node> node);
 
-  void TranslateTableConstraint(std::shared_ptr<Node> node,
-                                std::string table_name);
+  void TranslateListOfTableConstraints(std::shared_ptr<Node> node,
+                                       std::string& table_name);
   std::shared_ptr<Node> FindConstraint(std::shared_ptr<Node> node);
 
   void TranslateDropObject(std::shared_ptr<Node> node,
-                           std::string table_name);
+                           std::string& table_name);
   void TranslateListOfDropObjects(std::shared_ptr<Node> node,
-                                  std::string table_name);
+                                  std::string& table_name);
 
   void TranslateInsert(std::shared_ptr<Node> node);
   void TranslateDelete(std::shared_ptr<Node> node);
@@ -59,7 +65,6 @@ private:
       std::string& table_name);
   void TranslateForeignKey(
       std::shared_ptr<Node> key,
-      std::string& constraint_name,
       std::string& table_name);
   void CreateUniqueNodePropertyConstraint(
       const std::string& constraint_name,
@@ -69,9 +74,13 @@ private:
       const std::string& constraint_name,
       const std::string& LabelName,
       const std::string& property);
+  void CreateRelationship(const std::string& label_name,
+                          const std::string& ref_label_name);
+  void RemoveProperties(const std::string& label_name,
+                        const std::vector<std::string>& properties);
 
-  std::vector<std::string> GetListOfProperties(std::shared_ptr<Node> node);
-  std::vector<std::string> GetListOfNames(std::shared_ptr<Node> node);
+  std::vector<std::string> GetListOf(std::shared_ptr<Node> node,
+                                     StatementType type);
 
   std::string TranslateName(std::shared_ptr<Node> node);
   std::string TranslateIdentifiers(std::shared_ptr<Node> node);
