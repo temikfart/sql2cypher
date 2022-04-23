@@ -1,409 +1,433 @@
 digraph Dump
 {
-	Node0 [shape = record, label = " {<data> ROOT | <type> ROOT} "];
-	Node1 [shape = record, label = " {<data> query | <type> SERVICE} "];
-	Node0 -> Node1
-	Node2 [shape = record, label = " {<data> ddlStatement | <type> SERVICE} "];
-	Node1 -> Node2
-	Node3 [shape = record, label = " {<data> createDatabaseStatement | <type> SERVICE} "];
-	Node2 -> Node3
-	Node4 [shape = record, label = " {<data> name | <type> SERVICE} "];
-	Node3 -> Node4
-	Node5 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node4 -> Node5
-	Node6 [shape = record, label = " {<data> \"my_db_1\" | <type> WORD} "];
-	Node5 -> Node6
-	Node7 [shape = record, label = " {<data> ; | <type> SERVICE} "];
-	Node0 -> Node7
-	Node8 [shape = record, label = " {<data> query | <type> SERVICE} "];
-	Node7 -> Node8
-	Node9 [shape = record, label = " {<data> ddlStatement | <type> SERVICE} "];
-	Node8 -> Node9
-	Node10 [shape = record, label = " {<data> createDatabaseStatement | <type> SERVICE} "];
-	Node9 -> Node10
-	Node11 [shape = record, label = " {<data> name | <type> SERVICE} "];
-	Node10 -> Node11
-	Node12 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node11 -> Node12
-	Node13 [shape = record, label = " {<data> \"my_db_2\" | <type> WORD} "];
-	Node12 -> Node13
-	Node14 [shape = record, label = " {<data> ; | <type> SERVICE} "];
-	Node7 -> Node14
-	Node15 [shape = record, label = " {<data> query | <type> SERVICE} "];
-	Node14 -> Node15
-	Node16 [shape = record, label = " {<data> ddlStatement | <type> SERVICE} "];
-	Node15 -> Node16
-	Node17 [shape = record, label = " {<data> createDatabaseStatement | <type> SERVICE} "];
-	Node16 -> Node17
-	Node18 [shape = record, label = " {<data> name | <type> SERVICE} "];
-	Node17 -> Node18
-	Node19 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node18 -> Node19
-	Node20 [shape = record, label = " {<data> \"my_db_3\" | <type> WORD} "];
-	Node19 -> Node20
-	Node21 [shape = record, label = " {<data> ; | <type> SERVICE} "];
-	Node14 -> Node21
-	Node22 [shape = record, label = " {<data> query | <type> SERVICE} "];
-	Node21 -> Node22
-	Node23 [shape = record, label = " {<data> ddlStatement | <type> SERVICE} "];
-	Node22 -> Node23
-	Node24 [shape = record, label = " {<data> createTableStatement | <type> SERVICE} "];
-	Node23 -> Node24
-	Node25 [shape = record, label = " {<data> name | <type> SERVICE} "];
-	Node24 -> Node25
-	Node26 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node25 -> Node26
-	Node27 [shape = record, label = " {<data> \"my_table_1\" | <type> WORD} "];
-	Node26 -> Node27
-	Node28 [shape = record, label = " {<data> tableDefinition | <type> SERVICE} "];
-	Node24 -> Node28
-	Node29 [shape = record, label = " {<data> columnDefinition | <type> SERVICE} "];
-	Node28 -> Node29
-	Node30 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node29 -> Node30
-	Node31 [shape = record, label = " {<data> \"my_col_1_1\" | <type> WORD} "];
-	Node30 -> Node31
-	Node32 [shape = record, label = " {<data> \"integer\" | <type> WORD} "];
-	Node29 -> Node32
-	Node33 [shape = record, label = " {<data> , | <type> SERVICE} "];
-	Node28 -> Node33
-	Node34 [shape = record, label = " {<data> columnDefinition | <type> SERVICE} "];
-	Node33 -> Node34
-	Node35 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node34 -> Node35
-	Node36 [shape = record, label = " {<data> \"my_col_1_2\" | <type> WORD} "];
-	Node35 -> Node36
-	Node37 [shape = record, label = " {<data> \"varchar\" | <type> WORD} "];
-	Node34 -> Node37
-	Node38 [shape = record, label = " {<data> , | <type> SERVICE} "];
-	Node33 -> Node38
-	Node39 [shape = record, label = " {<data> columnDefinition | <type> SERVICE} "];
-	Node38 -> Node39
-	Node40 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node39 -> Node40
-	Node41 [shape = record, label = " {<data> \"my_col_1_3\" | <type> WORD} "];
-	Node40 -> Node41
-	Node42 [shape = record, label = " {<data> \"char\" | <type> WORD} "];
-	Node39 -> Node42
-	Node43 [shape = record, label = " {<data> , | <type> SERVICE} "];
-	Node38 -> Node43
-	Node44 [shape = record, label = " {<data> columnDefinition | <type> SERVICE} "];
-	Node43 -> Node44
-	Node45 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node44 -> Node45
-	Node46 [shape = record, label = " {<data> \"my_col_1_4\" | <type> WORD} "];
-	Node45 -> Node46
-	Node47 [shape = record, label = " {<data> \"float\" | <type> WORD} "];
-	Node44 -> Node47
-	Node48 [shape = record, label = " {<data> , | <type> SERVICE} "];
-	Node43 -> Node48
-	Node49 [shape = record, label = " {<data> tableConstraint | <type> SERVICE} "];
-	Node48 -> Node49
-	Node50 [shape = record, label = " {<data> primaryKey | <type> SERVICE} "];
-	Node49 -> Node50
-	Node51 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node50 -> Node51
-	Node52 [shape = record, label = " {<data> \"my_col_1_1\" | <type> WORD} "];
-	Node51 -> Node52
-	Node53 [shape = record, label = " {<data> , | <type> SERVICE} "];
-	Node48 -> Node53
-	Node54 [shape = record, label = " {<data> tableConstraint | <type> SERVICE} "];
-	Node53 -> Node54
-	Node55 [shape = record, label = " {<data> kw_constraint | <type> SERVICE} "];
-	Node54 -> Node55
-	Node56 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node55 -> Node56
-	Node57 [shape = record, label = " {<data> \"my_constraint_1\" | <type> WORD} "];
-	Node56 -> Node57
-	Node58 [shape = record, label = " {<data> primaryKey | <type> SERVICE} "];
-	Node54 -> Node58
-	Node59 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node58 -> Node59
-	Node60 [shape = record, label = " {<data> \"my_col_1_2\" | <type> WORD} "];
-	Node59 -> Node60
-	Node61 [shape = record, label = " {<data> ; | <type> SERVICE} "];
-	Node21 -> Node61
-	Node62 [shape = record, label = " {<data> query | <type> SERVICE} "];
-	Node61 -> Node62
-	Node63 [shape = record, label = " {<data> ddlStatement | <type> SERVICE} "];
-	Node62 -> Node63
-	Node64 [shape = record, label = " {<data> createTableStatement | <type> SERVICE} "];
-	Node63 -> Node64
-	Node65 [shape = record, label = " {<data> name | <type> SERVICE} "];
-	Node64 -> Node65
-	Node66 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node65 -> Node66
-	Node67 [shape = record, label = " {<data> \"my_table_2\" | <type> WORD} "];
-	Node66 -> Node67
-	Node68 [shape = record, label = " {<data> tableDefinition | <type> SERVICE} "];
-	Node64 -> Node68
-	Node69 [shape = record, label = " {<data> columnDefinition | <type> SERVICE} "];
-	Node68 -> Node69
-	Node70 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node69 -> Node70
-	Node71 [shape = record, label = " {<data> \"my_col_2_1\" | <type> WORD} "];
-	Node70 -> Node71
-	Node72 [shape = record, label = " {<data> \"integer\" | <type> WORD} "];
-	Node69 -> Node72
-	Node73 [shape = record, label = " {<data> , | <type> SERVICE} "];
-	Node68 -> Node73
-	Node74 [shape = record, label = " {<data> columnDefinition | <type> SERVICE} "];
-	Node73 -> Node74
-	Node75 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node74 -> Node75
-	Node76 [shape = record, label = " {<data> \"my_col_2_2\" | <type> WORD} "];
-	Node75 -> Node76
-	Node77 [shape = record, label = " {<data> \"varchar\" | <type> WORD} "];
-	Node74 -> Node77
-	Node78 [shape = record, label = " {<data> , | <type> SERVICE} "];
-	Node73 -> Node78
-	Node79 [shape = record, label = " {<data> columnDefinition | <type> SERVICE} "];
-	Node78 -> Node79
-	Node80 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node79 -> Node80
-	Node81 [shape = record, label = " {<data> \"my_col_2_3\" | <type> WORD} "];
-	Node80 -> Node81
-	Node82 [shape = record, label = " {<data> \"char\" | <type> WORD} "];
-	Node79 -> Node82
-	Node83 [shape = record, label = " {<data> , | <type> SERVICE} "];
-	Node78 -> Node83
-	Node84 [shape = record, label = " {<data> tableConstraint | <type> SERVICE} "];
-	Node83 -> Node84
-	Node85 [shape = record, label = " {<data> primaryKey | <type> SERVICE} "];
-	Node84 -> Node85
-	Node86 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node85 -> Node86
-	Node87 [shape = record, label = " {<data> \"my_col_2_1\" | <type> WORD} "];
-	Node86 -> Node87
-	Node88 [shape = record, label = " {<data> , | <type> SERVICE} "];
-	Node83 -> Node88
-	Node89 [shape = record, label = " {<data> tableConstraint | <type> SERVICE} "];
-	Node88 -> Node89
-	Node90 [shape = record, label = " {<data> foreignKey | <type> SERVICE} "];
-	Node89 -> Node90
-	Node91 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node90 -> Node91
-	Node92 [shape = record, label = " {<data> \"my_col_2_2\" | <type> WORD} "];
-	Node91 -> Node92
-	Node93 [shape = record, label = " {<data> reference | <type> SERVICE} "];
-	Node90 -> Node93
-	Node94 [shape = record, label = " {<data> name | <type> SERVICE} "];
-	Node93 -> Node94
-	Node95 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node94 -> Node95
-	Node96 [shape = record, label = " {<data> \"my_table_1\" | <type> WORD} "];
-	Node95 -> Node96
-	Node97 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node94 -> Node97
-	Node98 [shape = record, label = " {<data> \"my_col_1_2\" | <type> WORD} "];
-	Node97 -> Node98
-	Node99 [shape = record, label = " {<data> , | <type> SERVICE} "];
-	Node88 -> Node99
-	Node100 [shape = record, label = " {<data> tableConstraint | <type> SERVICE} "];
-	Node99 -> Node100
-	Node101 [shape = record, label = " {<data> foreignKey | <type> SERVICE} "];
-	Node100 -> Node101
-	Node102 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node101 -> Node102
-	Node103 [shape = record, label = " {<data> \"my_col_2_3\" | <type> WORD} "];
-	Node102 -> Node103
-	Node104 [shape = record, label = " {<data> reference | <type> SERVICE} "];
-	Node101 -> Node104
-	Node105 [shape = record, label = " {<data> name | <type> SERVICE} "];
-	Node104 -> Node105
-	Node106 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node105 -> Node106
-	Node107 [shape = record, label = " {<data> \"my_table_1\" | <type> WORD} "];
-	Node106 -> Node107
-	Node108 [shape = record, label = " {<data> ; | <type> SERVICE} "];
-	Node61 -> Node108
-	Node109 [shape = record, label = " {<data> query | <type> SERVICE} "];
-	Node108 -> Node109
-	Node110 [shape = record, label = " {<data> ddlStatement | <type> SERVICE} "];
-	Node109 -> Node110
-	Node111 [shape = record, label = " {<data> createTableStatement | <type> SERVICE} "];
-	Node110 -> Node111
-	Node112 [shape = record, label = " {<data> name | <type> SERVICE} "];
-	Node111 -> Node112
-	Node113 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node112 -> Node113
-	Node114 [shape = record, label = " {<data> \"my_table_3\" | <type> WORD} "];
-	Node113 -> Node114
-	Node115 [shape = record, label = " {<data> tableDefinition | <type> SERVICE} "];
-	Node111 -> Node115
-	Node116 [shape = record, label = " {<data> columnDefinition | <type> SERVICE} "];
-	Node115 -> Node116
-	Node117 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node116 -> Node117
-	Node118 [shape = record, label = " {<data> \"my_col_3_1\" | <type> WORD} "];
-	Node117 -> Node118
-	Node119 [shape = record, label = " {<data> \"integer\" | <type> WORD} "];
-	Node116 -> Node119
-	Node120 [shape = record, label = " {<data> ; | <type> SERVICE} "];
-	Node108 -> Node120
-	Node121 [shape = record, label = " {<data> query | <type> SERVICE} "];
-	Node120 -> Node121
-	Node122 [shape = record, label = " {<data> ddlStatement | <type> SERVICE} "];
-	Node121 -> Node122
-	Node123 [shape = record, label = " {<data> alterTableStatement | <type> SERVICE} "];
-	Node122 -> Node123
-	Node124 [shape = record, label = " {<data> name | <type> SERVICE} "];
-	Node123 -> Node124
-	Node125 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node124 -> Node125
-	Node126 [shape = record, label = " {<data> \"my_table_1\" | <type> WORD} "];
-	Node125 -> Node126
-	Node127 [shape = record, label = " {<data> alterActionADD | <type> SERVICE} "];
-	Node123 -> Node127
-	Node128 [shape = record, label = " {<data> tableDefinition | <type> SERVICE} "];
-	Node127 -> Node128
-	Node129 [shape = record, label = " {<data> columnDefinition | <type> SERVICE} "];
-	Node128 -> Node129
-	Node130 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node129 -> Node130
-	Node131 [shape = record, label = " {<data> \"my_col_1_5\" | <type> WORD} "];
-	Node130 -> Node131
-	Node132 [shape = record, label = " {<data> \"integer\" | <type> WORD} "];
-	Node129 -> Node132
-	Node133 [shape = record, label = " {<data> , | <type> SERVICE} "];
-	Node128 -> Node133
-	Node134 [shape = record, label = " {<data> columnDefinition | <type> SERVICE} "];
-	Node133 -> Node134
-	Node135 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node134 -> Node135
-	Node136 [shape = record, label = " {<data> \"my_col_1_6\" | <type> WORD} "];
-	Node135 -> Node136
-	Node137 [shape = record, label = " {<data> \"varchar\" | <type> WORD} "];
-	Node134 -> Node137
-	Node138 [shape = record, label = " {<data> , | <type> SERVICE} "];
-	Node133 -> Node138
-	Node139 [shape = record, label = " {<data> tableConstraint | <type> SERVICE} "];
-	Node138 -> Node139
-	Node140 [shape = record, label = " {<data> kw_constraint | <type> SERVICE} "];
-	Node139 -> Node140
-	Node141 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node140 -> Node141
-	Node142 [shape = record, label = " {<data> \"my_constraint_2\" | <type> WORD} "];
-	Node141 -> Node142
-	Node143 [shape = record, label = " {<data> primaryKey | <type> SERVICE} "];
-	Node139 -> Node143
-	Node144 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node143 -> Node144
-	Node145 [shape = record, label = " {<data> \"my_col_1_5\" | <type> WORD} "];
-	Node144 -> Node145
-	Node146 [shape = record, label = " {<data> , | <type> SERVICE} "];
-	Node138 -> Node146
-	Node147 [shape = record, label = " {<data> tableConstraint | <type> SERVICE} "];
-	Node146 -> Node147
-	Node148 [shape = record, label = " {<data> primaryKey | <type> SERVICE} "];
-	Node147 -> Node148
-	Node149 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node148 -> Node149
-	Node150 [shape = record, label = " {<data> \"my_col_1_5\" | <type> WORD} "];
-	Node149 -> Node150
-	Node151 [shape = record, label = " {<data> ; | <type> SERVICE} "];
-	Node120 -> Node151
-	Node152 [shape = record, label = " {<data> query | <type> SERVICE} "];
-	Node151 -> Node152
-	Node153 [shape = record, label = " {<data> ddlStatement | <type> SERVICE} "];
-	Node152 -> Node153
-	Node154 [shape = record, label = " {<data> alterTableStatement | <type> SERVICE} "];
-	Node153 -> Node154
-	Node155 [shape = record, label = " {<data> name | <type> SERVICE} "];
-	Node154 -> Node155
-	Node156 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node155 -> Node156
-	Node157 [shape = record, label = " {<data> \"my_table_1\" | <type> WORD} "];
-	Node156 -> Node157
-	Node158 [shape = record, label = " {<data> alterActionDROP | <type> SERVICE} "];
-	Node154 -> Node158
-	Node159 [shape = record, label = " {<data> dropList | <type> SERVICE} "];
-	Node158 -> Node159
-	Node160 [shape = record, label = " {<data> \"COLUMN\" | <type> WORD} "];
-	Node159 -> Node160
-	Node161 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node160 -> Node161
-	Node162 [shape = record, label = " {<data> \"my_col_1_5\" | <type> WORD} "];
-	Node161 -> Node162
-	Node163 [shape = record, label = " {<data> , | <type> SERVICE} "];
-	Node160 -> Node163
-	Node164 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node163 -> Node164
-	Node165 [shape = record, label = " {<data> \"my_col_1_6\" | <type> WORD} "];
-	Node164 -> Node165
-	Node166 [shape = record, label = " {<data> ; | <type> SERVICE} "];
-	Node151 -> Node166
-	Node167 [shape = record, label = " {<data> query | <type> SERVICE} "];
-	Node166 -> Node167
-	Node168 [shape = record, label = " {<data> ddlStatement | <type> SERVICE} "];
-	Node167 -> Node168
-	Node169 [shape = record, label = " {<data> dropTableStatement | <type> SERVICE} "];
-	Node168 -> Node169
-	Node170 [shape = record, label = " {<data> name | <type> SERVICE} "];
-	Node169 -> Node170
-	Node171 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node170 -> Node171
-	Node172 [shape = record, label = " {<data> \"my_table_1\" | <type> WORD} "];
-	Node171 -> Node172
-	Node173 [shape = record, label = " {<data> ; | <type> SERVICE} "];
-	Node166 -> Node173
-	Node174 [shape = record, label = " {<data> query | <type> SERVICE} "];
-	Node173 -> Node174
-	Node175 [shape = record, label = " {<data> ddlStatement | <type> SERVICE} "];
-	Node174 -> Node175
-	Node176 [shape = record, label = " {<data> dropTableStatement | <type> SERVICE} "];
-	Node175 -> Node176
-	Node177 [shape = record, label = " {<data> name | <type> SERVICE} "];
-	Node176 -> Node177
-	Node178 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node177 -> Node178
-	Node179 [shape = record, label = " {<data> \"my_table_2\" | <type> WORD} "];
-	Node178 -> Node179
-	Node180 [shape = record, label = " {<data> , | <type> SERVICE} "];
-	Node176 -> Node180
-	Node181 [shape = record, label = " {<data> name | <type> SERVICE} "];
-	Node180 -> Node181
-	Node182 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node181 -> Node182
-	Node183 [shape = record, label = " {<data> \"my_table_3\" | <type> WORD} "];
-	Node182 -> Node183
-	Node184 [shape = record, label = " {<data> ; | <type> SERVICE} "];
-	Node173 -> Node184
-	Node185 [shape = record, label = " {<data> query | <type> SERVICE} "];
-	Node184 -> Node185
-	Node186 [shape = record, label = " {<data> ddlStatement | <type> SERVICE} "];
-	Node185 -> Node186
-	Node187 [shape = record, label = " {<data> dropDatabaseStatement | <type> SERVICE} "];
-	Node186 -> Node187
-	Node188 [shape = record, label = " {<data> name | <type> SERVICE} "];
-	Node187 -> Node188
-	Node189 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node188 -> Node189
-	Node190 [shape = record, label = " {<data> \"my_db_1\" | <type> WORD} "];
-	Node189 -> Node190
-	Node191 [shape = record, label = " {<data> ; | <type> SERVICE} "];
-	Node184 -> Node191
-	Node192 [shape = record, label = " {<data> query | <type> SERVICE} "];
-	Node191 -> Node192
-	Node193 [shape = record, label = " {<data> ddlStatement | <type> SERVICE} "];
-	Node192 -> Node193
-	Node194 [shape = record, label = " {<data> dropDatabaseStatement | <type> SERVICE} "];
-	Node193 -> Node194
-	Node195 [shape = record, label = " {<data> name | <type> SERVICE} "];
-	Node194 -> Node195
-	Node196 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node195 -> Node196
-	Node197 [shape = record, label = " {<data> \"my_db_2\" | <type> WORD} "];
-	Node196 -> Node197
-	Node198 [shape = record, label = " {<data> , | <type> SERVICE} "];
-	Node194 -> Node198
-	Node199 [shape = record, label = " {<data> name | <type> SERVICE} "];
-	Node198 -> Node199
-	Node200 [shape = record, label = " {<data> identifier | <type> SERVICE} "];
-	Node199 -> Node200
-	Node201 [shape = record, label = " {<data> \"my_db_3\" | <type> WORD} "];
-	Node200 -> Node201
-	Node202 [shape = record, label = " {<data> ; | <type> SERVICE} "];
-	Node191 -> Node202
+	subgraph info {
+	edge [color = white];
+	node [color = black, shape = record];
+	node [style = filled, fillcolor = gray, label = ROOT];
+	root;
+	node [style = filled, fillcolor = purple, fontcolor = white, label = SERVICE];
+	service;
+	node [style = filled, fillcolor = green, fontcolor = black, label = "INT/FLOAT_NUMBER"];
+	int_float_number;
+	node [style = filled, fillcolor = lightblue, fontcolor = black,  label = BRACKET];
+	bracket;
+	node [style = filled, fillcolor = blue, fontcolor = white, label = PUNCTUATION];
+	punctuation;
+	node [style = filled, fillcolor = orange, label = OPERATOR];
+	operator;
+	node [style = filled, fillcolor = red, label = WORD];
+	word;
+	node [style = filled, fillcolor = yellow, fontcolor = black, label = STRING];
+	string;
+	style = filled;
+	color = lightgray;
+	root->service->int_float_number->bracket->punctuation->operator->word->string;
+	label = "graph info";
+	}
+	Node0 [shape = record, color = black, label = " {<data> ROOT | <st_type>Program} ", style = filled, fillcolor = gray];
+	Node1 [shape = record, color = black, label = " <st_type> query } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node0 -> Node1;
+	Node2 [shape = record, color = black, label = " <st_type> ddlStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node1 -> Node2;
+	Node3 [shape = record, color = black, label = " <st_type> createDatabaseStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node2 -> Node3;
+	Node4 [shape = record, color = black, label = " <st_type> name } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node3 -> Node4;
+	Node5 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node4 -> Node5;
+	Node6 [shape = record, color = black, label = " {<data> \"my_db_1} ", style = filled, fillcolor = red, fontcolor = white];
+	Node5 -> Node6;
+	Node7 [shape = record, color = black, label = " <st_type> delimiter_semicolon } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node0 -> Node7;
+	Node8 [shape = record, color = black, label = " <st_type> query } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node7 -> Node8;
+	Node9 [shape = record, color = black, label = " <st_type> ddlStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node8 -> Node9;
+	Node10 [shape = record, color = black, label = " <st_type> createDatabaseStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node9 -> Node10;
+	Node11 [shape = record, color = black, label = " <st_type> name } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node10 -> Node11;
+	Node12 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node11 -> Node12;
+	Node13 [shape = record, color = black, label = " {<data> \"my_db_2} ", style = filled, fillcolor = red, fontcolor = white];
+	Node12 -> Node13;
+	Node14 [shape = record, color = black, label = " <st_type> delimiter_semicolon } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node7 -> Node14;
+	Node15 [shape = record, color = black, label = " <st_type> query } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node14 -> Node15;
+	Node16 [shape = record, color = black, label = " <st_type> ddlStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node15 -> Node16;
+	Node17 [shape = record, color = black, label = " <st_type> createDatabaseStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node16 -> Node17;
+	Node18 [shape = record, color = black, label = " <st_type> name } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node17 -> Node18;
+	Node19 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node18 -> Node19;
+	Node20 [shape = record, color = black, label = " {<data> \"my_db_3} ", style = filled, fillcolor = red, fontcolor = white];
+	Node19 -> Node20;
+	Node21 [shape = record, color = black, label = " <st_type> delimiter_semicolon } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node14 -> Node21;
+	Node22 [shape = record, color = black, label = " <st_type> query } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node21 -> Node22;
+	Node23 [shape = record, color = black, label = " <st_type> ddlStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node22 -> Node23;
+	Node24 [shape = record, color = black, label = " <st_type> createTableStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node23 -> Node24;
+	Node25 [shape = record, color = black, label = " <st_type> name } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node24 -> Node25;
+	Node26 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node25 -> Node26;
+	Node27 [shape = record, color = black, label = " {<data> \"my_table_1} ", style = filled, fillcolor = red, fontcolor = white];
+	Node26 -> Node27;
+	Node28 [shape = record, color = black, label = " <st_type> tableDefinition } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node24 -> Node28;
+	Node29 [shape = record, color = black, label = " <st_type> columnDefinition } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node28 -> Node29;
+	Node30 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node29 -> Node30;
+	Node31 [shape = record, color = black, label = " {<data> \"my_col_1_1} ", style = filled, fillcolor = red, fontcolor = white];
+	Node30 -> Node31;
+	Node32 [shape = record, color = black, label = " {<data> \"integer | <st_type>SQL_int} ", style = filled, fillcolor = red, fontcolor = white];
+	Node29 -> Node32;
+	Node33 [shape = record, color = black, label = " <st_type> delimiter_comma } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node28 -> Node33;
+	Node34 [shape = record, color = black, label = " <st_type> columnDefinition } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node33 -> Node34;
+	Node35 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node34 -> Node35;
+	Node36 [shape = record, color = black, label = " {<data> \"my_col_1_2} ", style = filled, fillcolor = red, fontcolor = white];
+	Node35 -> Node36;
+	Node37 [shape = record, color = black, label = " {<data> \"varchar | <st_type>SQL_varchar} ", style = filled, fillcolor = red, fontcolor = white];
+	Node34 -> Node37;
+	Node38 [shape = record, color = black, label = " <st_type> delimiter_comma } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node33 -> Node38;
+	Node39 [shape = record, color = black, label = " <st_type> columnDefinition } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node38 -> Node39;
+	Node40 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node39 -> Node40;
+	Node41 [shape = record, color = black, label = " {<data> \"my_col_1_3} ", style = filled, fillcolor = red, fontcolor = white];
+	Node40 -> Node41;
+	Node42 [shape = record, color = black, label = " {<data> \"char | <st_type>SQL_char} ", style = filled, fillcolor = red, fontcolor = white];
+	Node39 -> Node42;
+	Node43 [shape = record, color = black, label = " <st_type> delimiter_comma } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node38 -> Node43;
+	Node44 [shape = record, color = black, label = " <st_type> columnDefinition } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node43 -> Node44;
+	Node45 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node44 -> Node45;
+	Node46 [shape = record, color = black, label = " {<data> \"my_col_1_4} ", style = filled, fillcolor = red, fontcolor = white];
+	Node45 -> Node46;
+	Node47 [shape = record, color = black, label = " {<data> \"float | <st_type>SQL_float} ", style = filled, fillcolor = red, fontcolor = white];
+	Node44 -> Node47;
+	Node48 [shape = record, color = black, label = " <st_type> delimiter_comma } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node43 -> Node48;
+	Node49 [shape = record, color = black, label = " <st_type> tableConstraint } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node48 -> Node49;
+	Node50 [shape = record, color = black, label = " <st_type> primaryKey } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node49 -> Node50;
+	Node51 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node50 -> Node51;
+	Node52 [shape = record, color = black, label = " {<data> \"my_col_1_1} ", style = filled, fillcolor = red, fontcolor = white];
+	Node51 -> Node52;
+	Node53 [shape = record, color = black, label = " <st_type> delimiter_comma } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node48 -> Node53;
+	Node54 [shape = record, color = black, label = " <st_type> tableConstraint } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node53 -> Node54;
+	Node55 [shape = record, color = black, label = " <st_type> kw_constraint } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node54 -> Node55;
+	Node56 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node55 -> Node56;
+	Node57 [shape = record, color = black, label = " {<data> \"my_constraint_1} ", style = filled, fillcolor = red, fontcolor = white];
+	Node56 -> Node57;
+	Node58 [shape = record, color = black, label = " <st_type> primaryKey } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node54 -> Node58;
+	Node59 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node58 -> Node59;
+	Node60 [shape = record, color = black, label = " {<data> \"my_col_1_2} ", style = filled, fillcolor = red, fontcolor = white];
+	Node59 -> Node60;
+	Node61 [shape = record, color = black, label = " <st_type> delimiter_semicolon } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node21 -> Node61;
+	Node62 [shape = record, color = black, label = " <st_type> query } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node61 -> Node62;
+	Node63 [shape = record, color = black, label = " <st_type> ddlStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node62 -> Node63;
+	Node64 [shape = record, color = black, label = " <st_type> createTableStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node63 -> Node64;
+	Node65 [shape = record, color = black, label = " <st_type> name } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node64 -> Node65;
+	Node66 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node65 -> Node66;
+	Node67 [shape = record, color = black, label = " {<data> \"my_table_2} ", style = filled, fillcolor = red, fontcolor = white];
+	Node66 -> Node67;
+	Node68 [shape = record, color = black, label = " <st_type> tableDefinition } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node64 -> Node68;
+	Node69 [shape = record, color = black, label = " <st_type> columnDefinition } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node68 -> Node69;
+	Node70 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node69 -> Node70;
+	Node71 [shape = record, color = black, label = " {<data> \"my_col_2_1} ", style = filled, fillcolor = red, fontcolor = white];
+	Node70 -> Node71;
+	Node72 [shape = record, color = black, label = " {<data> \"integer | <st_type>SQL_int} ", style = filled, fillcolor = red, fontcolor = white];
+	Node69 -> Node72;
+	Node73 [shape = record, color = black, label = " <st_type> delimiter_comma } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node68 -> Node73;
+	Node74 [shape = record, color = black, label = " <st_type> columnDefinition } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node73 -> Node74;
+	Node75 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node74 -> Node75;
+	Node76 [shape = record, color = black, label = " {<data> \"my_col_2_2} ", style = filled, fillcolor = red, fontcolor = white];
+	Node75 -> Node76;
+	Node77 [shape = record, color = black, label = " {<data> \"varchar | <st_type>SQL_varchar} ", style = filled, fillcolor = red, fontcolor = white];
+	Node74 -> Node77;
+	Node78 [shape = record, color = black, label = " <st_type> delimiter_comma } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node73 -> Node78;
+	Node79 [shape = record, color = black, label = " <st_type> columnDefinition } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node78 -> Node79;
+	Node80 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node79 -> Node80;
+	Node81 [shape = record, color = black, label = " {<data> \"my_col_2_3} ", style = filled, fillcolor = red, fontcolor = white];
+	Node80 -> Node81;
+	Node82 [shape = record, color = black, label = " {<data> \"char | <st_type>SQL_char} ", style = filled, fillcolor = red, fontcolor = white];
+	Node79 -> Node82;
+	Node83 [shape = record, color = black, label = " <st_type> delimiter_comma } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node78 -> Node83;
+	Node84 [shape = record, color = black, label = " <st_type> tableConstraint } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node83 -> Node84;
+	Node85 [shape = record, color = black, label = " <st_type> primaryKey } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node84 -> Node85;
+	Node86 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node85 -> Node86;
+	Node87 [shape = record, color = black, label = " {<data> \"my_col_2_1} ", style = filled, fillcolor = red, fontcolor = white];
+	Node86 -> Node87;
+	Node88 [shape = record, color = black, label = " <st_type> delimiter_comma } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node83 -> Node88;
+	Node89 [shape = record, color = black, label = " <st_type> tableConstraint } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node88 -> Node89;
+	Node90 [shape = record, color = black, label = " <st_type> foreignKey } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node89 -> Node90;
+	Node91 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node90 -> Node91;
+	Node92 [shape = record, color = black, label = " {<data> \"my_col_2_2} ", style = filled, fillcolor = red, fontcolor = white];
+	Node91 -> Node92;
+	Node93 [shape = record, color = black, label = " <st_type> reference } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node90 -> Node93;
+	Node94 [shape = record, color = black, label = " <st_type> name } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node93 -> Node94;
+	Node95 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node94 -> Node95;
+	Node96 [shape = record, color = black, label = " {<data> \"my_table_1} ", style = filled, fillcolor = red, fontcolor = white];
+	Node95 -> Node96;
+	Node97 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node94 -> Node97;
+	Node98 [shape = record, color = black, label = " {<data> \"my_col_1_2} ", style = filled, fillcolor = red, fontcolor = white];
+	Node97 -> Node98;
+	Node99 [shape = record, color = black, label = " <st_type> delimiter_comma } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node88 -> Node99;
+	Node100 [shape = record, color = black, label = " <st_type> tableConstraint } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node99 -> Node100;
+	Node101 [shape = record, color = black, label = " <st_type> foreignKey } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node100 -> Node101;
+	Node102 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node101 -> Node102;
+	Node103 [shape = record, color = black, label = " {<data> \"my_col_2_3} ", style = filled, fillcolor = red, fontcolor = white];
+	Node102 -> Node103;
+	Node104 [shape = record, color = black, label = " <st_type> reference } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node101 -> Node104;
+	Node105 [shape = record, color = black, label = " <st_type> name } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node104 -> Node105;
+	Node106 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node105 -> Node106;
+	Node107 [shape = record, color = black, label = " {<data> \"my_table_1} ", style = filled, fillcolor = red, fontcolor = white];
+	Node106 -> Node107;
+	Node108 [shape = record, color = black, label = " <st_type> delimiter_semicolon } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node61 -> Node108;
+	Node109 [shape = record, color = black, label = " <st_type> query } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node108 -> Node109;
+	Node110 [shape = record, color = black, label = " <st_type> ddlStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node109 -> Node110;
+	Node111 [shape = record, color = black, label = " <st_type> createTableStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node110 -> Node111;
+	Node112 [shape = record, color = black, label = " <st_type> name } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node111 -> Node112;
+	Node113 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node112 -> Node113;
+	Node114 [shape = record, color = black, label = " {<data> \"my_table_3} ", style = filled, fillcolor = red, fontcolor = white];
+	Node113 -> Node114;
+	Node115 [shape = record, color = black, label = " <st_type> tableDefinition } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node111 -> Node115;
+	Node116 [shape = record, color = black, label = " <st_type> columnDefinition } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node115 -> Node116;
+	Node117 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node116 -> Node117;
+	Node118 [shape = record, color = black, label = " {<data> \"my_col_3_1} ", style = filled, fillcolor = red, fontcolor = white];
+	Node117 -> Node118;
+	Node119 [shape = record, color = black, label = " {<data> \"integer | <st_type>SQL_int} ", style = filled, fillcolor = red, fontcolor = white];
+	Node116 -> Node119;
+	Node120 [shape = record, color = black, label = " <st_type> delimiter_semicolon } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node108 -> Node120;
+	Node121 [shape = record, color = black, label = " <st_type> query } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node120 -> Node121;
+	Node122 [shape = record, color = black, label = " <st_type> ddlStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node121 -> Node122;
+	Node123 [shape = record, color = black, label = " <st_type> alterTableStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node122 -> Node123;
+	Node124 [shape = record, color = black, label = " <st_type> name } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node123 -> Node124;
+	Node125 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node124 -> Node125;
+	Node126 [shape = record, color = black, label = " {<data> \"my_table_1} ", style = filled, fillcolor = red, fontcolor = white];
+	Node125 -> Node126;
+	Node127 [shape = record, color = black, label = " <st_type> alterActionADD } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node123 -> Node127;
+	Node128 [shape = record, color = black, label = " <st_type> tableDefinition } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node127 -> Node128;
+	Node129 [shape = record, color = black, label = " <st_type> columnDefinition } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node128 -> Node129;
+	Node130 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node129 -> Node130;
+	Node131 [shape = record, color = black, label = " {<data> \"my_col_1_5} ", style = filled, fillcolor = red, fontcolor = white];
+	Node130 -> Node131;
+	Node132 [shape = record, color = black, label = " {<data> \"integer | <st_type>SQL_int} ", style = filled, fillcolor = red, fontcolor = white];
+	Node129 -> Node132;
+	Node133 [shape = record, color = black, label = " <st_type> delimiter_comma } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node128 -> Node133;
+	Node134 [shape = record, color = black, label = " <st_type> columnDefinition } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node133 -> Node134;
+	Node135 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node134 -> Node135;
+	Node136 [shape = record, color = black, label = " {<data> \"my_col_1_6} ", style = filled, fillcolor = red, fontcolor = white];
+	Node135 -> Node136;
+	Node137 [shape = record, color = black, label = " {<data> \"varchar | <st_type>SQL_varchar} ", style = filled, fillcolor = red, fontcolor = white];
+	Node134 -> Node137;
+	Node138 [shape = record, color = black, label = " <st_type> delimiter_comma } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node133 -> Node138;
+	Node139 [shape = record, color = black, label = " <st_type> tableConstraint } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node138 -> Node139;
+	Node140 [shape = record, color = black, label = " <st_type> kw_constraint } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node139 -> Node140;
+	Node141 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node140 -> Node141;
+	Node142 [shape = record, color = black, label = " {<data> \"my_constraint_2} ", style = filled, fillcolor = red, fontcolor = white];
+	Node141 -> Node142;
+	Node143 [shape = record, color = black, label = " <st_type> primaryKey } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node139 -> Node143;
+	Node144 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node143 -> Node144;
+	Node145 [shape = record, color = black, label = " {<data> \"my_col_1_5} ", style = filled, fillcolor = red, fontcolor = white];
+	Node144 -> Node145;
+	Node146 [shape = record, color = black, label = " <st_type> delimiter_comma } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node138 -> Node146;
+	Node147 [shape = record, color = black, label = " <st_type> tableConstraint } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node146 -> Node147;
+	Node148 [shape = record, color = black, label = " <st_type> primaryKey } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node147 -> Node148;
+	Node149 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node148 -> Node149;
+	Node150 [shape = record, color = black, label = " {<data> \"my_col_1_5} ", style = filled, fillcolor = red, fontcolor = white];
+	Node149 -> Node150;
+	Node151 [shape = record, color = black, label = " <st_type> delimiter_semicolon } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node120 -> Node151;
+	Node152 [shape = record, color = black, label = " <st_type> query } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node151 -> Node152;
+	Node153 [shape = record, color = black, label = " <st_type> ddlStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node152 -> Node153;
+	Node154 [shape = record, color = black, label = " <st_type> alterTableStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node153 -> Node154;
+	Node155 [shape = record, color = black, label = " <st_type> name } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node154 -> Node155;
+	Node156 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node155 -> Node156;
+	Node157 [shape = record, color = black, label = " {<data> \"my_table_1} ", style = filled, fillcolor = red, fontcolor = white];
+	Node156 -> Node157;
+	Node158 [shape = record, color = black, label = " <st_type> alterActionDROP } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node154 -> Node158;
+	Node159 [shape = record, color = black, label = " <st_type> dropList } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node158 -> Node159;
+	Node160 [shape = record, color = black, label = " {<data> \"COLUMN | <st_type>dropColumn} ", style = filled, fillcolor = red, fontcolor = white];
+	Node159 -> Node160;
+	Node161 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node160 -> Node161;
+	Node162 [shape = record, color = black, label = " {<data> \"my_col_1_5} ", style = filled, fillcolor = red, fontcolor = white];
+	Node161 -> Node162;
+	Node163 [shape = record, color = black, label = " <st_type> delimiter_comma } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node160 -> Node163;
+	Node164 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node163 -> Node164;
+	Node165 [shape = record, color = black, label = " {<data> \"my_col_1_6} ", style = filled, fillcolor = red, fontcolor = white];
+	Node164 -> Node165;
+	Node166 [shape = record, color = black, label = " <st_type> delimiter_semicolon } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node151 -> Node166;
+	Node167 [shape = record, color = black, label = " <st_type> query } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node166 -> Node167;
+	Node168 [shape = record, color = black, label = " <st_type> ddlStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node167 -> Node168;
+	Node169 [shape = record, color = black, label = " <st_type> dropTableStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node168 -> Node169;
+	Node170 [shape = record, color = black, label = " <st_type> name } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node169 -> Node170;
+	Node171 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node170 -> Node171;
+	Node172 [shape = record, color = black, label = " {<data> \"my_table_1} ", style = filled, fillcolor = red, fontcolor = white];
+	Node171 -> Node172;
+	Node173 [shape = record, color = black, label = " <st_type> delimiter_semicolon } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node166 -> Node173;
+	Node174 [shape = record, color = black, label = " <st_type> query } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node173 -> Node174;
+	Node175 [shape = record, color = black, label = " <st_type> ddlStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node174 -> Node175;
+	Node176 [shape = record, color = black, label = " <st_type> dropTableStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node175 -> Node176;
+	Node177 [shape = record, color = black, label = " <st_type> name } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node176 -> Node177;
+	Node178 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node177 -> Node178;
+	Node179 [shape = record, color = black, label = " {<data> \"my_table_2} ", style = filled, fillcolor = red, fontcolor = white];
+	Node178 -> Node179;
+	Node180 [shape = record, color = black, label = " <st_type> delimiter_comma } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node176 -> Node180;
+	Node181 [shape = record, color = black, label = " <st_type> name } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node180 -> Node181;
+	Node182 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node181 -> Node182;
+	Node183 [shape = record, color = black, label = " {<data> \"my_table_3} ", style = filled, fillcolor = red, fontcolor = white];
+	Node182 -> Node183;
+	Node184 [shape = record, color = black, label = " <st_type> delimiter_semicolon } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node173 -> Node184;
+	Node185 [shape = record, color = black, label = " <st_type> query } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node184 -> Node185;
+	Node186 [shape = record, color = black, label = " <st_type> ddlStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node185 -> Node186;
+	Node187 [shape = record, color = black, label = " <st_type> dropDatabaseStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node186 -> Node187;
+	Node188 [shape = record, color = black, label = " <st_type> name } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node187 -> Node188;
+	Node189 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node188 -> Node189;
+	Node190 [shape = record, color = black, label = " {<data> \"my_db_1} ", style = filled, fillcolor = red, fontcolor = white];
+	Node189 -> Node190;
+	Node191 [shape = record, color = black, label = " <st_type> delimiter_semicolon } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node184 -> Node191;
+	Node192 [shape = record, color = black, label = " <st_type> query } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node191 -> Node192;
+	Node193 [shape = record, color = black, label = " <st_type> ddlStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node192 -> Node193;
+	Node194 [shape = record, color = black, label = " <st_type> dropDatabaseStatement } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node193 -> Node194;
+	Node195 [shape = record, color = black, label = " <st_type> name } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node194 -> Node195;
+	Node196 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node195 -> Node196;
+	Node197 [shape = record, color = black, label = " {<data> \"my_db_2} ", style = filled, fillcolor = red, fontcolor = white];
+	Node196 -> Node197;
+	Node198 [shape = record, color = black, label = " <st_type> delimiter_comma } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node194 -> Node198;
+	Node199 [shape = record, color = black, label = " <st_type> name } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node198 -> Node199;
+	Node200 [shape = record, color = black, label = " <st_type> identifier } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node199 -> Node200;
+	Node201 [shape = record, color = black, label = " {<data> \"my_db_3} ", style = filled, fillcolor = red, fontcolor = white];
+	Node200 -> Node201;
+	Node202 [shape = record, color = black, label = " <st_type> delimiter_semicolon } ", style = filled, fillcolor = purple, fontcolor = white];
+	Node191 -> Node202;
 
 }
