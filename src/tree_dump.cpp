@@ -1,50 +1,57 @@
 #include "SCC/tree_dump.h"
 
+#include <utility>
+
+TreeDump::TreeDump(std::string dot_path, std::string png_path) :
+  dot_path_(std::move(dot_path)), png_path_(std::move(png_path)) {}
+
 void TreeDump::Dump(const std::shared_ptr<Node> &AST) {
-  std::string dot_file_path = "../resources/tree_dump/tree_dump.txt";
-  std::string png_file_path = "../resources/tree_dump/tree_dump.png";
-  std::ofstream dot_file;
-  dot_file.open(dot_file_path, std::ios::out);
-  //TODO: opening check
+  dot_file_.open(dot_path_, std::ios::out);
+  this->ValidateDotFile();
 
-  dot_file << "digraph Dump\n"
+  dot_file_ << "digraph Dump\n"
            << "{\n";
-  PrintDumpInfo(dot_file);
-  RecursiveTreeDump(AST, dot_file, -1);
-  dot_file << "\n}";
+  this->PrintDumpInfo();
+  this->RecursiveTreeDump(AST, -1);
+  dot_file_ << "\n}";
 
-//  MakeDumpPng(dot_file_path, png_file_path);
-  dot_file.close();
-  //TODO: closing check
+  this->MakeDumpPng();
+  this->CloseDotFile();
 }
-void TreeDump::PrintDumpInfo(std::ofstream &dot_file) {
-  dot_file << "\tsubgraph info {\n"
-           << "\tedge [color = white];\n"
-           << "\tnode [color = black, shape = record];\n"
-           << "\tnode [style = filled, fillcolor = gray, label = ROOT];\n"
-           << "\troot;\n"
-           << "\tnode [style = filled, fillcolor = purple, fontcolor = white, label = SERVICE];\n"
-           << "\tservice;\n"
-           << "\tnode [style = filled, fillcolor = green, fontcolor = black, label = \"INT/FLOAT_NUMBER\"];\n"
-           << "\tint_float_number;\n"
-           << "\tnode [style = filled, fillcolor = lightblue, fontcolor = black,  label = BRACKET];\n"
-           << "\tbracket;\n"
-           << "\tnode [style = filled, fillcolor = blue, fontcolor = white, label = PUNCTUATION];\n"
-           << "\tpunctuation;\n"
-           << "\tnode [style = filled, fillcolor = orange, label = OPERATOR];\n"
-           << "\toperator;\n"
-           << "\tnode [style = filled, fillcolor = red, label = WORD];\n"
-           << "\tword;\n"
-           << "\tnode [style = filled, fillcolor = yellow, fontcolor = black, label = STRING];\n"
-           << "\tstring;\n"
-           << "\tstyle = filled;\n"
-           << "\tcolor = lightgray;\n"
-           << "\troot->service->int_float_number->bracket->punctuation->operator->word->string;\n"
-           << "\tlabel = \"graph info\";\n"
+void TreeDump::PrintDumpInfo() {
+  dot_file_ << "\tsubgraph info {\n"
+           << "\t\tedge [color = white];\n"
+           << "\t\tnode [color = black, shape = record];\n"
+           << "\t\tnode [style = filled, fillcolor = gray, label = ROOT];\n"
+           << "\t\troot;\n"
+           << "\t\tnode [style = filled, fillcolor = purple,"
+              " fontcolor = white, label = SERVICE];\n"
+           << "\t\tservice;\n"
+           << "\t\tnode [style = filled, fillcolor = green,"
+              " fontcolor = black, label = \"INT/FLOAT_NUMBER\"];\n"
+           << "\t\tint_float_number;\n"
+           << "\t\tnode [style = filled, fillcolor = lightblue,"
+              " fontcolor = black,  label = BRACKET];\n"
+           << "\t\tbracket;\n"
+           << "\t\tnode [style = filled, fillcolor = blue,"
+              " fontcolor = white, label = PUNCTUATION];\n"
+           << "\t\tpunctuation;\n"
+           << "\t\tnode [style = filled, fillcolor = orange,"
+              " label = OPERATOR];\n"
+           << "\t\toperator;\n"
+           << "\t\tnode [style = filled, fillcolor = red, label = WORD];\n"
+           << "\t\tword;\n"
+           << "\t\tnode [style = filled, fillcolor = yellow,"
+              " fontcolor = black, label = STRING];\n"
+           << "\t\tstring;\n"
+           << "\t\troot->service->int_float_number->bracket->"
+              "punctuation->operator->word->string;\n"
+           << "\t\tlabel = \"graph info\";\n"
+           << "\t\tcolor = black;\n"
            << "\t}\n";
 }
 void TreeDump::RecursiveTreeDump(const std::shared_ptr<Node> &node,
-                              std::ofstream &dot_file, int parent_node_num) {
+                                 int parent_node_num) {
   static int num_of_nodes = -1;
   if (parent_node_num == -1) {
     num_of_nodes = -1; //If this function will be called more than one time
@@ -56,76 +63,76 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<Node> &node,
   DataType type = node->get_type();
   StatementType st_type = node->get_st_type();
 
-  dot_file << "\tNode" << current_node_num
+  dot_file_ << "\tNode" << current_node_num
            << " [shape = record, color = black, label = ";
 
   switch (type) {
     case DataType::ROOT:
-      dot_file << "\" {<data> ROOT";
+      dot_file_ << "\" {<data> ROOT";
       if (st_type != EMPTY_TYPE)
-        dot_file << " | <st_type>" << GetServiceNodeData(st_type);
-      dot_file << "} \", style = filled, fillcolor = gray];\n";
+        dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
+      dot_file_ << "} \", style = filled, fillcolor = gray];\n";
       break;
     case DataType::SERVICE:
-      dot_file << "\" <st_type> "
+      dot_file_ << "\" {<st_type> "
                << GetServiceNodeData(st_type)
                <<" } \", style = filled, fillcolor = purple, "
                  "fontcolor = white];\n";
       break;
     case DataType::INT_NUMBER:
-      dot_file << "\" {<data> "
+      dot_file_ << "\" {<data> "
                << std::dynamic_pointer_cast<IntNumNode>(node)->get_data();
       if (st_type != EMPTY_TYPE)
-        dot_file << " | <st_type>" << GetServiceNodeData(st_type);
-      dot_file << "} \", style = filled, fillcolor = green, "
+        dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
+      dot_file_ << "} \", style = filled, fillcolor = green, "
                   "fontcolor = black];\n";
       break;
     case DataType::FLOAT_NUMBER:
-      dot_file << "\" {<data> "
+      dot_file_ << "\" {<data> "
                << std::dynamic_pointer_cast<FloatNumNode>(node)->get_data();
       if (st_type != EMPTY_TYPE)
-        dot_file << " | <st_type>" << GetServiceNodeData(st_type);
-      dot_file << "} \", style = filled, fillcolor = green, "
+        dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
+      dot_file_ << "} \", style = filled, fillcolor = green, "
                   "fontcolor = black];\n";
       break;
     case DataType::BRACKET:
-      dot_file << "\" {<data> "
+      dot_file_ << "\" {<data> "
                << std::dynamic_pointer_cast<CharNode>(node)->get_data();
       if (st_type != EMPTY_TYPE)
-        dot_file << " | <st_type>" << GetServiceNodeData(st_type);
-      dot_file << "} \", style = filled, fillcolor = lightblue, "
+        dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
+      dot_file_ << "} \", style = filled, fillcolor = lightblue, "
                   "fontcolor = black];\n";
       break;
     case DataType::PUNCTUATION:
-      dot_file << "\" {<data> \'"
+      dot_file_ << "\" {<data> \'"
                << std::dynamic_pointer_cast<CharNode>(node)->get_data();
       if (st_type != EMPTY_TYPE)
-        dot_file << " | <st_type>" << GetServiceNodeData(st_type);
-      dot_file << "} \", style = filled, fillcolor = blue, "
+        dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
+      dot_file_ << "} \", style = filled, fillcolor = blue, "
                   "fontcolor = white];\n";
       break;
     case DataType::WORD:
-      dot_file << "\" {<data> \\\""
+      dot_file_ << "\" {<data> \\\""
                << std::dynamic_pointer_cast<StringNode>(node)->get_data();
       if (st_type != EMPTY_TYPE)
-        dot_file << " | <st_type>" << GetServiceNodeData(st_type);
-      dot_file << "} \", style = filled, fillcolor = red, "
+        dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
+      dot_file_ << "} \", style = filled, fillcolor = red, "
                   "fontcolor = white];\n";
       break;
     case DataType::OPERATOR:
-      dot_file << "\" {<data> "
+      dot_file_ << "\" {<data> "
                << std::dynamic_pointer_cast<StringNode>(node)->get_data();
       if (st_type != EMPTY_TYPE)
-        dot_file << " | <st_type>" << GetServiceNodeData(st_type);
-      dot_file << "} \", style = filled, fillcolor = orange, "
+        dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
+      dot_file_ << "} \", style = filled, fillcolor = orange, "
                   "fontcolor = white];\n";
       break;
     case DataType::STRING:
-      dot_file << "\" {<data> \\\""
+      dot_file_ << "\" {<data> \\\""
                << std::dynamic_pointer_cast<StringNode>(node)->get_data();
       if (st_type != EMPTY_TYPE)
-        dot_file << " | <st_type>" << GetServiceNodeData(st_type);
-      dot_file << "} \", style = filled, fillcolor = yellow, "
+        dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
+      dot_file_ << "} \", style = filled, fillcolor = yellow, "
                   "fontcolor = black];\n";
       break;
     default:
@@ -134,24 +141,24 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<Node> &node,
   }
 
   if (num_of_nodes > 0) {
-    dot_file << "\tNode" << parent_node_num << " -> Node"
+    dot_file_ << "\tNode" << parent_node_num << " -> Node"
              << current_node_num << ";\n";
   }
 
-  for (size_t i = 0; i < num_of_children; i++) {
-    RecursiveTreeDump(node->get_child(i), dot_file, current_node_num);
-  }
+  for (size_t i = 0; i < num_of_children; i++)
+    this->RecursiveTreeDump(node->get_child(i), current_node_num);
 }
-//void TreeDump::MakeDumpPng(const std::string &dot_file_path,
-//                           const std::string &png_file_path) {
-//  std::ostringstream txt_to_png;
-//  txt_to_png << "dot " << dot_file_path << " -T png -o "
-//             << png_file_path << std::endl;
-//
-//  printf("%s", txt_to_png.str().c_str());
-//
-//  std::system(txt_to_png.str().c_str()); //TODO: fix problem with executing this command
-//}
+
+void TreeDump::MakeDumpPng() {
+  std::ostringstream txt_to_png;
+  txt_to_png << "dot " << dot_path_ << " -T png -o "
+             << png_path_ << std::endl;
+
+  printf("%s", txt_to_png.str().c_str());
+
+  std::system(txt_to_png.str().c_str()); //TODO: fix problem with executing this command
+}
+
 std::string TreeDump::GetServiceNodeData(StatementType statement_type) {
   switch (statement_type) {
     case StatementType::EMPTY_TYPE:
@@ -258,3 +265,26 @@ std::string TreeDump::GetServiceNodeData(StatementType statement_type) {
       exit(EXIT_FAILURE);
   }
 }
+
+void TreeDump::ValidateDotFile() {
+  if (!dot_file_.is_open()) {
+    LOG(ERROR, "dot dump file stream is invalid");
+    exit(EXIT_FAILURE);
+  }
+  LOG(DEBUG, "dot dump file stream is valid");
+}
+void TreeDump::CloseDotFile() {
+  LOG(DEBUG, "closing dot dump file...");
+  if (dot_file_.is_open()) {
+    dot_file_.close();
+    if (dot_file_.good()) {
+      LOG(DEBUG, "dot dump file closed successfully");
+    } else {
+      LOG(ERROR, "dot dump file close error");
+      exit(EXIT_FAILURE);
+    }
+  } else {
+    LOG(INFO, "dot dump file is already closed");
+  }
+}
+
