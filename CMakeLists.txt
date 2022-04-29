@@ -35,7 +35,8 @@ add_executable(${TestExec}
         test/config_test/config_test.cpp src/config.cpp
         test/log_test/log_test.cpp src/log.cpp
         test/ast_test/ast_test.cpp src/ast.cpp
-        test/lexical_analyzer_test/lexical_analyzer_test.cpp src/lexical_analyzer.cpp)
+        test/lexical_analyzer_test/lexical_analyzer_test.cpp src/lexical_analyzer.cpp
+        test/SQL_AST_test/SQL_AST_test.cpp src/tree_dump.cpp)
 
 target_link_libraries(
         ${TestExec}
