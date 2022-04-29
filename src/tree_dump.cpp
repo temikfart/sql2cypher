@@ -4,6 +4,11 @@ TreeDump::TreeDump(std::string dot_path, std::string png_path) :
     dot_path_(std::move(dot_path)), png_path_(std::move(png_path)) {}
 
 void TreeDump::Dump(const std::shared_ptr<Node>& AST) {
+  if (AST == nullptr) {
+    LOG(DEBUG, "AST is empty");
+    return;
+  }
+
   this->OpenDotFile();
 
   dot_file_ << "digraph Dump\n"
@@ -12,8 +17,8 @@ void TreeDump::Dump(const std::shared_ptr<Node>& AST) {
   this->RecursiveTreeDump(AST, -1);
   dot_file_ << "\n}";
 
-//  this->MakeDumpPng(); // TODO: fix problem with executing this command
   this->CloseDotFile();
+  this->MakeDumpPng();
 }
 void TreeDump::PrintDumpInfo() {
   dot_file_ << "\tsubgraph info {\n"
