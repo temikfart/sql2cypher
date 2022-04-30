@@ -1,18 +1,16 @@
 #include "SCC/log.h"
 
-using namespace std;
-
 Log SCC_log;
 
-string Log::GetLogPath() const {
-  string cwf_path = __FILE__;
-  string cwf = cwf_path.substr(cwf_path.find_last_of('/') + 1);
-  string path = cwf_path.substr(0, cwf_path.find(cwf));
+std::string Log::GetLogPath() const {
+  std::string cwf_path = __FILE__;
+  std::string cwf = cwf_path.substr(cwf_path.find_last_of('/') + 1);
+  std::string path = cwf_path.substr(0, cwf_path.find(cwf));
   path += "../log/" + filename_;
 
   return path;
 }
-string Log::GetTimestamp() {
+std::string Log::GetTimestamp() {
   time_t now;
   time(&now);
   const int kTimeZone = 3;  // UTC + kTimeZone
@@ -23,17 +21,18 @@ string Log::GetTimestamp() {
 
   return buf;
 }
-string Log::TimeToLogFilename(string timestamp) const {
+std::string Log::TimeToLogFilename(std::string timestamp) const {
   replace(begin(timestamp), end(timestamp), ':', '-');
   return (timestamp + ".log");
 }
-void Log::ValidateLogLevel(LogLevel level) const {
+void Log::ValidateLogLevel(LogLevel level) {
   if (LogLevel::LOG_LEVEL_COUNT <= level) {
-    cerr << "incorrect SCC log level: " << to_string(level) << endl;
+    std::cerr << "incorrect SCC log level: "
+              << std::to_string(level) << std::endl;
     exit(EXIT_FAILURE);
   }
 }
-void Log::ValidateLogLevel(string& level) const {
+void Log::ValidateLogLevel(std::string& level) const {
   if (str2lvl_.count(level) == 0) {
     LOG(ERROR, "incorrect SCC log level: " + level);
     exit(EXIT_FAILURE);
@@ -43,18 +42,18 @@ void Log::ValidateLogLevel(string& level) const {
 
 Log::Log() {
   filename_ = this->TimeToLogFilename(this->GetTimestamp());
-  output_.open(this->GetLogPath(), ios::out);
+  output_.open(this->GetLogPath(), std::ios::out);
 }
-void Log::AddLog(LogLevel level, const string& msg) {
+void Log::AddLog(LogLevel level, const std::string& msg) {
   this->ValidateLogLevel(level);
 
-  ostringstream output;
+  std::ostringstream output;
   output << "[" << lvl2str_.at(level) << "]\t"
          << this->GetTimestamp() << " " << msg;
   output_ << output.str();
 
   if (log_level_ >= level) {
-    cout << output.str();
+    std::cout << output.str();
   }
 }
 LogLevel Log::get_log_level() const {
@@ -64,7 +63,7 @@ void Log::set_log_level(LogLevel level) {
   this->ValidateLogLevel(level);
   log_level_ = level;
 }
-LogLevel Log::StringToLogLevel(string level) const {
+LogLevel Log::StringToLogLevel(std::string level) const {
   for_each(begin(level), end(level),
            [](char& c) {
              c = (char) ::toupper(c);

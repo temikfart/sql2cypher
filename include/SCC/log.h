@@ -63,7 +63,7 @@ private:
   static std::string GetTimestamp();
   std::string TimeToLogFilename(std::string timestamp) const;
 
-  void ValidateLogLevel(LogLevel level) const;
+  static void ValidateLogLevel(LogLevel level) ;
   void ValidateLogLevel(std::string& level) const;
 };
 
