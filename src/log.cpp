@@ -9,25 +9,26 @@ string Log::GetLogPath() const {
   string cwf = cwf_path.substr(cwf_path.find_last_of('/') + 1);
   string path = cwf_path.substr(0, cwf_path.find(cwf));
   path += "../log/" + filename_;
-  
+
   return path;
 }
-string Log::get_timestamp() {
+string Log::GetTimestamp() {
   time_t now;
   time(&now);
-  now += 3 * 3600;    // UTC+3 -- MSC
+  const int kTimeZone = 3;  // UTC + kTimeZone
+  const int ksec_in_hour = 3600;
+  now += kTimeZone * ksec_in_hour;
   char buf[sizeof "2011-10-08T07:07:09"];
   strftime(buf, sizeof buf, "%FT%T", gmtime(&now));
-  
+
   return buf;
 }
-string Log::TimeToLogName(string timestamp) const {
+string Log::TimeToLogFilename(string timestamp) const {
   replace(begin(timestamp), end(timestamp), ':', '-');
   return (timestamp + ".log");
 }
 void Log::ValidateLogLevel(LogLevel level) const {
   if (LogLevel::LOG_LEVEL_COUNT <= level) {
-    // TODO: resolve this log
     cerr << "incorrect SCC log level: " << to_string(level) << endl;
     exit(EXIT_FAILURE);
   }
@@ -41,17 +42,17 @@ void Log::ValidateLogLevel(string& level) const {
 }
 
 Log::Log() {
-  filename_ = this->TimeToLogName(this->get_timestamp());
+  filename_ = this->TimeToLogFilename(this->GetTimestamp());
   output_.open(this->GetLogPath(), ios::out);
 }
 void Log::AddLog(LogLevel level, const string& msg) {
   this->ValidateLogLevel(level);
-  
+
   ostringstream output;
   output << "[" << lvl2str_.at(level) << "]\t"
-         << this->get_timestamp() << " " << msg;
+         << this->GetTimestamp() << " " << msg;
   output_ << output.str();
-  
+
   if (log_level_ >= level) {
     cout << output.str();
   }
@@ -66,7 +67,7 @@ void Log::set_log_level(LogLevel level) {
 LogLevel Log::StringToLogLevel(string level) const {
   for_each(begin(level), end(level),
            [](char& c) {
-             c = (char)::toupper(c);
+             c = (char) ::toupper(c);
            });
   this->ValidateLogLevel(level);
   return str2lvl_.at(level);
