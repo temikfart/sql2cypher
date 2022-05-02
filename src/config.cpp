@@ -1,7 +1,5 @@
 #include "SCC/config.h"
 
-using namespace std;
-
 Config config;
 
 Config::Config() {
@@ -22,17 +20,17 @@ void Config::set_mode(SCCMode mode) {
 SCCMode Config::get_mode() const {
   return mode_;
 }
-void Config::set_sql_path(const string& new_sql_path) {
+void Config::set_sql_path(const std::string& new_sql_path) {
   this->ValidateSQLPath(new_sql_path);
   sql_path_ = new_sql_path;
 }
-string Config::get_sql_path() const {
+std::string Config::get_sql_path() const {
   return sql_path_;
 }
-void Config::set_cypher_path(const string& new_cypher_path) {
+void Config::set_cypher_path(const std::string& new_cypher_path) {
   cypher_path_ = new_cypher_path;
 }
-string Config::get_cypher_path() const {
+std::string Config::get_cypher_path() const {
   return cypher_path_;
 }
 
@@ -45,8 +43,8 @@ void Config::Start(int argc, char* argv[]) {
     // TODO: Parse config.ini
   }
 
-  input_.open(sql_path_, ios::in);
-  output_.open(cypher_path_, ios::out);
+  input_.open(sql_path_, std::ios::in);
+  output_.open(cypher_path_, std::ios::out);
   this->ValidateCypherPath(cypher_path_);
 
   // TODO: implement SCC mode behavior.
@@ -112,10 +110,10 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
   LOG(DEBUG, "all console arguments are parsed");
 }
 
-string Config::GetConfigPath() const {
-  string cwf_path = __FILE__;
-  string cwf = cwf_path.substr(cwf_path.find_last_of('/') + 1);
-  string path = cwf_path.substr(0, cwf_path.find(cwf));
+std::string Config::GetConfigPath() const {
+  std::string cwf_path = __FILE__;
+  std::string cwf = cwf_path.substr(cwf_path.find_last_of('/') + 1);
+  std::string path = cwf_path.substr(0, cwf_path.find(cwf));
 
   return path;
 }
@@ -127,11 +125,11 @@ char Config::PeekSQLSymbol() {
   this->ValidateIsInputStreamOpen();
   return (char) input_.peek();
 }
-ifstream& Config::ReadSQL() {
+std::ifstream& Config::ReadSQL() {
   this->ValidateIsInputStreamOpen();
   return input_;
 }
-ofstream& Config::WriteCypher() {
+std::ofstream& Config::WriteCypher() {
   this->ValidateIsOutputStreamOpen();
   return output_;
 }
@@ -164,7 +162,7 @@ void Config::CloseOutputFile() {
   }
 }
 
-SCCMode Config::StringToSCCMode(string mode) const {
+SCCMode Config::StringToSCCMode(std::string mode) const {
   for_each(begin(mode), end(mode),
            [](char& c) {
              c = (char) ::toupper(c);
@@ -172,12 +170,12 @@ SCCMode Config::StringToSCCMode(string mode) const {
   this->ValidateMode(mode);
   return str2modes_.at(mode);
 }
-string Config::SCCModeToString(SCCMode mode) const {
+std::string Config::SCCModeToString(SCCMode mode) const {
   this->ValidateMode(mode);
   return modes2str_.at(mode);
 }
 
-bool Config::IsFileExists(const string& path) {
+bool Config::IsFileExists(const std::string& path) {
   struct stat buffer{};
   return (stat(path.c_str(), &buffer) == 0);
 }
@@ -234,54 +232,54 @@ void Config::SetOptFlagInteractive(OptFlag flag) {
 void Config::SetOptFlagLog(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
   LOG(TRACE, "set log level = " << optarg);
-  string tmp_log_level = optarg;
+  std::string tmp_log_level = optarg;
   SCC_log.set_log_level(SCC_log.StringToLogLevel(tmp_log_level));
   this->SetFlag(flag);
 }
 void Config::SetOptFlagMode(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
   LOG(TRACE, "set SCC mode = " << optarg);
-  string tmp_mode = optarg;
+  std::string tmp_mode = optarg;
   this->set_mode(this->StringToSCCMode(tmp_mode));
   this->SetFlag(flag);
 }
 void Config::SetOptFlagSQL(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
   LOG(TRACE, "set SQL path = " << optarg);
-  string tmp = optarg;
+  std::string tmp = optarg;
   this->set_sql_path(tmp);
   this->SetFlag(flag);
 }
 void Config::SetOptFlagCypher(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
   LOG(TRACE, "set Cypher path = " << optarg);
-  string tmp = optarg;
+  std::string tmp = optarg;
   this->set_cypher_path(tmp);
   this->SetFlag(flag);
 }
 
 void Config::ValidateMode(SCCMode mode) const {
   if (SCCMode::kSCCModeCount <= mode) {
-    LOG(ERROR, "incorrect SCC mode: " << to_string(mode));
+    LOG(ERROR, "incorrect SCC mode: " << std::to_string(mode));
     exit(EXIT_FAILURE);
   }
   LOG(DEBUG, "mode is valid");
 }
-void Config::ValidateMode(const string& mode) const {
+void Config::ValidateMode(const std::string& mode) const {
   if (str2modes_.count(mode) == 0) {
     LOG(ERROR, "invalid SCC mode: " << mode);
     exit(EXIT_FAILURE);
   }
   LOG(DEBUG, "mode is valid");
 }
-void Config::ValidateSQLPath(const string& sql_path) const {
+void Config::ValidateSQLPath(const std::string& sql_path) const {
   if (!(this->IsFileExists(sql_path))) {
     LOG(ERROR, "SQL file does not exist: " << sql_path);
     exit(EXIT_FAILURE);
   }
   LOG(DEBUG, "SQL path is valid");
 }
-void Config::ValidateCypherPath(const string& cypher_path) const {
+void Config::ValidateCypherPath(const std::string& cypher_path) const {
   if (!output_.good()) {
     LOG(ERROR, "Cypher file does not exist: " << cypher_path);
     exit(EXIT_FAILURE);

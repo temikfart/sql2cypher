@@ -35,8 +35,6 @@ enum ConfigIsSet {
   kConfigMode,
   kConfigSQL,
   kConfigCypher,
-
-  kConfigCount
 };
 
 class Config {
