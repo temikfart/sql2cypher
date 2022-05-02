@@ -31,11 +31,13 @@ enum LogLevel {
 class Log {
 public:
   Log();
+  ~Log();
+
   void set_log_level(LogLevel level);
   LogLevel get_log_level() const;
+
   void AddLog(LogLevel level, const std::string& msg);
   LogLevel StringToLogLevel(std::string level) const;
-  ~Log();
 
 private:
   std::string filename_;

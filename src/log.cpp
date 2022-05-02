@@ -2,6 +2,42 @@
 
 Log SCC_log;
 
+Log::Log() {
+  filename_ = this->TimeToLogFilename(Log::GetTimestamp());
+  output_.open(this->GetLogPath(), std::ios::out);
+}
+Log::~Log() = default;
+
+void Log::set_log_level(LogLevel level) {
+  Log::ValidateLogLevel(level);
+  log_level_ = level;
+}
+LogLevel Log::get_log_level() const {
+  return log_level_;
+}
+
+void Log::AddLog(LogLevel level, const std::string& msg) {
+  Log::ValidateLogLevel(level);
+
+  std::ostringstream output;
+  output << "[" << lvl2str_.at(level) << "]\t"
+         << Log::GetTimestamp() << " " << msg;
+  output_ << output.str();
+
+  if (log_level_ >= level) {
+    std::cout << output.str();
+  }
+}
+LogLevel Log::StringToLogLevel(std::string level) const {
+  for_each(begin(level), end(level),
+           [](char& c) {
+             c = (char) ::toupper(c);
+           });
+  this->ValidateLogLevel(level);
+  return str2lvl_.at(level);
+}
+
+
 std::string Log::GetLogPath() const {
   std::string cwf_path = __FILE__;
   std::string cwf = cwf_path.substr(cwf_path.find_last_of('/') + 1);
@@ -25,6 +61,7 @@ std::string Log::TimeToLogFilename(std::string timestamp) const {
   replace(begin(timestamp), end(timestamp), ':', '-');
   return (timestamp + ".log");
 }
+
 void Log::ValidateLogLevel(LogLevel level) {
   if (LogLevel::LOG_LEVEL_COUNT <= level) {
     std::cerr << "incorrect SCC log level: "
@@ -39,36 +76,3 @@ void Log::ValidateLogLevel(std::string& level) const {
   }
   LOG(DEBUG, "log level is valid");
 }
-
-Log::Log() {
-  filename_ = this->TimeToLogFilename(this->GetTimestamp());
-  output_.open(this->GetLogPath(), std::ios::out);
-}
-void Log::AddLog(LogLevel level, const std::string& msg) {
-  this->ValidateLogLevel(level);
-
-  std::ostringstream output;
-  output << "[" << lvl2str_.at(level) << "]\t"
-         << this->GetTimestamp() << " " << msg;
-  output_ << output.str();
-
-  if (log_level_ >= level) {
-    std::cout << output.str();
-  }
-}
-LogLevel Log::get_log_level() const {
-  return log_level_;
-}
-void Log::set_log_level(LogLevel level) {
-  this->ValidateLogLevel(level);
-  log_level_ = level;
-}
-LogLevel Log::StringToLogLevel(std::string level) const {
-  for_each(begin(level), end(level),
-           [](char& c) {
-             c = (char) ::toupper(c);
-           });
-  this->ValidateLogLevel(level);
-  return str2lvl_.at(level);
-}
-Log::~Log() = default;

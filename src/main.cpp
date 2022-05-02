@@ -2,7 +2,7 @@
 
 int main(int argc, char* argv[]) {
   LOG(INFO, "Starting system...");
-  Configure(argc, argv);
+  config.Start(argc, argv);
   LOG(INFO, "System started");
 
   Tokenizer tokenizer;

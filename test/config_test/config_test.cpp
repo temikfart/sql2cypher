@@ -10,7 +10,7 @@ using namespace testing;
 TEST(SetGetConfigTests, DefaultConfigTest) {
   Config tConf;
   
-  EXPECT_EQ(SCCMode::INTERACTIVE, tConf.get_mode())
+  EXPECT_EQ(SCCMode::kInteractive, tConf.get_mode())
     << "default mode should be INTERACTIVE";
 
   const std::string ConfigPath = tConf.GetConfigPath();
@@ -25,17 +25,17 @@ TEST(SetGetConfigTests, DefaultConfigTest) {
 TEST(SetGetConfigTests, ValidModeTest) {
   Config tConf;
 
-  tConf.set_mode(SCCMode::INTERACTIVE);
-  EXPECT_EQ(SCCMode::INTERACTIVE, tConf.get_mode());
+  tConf.set_mode(SCCMode::kInteractive);
+  EXPECT_EQ(SCCMode::kInteractive, tConf.get_mode());
 
-  tConf.set_mode(SCCMode::DAEMON);
-  EXPECT_EQ(SCCMode::DAEMON, tConf.get_mode());
+  tConf.set_mode(SCCMode::kDaemon);
+  EXPECT_EQ(SCCMode::kDaemon, tConf.get_mode());
 }
 TEST(SetGetConfigTests, InvalidModeTest) {
   Config tConf;
   SCC_log.set_log_level(LogLevel::SILENT);
 
-  EXPECT_EXIT(tConf.set_mode(SCCMode::SCCMODE_COUNT),
+  EXPECT_EXIT(tConf.set_mode(SCCMode::kSCCModeCount),
               ExitedWithCode(EXIT_FAILURE),
               "")
     << "SCCMODE_COUNT should not be set";
@@ -80,9 +80,9 @@ TEST(ConvertConfigTests, ValidStringToModeTest) {
   Config tConf;
 
   EXPECT_THAT(tConf.StringToSCCMode("InteRaCTivE"),
-              Eq(SCCMode::INTERACTIVE));
+              Eq(SCCMode::kInteractive));
   EXPECT_THAT(tConf.StringToSCCMode("DaeMOn"),
-              Eq(SCCMode::DAEMON));
+              Eq(SCCMode::kDaemon));
 }
 TEST(ConvertConfigTests, InvalidStringToModeTest) {
   Config tConf;
@@ -105,15 +105,15 @@ TEST(ConvertConfigTests, InvalidStringToModeTest) {
 TEST(ConvertConfigTests, ValidModeToStringTest) {
   Config tConf;
 
-  EXPECT_THAT(tConf.SCCModeToString(SCCMode::INTERACTIVE),
+  EXPECT_THAT(tConf.SCCModeToString(SCCMode::kInteractive),
               Eq("INTERACTIVE"));
-  EXPECT_THAT(tConf.SCCModeToString(SCCMode::DAEMON),
+  EXPECT_THAT(tConf.SCCModeToString(SCCMode::kDaemon),
               Eq("DAEMON"));
 }
 TEST(ConvertConfigTests, InvalidModeToStringTest) {
   Config tConf;
 
-  EXPECT_EXIT(tConf.SCCModeToString(SCCMode::SCCMODE_COUNT),
+  EXPECT_EXIT(tConf.SCCModeToString(SCCMode::kSCCModeCount),
               ExitedWithCode(EXIT_FAILURE),
               "")
     << "SCCMODE_COUNT should not be converted to string";

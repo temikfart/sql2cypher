@@ -7,6 +7,7 @@ void QueryAssembler::Translate(std::shared_ptr<Node> AST) {
 
   if (ast_ == nullptr) {
     LOG(TRACE, "empty AST, nothing to translate");
+    LOG(INFO, "Translation is ended");
     return;
   }
 
@@ -15,6 +16,7 @@ void QueryAssembler::Translate(std::shared_ptr<Node> AST) {
       this->TranslateProgram(ast_);
     } else {
       LOG(TRACE, "root of AST does not have children");
+      LOG(INFO, "Translation is ended");
       return;
     }
   } else {
