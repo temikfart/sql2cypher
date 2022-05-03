@@ -51,7 +51,7 @@ TEST(SetGetConfigTests, SQLPathTest) {
 
   std::string SQL_path = tConf.GetConfigPath()
                          + "../resources/config_test_resources/";
-  std::string Valid_SQL_path = SQL_path + "test_sql_queries.sql";
+  std::string Valid_SQL_path = SQL_path + "sql_path_test.sql";
   std::string Invalid_SQL_path = SQL_path + "invalid.sql";
 
   tConf.set_sql_path(Valid_SQL_path);
@@ -69,7 +69,7 @@ TEST(SetGetConfigTests, CypherPathTest) {
 
   std::string Cypher_path = tConf.GetConfigPath()
                             + "../resources/config_test_resources/";
-  std::string Valid_Cypher_path = Cypher_path + "test_cypher_queries.cypher";
+  std::string Valid_Cypher_path = Cypher_path + "cypher_path_test.cypher";
 
   tConf.set_cypher_path(Valid_Cypher_path);
   EXPECT_EQ(Valid_Cypher_path, tConf.get_cypher_path())
