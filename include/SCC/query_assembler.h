@@ -1,14 +1,15 @@
 #pragma once
 
-#include "SCC/log.h"
-#include "SCC/config.h"
-#include "SCC/ast.h"
-#include "SCC/syntax_analyzer.h"
+#include <algorithm>
 #include <iostream>
 #include <memory>
-#include <sstream>
-#include <algorithm>
 #include <tuple>
+#include <sstream>
+
+#include "SCC/ast.h"
+#include "SCC/config.h"
+#include "SCC/log.h"
+#include "SCC/syntax_analyzer.h"
 
 // Column as property with standard data
 using StdProperty = std::tuple<std::string, std::string>;
@@ -20,6 +21,7 @@ public:
 private:
   std::shared_ptr<Node> ast_;
   std::ofstream& out_ = config.WriteCypher();
+
   int constraint_counter = 0;
   int relationship_counter = 0;
 

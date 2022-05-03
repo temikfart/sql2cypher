@@ -17,7 +17,10 @@ add_executable(SCC
         src/syntax_analyzer_dml.cpp
         src/syntax_analyzer_other.cpp
         src/ast_handler.cpp
-        src/query_assembler.cpp
+        src/query_assembler_general.cpp
+        src/query_assembler_ddl.cpp
+        src/query_assembler_dml.cpp
+        src/query_assembler_other.cpp
         src/tree_dump.cpp)
 
 include(FetchContent)
