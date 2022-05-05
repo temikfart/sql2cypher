@@ -4,13 +4,14 @@ Config config;
 
 Config::Config() {
   mode_ = SCCMode::kInteractive;
-  sql_path_ = cypher_path_ = this->GetConfigPath();
+  sql_path_ = cypher_path_ = tree_dump_path_ = this->GetConfigPath();
   sql_path_ += "../resources/sql_queries.sql";
   cypher_path_ += "../resources/cypher_queries.cypher";
+  tree_dump_path_ += "../resources/tree_dump/tree_dump.txt";
 }
 Config::~Config() {
-  input_.close();
-  output_.close();
+  CloseInputFile();
+  CloseOutputFile();
 }
 
 void Config::set_mode(SCCMode mode) {
@@ -33,6 +34,12 @@ void Config::set_cypher_path(const std::string& new_cypher_path) {
 std::string Config::get_cypher_path() const {
   return cypher_path_;
 }
+void Config::set_tree_dump_path(const std::string& new_tree_dump_path) {
+  tree_dump_path_ = new_tree_dump_path;
+}
+std::string Config::get_tree_dump_path() const {
+  return tree_dump_path_;
+}
 
 void Config::Start(int argc, char* argv[]) {
   LOG(TRACE, "Configuring system...");
@@ -45,7 +52,10 @@ void Config::Start(int argc, char* argv[]) {
 
   input_.open(sql_path_, std::ios::in);
   output_.open(cypher_path_, std::ios::out);
+  tree_dump_.open(tree_dump_path_, std::ios::out);
+
   this->ValidateCypherPath(cypher_path_);
+  this->ValidateTreeDumpPath(tree_dump_path_);
 
   // TODO: implement SCC mode behavior.
 
@@ -66,6 +76,7 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
       {"log", required_argument, nullptr, OptFlag::kLogFlag},
       {"mode", required_argument, nullptr, OptFlag::kModeFlag},
       {"sql", required_argument, nullptr, OptFlag::kSQLFlag},
+      {"dump", required_argument, nullptr, OptFlag::kSQLFlag},
       {nullptr, 0, nullptr, 0},
   };
   while ((flag = getopt_long(argc,
@@ -95,6 +106,9 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
         break;
       case OptFlag::kCypherFlag:
         this->SetOptFlagCypher(OF_flag);
+        break;
+      case OptFlag::kTreeDumpFlag:
+        this->SetOptFlagTreeDump(OF_flag);
         break;
       default:
         char invalid_flag = short_options[optind + 1];
@@ -133,6 +147,10 @@ std::ofstream& Config::WriteCypher() {
   this->ValidateIsOutputStreamOpen();
   return output_;
 }
+std::ofstream& Config::WriteTreeDump() {
+  this->ValidateIsTreeDumpStreamOpen();
+  return tree_dump_;
+}
 void Config::CloseInputFile() {
   LOG(DEBUG, "closing input file...");
   if (input_.is_open()) {
@@ -159,6 +177,20 @@ void Config::CloseOutputFile() {
     }
   } else {
     LOG(DEBUG, "output file is already closed");
+  }
+}
+void Config::CloseTreeDumpFile() {
+  LOG(DEBUG, "closing Tree Dump file...");
+  if (tree_dump_.is_open()) {
+    tree_dump_.close();
+    if (tree_dump_.good()) {
+      LOG(DEBUG, "Tree Dump file closed successfully");
+    } else {
+      LOG(ERROR, "Tree Dump file close error");
+      exit(EXIT_FAILURE);
+    }
+  } else {
+    LOG(INFO, "Tree Dump file is already closed");
   }
 }
 
@@ -257,6 +289,13 @@ void Config::SetOptFlagCypher(OptFlag flag) {
   this->set_cypher_path(tmp);
   this->SetFlag(flag);
 }
+void Config::SetOptFlagTreeDump(OptFlag flag) {
+  this->ValidateIsFlagSet(flag);
+  LOG(TRACE, "set Tree Dump path = " << optarg);
+  std::string tmp = optarg;
+  this->set_tree_dump_path(tmp);
+  this->SetFlag(flag);
+}
 
 void Config::ValidateMode(SCCMode mode) const {
   if (SCCMode::kSCCModeCount <= mode) {
@@ -286,6 +325,13 @@ void Config::ValidateCypherPath(const std::string& cypher_path) const {
   }
   LOG(DEBUG, "Cypher path is valid");
 }
+void Config::ValidateTreeDumpPath(const std::string& tree_dump_path) const {
+  if (!(this->IsFileExists(tree_dump_path))) {
+    LOG(ERROR, "Tree Dump file does not exist: " << tree_dump_path);
+    exit(EXIT_FAILURE);
+  }
+  LOG(DEBUG, "Tree Dump path is valid");
+}
 void Config::ValidateIsInputStreamOpen() const {
   if (!input_.is_open()) {
     LOG(ERROR, "input file stream is not opened");
@@ -299,6 +345,13 @@ void Config::ValidateIsOutputStreamOpen() const {
     exit(EXIT_FAILURE);
   }
   LOG(DEBUG, "output file stream is opened");
+}
+void Config::ValidateIsTreeDumpStreamOpen() const {
+  if (!tree_dump_.is_open()) {
+    LOG(ERROR, "tree dump file stream is not opened");
+    exit(EXIT_FAILURE);
+  }
+  LOG(DEBUG, "tree dump stream is opened");
 }
 void Config::ValidateIsFlagSet(OptFlag flag) const {
   if (this->IsFlagSet(flag)) {
