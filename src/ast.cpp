@@ -109,7 +109,7 @@ void Node::ValidateAddChild(std::shared_ptr<Node> const& node) const {
 void Node::ValidateStType(StatementType type) {
   if (StatementType::StTypeCount <= type) {
     LOG(ERROR, "invalid statement type: " << type);
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
 }
 
