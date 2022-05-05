@@ -83,6 +83,8 @@ public:
   explicit Node(DataType type);
   virtual ~Node();
 
+  void set_line(int line);
+  int get_line();
   void set_st_type(StatementType type);
   StatementType get_st_type();
   void set_parent(std::shared_ptr<Node>& parent);
@@ -99,6 +101,7 @@ public:
   virtual void PrintType(std::ostream& stream) = 0;
 
 protected:
+  int line_ = 0;
   DataType type_;
   StatementType st_type_ = StatementType::EMPTY_TYPE;
   std::shared_ptr<Node> parent_ = nullptr;

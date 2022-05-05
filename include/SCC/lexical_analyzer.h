@@ -25,6 +25,7 @@ public:
   void PrintTokens();
 
 private:
+  int line_number_ = 0;
   std::deque<std::shared_ptr<Node>> tokens_array_;
 
   void GetNumber();

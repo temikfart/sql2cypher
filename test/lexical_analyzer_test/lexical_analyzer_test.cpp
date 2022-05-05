@@ -117,4 +117,15 @@ TEST_F(TokenizerTests, InvalidTest) {
   EXPECT_EXIT(tTokenizer.Tokenize(), ExitedWithCode(EXIT_FAILURE) , "")
     << "№ is an invalid character";
 }
+TEST_F(TokenizerTests, LineTest) {
+  config.set_sql_path(config.GetConfigPath() +
+      "../resources/lexical_analyzer_test/line_test.sql");
+  config.Start(1, nullptr);
+
+  tTokenizer.Tokenize();
+
+  EXPECT_EQ(1, tTokenizer.get_first_token()->get_line());
+  EXPECT_EQ(2, tTokenizer.get_first_token()->get_line());
+  EXPECT_EQ(4, tTokenizer.get_first_token()->get_line());
+}
 
