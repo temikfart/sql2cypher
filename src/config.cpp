@@ -81,7 +81,7 @@ void Config::Start(int argc, char* argv[]) {
     // TODO: implement SCC mode=daemon behavior.
   }
 
-  LOG(TRACE, "сonfiguration is completed");
+  LOG(TRACE, "configuration is completed");
 }
 void Config::GetConsoleArguments(int argc, char* const* argv) {
   LOG(TRACE, "parsing console arguments...");

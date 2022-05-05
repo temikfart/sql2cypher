@@ -3,7 +3,7 @@
 /* ------------------ Node ------------------ */
 
 Node::Node(DataType type) : type_(type) {}
-Node::~Node() {}
+Node::~Node() = default;
 
 void Node::set_st_type(StatementType type) {
   this->ValidateStType(type);
@@ -35,9 +35,12 @@ void Node::AddChild(std::shared_ptr<Node> const& node) {
 }
 bool Node::IsNodesEqual(const std::shared_ptr<Node>& node1,
                         const std::shared_ptr<Node>& node2) {
+  LOG(TRACE, "starting of comparing two nodes...");
   if (node1->get_type() != node2->get_type() ||
       node1->get_children_amount()
           != node2->get_children_amount()) { //TODO: add parent ptr comparison
+    LOG(DEBUG, "not equal: comparing nodes with different "
+               "numbers of children or have different types");
     return false;
   }
 
@@ -47,12 +50,14 @@ bool Node::IsNodesEqual(const std::shared_ptr<Node>& node1,
     case DataType::INT_NUMBER:
       if (std::dynamic_pointer_cast<IntNumNode>(node1)->get_data() !=
           std::dynamic_pointer_cast<IntNumNode>(node2)->get_data()) {
+        LOG(DEBUG, "not equal: different integer number data");
         return false;
       }
       break;
     case DataType::FLOAT_NUMBER:
       if (std::dynamic_pointer_cast<FloatNumNode>(node1)->get_data() !=
           std::dynamic_pointer_cast<FloatNumNode>(node2)->get_data()) {
+        LOG(DEBUG, "not equal: different float number data");
         return false;
       }
       break;
@@ -67,43 +72,45 @@ bool Node::IsNodesEqual(const std::shared_ptr<Node>& node1,
     case DataType::OPERATOR:
       if (std::dynamic_pointer_cast<StringNode>(node1)->get_data() !=
           std::dynamic_pointer_cast<StringNode>(node2)->get_data()) {
+        LOG(DEBUG, "not equal: different string data");
         return false;
       }
       break;
     default:
       LOG(ERROR, "invalid Datatype: " << node1->get_type());
-      exit(EXIT_FAILURE);
+      end(EXIT_FAILURE);
   }
 
   size_t children_amount = node1->get_children_amount();
   for (size_t i = 0; i < children_amount; i++) {
     if (!IsNodesEqual(node1->get_child(i),
-                      node2->get_child(i)))
+                      node2->get_child(i))) {
+      LOG(DEBUG, "not equal: different subtrees");
       return false;
+    }
   }
 
+  LOG(DEBUG, "nodes are equal");
   return true;
 }
 
 void Node::ValidateChildNumber(size_t node_num) const {
   if (node_num >= children_.size()) {
     LOG(ERROR, "node number too big");
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
 }
 void Node::ValidateAddChild(std::shared_ptr<Node> const& node) const {
   if (node == nullptr) {
     LOG(ERROR, "nullptr can not be added to the tree");
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "adding node is valid");
 }
 void Node::ValidateStType(StatementType type) {
   if (StatementType::StTypeCount <= type) {
-    LOG(ERROR, "invalid StatementType: " << type);
+    LOG(ERROR, "invalid statement type: " << type);
     exit(EXIT_FAILURE);
   }
-  LOG(DEBUG, "StatementType is valid");
 }
 
 /* --------------- IntNumNode --------------- */
@@ -134,9 +141,8 @@ void IntNumNode::PrintType(std::ostream& stream) {
 void IntNumNode::ValidateType(DataType type) const {
   if (type != DataType::INT_NUMBER) {
     LOG(ERROR, "invalid type for IntNumNode: " << type);
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "valid type for IntNumNode");
 }
 
 /* -------------- FloatNumNode -------------- */
@@ -167,9 +173,8 @@ void FloatNumNode::PrintType(std::ostream& stream) {
 void FloatNumNode::ValidateType(DataType type) const {
   if (type != DataType::FLOAT_NUMBER) {
     LOG(ERROR, "invalid type for FloatNumNode: " << type);
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "valid type for FloatNumNode");
 }
 
 /* ---------------- CharNode ---------------- */
@@ -205,7 +210,7 @@ void CharNode::PrintType(std::ostream& stream) {
     default:
       LOG(ERROR, "wrong type for CharNode, "
                  "something wrong with validation of type");
-      exit(EXIT_FAILURE);
+      end(EXIT_FAILURE);
   }
 }
 
@@ -214,9 +219,8 @@ void CharNode::ValidateType(DataType type) const {
   bool is_PUNCTUATION = type == DataType::PUNCTUATION;
   if (!(is_BRACKET || is_PUNCTUATION)) {
     LOG(ERROR, "invalid type for CharNode: " << type);
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "valid type for CharNode");
 }
 
 /* --------------- StringNode --------------- */
@@ -252,7 +256,7 @@ void StringNode::PrintType(std::ostream& stream) {
     default:
       LOG(ERROR, "wrong type for StringNode, "
                  "something wrong with validation of type");
-      exit(EXIT_FAILURE);
+      end(EXIT_FAILURE);
   }
 }
 
@@ -262,9 +266,8 @@ void StringNode::ValidateType(DataType type) const {
   bool is_STRING = type == DataType::STRING;
   if (!(is_WORD || is_OPERATOR || is_STRING)) {
     LOG(ERROR, "invalid type for StringNode: " << type);
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "valid type for StringNode");
 }
 
 /* ---------------- RootNode ---------------- */
@@ -283,9 +286,8 @@ void RootNode::PrintType(std::ostream& stream) {
 void RootNode::ValidateType(DataType type) const {
   if (type != DataType::ROOT) {
     LOG(ERROR, "invalid type for RootNode: " << type);
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "valid type for RootNode");
 }
 
 /* --------------- ServiceNode -------------- */
@@ -304,9 +306,8 @@ void ServiceNode::PrintType(std::ostream& stream) {
 void ServiceNode::ValidateType(DataType type) const {
   if (type != DataType::SERVICE) {
     LOG(ERROR, "invalid type for ServiceNode: " << type);
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "valid type for ServiceNode");
 }
 
 /* ------------------ Tree ------------------ */
