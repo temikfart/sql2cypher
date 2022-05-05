@@ -93,15 +93,16 @@ void QueryAssembler::TranslateForeignKey(
     }
   }
 
-  this->RemoveProperties(table_name, properties);
-  this->RemoveProperties(table_name, ref_columns);
+//  this->RemoveProperties(table_name, properties);
+//  this->RemoveProperties(table_name, ref_columns);
   this->CreateRelationship(table_name, ref_table_name);
 }
 void QueryAssembler::CreateUniqueNodePropertyConstraint(
     const std::string& constraint_name,
     const std::string& LabelName,
     const std::vector<std::string>& properties) {
-  out_ << "CREATE CONSTRAINT [" << constraint_name << "]" << std::endl;
+  out_ << "CREATE CONSTRAINT " << constraint_name
+       << " IF NOT EXISTS" << std::endl;
   out_ << "FOR (n:" << LabelName << ")" << std::endl;
   out_ << "REQUIRE (";
   for (size_t i = 0; i < properties.size(); i++) {
@@ -116,7 +117,8 @@ void QueryAssembler::CreateNodePropertyExistenceConstraint(
     const std::string& constraint_name,
     const std::string& LabelName,
     const std::string& property) {
-  out_ << "CREATE CONSTRAINT [" << constraint_name << "]" << std::endl;
+  out_ << "CREATE CONSTRAINT " << constraint_name
+       << " IF NOT EXISTS" << std::endl;
   out_ << "FOR (n:" << LabelName << ")" << std::endl;
   out_ << "REQUIRE (n." << property << ") IS NOT NULL;\n" << std::endl;
 }
@@ -126,7 +128,7 @@ void QueryAssembler::CreateRelationship(
   out_ << "MATCH (a:" << label_name << "), (b:" << ref_label_name << ")\n";
   out_ << "CREATE (a)-[r:fk_"
        << label_name << "_to_" << ref_label_name << "_" << relationship_counter
-       << "]->(b)\n" << std::endl;
+       << "]->(b);\n" << std::endl;
   relationship_counter++;
 }
 void QueryAssembler::RemoveProperties(

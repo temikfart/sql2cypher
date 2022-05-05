@@ -57,7 +57,7 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
   int flag;
   opterr = 0;
 
-  const char short_options[] = "dhil:m:";
+  const char short_options[] = "dhil:m:v";
   const struct option long_options[] = {
       {"cypher", required_argument, nullptr, OptFlag::kCypherFlag},
       {"daemon", 0, nullptr, OptFlag::kDaemonFlag},
@@ -66,6 +66,7 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
       {"log", required_argument, nullptr, OptFlag::kLogFlag},
       {"mode", required_argument, nullptr, OptFlag::kModeFlag},
       {"sql", required_argument, nullptr, OptFlag::kSQLFlag},
+      {"version", 0, nullptr, OptFlag::kVersionFlag},
       {nullptr, 0, nullptr, 0},
   };
   while ((flag = getopt_long(argc,
@@ -80,6 +81,9 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
         break;
       case OptFlag::kHelpFlag:
         this->PrintHelp();
+        break;
+      case OptFlag::kVersionFlag:
+        this->PrintVersion();
         break;
       case OptFlag::kInteractiveFlag:
         this->SetOptFlagInteractive(OF_flag);
@@ -212,6 +216,13 @@ void Config::PrintHelp() const {
             << "Pointer to the file, "
                "where will be converted cypher queries.\n";
   std::cout.flush();
+
+  exit(EXIT_SUCCESS);
+}
+void Config::PrintVersion() const {
+  std::cout << "<===| SCC (The SQL to CypherQL Converter) |===>\n";
+  std::cout << "Version: rc-0.9\n";
+  std::cout << "Authors: Artyom Fartygin and Roman Korostinskiy" << std::endl;
 
   exit(EXIT_SUCCESS);
 }

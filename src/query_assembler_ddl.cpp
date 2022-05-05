@@ -412,7 +412,7 @@ void QueryAssembler::TranslateDropObject(
 
   if (node->get_st_type() == StatementType::dropColumn) {
     out_ << "MATCH (n:" << table_name << ")\n";
-    out_ << "SET " << argument;
+    out_ << "SET n." << argument << " = null";
     for (auto& i: other_arguments) {
       out_ << ", n." << i << " = null";
     }

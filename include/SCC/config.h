@@ -26,6 +26,7 @@ enum OptFlag {
   kInteractiveFlag = 'i',
   kLogFlag = 'l',
   kModeFlag = 'm',
+  kVersionFlag = 'v',
   kCypherFlag = 'z' + 1,
   kSQLFlag = 'z' + 2
 };
@@ -101,6 +102,7 @@ private:
   bool IsFlagSet(OptFlag flag) const;
 
   void PrintHelp() const;
+  void PrintVersion() const;
   void SetOptFlagDaemon(OptFlag flag);
   void SetOptFlagInteractive(OptFlag flag);
   void SetOptFlagLog(OptFlag flag);
