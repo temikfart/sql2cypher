@@ -2,15 +2,39 @@
 
 Config config;
 
+void end(int exit_code) {
+  LOG(TRACE, "end-function is invoked");
+  LOG(TRACE, "closing files...");
+
+  bool is_all_files_closed = true;
+  if (!config.CloseInputFile()) {
+    LOG(ERROR, "closing input file error");
+    is_all_files_closed = false;
+  }
+  if (!config.CloseOutputFile()) {
+    LOG(ERROR, "closing output file error");
+    is_all_files_closed = false;
+  }
+  if (is_all_files_closed) {
+    LOG(TRACE, "all i/o files are closed");
+  } else {
+    LOG(ERROR, "some files was not closed");
+    exit_code = EXIT_FAILURE;
+  }
+
+  LogLevel ec_lvl = INFO;
+  if (exit_code != 0) {
+    ec_lvl = ERROR;
+  }
+  LOG(ec_lvl, "System ended with exit code " << exit_code);
+  exit(exit_code);
+}
+
 Config::Config() {
   mode_ = SCCMode::kInteractive;
   sql_path_ = cypher_path_ = this->GetConfigPath();
   sql_path_ += "../resources/sql_queries.sql";
   cypher_path_ += "../resources/cypher_queries.cypher";
-}
-Config::~Config() {
-  input_.close();
-  output_.close();
 }
 
 void Config::set_mode(SCCMode mode) {
@@ -35,7 +59,7 @@ std::string Config::get_cypher_path() const {
 }
 
 void Config::Start(int argc, char* argv[]) {
-  LOG(TRACE, "Configuring system...");
+  LOG(TRACE, "configuring system...");
 
   if (argc > 1) {
     config.GetConsoleArguments(argc, argv);
@@ -43,16 +67,24 @@ void Config::Start(int argc, char* argv[]) {
     // TODO: Parse config.ini
   }
 
+  LOG(TRACE, "opening i/o files...");
   input_.open(sql_path_, std::ios::in);
+  this->ValidateIsInputStreamOpen();
   output_.open(cypher_path_, std::ios::out);
   this->ValidateCypherPath(cypher_path_);
+  this->ValidateIsOutputStreamOpen();
+  LOG(TRACE, "all i/o files are opened");
 
-  // TODO: implement SCC mode behavior.
+  if (config.get_mode() == SCCMode::kDaemon) {
+    LOG(TRACE, "daemon mode cannot be activated "
+               "(not implemented, for now)");
+    // TODO: implement SCC mode=daemon behavior.
+  }
 
-  LOG(TRACE, "Configuration is completed");
+  LOG(TRACE, "сonfiguration is completed");
 }
 void Config::GetConsoleArguments(int argc, char* const* argv) {
-  LOG(DEBUG, "parsing console arguments...");
+  LOG(TRACE, "parsing console arguments...");
 
   int flag;
   opterr = 0;
@@ -108,7 +140,7 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
         } else {
           LOG(ERROR, "undefined flag: " << invalid_flag);
         }
-        exit(EXIT_FAILURE);
+        end(EXIT_FAILURE);
     }
   }
   LOG(DEBUG, "all console arguments are parsed");
@@ -137,33 +169,35 @@ std::ofstream& Config::WriteCypher() {
   this->ValidateIsOutputStreamOpen();
   return output_;
 }
-void Config::CloseInputFile() {
-  LOG(DEBUG, "closing input file...");
+bool Config::CloseInputFile() {
+  LOG(TRACE, "closing input file...");
   if (input_.is_open()) {
     input_.close();
     if (input_.good() || input_.eof()) {
-      LOG(DEBUG, "input file closed successfully");
+      LOG(TRACE, "input file closed successfully");
     } else {
       LOG(ERROR, "input file close error");
-      exit(EXIT_FAILURE);
+      return false;
     }
   } else {
-    LOG(DEBUG, "input file is already closed");
+    LOG(TRACE, "input file is already closed");
   }
+  return true;
 }
-void Config::CloseOutputFile() {
-  LOG(DEBUG, "closing output file...");
+bool Config::CloseOutputFile() {
+  LOG(TRACE, "closing output file...");
   if (output_.is_open()) {
     output_.close();
     if (output_.good()) {
-      LOG(DEBUG, "output file closed successfully");
+      LOG(TRACE, "output file closed successfully");
     } else {
       LOG(ERROR, "output file close error");
-      exit(EXIT_FAILURE);
+      return false;
     }
   } else {
-    LOG(DEBUG, "output file is already closed");
+    LOG(TRACE, "output file is already closed");
   }
+  return true;
 }
 
 SCCMode Config::StringToSCCMode(std::string mode) const {
@@ -224,7 +258,7 @@ void Config::PrintHelp() const {
                "where will be created image of AST of SQL queries\n";
   std::cout.flush();
 
-  exit(EXIT_SUCCESS);
+  end(EXIT_SUCCESS);
 }
 void Config::PrintVersion() const {
   LOG(INFO, "printing version of the SCC...");
@@ -236,46 +270,44 @@ void Config::PrintVersion() const {
             << "Artyom Fartygin and Roman Korostinskiy";
   std::cout << std::endl;
 
-  exit(EXIT_SUCCESS);
+  end(EXIT_SUCCESS);
 }
 void Config::SetOptFlagDaemon(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
-  LOG(TRACE, "set SCC mode = "
-      << this->SCCModeToString(SCCMode::kDaemon));
+  LOG(TRACE, "set SCC mode=DAEMON");
   this->set_mode(SCCMode::kDaemon);
   this->SetFlag(flag);
 }
 void Config::SetOptFlagInteractive(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
-  LOG(TRACE, "set SCC mode = "
-      << this->SCCModeToString(SCCMode::kInteractive));
+  LOG(TRACE, "set SCC mode=INTERACTIVE");
   this->set_mode(SCCMode::kInteractive);
   this->SetFlag(flag);
 }
 void Config::SetOptFlagLog(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
-  LOG(TRACE, "set log level = " << optarg);
+  LOG(TRACE, "set LogLevel=" << optarg);
   std::string tmp_log_level = optarg;
   SCC_log.set_log_level(SCC_log.StringToLogLevel(tmp_log_level));
   this->SetFlag(flag);
 }
 void Config::SetOptFlagMode(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
-  LOG(TRACE, "set SCC mode = " << optarg);
+  LOG(TRACE, "set SCC mode=" << optarg);
   std::string tmp_mode = optarg;
   this->set_mode(this->StringToSCCMode(tmp_mode));
   this->SetFlag(flag);
 }
 void Config::SetOptFlagSQL(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
-  LOG(TRACE, "set SQL path = " << optarg);
+  LOG(TRACE, "set file with SQL queries as \'" << optarg << "\'");
   std::string tmp = optarg;
   this->set_sql_path(tmp);
   this->SetFlag(flag);
 }
 void Config::SetOptFlagCypher(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
-  LOG(TRACE, "set Cypher path = " << optarg);
+  LOG(TRACE, "set file with CypherQL queries as \'" << optarg << "\'");
   std::string tmp = optarg;
   this->set_cypher_path(tmp);
   this->SetFlag(flag);
@@ -283,49 +315,43 @@ void Config::SetOptFlagCypher(OptFlag flag) {
 
 void Config::ValidateMode(SCCMode mode) const {
   if (SCCMode::kSCCModeCount <= mode) {
-    LOG(ERROR, "incorrect SCC mode: " << std::to_string(mode));
-    exit(EXIT_FAILURE);
+    LOG(ERROR, "incorrect SCC mode: " << mode);
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "mode is valid");
 }
 void Config::ValidateMode(const std::string& mode) const {
   if (str2modes_.count(mode) == 0) {
     LOG(ERROR, "invalid SCC mode: " << mode);
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "mode is valid");
 }
 void Config::ValidateSQLPath(const std::string& sql_path) const {
   if (!(this->IsFileExists(sql_path))) {
-    LOG(ERROR, "SQL file does not exist: " << sql_path);
-    exit(EXIT_FAILURE);
+    LOG(ERROR, "file with SQL queries does not exist: " << sql_path);
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "SQL path is valid");
 }
 void Config::ValidateCypherPath(const std::string& cypher_path) const {
   if (!output_.good()) {
-    LOG(ERROR, "Cypher file does not exist: " << cypher_path);
-    exit(EXIT_FAILURE);
+    LOG(ERROR, "file with CypherQL queries does not exist: " << cypher_path);
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "Cypher path is valid");
 }
 void Config::ValidateIsInputStreamOpen() const {
   if (!input_.is_open()) {
     LOG(ERROR, "input file stream is not opened");
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "input file stream is opened");
 }
 void Config::ValidateIsOutputStreamOpen() const {
   if (!output_.is_open()) {
     LOG(ERROR, "output file stream is not opened");
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "output file stream is opened");
 }
 void Config::ValidateIsFlagSet(OptFlag flag) const {
   if (this->IsFlagSet(flag)) {
     LOG(ERROR, "conflicting flags");
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
 }

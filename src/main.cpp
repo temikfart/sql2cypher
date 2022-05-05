@@ -7,10 +7,8 @@ int main(int argc, char* argv[]) {
 
   Tokenizer tokenizer;
   tokenizer.Tokenize();
-//  tokenizer.PrintTokens();
 
   SyntaxAnalyzer syntax_analyzer;
-
   std::shared_ptr<Node> AST =
       syntax_analyzer.Analyze(tokenizer.get_tokens_array());
   
@@ -20,8 +18,7 @@ int main(int argc, char* argv[]) {
   QueryAssembler query_assembler;
   query_assembler.Translate(AST);
 
-  config.CloseOutputFile();
-  config.CloseInputFile();
+  end(EXIT_SUCCESS);
 
   return 0;
 }
