@@ -18,7 +18,7 @@ void QueryAssembler::TranslateDMLStatement(std::shared_ptr<Node> node) {
       break;
     default:
       LOG(ERROR, "unknown DML statement");
-      exit(EXIT_FAILURE);
+      end(EXIT_FAILURE);
   }
 }
 
