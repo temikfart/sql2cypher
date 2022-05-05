@@ -29,41 +29,44 @@ enum LogLevel {
 };
 
 class Log {
+public:
+  Log();
+  ~Log();
+
+  void set_log_level(LogLevel level);
+  LogLevel get_log_level() const;
+
+  void AddLog(LogLevel level, const std::string& msg);
+  LogLevel StringToLogLevel(std::string level) const;
+
 private:
   std::string filename_;
   std::ofstream output_;
   LogLevel log_level_ = LogLevel::INFO;
-  
+
   std::map<LogLevel, std::string> lvl2str_ = {
-    {LogLevel::SILENT,  "SILENT"},
-    {LogLevel::FATAL,   "FATAL"},
-    {LogLevel::ERROR,   "ERROR"},
-    {LogLevel::INFO,    "INFO"},
-    {LogLevel::TRACE,   "TRACE"},
-    {LogLevel::DEBUG,   "DEBUG"},
+      {LogLevel::SILENT, "SILENT"},
+      {LogLevel::FATAL, "FATAL"},
+      {LogLevel::ERROR, "ERROR"},
+      {LogLevel::INFO, "INFO"},
+      {LogLevel::TRACE, "TRACE"},
+      {LogLevel::DEBUG, "DEBUG"},
   };
   std::map<std::string, LogLevel> str2lvl_ = {
-    {"SILENT",  LogLevel::SILENT},
-    {"FATAL",   LogLevel::FATAL},
-    {"ERROR",   LogLevel::ERROR},
-    {"INFO",    LogLevel::INFO},
-    {"TRACE",   LogLevel::TRACE},
-    {"DEBUG",   LogLevel::DEBUG}
+      {"SILENT", LogLevel::SILENT},
+      {"FATAL", LogLevel::FATAL},
+      {"ERROR", LogLevel::ERROR},
+      {"INFO", LogLevel::INFO},
+      {"TRACE", LogLevel::TRACE},
+      {"DEBUG", LogLevel::DEBUG}
   };
-  
+
   std::string GetLogPath() const;
-  static std::string get_timestamp();
-  std::string TimeToLogName(std::string timestamp) const;
-  void ValidateLogLevel(LogLevel level) const;
+  static std::string GetTimestamp();
+  std::string TimeToLogFilename(std::string timestamp) const;
+
+  static void ValidateLogLevel(LogLevel level) ;
   void ValidateLogLevel(std::string& level) const;
-  
-public:
-  Log();
-  void AddLog(LogLevel level, const std::string& msg);
-  LogLevel get_log_level() const;
-  void set_log_level(LogLevel level);
-  LogLevel StringToLogLevel(std::string level) const;
-  ~Log();
 };
 
 extern Log SCC_log;

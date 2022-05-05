@@ -1,14 +1,10 @@
 #pragma once
 
-#include "SCC/ast.h"
 #include <utility>
 
+#include "SCC/ast.h"
+
 class TreeDump {
-  std::string dot_path_ = "../resources/tree_dump/tree_dump.txt";
-  std::string png_path_ = "../resources/tree_dump/tree_dump.png";
-
-  std::ofstream dot_file_;
-
 public:
   explicit TreeDump(std::string dot_path, std::string png_path);
   TreeDump() = default;
@@ -23,6 +19,11 @@ public:
   static std::string GetServiceNodeData(StatementType statement_type);
 
 private:
+  std::string dot_path_ = "../resources/tree_dump/tree_dump.txt";
+  std::string png_path_ = "../resources/tree_dump/tree_dump.png";
+
+  std::ofstream dot_file_;
+
   void OpenDotFile();
   void CloseDotFile();
 };

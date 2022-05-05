@@ -39,7 +39,7 @@ protected:
 TEST_F(TokenizerTests, IntNumTest) {
   config.set_sql_path(config.GetConfigPath() +
                       "../resources/lexical_analyzer_test/int_num_test.sql");
-  config.Start();
+  config.Start(1, nullptr);
 
   tTokenizer.Tokenize();
 
@@ -50,7 +50,7 @@ TEST_F(TokenizerTests, IntNumTest) {
 TEST_F(TokenizerTests, FloatNumTest) {
   config.set_sql_path(config.GetConfigPath() +
                       "../resources/lexical_analyzer_test/float_num_test.sql");
-  config.Start();
+  config.Start(1, nullptr);
 
   tTokenizer.Tokenize();
 
@@ -62,7 +62,7 @@ TEST_F(TokenizerTests, FloatNumTest) {
 TEST_F(TokenizerTests, CharNodeTest) {
   config.set_sql_path(config.GetConfigPath() +
       "../resources/lexical_analyzer_test/char_test.sql");
-  config.Start();
+  config.Start(1, nullptr);
 
   tTokenizer.Tokenize();
 
@@ -89,7 +89,7 @@ TEST_F(TokenizerTests, CharNodeTest) {
 TEST_F(TokenizerTests, StringNodeTest) {
   config.set_sql_path(config.GetConfigPath() +
       "../resources/lexical_analyzer_test/string_test.sql");
-  config.Start();
+  config.Start(1, nullptr);
 
   tTokenizer.Tokenize();
 
@@ -112,9 +112,20 @@ TEST_F(TokenizerTests, StringNodeTest) {
 TEST_F(TokenizerTests, InvalidTest) {
   config.set_sql_path(config.GetConfigPath() +
       "../resources/lexical_analyzer_test/invalid_test.sql");
-  config.Start();
+  config.Start(1, nullptr);
 
   EXPECT_EXIT(tTokenizer.Tokenize(), ExitedWithCode(EXIT_FAILURE) , "")
     << "№ is an invalid character";
+}
+TEST_F(TokenizerTests, LineTest) {
+  config.set_sql_path(config.GetConfigPath() +
+      "../resources/lexical_analyzer_test/line_test.sql");
+  config.Start(1, nullptr);
+
+  tTokenizer.Tokenize();
+
+  EXPECT_EQ(1, tTokenizer.get_first_token()->get_line());
+  EXPECT_EQ(2, tTokenizer.get_first_token()->get_line());
+  EXPECT_EQ(4, tTokenizer.get_first_token()->get_line());
 }
 

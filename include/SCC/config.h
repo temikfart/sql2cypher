@@ -1,106 +1,120 @@
 #pragma once
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <algorithm>
-#include <map>
-#include <getopt.h>
 #include <sys/stat.h>
+#include <getopt.h>
+
+#include <algorithm>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <map>
+#include <string>
+#include <sstream>
+
 #include "SCC/log.h"
 
-void Configure(int argc, char* argv[]);
-
 enum SCCMode {
-  INTERACTIVE,
-  DAEMON,
-  SCCMODE_COUNT
+  kInteractive,
+  kDaemon,
+
+  kSCCModeCount
 };
 
 enum OptFlag {
-  fDAEMON = 'd',
-  fHELP = 'h',
-  fINTERACTIVE = 'i',
-  fLOG = 'l',
-  fMODE = 'm',
-  fCYPHER = 'z' + 1,
-  fSQL
+  kDaemonFlag = 'd',
+  kHelpFlag = 'h',
+  kInteractiveFlag = 'i',
+  kLogFlag = 'l',
+  kModeFlag = 'm',
+  kCypherFlag = 'z' + 1,
+  kSQLFlag = 'z' + 2
 };
 
 enum ConfigIsSet {
-  ConfLOG,
-  ConfMODE,
-  ConfSQL,
-  ConfCYPHER,
-  CONF_COUNT
+  kConfigLog,
+  kConfigMode,
+  kConfigSQL,
+  kConfigCypher,
 };
 
-class Config: public Log {
+class Config {
+public:
+  Config();
+  ~Config();
+
+  void set_mode(SCCMode mode);
+  SCCMode get_mode() const;
+  void set_sql_path(const std::string& new_sql_path);
+  std::string get_sql_path() const;
+  void set_cypher_path(const std::string& new_cypher_path);
+  std::string get_cypher_path() const;
+
+  void Start(int argc, char *argv[]);
+  void GetConsoleArguments(int argc, char *const *argv);
+
+  std::string GetConfigPath() const;
+  char GetSQLSymbol();
+  char PeekSQLSymbol();
+  std::ifstream& ReadSQL();
+  std::ofstream& WriteCypher();
+  void CloseInputFile();
+  void CloseOutputFile();
+
+  SCCMode StringToSCCMode(std::string mode) const;
+  std::string SCCModeToString(SCCMode mode) const;
+
 private:
-  SCCMode mode_ = SCCMode::INTERACTIVE;
-  
+  SCCMode mode_ = SCCMode::kInteractive;
+
   const std::map<std::string, SCCMode> str2modes_ = {
-    {"INTERACTIVE", SCCMode::INTERACTIVE},
-    {"DAEMON",      SCCMode::DAEMON},
+      {"INTERACTIVE", SCCMode::kInteractive},
+      {"DAEMON", SCCMode::kDaemon},
   };
   const std::map<SCCMode, std::string> modes2str_ = {
-    {SCCMode::INTERACTIVE,  "INTERACTIVE"},
-    {SCCMode::DAEMON,       "DAEMON"}
+      {SCCMode::kInteractive, "INTERACTIVE"},
+      {SCCMode::kDaemon, "DAEMON"}
   };
-  
+
   std::string sql_path_;
   std::ifstream input_;
-  
+
   std::string cypher_path_;
   std::ofstream output_;
 
   std::map<ConfigIsSet, bool> is_config_set_ = {
-          {ConfigIsSet::ConfLOG,    false},
-          {ConfigIsSet::ConfMODE,   false},
-          {ConfigIsSet::ConfSQL,    false},
-          {ConfigIsSet::ConfCYPHER, false},
+      {ConfigIsSet::kConfigLog, false},
+      {ConfigIsSet::kConfigMode, false},
+      {ConfigIsSet::kConfigSQL, false},
+      {ConfigIsSet::kConfigCypher, false},
   };
   const std::map<OptFlag, ConfigIsSet> flag_to_config_ = {
-          {OptFlag::fDAEMON,      ConfigIsSet::ConfMODE},
-          {OptFlag::fINTERACTIVE, ConfigIsSet::ConfMODE},
-          {OptFlag::fLOG,         ConfigIsSet::ConfLOG},
-          {OptFlag::fMODE,        ConfigIsSet::ConfMODE},
-          {OptFlag::fCYPHER,      ConfigIsSet::ConfSQL},
-          {OptFlag::fSQL,         ConfigIsSet::ConfCYPHER}
+      {OptFlag::kDaemonFlag, ConfigIsSet::kConfigMode},
+      {OptFlag::kInteractiveFlag, ConfigIsSet::kConfigMode},
+      {OptFlag::kLogFlag, ConfigIsSet::kConfigLog},
+      {OptFlag::kModeFlag, ConfigIsSet::kConfigMode},
+      {OptFlag::kCypherFlag, ConfigIsSet::kConfigSQL},
+      {OptFlag::kSQLFlag, ConfigIsSet::kConfigCypher}
   };
 
   static bool IsFileExists(const std::string& path);
-  static bool IsFileExists(const std::ofstream& f);
+  void SetFlag(OptFlag flag);
+  bool IsFlagSet(OptFlag flag) const;
+
+  void PrintHelp() const;
+  void SetOptFlagDaemon(OptFlag flag);
+  void SetOptFlagInteractive(OptFlag flag);
+  void SetOptFlagLog(OptFlag flag);
+  void SetOptFlagMode(OptFlag flag);
+  void SetOptFlagSQL(OptFlag flag);
+  void SetOptFlagCypher(OptFlag flag);
+
   void ValidateMode(SCCMode mode) const;
   void ValidateMode(const std::string& mode) const;
   void ValidateSQLPath(const std::string& sql_path) const;
   void ValidateCypherPath(const std::string& cypher_path) const;
-  void ValidateInputStream(const std::ifstream& input) const;
-  bool IsFlagSet(OptFlag flag) const;
-  void ValidateSetFlag(OptFlag flag) const;
-  void SetFlag(OptFlag flag);
-
-public:
-  Config();
-  void Start();
-  void set_mode(SCCMode mode);
-  void set_sql_path(const std::string& new_sql_path);
-  void set_cypher_path(const std::string& new_cypher_path);
-  SCCMode get_mode() const;
-  std::string get_sql_path() const;
-  std::string get_cypher_path() const;
-  std::string GetConfigPath() const;
-  std::ifstream& ReadSQL();
-  char GetSQLSymb();
-  char PeekSQLSymb();
-  std::ofstream& WriteCypher();
-  SCCMode StringToSCCMode(std::string mode) const;
-  std::string SCCModeToString(SCCMode mode) const;
-  void GetConsoleArguments(int argc, char* const* argv);
-  void CloseOutputFile();
-  void CloseInputFile();
-  ~Config();
+  void ValidateIsInputStreamOpen() const;
+  void ValidateIsOutputStreamOpen() const;
+  void ValidateIsFlagSet(OptFlag flag) const;
 };
 
 extern Config config;

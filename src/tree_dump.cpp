@@ -174,7 +174,7 @@ std::string TreeDump::GetServiceNodeData(StatementType statement_type) {
     case StatementType::dmlStatement:
       return "dmlStatement";
 
-    // DDL Statements
+      // DDL Statements
     case StatementType::alterTableStatement:
       return "alterTableStatement";
     case StatementType::createDatabaseStatement:
@@ -186,7 +186,7 @@ std::string TreeDump::GetServiceNodeData(StatementType statement_type) {
     case StatementType::dropTableStatement:
       return "dropTableStatement";
 
-    // DDL Basic Statements
+      // DDL Basic Statements
     case StatementType::tableDefinition:
       return "tableDefinition";
     case StatementType::columnDefinition:
@@ -204,7 +204,7 @@ std::string TreeDump::GetServiceNodeData(StatementType statement_type) {
     case StatementType::dropColumn:
       return "dropColumn";
 
-    // DML Statements
+      // DML Statements
     case StatementType::deleteStatement:
       return "deleteStatement";
     case StatementType::insertStatement:
@@ -212,7 +212,7 @@ std::string TreeDump::GetServiceNodeData(StatementType statement_type) {
     case StatementType::updateStatement:
       return "updateStatement";
 
-    // DML Basic Statements
+      // DML Basic Statements
     case StatementType::condition:
       return "condition";
     case StatementType::ORcondition:
@@ -226,7 +226,7 @@ std::string TreeDump::GetServiceNodeData(StatementType statement_type) {
     case StatementType::expression:
       return "expression";
 
-    // Basic Statements
+      // Basic Statements
     case StatementType::primaryKey:
       return "primaryKey";
     case StatementType::foreignKey:
@@ -244,11 +244,11 @@ std::string TreeDump::GetServiceNodeData(StatementType statement_type) {
     case StatementType::delimiter_semicolon:
       return "delimiter_semicolon";
 
-    // Basic Statements
+      // Basic Statements
     case StatementType::kw_constraint:
       return "kw_constraint";
 
-    // SQL datatypes
+      // SQL datatypes
     case StatementType::SQL_int:
       return "SQL_int";
     case StatementType::SQL_float:
@@ -292,4 +292,3 @@ void TreeDump::CloseDotFile() {
     LOG(INFO, "dot dump file is already closed");
   }
 }
-
