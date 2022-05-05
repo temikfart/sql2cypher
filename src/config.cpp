@@ -196,33 +196,45 @@ void Config::PrintHelp() const {
             << "Prints Usage and information about acceptable flags.\n";
   std::cout << std::setw(20) << "-v, --version"
             << "Prints current version.\n";
+  std::cout << std::setw(20) << "-m, --mode=[mode]"
+            << "Starts the SCC in special mode (by default: interactive)\n";
   std::cout << std::setw(20) << "-i, --interactive"
             << "Starts the SCC in interactive mode.\n";
   std::cout << std::setw(20) << ""
             << "(logs will be printed in console)\n";
-  std::cout << std::setw(20) << "-d, --daemon"
-            << "Starts the SCC in daemon mode.\n";
+  // TODO: uncomment when daemon mode will be implemented
+//  std::cout << std::setw(20) << "-d, --daemon"
+//            << "Starts the SCC in daemon mode.\n";
   std::cout << std::setw(20) << ""
             << "(logs will be printed in the special log files "
                "into \"log/\")\n";
   std::cout << std::setw(20) << "--log=lvl"
             << "Sets logging level to \"lvl\".\n";
   std::cout << std::setw(20) << ""
-            << "Acceptable levels: FATAL, ERROR, INFO, TRACE, DEBUG.\n";
-  std::cout << std::setw(20) << "--sql=path"
-            << "Pointer to the file with SQL queries, "
-               "which will be converted.\n";
-  std::cout << std::setw(20) << "--cypher=path"
-            << "Pointer to the file, "
-               "where will be converted cypher queries.\n";
+            << "Acceptable levels: SILENT, FATAL, "
+               "ERROR, INFO, TRACE, DEBUG.\n";
+  std::cout << std::setw(20) << "--sql=[path]"
+            << "Path to the file with SQL queries, "
+               "which will be converted (SQL).\n";
+  std::cout << std::setw(20) << "--cypher=[path]"
+            << "Path to the file, "
+               "where will be converted queries (CQL).\n";
+  std::cout << std::setw(20) << "--dump=[path]"
+            << "Path to the file, "
+               "where will be created image of AST of SQL queries\n";
   std::cout.flush();
 
   exit(EXIT_SUCCESS);
 }
 void Config::PrintVersion() const {
+  LOG(INFO, "printing version of the SCC...");
+
+  std::cout << std::left;
   std::cout << "<===| SCC (The SQL to CypherQL Converter) |===>\n";
-  std::cout << "Version: rc-0.9\n";
-  std::cout << "Authors: Artyom Fartygin and Roman Korostinskiy" << std::endl;
+  std::cout << std::setw(13) << "Version:" << "rc-0.9\n";
+  std::cout << std::setw(13) << "Developers:"
+            << "Artyom Fartygin and Roman Korostinskiy";
+  std::cout << std::endl;
 
   exit(EXIT_SUCCESS);
 }
