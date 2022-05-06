@@ -12,9 +12,15 @@ add_executable(SCC
         src/config.cpp
         src/ast.cpp
         src/lexical_analyzer.cpp
-        src/syntax_analyzer.cpp
+        src/syntax_analyzer_general.cpp
+        src/syntax_analyzer_ddl.cpp
+        src/syntax_analyzer_dml.cpp
+        src/syntax_analyzer_other.cpp
         src/ast_handler.cpp
-        src/query_assembler.cpp
+        src/query_assembler_general.cpp
+        src/query_assembler_ddl.cpp
+        src/query_assembler_dml.cpp
+        src/query_assembler_other.cpp
         src/tree_dump.cpp)
 
 include(FetchContent)

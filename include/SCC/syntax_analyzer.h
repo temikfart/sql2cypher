@@ -1,12 +1,13 @@
 #pragma once
 
+#include <deque>
 #include <iostream>
 #include <memory>
-#include <deque>
 #include <utility>
+
+#include "SCC/ast.h"
 #include "SCC/config.h"
 #include "SCC/log.h"
-#include "SCC/ast.h"
 
 class SyntaxAnalyzer {
 public:
@@ -99,31 +100,31 @@ private:
   // Validation
 
   void ValidateNotEmpty() const;
-  void ValidateIsWord(std::shared_ptr<Node> &node) const;
-  void ValidateIsOpeningRoundBracket(std::shared_ptr<Node> &node) const;
-  void ValidateIsClosingRoundBracket(std::shared_ptr<Node> &node) const;
-  void ValidateIsSingleQuote(std::shared_ptr<Node> &node) const;
-  void ValidateIsDoubleQuote(std::shared_ptr<Node> &node) const;
+  void ValidateIsWord(std::shared_ptr<Node>& node) const;
+  void ValidateIsOpeningRoundBracket(std::shared_ptr<Node>& node) const;
+  void ValidateIsClosingRoundBracket(std::shared_ptr<Node>& node) const;
+  void ValidateIsSingleQuote(std::shared_ptr<Node>& node) const;
+  void ValidateIsDoubleQuote(std::shared_ptr<Node>& node) const;
 
   // Defining Node Datatype
 
-  static bool IsBracket(std::shared_ptr<Node> &node);
-  static bool IsPunctuation(std::shared_ptr<Node> &node);
-  static bool IsWord(std::shared_ptr<Node> &node);
-  static bool IsNumber(std::shared_ptr<Node> &node);
-  static bool IsOperator(std::shared_ptr<Node> &node);
+  static bool IsBracket(std::shared_ptr<Node>& node);
+  static bool IsPunctuation(std::shared_ptr<Node>& node);
+  static bool IsWord(std::shared_ptr<Node>& node);
+  static bool IsNumber(std::shared_ptr<Node>& node);
+  static bool IsOperator(std::shared_ptr<Node>& node);
 
   // Defining Node data
 
-  static bool IsDot(std::shared_ptr<Node> &node);
-  static bool IsComma(std::shared_ptr<Node> &node);
-  static bool IsOpeningRoundBracket(std::shared_ptr<Node> &node);
-  static bool IsClosingRoundBracket(std::shared_ptr<Node> &node);
-  static bool IsSingleQuote(std::shared_ptr<Node> &node);
-  static bool IsDoubleQuote(std::shared_ptr<Node> &node);
-  static bool IsUnaryOperator(std::shared_ptr<Node> &node);
-  static bool IsBinaryOperator(std::shared_ptr<Node> &node);
-  static bool IsSemicolon(std::shared_ptr<Node> &node);
+  static bool IsDot(std::shared_ptr<Node>& node);
+  static bool IsComma(std::shared_ptr<Node>& node);
+  static bool IsOpeningRoundBracket(std::shared_ptr<Node>& node);
+  static bool IsClosingRoundBracket(std::shared_ptr<Node>& node);
+  static bool IsSingleQuote(std::shared_ptr<Node>& node);
+  static bool IsDoubleQuote(std::shared_ptr<Node>& node);
+  static bool IsUnaryOperator(std::shared_ptr<Node>& node);
+  static bool IsBinaryOperator(std::shared_ptr<Node>& node);
+  static bool IsSemicolon(std::shared_ptr<Node>& node);
 
   // Creates kinship between two nodes
   static void MakeKinship(std::shared_ptr<Node>& parent,

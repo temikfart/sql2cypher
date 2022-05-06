@@ -36,6 +36,8 @@
 
 # logs
 *.log
+resources/tree_dump/*.txt
+resources/tree_dump/*.png
 
 # CMake
 cmake-build-debug
