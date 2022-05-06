@@ -41,7 +41,6 @@ void Node::AddChild(std::shared_ptr<Node> const& node) {
 }
 bool Node::IsNodesEqual(const std::shared_ptr<Node>& node1,
                         const std::shared_ptr<Node>& node2) {
-  LOG(TRACE, "starting of comparing two nodes...");
   if (node1->get_type() != node2->get_type() ||
       node1->get_children_amount()
           != node2->get_children_amount()) { //TODO: add parent ptr comparison
