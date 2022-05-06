@@ -1,13 +1,12 @@
 #include "SCC/query_assembler.h"
 
 void QueryAssembler::Translate(std::shared_ptr<Node> AST) {
-  LOG(INFO, "Starting translation...");
+  LOG(INFO, "starting translation...");
 
   ast_ = std::move(AST);
 
   if (ast_ == nullptr) {
-    LOG(TRACE, "empty AST, nothing to translate");
-    LOG(INFO, "Translation is ended");
+    LOG(INFO, "translation is ended: nothing to translate");
     return;
   }
 
@@ -15,17 +14,16 @@ void QueryAssembler::Translate(std::shared_ptr<Node> AST) {
     if (ast_->get_children_amount() > 0) {
       this->TranslateProgram(ast_);
     } else {
-      LOG(TRACE, "root of AST does not have children");
-      LOG(INFO, "Translation is ended");
+      LOG(INFO, "translation is ended: only one node in AST");
       return;
     }
   } else {
     LOG(ERROR,
         "invalid AST: root should be with \'Program\' statement type");
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
 
-  LOG(INFO, "Translation is ended");
+  LOG(INFO, "translation is ended");
 }
 
 void QueryAssembler::TranslateProgram(std::shared_ptr<Node> node) {
@@ -33,8 +31,8 @@ void QueryAssembler::TranslateProgram(std::shared_ptr<Node> node) {
   if (query->get_st_type() == StatementType::query) {
     this->TranslateQuery(query);
   } else {
-    LOG(ERROR, "first child of program node is not a query");
-    exit(EXIT_FAILURE);
+    LOG(ERROR, "first child is not a query");
+    end(EXIT_FAILURE);
   }
 
   if (node->get_children_amount() > 1) {
@@ -45,7 +43,7 @@ void QueryAssembler::TranslateProgram(std::shared_ptr<Node> node) {
       }
     } else {
       LOG(ERROR, "invalid delimiter between queries");
-      exit(EXIT_FAILURE);
+      end(EXIT_FAILURE);
     }
   }
 }
@@ -65,6 +63,6 @@ void QueryAssembler::TranslateQuery(std::shared_ptr<Node> node) {
       break;
     default:
       LOG(ERROR, "unknown query data language");
-      exit(EXIT_FAILURE);
+      end(EXIT_FAILURE);
   }
 }

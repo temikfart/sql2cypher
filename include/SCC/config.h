@@ -4,6 +4,7 @@
 #include <getopt.h>
 
 #include <algorithm>
+#include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -26,6 +27,7 @@ enum OptFlag {
   kInteractiveFlag = 'i',
   kLogFlag = 'l',
   kModeFlag = 'm',
+  kVersionFlag = 'v',
   kCypherFlag = 'z' + 1,
   kSQLFlag = 'z' + 2
 };
@@ -37,10 +39,11 @@ enum ConfigIsSet {
   kConfigCypher,
 };
 
+void end(int exit_code);
+
 class Config {
 public:
   Config();
-  ~Config();
 
   void set_mode(SCCMode mode);
   SCCMode get_mode() const;
@@ -57,8 +60,8 @@ public:
   char PeekSQLSymbol();
   std::ifstream& ReadSQL();
   std::ofstream& WriteCypher();
-  void CloseInputFile();
-  void CloseOutputFile();
+  bool CloseInputFile();
+  bool CloseOutputFile();
 
   SCCMode StringToSCCMode(std::string mode) const;
   std::string SCCModeToString(SCCMode mode) const;
@@ -101,6 +104,7 @@ private:
   bool IsFlagSet(OptFlag flag) const;
 
   void PrintHelp() const;
+  void PrintVersion() const;
   void SetOptFlagDaemon(OptFlag flag);
   void SetOptFlagInteractive(OptFlag flag);
   void SetOptFlagLog(OptFlag flag);
