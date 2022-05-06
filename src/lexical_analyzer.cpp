@@ -5,12 +5,12 @@
 void Tokenizer::Tokenize() {
   LOG(INFO, "tokenizing...");
 
-  int string_number = 1;
+  line_number_ = 1;
   while (true) {
     char another_symbol = config.PeekSQLSymbol();
     if (std::isspace(another_symbol)) {
       if (another_symbol == '\n')
-        string_number++;
+        line_number_++;
       config.GetSQLSymbol();
     } else if (std::isdigit(another_symbol)) {
       this->GetNumber();
@@ -26,7 +26,7 @@ void Tokenizer::Tokenize() {
       break;
     } else {
       LOG(ERROR, "Unknown symbol \'" << another_symbol
-                                     << "\' in line " << string_number);
+                                     << "\' in line " << line_number_);
       end(EXIT_FAILURE);
     }
   }
@@ -100,7 +100,9 @@ void Tokenizer::GetNumber() {
   }
   data = data / power;
 
-  tokens_array_.push_back(std::make_shared<FloatNumNode>(data));
+  auto num_node = std::make_shared<FloatNumNode>(data);
+  num_node->set_line(line_number_);
+  tokens_array_.push_back(num_node);
   LOG(TRACE, "got the float number");
 }
 void Tokenizer::GetWord() {
@@ -114,8 +116,9 @@ void Tokenizer::GetWord() {
     another_symbol = config.PeekSQLSymbol();
   }
 
-  tokens_array_.push_back(
-      std::make_shared<StringNode>(data.str(), DataType::WORD));
+  auto word_node = std::make_shared<StringNode>(data.str(), DataType::WORD);
+  word_node->set_line(line_number_);
+  tokens_array_.push_back(word_node);
   LOG(TRACE, "got the word");
 }
 void Tokenizer::GetOperator() {
@@ -126,13 +129,15 @@ void Tokenizer::GetOperator() {
   while (IsOperator(config.PeekSQLSymbol()))
     data << config.GetSQLSymbol();
 
-  tokens_array_.push_back(
-      std::make_shared<StringNode>(data.str(), DataType::OPERATOR));
+  auto op_node = std::make_shared<StringNode>(data.str(), DataType::OPERATOR);
+  op_node->set_line(line_number_);
+  tokens_array_.push_back(op_node);
   LOG(TRACE, "got the operator");
 }
 void Tokenizer::GetCharacter(DataType type) {
   LOG(TRACE, "getting a character...");
-  tokens_array_.push_back(
-      std::make_shared<CharNode>(config.GetSQLSymbol(), type));
+  auto char_node = std::make_shared<CharNode>(config.GetSQLSymbol(), type);
+  char_node->set_line(line_number_);
+  tokens_array_.push_back(char_node);
   LOG(TRACE, "got the character");
 }

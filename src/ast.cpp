@@ -5,6 +5,12 @@
 Node::Node(DataType type) : type_(type) {}
 Node::~Node() = default;
 
+void Node::set_line(int line) {
+  line_ = line;
+}
+int Node::get_line() {
+  return line_;
+}
 void Node::set_st_type(StatementType type) {
   this->ValidateStType(type);
   st_type_ = type;
