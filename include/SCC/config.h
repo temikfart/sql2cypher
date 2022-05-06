@@ -36,7 +36,7 @@ enum ConfigIsSet {
   kConfigLog,
   kConfigMode,
   kConfigSQL,
-  kConfigCypher,
+  kConfigCypher
 };
 
 void end(int exit_code);
@@ -55,6 +55,7 @@ public:
   void Start(int argc, char *argv[]);
   void GetConsoleArguments(int argc, char *const *argv);
 
+  bool IsNeedDump() const;
   std::string GetConfigPath() const;
   char GetSQLSymbol();
   char PeekSQLSymbol();
@@ -84,11 +85,13 @@ private:
   std::string cypher_path_;
   std::ofstream output_;
 
+  bool is_need_dump_ = false;
+
   std::map<ConfigIsSet, bool> is_config_set_ = {
       {ConfigIsSet::kConfigLog, false},
       {ConfigIsSet::kConfigMode, false},
       {ConfigIsSet::kConfigSQL, false},
-      {ConfigIsSet::kConfigCypher, false},
+      {ConfigIsSet::kConfigCypher, false}
   };
   const std::map<OptFlag, ConfigIsSet> flag_to_config_ = {
       {OptFlag::kDaemonFlag, ConfigIsSet::kConfigMode},

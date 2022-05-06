@@ -223,6 +223,9 @@ void Config::SetFlag(OptFlag flag) {
 bool Config::IsFlagSet(OptFlag flag) const {
   return is_config_set_.at(flag_to_config_.at(flag));
 }
+bool Config::IsNeedDump() const {
+  return is_need_dump_;
+}
 
 void Config::PrintHelp() const {
   std::cout << std::left;
@@ -242,6 +245,8 @@ void Config::PrintHelp() const {
   std::cout << std::setw(20) << ""
             << "(logs will be printed in the special log files "
                "into \"log/\")\n";
+  std::cout << std::setw(20) << "--dump"
+            << "Creates Tree Dump image of the AST.\n";
   std::cout << std::setw(20) << "--log=lvl"
             << "Sets logging level to \"lvl\".\n";
   std::cout << std::setw(20) << ""
@@ -255,7 +260,9 @@ void Config::PrintHelp() const {
                "where will be converted queries (CQL).\n";
   std::cout << std::setw(20) << "--dump=[path]"
             << "Path to the file, "
-               "where will be created image of AST of SQL queries\n";
+               "where will be created image of AST of SQL queries \n";
+  std::cout << std::setw(20) << ""
+            << "(by default, the image is not created)\n";
   std::cout.flush();
 
   end(EXIT_SUCCESS);
