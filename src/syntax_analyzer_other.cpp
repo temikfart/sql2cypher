@@ -4,97 +4,63 @@
 
 void SyntaxAnalyzer::ValidateNotEmpty() const {
   if (tokens_array_.empty()) {
-    LOG(ERROR, "token's array are empty");
-    exit(EXIT_FAILURE);
+    LOG(ERROR, "expected that tokens' array is not empty");
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "token's array are not empty");
 }
 void SyntaxAnalyzer::ValidateIsWord(std::shared_ptr<Node>& node) const {
   if (node->get_type() != DataType::WORD) {
-    LOG(ERROR, "token is not a word");
-    exit(EXIT_FAILURE);
+    LOG(ERROR, "expected word in line " << node->get_line());
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "token is a word");
 }
 void SyntaxAnalyzer::ValidateIsOpeningRoundBracket(
     std::shared_ptr<Node>& node) const {
   if (!SyntaxAnalyzer::IsOpeningRoundBracket(node)) {
-    LOG(ERROR, "token is not a opening round bracket");
-    exit(EXIT_FAILURE);
+    LOG(ERROR, "expected an opening round bracket in line "
+        << node->get_line());
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "token is a opening round bracket");
 }
 void SyntaxAnalyzer::ValidateIsClosingRoundBracket(
     std::shared_ptr<Node>& node) const {
   if (!SyntaxAnalyzer::IsClosingRoundBracket(node)) {
-    LOG(ERROR, "token is not a closing round bracket");
-    exit(EXIT_FAILURE);
+    LOG(ERROR, "expected a closing round bracket in line "
+        << node->get_line());
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "token is a closing round bracket");
 }
 void SyntaxAnalyzer::ValidateIsSingleQuote(std::shared_ptr<Node>& node) const {
   if (!SyntaxAnalyzer::IsSingleQuote(node)) {
-    LOG(ERROR, "token is not a single quote");
-    exit(EXIT_FAILURE);
+    LOG(ERROR, "expected a single quote in line " << node->get_line());
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "token is a single quote");
 }
 void SyntaxAnalyzer::ValidateIsDoubleQuote(std::shared_ptr<Node>& node) const {
   if (!SyntaxAnalyzer::IsSingleQuote(node)) {
-    LOG(ERROR, "token is not a double quote");
-    exit(EXIT_FAILURE);
+    LOG(ERROR, "expected a double quote in line " << node->get_line());
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "token is a double quote");
 }
 
 // Defining Node Datatype
 
 bool SyntaxAnalyzer::IsBracket(std::shared_ptr<Node>& node) {
-  if (node->get_type() != DataType::BRACKET) {
-    LOG(DEBUG, "token is not a bracket: " << node->get_type());
-    return false;
-  } else {
-    LOG(DEBUG, "token is a bracket");
-    return true;
-  }
+  return (node->get_type() == DataType::BRACKET);
 }
 bool SyntaxAnalyzer::IsPunctuation(std::shared_ptr<Node>& node) {
-  if (node->get_type() != DataType::PUNCTUATION) {
-    LOG(DEBUG, "token does not apply to punctuation: " << node->get_type());
-    return false;
-  } else {
-    LOG(DEBUG, "token applies to punctuation");
-    return true;
-  }
+  return (node->get_type() == DataType::PUNCTUATION);
 }
 bool SyntaxAnalyzer::IsWord(std::shared_ptr<Node>& node) {
-  if (node->get_type() != DataType::WORD) {
-    LOG(DEBUG, "token is not a word: " << node->get_type());
-    return false;
-  } else {
-    LOG(DEBUG, "token is a word");
-    return true;
-  }
+  return (node->get_type() == DataType::WORD);
 }
 bool SyntaxAnalyzer::IsNumber(std::shared_ptr<Node>& node) {
   bool is_int = node->get_type() != DataType::INT_NUMBER;
   bool is_float = node->get_type() != DataType::FLOAT_NUMBER;
-  if (!is_int && !is_float) {
-    LOG(DEBUG, "token is not a number: " << node->get_type());
-    return false;
-  } else {
-    LOG(DEBUG, "token is a number");
-    return true;
-  }
+  return (is_int || is_float);
 }
 bool SyntaxAnalyzer::IsOperator(std::shared_ptr<Node>& node) {
-  if (node->get_type() != DataType::OPERATOR) {
-    LOG(DEBUG, "token is not a operator: " << node->get_type());
-    return false;
-  } else {
-    LOG(DEBUG, "token is a operator");
-    return true;
-  }
+  return (node->get_type() == DataType::OPERATOR);
 }
 
 // Defining Node data

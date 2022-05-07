@@ -8,11 +8,11 @@ void QueryAssembler::TranslatePrimaryKey(
     std::string& table_name) {
   if (key->get_st_type() != StatementType::primaryKey) {
     LOG(ERROR, "incorrect type for primaryKey node");
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
   if (key->get_children_amount() == 0) {
     LOG(ERROR, "PRIMARY KEY definition is missed");
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
 
   std::vector<std::string> properties;
@@ -43,11 +43,11 @@ void QueryAssembler::TranslateForeignKey(
     std::string& table_name) {
   if (key->get_st_type() != StatementType::foreignKey) {
     LOG(ERROR, "incorrect type for foreignKey node");
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
   if (key->get_children_amount() == 0) {
     LOG(ERROR, "PRIMARY KEY definition is missed");
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
   int reference_child_num = 1;
 
@@ -56,7 +56,7 @@ void QueryAssembler::TranslateForeignKey(
   if (key->get_children_amount() > 2) {
     if (key->get_child(1)->get_st_type() != StatementType::delimiter_comma) {
       LOG(ERROR, "invalid delimiter between properties in foreign key");
-      exit(EXIT_FAILURE);
+      end(EXIT_FAILURE);
     }
     reference_child_num++;
     std::vector<std::string> other_properties =
@@ -70,11 +70,11 @@ void QueryAssembler::TranslateForeignKey(
   auto reference = key->get_child(reference_child_num);
   if (reference->get_st_type() != StatementType::reference) {
     LOG(ERROR, "invalid foreign key: incorrect referene statement type");
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
   if (reference->get_children_amount() == 0) {
     LOG(ERROR, "empty reference");
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
   auto table_name_node = reference->get_child(0);
   std::string ref_table_name = this->TranslateName(table_name_node);
@@ -93,15 +93,16 @@ void QueryAssembler::TranslateForeignKey(
     }
   }
 
-  this->RemoveProperties(table_name, properties);
-  this->RemoveProperties(table_name, ref_columns);
+//  this->RemoveProperties(table_name, properties);
+//  this->RemoveProperties(table_name, ref_columns);
   this->CreateRelationship(table_name, ref_table_name);
 }
 void QueryAssembler::CreateUniqueNodePropertyConstraint(
     const std::string& constraint_name,
     const std::string& LabelName,
     const std::vector<std::string>& properties) {
-  out_ << "CREATE CONSTRAINT [" << constraint_name << "]" << std::endl;
+  out_ << "CREATE CONSTRAINT " << constraint_name
+       << " IF NOT EXISTS" << std::endl;
   out_ << "FOR (n:" << LabelName << ")" << std::endl;
   out_ << "REQUIRE (";
   for (size_t i = 0; i < properties.size(); i++) {
@@ -116,7 +117,8 @@ void QueryAssembler::CreateNodePropertyExistenceConstraint(
     const std::string& constraint_name,
     const std::string& LabelName,
     const std::string& property) {
-  out_ << "CREATE CONSTRAINT [" << constraint_name << "]" << std::endl;
+  out_ << "CREATE CONSTRAINT " << constraint_name
+       << " IF NOT EXISTS" << std::endl;
   out_ << "FOR (n:" << LabelName << ")" << std::endl;
   out_ << "REQUIRE (n." << property << ") IS NOT NULL;\n" << std::endl;
 }
@@ -126,7 +128,7 @@ void QueryAssembler::CreateRelationship(
   out_ << "MATCH (a:" << label_name << "), (b:" << ref_label_name << ")\n";
   out_ << "CREATE (a)-[r:fk_"
        << label_name << "_to_" << ref_label_name << "_" << relationship_counter
-       << "]->(b)\n" << std::endl;
+       << "]->(b);\n" << std::endl;
   relationship_counter++;
 }
 void QueryAssembler::RemoveProperties(
@@ -151,11 +153,11 @@ std::vector<std::string> QueryAssembler::GetListOf(
     StatementType type) {
   if (node->get_st_type() != StatementType::delimiter_comma) {
     LOG(ERROR, "invalid ListOf: delimiter is not a comma");
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
   if (node->get_children_amount() == 0) {
     LOG(ERROR, "invalid ListOf: comma without children");
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
 
   std::vector<std::string> arguments;
@@ -168,7 +170,7 @@ std::vector<std::string> QueryAssembler::GetListOf(
       break;
     default:
       LOG(ERROR, "invalid ListOf: unknown argument type");
-      exit(EXIT_FAILURE);
+      end(EXIT_FAILURE);
   }
 
   if (node->get_children_amount() > 1) {
@@ -184,8 +186,8 @@ std::vector<std::string> QueryAssembler::GetListOf(
 
 std::string QueryAssembler::TranslateName(std::shared_ptr<Node> node) {
   if (node->get_children_amount() == 0) {
-    LOG(ERROR, "empty name");
-    exit(EXIT_FAILURE);
+    LOG(ERROR, "empty name node");
+    end(EXIT_FAILURE);
   }
 
   std::ostringstream name;
@@ -195,8 +197,8 @@ std::string QueryAssembler::TranslateName(std::shared_ptr<Node> node) {
     if (node->get_child(1)->get_st_type() == StatementType::delimiter_dot) {
       name << this->TranslateIdentifiers(node->get_child(1));
     } else {
-      LOG(ERROR, "invalid name: incorrect delimiter");
-      exit(EXIT_FAILURE);
+      LOG(ERROR, "invalid name: delimiter is not a dot");
+      end(EXIT_FAILURE);
     }
   }
 
@@ -206,7 +208,7 @@ std::string QueryAssembler::TranslateIdentifiers(
     std::shared_ptr<Node> node) {
   if (node->get_children_amount() == 0) {
     LOG(ERROR, "invalid list of identifiers");
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
 
   std::ostringstream identifiers;
@@ -221,7 +223,7 @@ std::string QueryAssembler::TranslateIdentifiers(
 std::string QueryAssembler::TranslateIdentifier(std::shared_ptr<Node> node) {
   if (node->get_children_amount() == 0) {
     LOG(ERROR, "empty identifier");
-    exit(EXIT_FAILURE);
+    end(EXIT_FAILURE);
   }
 
   return std::dynamic_pointer_cast<StringNode>(node->get_child(0))->get_data();
