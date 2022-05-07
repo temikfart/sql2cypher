@@ -116,7 +116,8 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<Node>& node,
       break;
     case DataType::WORD:
       dot_file_ << R"(" {<data> \")"
-                << std::dynamic_pointer_cast<StringNode>(node)->get_data();
+                << std::dynamic_pointer_cast<StringNode>(node)->get_data()
+                << R"(\")";
       if (st_type != EMPTY_TYPE)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = red, "
@@ -132,7 +133,8 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<Node>& node,
       break;
     case DataType::STRING:
       dot_file_ << R"(" {<data> \")"
-                << std::dynamic_pointer_cast<StringNode>(node)->get_data();
+                << std::dynamic_pointer_cast<StringNode>(node)->get_data()
+                << R"(\")";
       if (st_type != EMPTY_TYPE)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = yellow, "

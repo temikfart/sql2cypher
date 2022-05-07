@@ -81,12 +81,15 @@ void Config::Start(int argc, char* argv[]) {
   LOG(TRACE, "opening i/o files...");
   input_.open(sql_path_, std::ios::in);
   this->ValidateIsInputStreamOpen();
-  output_.open(cypher_path_, std::ios::out);
-  tree_dump_.open(tree_dump_path_, std::ios::out);
 
-  this->ValidateCypherPath(cypher_path_);
+  output_.open(cypher_path_, std::ios::out);
+  this->ValidateCypherPath();
   this->ValidateIsOutputStreamOpen();
-  this->ValidateTreeDumpPath(tree_dump_path_);
+
+  tree_dump_.open(tree_dump_path_, std::ios::out);
+  this->ValidateTreeDumpPath();
+  this->ValidateIsTreeDumpStreamOpen();
+
   LOG(TRACE, "all i/o files are opened");
 
   if (config.get_mode() == SCCMode::kDaemon) {
@@ -107,7 +110,7 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
   const struct option long_options[] = {
       {"cypher", required_argument, nullptr, OptFlag::kCypherFlag},
       {"daemon", 0, nullptr, OptFlag::kDaemonFlag},
-      {"dump", required_argument, nullptr, OptFlag::kSQLFlag},
+      {"dump", required_argument, nullptr, OptFlag::kTreeDumpFlag},
       {"help", 0, nullptr, OptFlag::kHelpFlag},
       {"interactive", 0, nullptr, OptFlag::kInteractiveFlag},
       {"log", required_argument, nullptr, OptFlag::kLogFlag},
@@ -375,18 +378,17 @@ void Config::ValidateSQLPath(const std::string& sql_path) const {
     end(EXIT_FAILURE);
   }
 }
-void Config::ValidateCypherPath(const std::string& cypher_path) const {
-  if (!output_.good()) {
-    LOG(ERROR, "file with CypherQL queries does not exist: " << cypher_path);
+void Config::ValidateCypherPath() const {
+  if (!(this->IsFileExists(cypher_path_))) {
+    LOG(ERROR, "file with CypherQL queries does not exist: " << cypher_path_);
     end(EXIT_FAILURE);
   }
 }
-void Config::ValidateTreeDumpPath(const std::string& tree_dump_path) const {
-  if (!(this->IsFileExists(tree_dump_path))) {
-    LOG(ERROR, "Tree Dump file does not exist: " << tree_dump_path);
-    exit(EXIT_FAILURE);
+void Config::ValidateTreeDumpPath() const {
+  if (!(this->IsFileExists(tree_dump_path_))) {
+    LOG(ERROR, "Tree Dump file does not exist: " << tree_dump_path_);
+    end(EXIT_FAILURE);
   }
-  LOG(DEBUG, "Tree Dump path is valid");
 }
 void Config::ValidateIsInputStreamOpen() const {
   if (!input_.is_open()) {

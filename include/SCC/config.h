@@ -127,8 +127,8 @@ private:
   void ValidateMode(SCCMode mode) const;
   void ValidateMode(const std::string& mode) const;
   void ValidateSQLPath(const std::string& sql_path) const;
-  void ValidateCypherPath(const std::string& cypher_path) const;
-  void ValidateTreeDumpPath(const std::string& tree_dump_path) const;
+  void ValidateCypherPath() const;
+  void ValidateTreeDumpPath() const;
   void ValidateIsInputStreamOpen() const;
   void ValidateIsOutputStreamOpen() const;
   void ValidateIsTreeDumpStreamOpen() const;

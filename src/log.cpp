@@ -23,6 +23,7 @@ void Log::AddLog(LogLevel level, const std::string& msg) {
   output << "[" << lvl2str_.at(level) << "]\t"
          << Log::GetTimestamp() << " " << msg;
   output_ << output.str();
+  output_.flush();
 
   if (log_level_ >= level) {
     std::cout << output.str();
