@@ -15,8 +15,12 @@ void end(int exit_code) {
     LOG(ERROR, "closing output file error");
     is_all_files_closed = false;
   }
+  if (!config.CloseTreeDumpFile()) {
+    LOG(ERROR, "closing tree dump file error");
+    is_all_files_closed = false;
+  }
   if (is_all_files_closed) {
-    LOG(TRACE, "all i/o files are closed");
+    LOG(TRACE, "all I/O files are closed");
   } else {
     LOG(ERROR, "some files was not closed");
     exit_code = EXIT_FAILURE;
@@ -32,9 +36,10 @@ void end(int exit_code) {
 
 Config::Config() {
   mode_ = SCCMode::kInteractive;
-  sql_path_ = cypher_path_ = this->GetConfigPath();
+  sql_path_ = cypher_path_ = tree_dump_path_ = this->GetConfigPath();
   sql_path_ += "../resources/sql_queries.sql";
   cypher_path_ += "../resources/cypher_queries.cypher";
+  tree_dump_path_ += "../resources/tree_dump/tree_dump.txt";
 }
 
 void Config::set_mode(SCCMode mode) {
@@ -57,6 +62,12 @@ void Config::set_cypher_path(const std::string& new_cypher_path) {
 std::string Config::get_cypher_path() const {
   return cypher_path_;
 }
+void Config::set_tree_dump_path(const std::string& new_tree_dump_path) {
+  tree_dump_path_ = new_tree_dump_path;
+}
+std::string Config::get_tree_dump_path() const {
+  return tree_dump_path_;
+}
 
 void Config::Start(int argc, char* argv[]) {
   LOG(TRACE, "configuring system...");
@@ -70,9 +81,15 @@ void Config::Start(int argc, char* argv[]) {
   LOG(TRACE, "opening i/o files...");
   input_.open(sql_path_, std::ios::in);
   this->ValidateIsInputStreamOpen();
+
   output_.open(cypher_path_, std::ios::out);
-  this->ValidateCypherPath(cypher_path_);
+  this->ValidateCypherPath();
   this->ValidateIsOutputStreamOpen();
+
+  tree_dump_.open(tree_dump_path_, std::ios::out);
+  this->ValidateTreeDumpPath();
+  this->ValidateIsTreeDumpStreamOpen();
+
   LOG(TRACE, "all i/o files are opened");
 
   if (config.get_mode() == SCCMode::kDaemon) {
@@ -93,6 +110,7 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
   const struct option long_options[] = {
       {"cypher", required_argument, nullptr, OptFlag::kCypherFlag},
       {"daemon", 0, nullptr, OptFlag::kDaemonFlag},
+      {"dump", required_argument, nullptr, OptFlag::kTreeDumpFlag},
       {"help", 0, nullptr, OptFlag::kHelpFlag},
       {"interactive", 0, nullptr, OptFlag::kInteractiveFlag},
       {"log", required_argument, nullptr, OptFlag::kLogFlag},
@@ -132,6 +150,9 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
       case OptFlag::kCypherFlag:
         this->SetOptFlagCypher(OF_flag);
         break;
+      case OptFlag::kTreeDumpFlag:
+        this->SetOptFlagTreeDump(OF_flag);
+        break;
       default:
         char invalid_flag = short_options[optind + 1];
         if (short_options[optind + 2] == ':') {
@@ -169,6 +190,10 @@ std::ofstream& Config::WriteCypher() {
   this->ValidateIsOutputStreamOpen();
   return output_;
 }
+std::ofstream& Config::WriteTreeDump() {
+  this->ValidateIsTreeDumpStreamOpen();
+  return tree_dump_;
+}
 bool Config::CloseInputFile() {
   LOG(TRACE, "closing input file...");
   if (input_.is_open()) {
@@ -196,6 +221,21 @@ bool Config::CloseOutputFile() {
     }
   } else {
     LOG(TRACE, "output file is already closed");
+  }
+  return true;
+}
+bool Config::CloseTreeDumpFile() {
+  LOG(TRACE, "closing tree dump file...");
+  if (tree_dump_.is_open()) {
+    tree_dump_.close();
+    if (tree_dump_.good()) {
+      LOG(TRACE, "dot tree dump file closed successfully");
+    } else {
+      LOG(ERROR, "dot dump file close error");
+      return false;
+    }
+  } else {
+    LOG(TRACE, "dot tree dump file is already closed");
   }
   return true;
 }
@@ -312,6 +352,13 @@ void Config::SetOptFlagCypher(OptFlag flag) {
   this->set_cypher_path(tmp);
   this->SetFlag(flag);
 }
+void Config::SetOptFlagTreeDump(OptFlag flag) {
+  this->ValidateIsFlagSet(flag);
+  LOG(TRACE, "set Tree Dump path = " << optarg);
+  std::string tmp = optarg;
+  this->set_tree_dump_path(tmp);
+  this->SetFlag(flag);
+}
 
 void Config::ValidateMode(SCCMode mode) const {
   if (SCCMode::kSCCModeCount <= mode) {
@@ -331,9 +378,15 @@ void Config::ValidateSQLPath(const std::string& sql_path) const {
     end(EXIT_FAILURE);
   }
 }
-void Config::ValidateCypherPath(const std::string& cypher_path) const {
-  if (!output_.good()) {
-    LOG(ERROR, "file with CypherQL queries does not exist: " << cypher_path);
+void Config::ValidateCypherPath() const {
+  if (!(this->IsFileExists(cypher_path_))) {
+    LOG(ERROR, "file with CypherQL queries does not exist: " << cypher_path_);
+    end(EXIT_FAILURE);
+  }
+}
+void Config::ValidateTreeDumpPath() const {
+  if (!(this->IsFileExists(tree_dump_path_))) {
+    LOG(ERROR, "Tree Dump file does not exist: " << tree_dump_path_);
     end(EXIT_FAILURE);
   }
 }
@@ -346,6 +399,12 @@ void Config::ValidateIsInputStreamOpen() const {
 void Config::ValidateIsOutputStreamOpen() const {
   if (!output_.is_open()) {
     LOG(ERROR, "output file stream is not opened");
+    end(EXIT_FAILURE);
+  }
+}
+void Config::ValidateIsTreeDumpStreamOpen() const {
+  if (!tree_dump_.is_open()) {
+    LOG(ERROR, "dump file stream is not opened");
     end(EXIT_FAILURE);
   }
 }

@@ -29,7 +29,8 @@ enum OptFlag {
   kModeFlag = 'm',
   kVersionFlag = 'v',
   kCypherFlag = 'z' + 1,
-  kSQLFlag = 'z' + 2
+  kSQLFlag = 'z' + 2,
+  kTreeDumpFlag = 'z' + 3
 };
 
 enum ConfigIsSet {
@@ -37,6 +38,7 @@ enum ConfigIsSet {
   kConfigMode,
   kConfigSQL,
   kConfigCypher,
+  kConfigTreeDump
 };
 
 void end(int exit_code);
@@ -51,6 +53,8 @@ public:
   std::string get_sql_path() const;
   void set_cypher_path(const std::string& new_cypher_path);
   std::string get_cypher_path() const;
+  void set_tree_dump_path(const std::string& new_tree_dump_path);
+  std::string get_tree_dump_path() const;
 
   void Start(int argc, char *argv[]);
   void GetConsoleArguments(int argc, char *const *argv);
@@ -60,8 +64,10 @@ public:
   char PeekSQLSymbol();
   std::ifstream& ReadSQL();
   std::ofstream& WriteCypher();
+  std::ofstream& WriteTreeDump();
   bool CloseInputFile();
   bool CloseOutputFile();
+  bool CloseTreeDumpFile();
 
   SCCMode StringToSCCMode(std::string mode) const;
   std::string SCCModeToString(SCCMode mode) const;
@@ -84,19 +90,24 @@ private:
   std::string cypher_path_;
   std::ofstream output_;
 
+  std::string tree_dump_path_;
+  std::ofstream tree_dump_;
+
   std::map<ConfigIsSet, bool> is_config_set_ = {
       {ConfigIsSet::kConfigLog, false},
       {ConfigIsSet::kConfigMode, false},
       {ConfigIsSet::kConfigSQL, false},
       {ConfigIsSet::kConfigCypher, false},
+      {ConfigIsSet::kConfigTreeDump, false}
   };
   const std::map<OptFlag, ConfigIsSet> flag_to_config_ = {
       {OptFlag::kDaemonFlag, ConfigIsSet::kConfigMode},
       {OptFlag::kInteractiveFlag, ConfigIsSet::kConfigMode},
       {OptFlag::kLogFlag, ConfigIsSet::kConfigLog},
       {OptFlag::kModeFlag, ConfigIsSet::kConfigMode},
-      {OptFlag::kCypherFlag, ConfigIsSet::kConfigSQL},
-      {OptFlag::kSQLFlag, ConfigIsSet::kConfigCypher}
+      {OptFlag::kCypherFlag, ConfigIsSet::kConfigCypher},
+      {OptFlag::kSQLFlag, ConfigIsSet::kConfigSQL},
+      {OptFlag::kTreeDumpFlag, ConfigIsSet::kConfigTreeDump}
   };
 
   static bool IsFileExists(const std::string& path);
@@ -111,13 +122,16 @@ private:
   void SetOptFlagMode(OptFlag flag);
   void SetOptFlagSQL(OptFlag flag);
   void SetOptFlagCypher(OptFlag flag);
+  void SetOptFlagTreeDump(OptFlag flag);
 
   void ValidateMode(SCCMode mode) const;
   void ValidateMode(const std::string& mode) const;
   void ValidateSQLPath(const std::string& sql_path) const;
-  void ValidateCypherPath(const std::string& cypher_path) const;
+  void ValidateCypherPath() const;
+  void ValidateTreeDumpPath() const;
   void ValidateIsInputStreamOpen() const;
   void ValidateIsOutputStreamOpen() const;
+  void ValidateIsTreeDumpStreamOpen() const;
   void ValidateIsFlagSet(OptFlag flag) const;
 };
 

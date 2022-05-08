@@ -34,6 +34,7 @@ protected:
   void TearDown() override {
     config.CloseInputFile();
     config.CloseOutputFile();
+    config.CloseTreeDumpFile();
   }
 };
 TEST_F(TokenizerTests, IntNumTest) {
