@@ -43,13 +43,7 @@ void Log::AddLog(LogLevel level, const std::string& msg) {
     return;
   } else {
     if (!is_buffer_load) {
-      for (const auto& m : buffered_logs_) {
-        output_ << m.second;
-        if (log_level_ >= m.first) {
-          std::cout << m.second;
-        }
-      }
-      is_buffer_load = true;
+      this->LoadBufferedLogs();
     }
   }
   output_ << output.str();
@@ -57,6 +51,15 @@ void Log::AddLog(LogLevel level, const std::string& msg) {
   if (log_level_ >= level) {
     std::cout << output.str();
   }
+}
+void Log::LoadBufferedLogs() {
+  for (const auto& m : buffered_logs_) {
+    output_ << m.second;
+    if (log_level_ >= m.first) {
+      std::cout << m.second;
+    }
+  }
+  is_buffer_load = true;
 }
 LogLevel Log::StringToLogLevel(std::string level) const {
   for_each(begin(level), end(level),

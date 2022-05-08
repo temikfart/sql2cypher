@@ -48,6 +48,7 @@ public:
 
   void Start();
   void AddLog(LogLevel level, const std::string& msg);
+  void LoadBufferedLogs();
   static std::string GetLogDir() ;
   LogLevel StringToLogLevel(std::string level) const;
   bool CloseLogFile();

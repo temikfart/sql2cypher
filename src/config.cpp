@@ -81,16 +81,19 @@ void Config::Start(int argc, char* argv[]) {
     LOG(ERROR, "expected path to input SQL queries (the file must exist) "
                "and output CypherQL file (the file will be created, "
                "if not exists)");
+    SCC_log.LoadBufferedLogs();
     end(EXIT_FAILURE);
   }
   if (!this->IsFlagSet(OptFlag::kSQLFlag)) {
     LOG(ERROR, "expected path to input SQL queries "
                "(the file must exist)");
+    SCC_log.LoadBufferedLogs();
     end(EXIT_FAILURE);
   }
   if (!this->IsFlagSet(OptFlag::kCypherFlag)) {
     LOG(ERROR, "expected path to output CypherQL file "
                "(the file will be created, if not exists)");
+    SCC_log.LoadBufferedLogs();
     end(EXIT_FAILURE);
   }
 #endif // CREATE_DEBIAN_PACKAGE
@@ -135,7 +138,7 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
       {"help", 0, nullptr, OptFlag::kHelpFlag},
       {"interactive", 0, nullptr, OptFlag::kInteractiveFlag},
       {"loglvl", required_argument, nullptr, OptFlag::kLogLvlFlag},
-      {"log", required_argument, nullptr, OptFlag::kLogFlag},
+      {"log", required_argument, nullptr, OptFlag::kLogDirFlag},
       {"mode", required_argument, nullptr, OptFlag::kModeFlag},
       {"sql", required_argument, nullptr, OptFlag::kSQLFlag},
       {"version", 0, nullptr, OptFlag::kVersionFlag},
@@ -163,8 +166,8 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
       case OptFlag::kLogLvlFlag:
         this->SetOptFlagLogLvl(OF_flag);
         break;
-      case OptFlag::kLogFlag:
-        this->SetOptFlagLog(OF_flag);
+      case OptFlag::kLogDirFlag:
+        this->SetOptFlagLogDir(OF_flag);
         break;
       case OptFlag::kModeFlag:
         this->SetOptFlagMode(OF_flag);
@@ -294,10 +297,6 @@ void Config::PrintHelp() const {
                "ERROR, INFO, TRACE, DEBUG.\n";
   std::cout << std::setw(20) << "--log=[path]"
             << "Path to the output log file\n";
-#ifdef CREATE_DEBIAN_PACKAGE
-  std::cout << std::setw(20) << ""
-            << "(by default, the log file is not created)\n";
-#endif // CREATE_DEBIAN_PACKAGE
   std::cout << std::setw(20) << "--sql=[path]"
             << "Path to the file with SQL queries, "
                "which will be converted (SQL).\n";
@@ -343,9 +342,9 @@ void Config::SetOptFlagLogLvl(OptFlag flag) {
   SCC_log.set_log_level(SCC_log.StringToLogLevel(tmp_log_level));
   this->SetFlag(flag);
 }
-void Config::SetOptFlagLog(OptFlag flag) {
+void Config::SetOptFlagLogDir(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
-  LOG(TRACE, "set path to log as \'" << optarg << "\'");
+  LOG(TRACE, "set path to log directory as \'" << optarg << "\'");
   std::string dir = optarg;
   log_dir_ = dir;
   this->SetFlag(flag);

@@ -43,7 +43,7 @@ enum OptFlag {
   kCypherFlag = 'z' + 1,
   kSQLFlag = 'z' + 2,
   kTreeDumpFlag = 'z' + 3,
-  kLogFlag = 'z' + 4
+  kLogDirFlag = 'z' + 4
 };
 
 enum ConfigIsSet {
@@ -52,7 +52,7 @@ enum ConfigIsSet {
   kConfigSQL,
   kConfigCypher,
   kConfigTreeDump,
-  kConfigLog
+  kConfigLogDir
 };
 
 void end(int exit_code);
@@ -112,7 +112,7 @@ private:
       {ConfigIsSet::kConfigSQL, false},
       {ConfigIsSet::kConfigCypher, false},
       {ConfigIsSet::kConfigTreeDump, false},
-      {ConfigIsSet::kConfigLog, false}
+      {ConfigIsSet::kConfigLogDir, false}
   };
   const std::map<OptFlag, ConfigIsSet> flag_to_config_ = {
       {OptFlag::kDaemonFlag, ConfigIsSet::kConfigMode},
@@ -122,7 +122,7 @@ private:
       {OptFlag::kCypherFlag, ConfigIsSet::kConfigSQL},
       {OptFlag::kSQLFlag, ConfigIsSet::kConfigCypher},
       {OptFlag::kTreeDumpFlag, ConfigIsSet::kConfigTreeDump},
-      {OptFlag::kLogFlag, ConfigIsSet::kConfigLog},
+      {OptFlag::kLogDirFlag, ConfigIsSet::kConfigLogDir},
   };
 
   static bool IsFileExists(const std::string& path);
@@ -134,7 +134,7 @@ private:
   void SetOptFlagDaemon(OptFlag flag);
   void SetOptFlagInteractive(OptFlag flag);
   void SetOptFlagLogLvl(OptFlag flag);
-  void SetOptFlagLog(OptFlag flag);
+  void SetOptFlagLogDir(OptFlag flag);
   void SetOptFlagMode(OptFlag flag);
   void SetOptFlagSQL(OptFlag flag);
   void SetOptFlagCypher(OptFlag flag);
