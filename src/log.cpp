@@ -2,10 +2,7 @@
 
 Log SCC_log;
 
-Log::Log() {
-  filename_ = this->TimeToLogFilename(Log::GetTimestamp());
-  output_.open(this->GetLogPath(), std::ios::out);
-}
+Log::Log() = default;
 Log::~Log() = default;
 
 void Log::set_log_level(LogLevel level) {
@@ -15,13 +12,46 @@ void Log::set_log_level(LogLevel level) {
 LogLevel Log::get_log_level() const {
   return log_level_;
 }
+void Log::set_log_path(const std::string& dir) {
+  filepath_ = dir.substr(0, dir.find_last_of('/') + 1);
+  this->ValidateDoesFileExist(filepath_);
+  filepath_ += this->TimeToLogFilename(Log::GetTimestamp());
+}
+std::string Log::get_log_path() const {
+  return filepath_;
+}
+void Log::set_is_system_configured(bool value) {
+  is_system_configured_ = value;
+}
+bool Log::get_is_system_configured() const {
+  return is_system_configured_;
+}
 
+void Log::Start() {
+  output_.open(this->get_log_path(), std::ios::out);
+  this->ValidateDoesFileExist(filepath_);
+  this->ValidateIsLogFileOpen();
+}
 void Log::AddLog(LogLevel level, const std::string& msg) {
   Log::ValidateLogLevel(level);
 
   std::ostringstream output;
   output << "[" << lvl2str_.at(level) << "]\t"
          << Log::GetTimestamp() << " " << msg;
+  if (!is_system_configured_) {
+    buffered_logs_.emplace_back(level, output.str());
+    return;
+  } else {
+    if (!is_buffer_load) {
+      for (const auto& m : buffered_logs_) {
+        output_ << m.second;
+        if (log_level_ >= m.first) {
+          std::cout << m.second;
+        }
+      }
+      is_buffer_load = true;
+    }
+  }
   output_ << output.str();
 
   if (log_level_ >= level) {
@@ -38,11 +68,17 @@ LogLevel Log::StringToLogLevel(std::string level) const {
 }
 
 
-std::string Log::GetLogPath() const {
+std::string Log::GetLogDir() {
+  std::string path;
+#ifdef CREATE_DEBIAN_PACKAGE
+  path = SCC_LOG_DIR;
+#else
   std::string cwf_path = __FILE__;
   std::string cwf = cwf_path.substr(cwf_path.find_last_of('/') + 1);
-  std::string path = cwf_path.substr(0, cwf_path.find(cwf));
-  path += "../log/" + filename_;
+  path = cwf_path.substr(0, cwf_path.find(cwf));
+  path += "../log/";
+#endif // CREATE_DEBIAN_PACKAGE
+
 
   return path;
 }
@@ -61,6 +97,25 @@ std::string Log::TimeToLogFilename(std::string timestamp) const {
   replace(begin(timestamp), end(timestamp), ':', '-');
   return (timestamp + ".log");
 }
+bool Log::IsFileExists(const std::string& path) {
+  struct stat buffer{};
+  return (stat(path.c_str(), &buffer) == 0);
+}
+bool Log::CloseLogFile() {
+  LOG(TRACE, "closing output file...");
+  if (output_.is_open()) {
+    output_.close();
+    if (output_.good()) {
+      LOG(TRACE, "output file closed successfully");
+    } else {
+      LOG(ERROR, "output file close error");
+      return false;
+    }
+  } else {
+    LOG(TRACE, "output file is already closed");
+  }
+  return true;
+}
 
 void Log::ValidateLogLevel(LogLevel level) {
   if (LogLevel::LOG_LEVEL_COUNT <= level) {
@@ -75,4 +130,16 @@ void Log::ValidateLogLevel(std::string& level) const {
     exit(EXIT_FAILURE);
   }
   LOG(DEBUG, "log level is valid");
+}
+void Log::ValidateDoesFileExist(const std::string& path) const {
+  if (!(this->IsFileExists(path))) {
+    std::cout << "file or directory does not exist: " << path << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+void Log::ValidateIsLogFileOpen() const {
+  if (!output_.is_open()) {
+    std::cout <<"input file stream is not opened" << std::endl;
+    exit(EXIT_FAILURE);
+  }
 }

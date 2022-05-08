@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
   std::shared_ptr<Node> AST =
       syntax_analyzer.Analyze(tokenizer.get_tokens_array());
 
-  if (config.IsNeedDump()) {
+  if (config.get_is_need_dump()) {
     TreeDump dump;
     dump.Dump(AST);
   }

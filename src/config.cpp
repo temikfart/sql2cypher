@@ -32,9 +32,11 @@ void end(int exit_code) {
 
 Config::Config() {
   mode_ = SCCMode::kInteractive;
-  sql_path_ = cypher_path_ = this->GetConfigPath();
+#ifndef CREATE_DEBIAN_PACKAGE
+  sql_path_ = cypher_path_ = Config::GetConfigPath();
   sql_path_ += "../resources/sql_queries.sql";
   cypher_path_ += "../resources/cypher_queries.cypher";
+#endif // CREATE_DEBIAN_PACKAGE
 }
 
 void Config::set_mode(SCCMode mode) {
@@ -57,9 +59,15 @@ void Config::set_cypher_path(const std::string& new_cypher_path) {
 std::string Config::get_cypher_path() const {
   return cypher_path_;
 }
+void Config::set_is_need_dump(bool value) {
+  is_need_dump_ = value;
+}
+bool Config::get_is_need_dump() const {
+  return is_need_dump_;
+}
 
 void Config::Start(int argc, char* argv[]) {
-  LOG(TRACE, "configuring system...");
+  LOG(INFO, "configuring system...");
 
   if (argc > 1) {
     config.GetConsoleArguments(argc, argv);
@@ -67,12 +75,43 @@ void Config::Start(int argc, char* argv[]) {
     // TODO: Parse config.ini
   }
 
+#ifdef CREATE_DEBIAN_PACKAGE
+  if (!this->IsFlagSet(OptFlag::kSQLFlag)
+      && !this->IsFlagSet(OptFlag::kCypherFlag)) {
+    LOG(ERROR, "expected path to input SQL queries (the file must exist) "
+               "and output CypherQL file (the file will be created, "
+               "if not exists)");
+    end(EXIT_FAILURE);
+  }
+  if (!this->IsFlagSet(OptFlag::kSQLFlag)) {
+    LOG(ERROR, "expected path to input SQL queries "
+               "(the file must exist)");
+    end(EXIT_FAILURE);
+  }
+  if (!this->IsFlagSet(OptFlag::kCypherFlag)) {
+    LOG(ERROR, "expected path to output CypherQL file "
+               "(the file will be created, if not exists)");
+    end(EXIT_FAILURE);
+  }
+#endif // CREATE_DEBIAN_PACKAGE
+
   LOG(TRACE, "opening i/o files...");
+
   input_.open(sql_path_, std::ios::in);
   this->ValidateIsInputStreamOpen();
+
   output_.open(cypher_path_, std::ios::out);
   this->ValidateCypherPath(cypher_path_);
   this->ValidateIsOutputStreamOpen();
+
+  SCC_log.set_is_system_configured(true);
+  if (log_dir_.empty()) {
+    SCC_log.set_log_path(Log::GetLogDir());
+  } else {
+    SCC_log.set_log_path(log_dir_);
+  }
+  SCC_log.Start();
+
   LOG(TRACE, "all i/o files are opened");
 
   if (config.get_mode() == SCCMode::kDaemon) {
@@ -81,7 +120,7 @@ void Config::Start(int argc, char* argv[]) {
     // TODO: implement SCC mode=daemon behavior.
   }
 
-  LOG(TRACE, "configuration is completed");
+  LOG(INFO, "configuration is completed");
 }
 void Config::GetConsoleArguments(int argc, char* const* argv) {
   LOG(TRACE, "parsing console arguments...");
@@ -95,6 +134,7 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
       {"daemon", 0, nullptr, OptFlag::kDaemonFlag},
       {"help", 0, nullptr, OptFlag::kHelpFlag},
       {"interactive", 0, nullptr, OptFlag::kInteractiveFlag},
+      {"loglvl", required_argument, nullptr, OptFlag::kLogLvlFlag},
       {"log", required_argument, nullptr, OptFlag::kLogFlag},
       {"mode", required_argument, nullptr, OptFlag::kModeFlag},
       {"sql", required_argument, nullptr, OptFlag::kSQLFlag},
@@ -119,6 +159,9 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
         break;
       case OptFlag::kInteractiveFlag:
         this->SetOptFlagInteractive(OF_flag);
+        break;
+      case OptFlag::kLogLvlFlag:
+        this->SetOptFlagLogLvl(OF_flag);
         break;
       case OptFlag::kLogFlag:
         this->SetOptFlagLog(OF_flag);
@@ -146,7 +189,7 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
   LOG(DEBUG, "all console arguments are parsed");
 }
 
-std::string Config::GetConfigPath() const {
+std::string Config::GetConfigPath() {
   std::string cwf_path = __FILE__;
   std::string cwf = cwf_path.substr(cwf_path.find_last_of('/') + 1);
   std::string path = cwf_path.substr(0, cwf_path.find(cwf));
@@ -223,9 +266,6 @@ void Config::SetFlag(OptFlag flag) {
 bool Config::IsFlagSet(OptFlag flag) const {
   return is_config_set_.at(flag_to_config_.at(flag));
 }
-bool Config::IsNeedDump() const {
-  return is_need_dump_;
-}
 
 void Config::PrintHelp() const {
   std::cout << std::left;
@@ -247,11 +287,17 @@ void Config::PrintHelp() const {
                "into \"log/\")\n";
   std::cout << std::setw(20) << "--dump"
             << "Creates Tree Dump image of the AST.\n";
-  std::cout << std::setw(20) << "--log=lvl"
+  std::cout << std::setw(20) << "-l, --loglvl=lvl"
             << "Sets logging level to \"lvl\".\n";
   std::cout << std::setw(20) << ""
             << "Acceptable levels: SILENT, FATAL, "
                "ERROR, INFO, TRACE, DEBUG.\n";
+  std::cout << std::setw(20) << "--log=[path]"
+            << "Path to the output log file\n";
+#ifdef CREATE_DEBIAN_PACKAGE
+  std::cout << std::setw(20) << ""
+            << "(by default, the log file is not created)\n";
+#endif // CREATE_DEBIAN_PACKAGE
   std::cout << std::setw(20) << "--sql=[path]"
             << "Path to the file with SQL queries, "
                "which will be converted (SQL).\n";
@@ -272,9 +318,8 @@ void Config::PrintVersion() const {
 
   std::cout << std::left;
   std::cout << "<===| SCC (The SQL to CypherQL Converter) |===>\n";
-  std::cout << std::setw(13) << "Version:" << "rc-0.9\n";
-  std::cout << std::setw(13) << "Developers:"
-            << "Artyom Fartygin and Roman Korostinskiy";
+  std::cout << std::setw(13) << "Version:" << VERSION << "\n";
+  std::cout << std::setw(13) << "Developers:" << DEVELOPERS;
   std::cout << std::endl;
 
   end(EXIT_SUCCESS);
@@ -291,11 +336,18 @@ void Config::SetOptFlagInteractive(OptFlag flag) {
   this->set_mode(SCCMode::kInteractive);
   this->SetFlag(flag);
 }
-void Config::SetOptFlagLog(OptFlag flag) {
+void Config::SetOptFlagLogLvl(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
   LOG(TRACE, "set LogLevel=" << optarg);
   std::string tmp_log_level = optarg;
   SCC_log.set_log_level(SCC_log.StringToLogLevel(tmp_log_level));
+  this->SetFlag(flag);
+}
+void Config::SetOptFlagLog(OptFlag flag) {
+  this->ValidateIsFlagSet(flag);
+  LOG(TRACE, "set path to log as \'" << optarg << "\'");
+  std::string dir = optarg;
+  log_dir_ = dir;
   this->SetFlag(flag);
 }
 void Config::SetOptFlagMode(OptFlag flag) {
@@ -308,8 +360,8 @@ void Config::SetOptFlagMode(OptFlag flag) {
 void Config::SetOptFlagSQL(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
   LOG(TRACE, "set file with SQL queries as \'" << optarg << "\'");
-  std::string tmp = optarg;
-  this->set_sql_path(tmp);
+  std::string path = optarg;
+  this->set_sql_path(path);
   this->SetFlag(flag);
 }
 void Config::SetOptFlagCypher(OptFlag flag) {

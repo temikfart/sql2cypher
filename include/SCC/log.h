@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sys/stat.h>
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -18,6 +20,10 @@
   break;                                                        \
 } while(true)
 
+#ifdef CREATE_DEBIAN_PACKAGE
+#define SCC_LOG_DIR "/var/log/SCC_log/"
+#endif // CREATE_DEBIAN_PACKAGE
+
 enum LogLevel {
   SILENT,
   FATAL,
@@ -35,14 +41,25 @@ public:
 
   void set_log_level(LogLevel level);
   LogLevel get_log_level() const;
+  void set_log_path(const std::string& dir);
+  std::string get_log_path() const;
+  void set_is_system_configured(bool value);
+  bool get_is_system_configured() const;
 
+  void Start();
   void AddLog(LogLevel level, const std::string& msg);
+  static std::string GetLogDir() ;
   LogLevel StringToLogLevel(std::string level) const;
+  bool CloseLogFile();
 
 private:
-  std::string filename_;
+  std::string filepath_;
   std::ofstream output_;
   LogLevel log_level_ = LogLevel::INFO;
+
+  std::vector<std::pair<LogLevel, std::string>> buffered_logs_;
+  bool is_buffer_load = false;
+  bool is_system_configured_ = false;
 
   std::map<LogLevel, std::string> lvl2str_ = {
       {LogLevel::SILENT, "SILENT"},
@@ -61,12 +78,14 @@ private:
       {"DEBUG", LogLevel::DEBUG}
   };
 
-  std::string GetLogPath() const;
   static std::string GetTimestamp();
   std::string TimeToLogFilename(std::string timestamp) const;
+  static bool IsFileExists(const std::string& path);
 
   static void ValidateLogLevel(LogLevel level) ;
   void ValidateLogLevel(std::string& level) const;
+  void ValidateDoesFileExist(const std::string& path) const;
+  void ValidateIsLogFileOpen() const;
 };
 
 extern Log SCC_log;
