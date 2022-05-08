@@ -47,9 +47,9 @@ protected:
     config.CloseTreeDumpFile();
 
     std::string delete_cmd;
-    delete_cmd = "rm " + png_dump_path_test_;
+    delete_cmd = "rm \"" + png_dump_path_test_ + "\"";
     std::system(delete_cmd.c_str());
-    delete_cmd = "rm " + dot_dump_path_test_;
+    delete_cmd = "rm \"" + dot_dump_path_test_ + "\"";
     std::system(delete_cmd.c_str());
   }
 };
@@ -314,9 +314,9 @@ protected:
     config.CloseTreeDumpFile();
 
     std::string delete_cmd;
-    delete_cmd = "rm " + png_dump_path_test_;
+    delete_cmd = "rm \"" + png_dump_path_test_ + "\"";
     std::system(delete_cmd.c_str());
-    delete_cmd = "rm " + dot_dump_path_test_;
+    delete_cmd = "rm \"" + dot_dump_path_test_ + "\"";
     std::system(delete_cmd.c_str());
   }
 };
@@ -461,9 +461,9 @@ protected:
     config.CloseTreeDumpFile();
 
     std::string delete_cmd;
-    delete_cmd = "rm " + png_dump_path_test_;
+    delete_cmd = "rm \"" + png_dump_path_test_ + "\"";
     std::system(delete_cmd.c_str());
-    delete_cmd = "rm " + dot_dump_path_test_;
+    delete_cmd = "rm \"" + dot_dump_path_test_ + "\"";
     std::system(delete_cmd.c_str());
   }
 };

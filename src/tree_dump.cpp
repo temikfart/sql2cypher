@@ -159,8 +159,8 @@ void TreeDump::MakeDumpPng() {
   std::string png_file_path =
       dot_file_path_.substr(0, dot_file_path_.find_last_of('.')) + ".png";
   std::ostringstream txt_to_png;
-  txt_to_png << "dot " << dot_file_path_ << " -T png -o "
-             << png_file_path;
+  txt_to_png << "dot \"" << dot_file_path_ << "\" -T png -o \""
+             << png_file_path << "\"";
 
   LOG(TRACE, "executing: " << txt_to_png.str());
 
