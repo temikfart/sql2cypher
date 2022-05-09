@@ -2,6 +2,7 @@
 
 #include <sys/stat.h>
 
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -20,9 +21,13 @@
   break;                                                        \
 } while(true)
 
-#ifdef CREATE_DEBIAN_PACKAGE
+#ifdef DEBIAN_PACKAGE
 #define SCC_LOG_DIR "/var/log/SCC_log/"
-#endif // CREATE_DEBIAN_PACKAGE
+#endif // DEBIAN_PACKAGE
+
+#ifdef MSI_PACKAGE
+#define SCC_LOG_DIR "C:/Program Files/SCC/log/"
+#endif // MSI_PACKAGE
 
 enum LogLevel {
   SILENT,

@@ -14,7 +14,9 @@ LogLevel Log::get_log_level() const {
 }
 void Log::set_log_path(const std::string& dir) {
   filepath_ = dir.substr(0, dir.find_last_of('/') + 1);
+#ifndef MSI_PACKAGE
   this->ValidateDoesFileExist(filepath_);
+#endif // MSI_PACKAGE
   filepath_ += this->TimeToLogFilename(Log::GetTimestamp());
 }
 std::string Log::get_log_path() const {
@@ -28,9 +30,11 @@ bool Log::get_is_system_configured() const {
 }
 
 void Log::Start() {
+#ifndef MSI_PACKAGE
   output_.open(this->get_log_path(), std::ios::out);
   this->ValidateDoesFileExist(filepath_);
   this->ValidateIsLogFileOpen();
+#endif // MSI_PACKAGE
 }
 void Log::AddLog(LogLevel level, const std::string& msg) {
   Log::ValidateLogLevel(level);
@@ -46,7 +50,9 @@ void Log::AddLog(LogLevel level, const std::string& msg) {
       this->LoadBufferedLogs();
     }
   }
+#ifndef MSI_PACKAGE
   output_ << output.str();
+#endif // MSI_PACKAGE
 
   if (log_level_ >= level) {
     std::cout << output.str();
@@ -54,7 +60,9 @@ void Log::AddLog(LogLevel level, const std::string& msg) {
 }
 void Log::LoadBufferedLogs() {
   for (const auto& m : buffered_logs_) {
+#ifndef MSI_PACKAGE
     output_ << m.second;
+#endif // MSI_PACKAGE
     if (log_level_ >= m.first) {
       std::cout << m.second;
     }
@@ -73,14 +81,14 @@ LogLevel Log::StringToLogLevel(std::string level) const {
 
 std::string Log::GetLogDir() {
   std::string path;
-#ifdef CREATE_DEBIAN_PACKAGE
+#ifdef CREATE_PACKAGE
   path = SCC_LOG_DIR;
 #else
   std::string cwf_path = __FILE__;
   std::string cwf = cwf_path.substr(cwf_path.find_last_of('/') + 1);
   path = cwf_path.substr(0, cwf_path.find(cwf));
   path += "../log/";
-#endif // CREATE_DEBIAN_PACKAGE
+#endif // CREATE_PACKAGE
 
 
   return path;
@@ -92,7 +100,8 @@ std::string Log::GetTimestamp() {
   const int ksec_in_hour = 3600;
   now += kTimeZone * ksec_in_hour;
   char buf[sizeof "2011-10-08T07:07:09"];
-  strftime(buf, sizeof buf, "%FT%T", gmtime(&now));
+//  strftime(buf, sizeof buf, "%FT%T", gmtime(&now));
+  strftime(buf, sizeof buf, "%Y-%m-%dT%H:%M:%S", gmtime(&now));
 
   return buf;
 }

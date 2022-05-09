@@ -32,11 +32,11 @@ void end(int exit_code) {
 
 Config::Config() {
   mode_ = SCCMode::kInteractive;
-#ifndef CREATE_DEBIAN_PACKAGE
+#ifndef CREATE_PACKAGE
   sql_path_ = cypher_path_ = Config::GetConfigPath();
   sql_path_ += "../resources/sql_queries.sql";
   cypher_path_ += "../resources/cypher_queries.cypher";
-#endif // CREATE_DEBIAN_PACKAGE
+#endif // CREATE_PACKAGE
 }
 
 void Config::set_mode(SCCMode mode) {
@@ -72,18 +72,11 @@ void Config::Start(int argc, char* argv[]) {
   if (argc > 1) {
     config.GetConsoleArguments(argc, argv);
   } else {
+    this->PrintHelp();
     // TODO: Parse config.ini
   }
 
-#ifdef CREATE_DEBIAN_PACKAGE
-  if (!this->IsFlagSet(OptFlag::kSQLFlag)
-      && !this->IsFlagSet(OptFlag::kCypherFlag)) {
-    LOG(ERROR, "expected path to input SQL queries (the file must exist) "
-               "and output CypherQL file (the file will be created, "
-               "if not exists)");
-    SCC_log.LoadBufferedLogs();
-    end(EXIT_FAILURE);
-  }
+#ifdef CREATE_PACKAGE
   if (!this->IsFlagSet(OptFlag::kSQLFlag)) {
     LOG(ERROR, "expected path to input SQL queries "
                "(the file must exist)");
@@ -96,7 +89,7 @@ void Config::Start(int argc, char* argv[]) {
     SCC_log.LoadBufferedLogs();
     end(EXIT_FAILURE);
   }
-#endif // CREATE_DEBIAN_PACKAGE
+#endif // CREATE_PACKAGE
 
   LOG(TRACE, "opening i/o files...");
 
@@ -107,6 +100,8 @@ void Config::Start(int argc, char* argv[]) {
   this->ValidateCypherPath(cypher_path_);
   this->ValidateIsOutputStreamOpen();
 
+  LOG(TRACE, "all i/o files are opened");
+
   SCC_log.set_is_system_configured(true);
   if (log_dir_.empty()) {
     SCC_log.set_log_path(Log::GetLogDir());
@@ -114,8 +109,6 @@ void Config::Start(int argc, char* argv[]) {
     SCC_log.set_log_path(log_dir_);
   }
   SCC_log.Start();
-
-  LOG(TRACE, "all i/o files are opened");
 
   if (config.get_mode() == SCCMode::kDaemon) {
     LOG(TRACE, "daemon mode cannot be activated "
@@ -138,7 +131,7 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
       {"help", 0, nullptr, OptFlag::kHelpFlag},
       {"interactive", 0, nullptr, OptFlag::kInteractiveFlag},
       {"loglvl", required_argument, nullptr, OptFlag::kLogLvlFlag},
-      {"log", required_argument, nullptr, OptFlag::kLogDirFlag},
+      {"logdir", required_argument, nullptr, OptFlag::kLogDirFlag},
       {"mode", required_argument, nullptr, OptFlag::kModeFlag},
       {"sql", required_argument, nullptr, OptFlag::kSQLFlag},
       {"version", 0, nullptr, OptFlag::kVersionFlag},
@@ -295,8 +288,8 @@ void Config::PrintHelp() const {
   std::cout << std::setw(20) << ""
             << "Acceptable levels: SILENT, FATAL, "
                "ERROR, INFO, TRACE, DEBUG.\n";
-  std::cout << std::setw(20) << "--log=[path]"
-            << "Path to the output log file\n";
+  std::cout << std::setw(20) << "--logdir=[path]"
+            << "Path to the log directory, where will be created log file\n";
   std::cout << std::setw(20) << "--sql=[path]"
             << "Path to the file with SQL queries, "
                "which will be converted (SQL).\n";

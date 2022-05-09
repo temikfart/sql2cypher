@@ -14,17 +14,17 @@
 
 #include "SCC/log.h"
 
-#ifdef deb_SCC_MAINTAINERS
-#define DEVELOPERS deb_SCC_MAINTAINERS
+#ifdef SCC_MAINTAINERS
+#define DEVELOPERS SCC_MAINTAINERS
 #else
 #define DEVELOPERS "Artyom Fartygin, Roman Korostinkiy"
-#endif // deb_SCC_MAINTAINERS
+#endif // SCC_MAINTAINERS
 
-#ifdef deb_SCC_VERSION
-#define VERSION deb_SCC_VERSION
+#ifdef SCC_VERSION
+#define VERSION SCC_VERSION
 #else
 #define VERSION "0.9.0-rc"
-#endif // deb_SCC_VERSION
+#endif // SCC_VERSION
 
 enum SCCMode {
   kInteractive,
@@ -119,8 +119,8 @@ private:
       {OptFlag::kInteractiveFlag, ConfigIsSet::kConfigMode},
       {OptFlag::kLogLvlFlag, ConfigIsSet::kConfigLogLvl},
       {OptFlag::kModeFlag, ConfigIsSet::kConfigMode},
-      {OptFlag::kCypherFlag, ConfigIsSet::kConfigSQL},
-      {OptFlag::kSQLFlag, ConfigIsSet::kConfigCypher},
+      {OptFlag::kCypherFlag, ConfigIsSet::kConfigCypher},
+      {OptFlag::kSQLFlag, ConfigIsSet::kConfigSQL},
       {OptFlag::kTreeDumpFlag, ConfigIsSet::kConfigTreeDump},
       {OptFlag::kLogDirFlag, ConfigIsSet::kConfigLogDir},
   };
