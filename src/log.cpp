@@ -28,6 +28,9 @@ void Log::set_is_system_configured(bool value) {
 bool Log::get_is_system_configured() const {
   return is_system_configured_;
 }
+bool Log::get_is_buffer_load() const {
+  return is_buffer_load;
+}
 
 void Log::Start() {
 #ifndef MSI_PACKAGE

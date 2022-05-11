@@ -29,6 +29,10 @@
 #define SCC_LOG_DIR "C:/Program Files/SCC/log/"
 #endif // MSI_PACKAGE
 
+#ifdef PKG_PACKAGE
+#define SCC_LOG_DIR ""
+#endif // PKG_PACKAGE
+
 enum LogLevel {
   SILENT,
   FATAL,
@@ -50,6 +54,7 @@ public:
   std::string get_log_path() const;
   void set_is_system_configured(bool value);
   bool get_is_system_configured() const;
+  bool get_is_buffer_load() const;
 
   void Start();
   void AddLog(LogLevel level, const std::string& msg);

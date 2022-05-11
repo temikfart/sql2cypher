@@ -1,212 +1,262 @@
 cmake_minimum_required(VERSION 3.10)
 
+########################### COMPILER'S CONFIGURATION ###########################
+
+# Set compilers' variables
+set(IS_COMPILERS_SET false)
 if (APPLE)
-    #
+    message("Set C/C++ compilers for MacOS")
+
+    # Set compilers for MacOS
+#    set(C_COMPILER "")
+#    set(CXX_COMPILER "")
+#    set(IS_COMPILERS_SET true)
+
+    # Set compilation flag (package)
+    set(PACKAGE_TYPE ".dmg")
+    set(PACKAGE_TYPE_FLAG "-DPKG_PACKAGE")
 elseif (WIN32)
-    message("Set compilers for Windows")
+    message("Set C/C++ compilers for Windows")
+
+    # Set compilers for Windows
 #    set(C_COMPILER "C:/MinGW/bin/gcc")
 #    set(CXX_COMPILER "C:/MinGW/bin/g++")
+#    set(IS_COMPILERS_SET true)
+
+    # Set compilation flag (package)
+    set(PACKAGE_TYPE ".msi")
+    set(PACKAGE_TYPE_FLAG "-DMSI_PACKAGE")
 elseif (UNIX)
-    message("Set compilers for Linux")
+    message("Set C/C++ compilers for Linux")
+
+    # Set compilers for Linux
     set(C_COMPILER "/usr/bin/gcc")
     set(CXX_COMPILER "/usr/bin/g++")
+    set(IS_COMPILERS_SET true)
+
+    # Set compilation flag (package)
+    set(PACKAGE_TYPE ".deb")
+    set(PACKAGE_TYPE_FLAG "-DDEBIAN_PACKAGE")
+else ()
+    message(SEND_ERROR "Unsupported system")
 endif ()
 
 # Set compilers
-set(CMAKE_C_COMPILER ${C_COMPILER})
-set(CMAKE_CXX_COMPILER ${CXX_COMPILER})
-
-# Set project
-project(SCC)
+if (IS_COMPILERS_SET)
+    set(CMAKE_C_COMPILER ${C_COMPILER})
+    set(CMAKE_CXX_COMPILER ${CXX_COMPILER})
+endif ()
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 
-# Set Version (rc - Release Candidate)
-set(SCC_VERSION_MAJOR 0)
-set(SCC_VERSION_MINOR 9)
-set(SCC_VERSION_PATCH 0)
-set(SCC_VERSION "${SCC_VERSION_MAJOR}.${SCC_VERSION_MINOR}.${SCC_VERSION_PATCH}")
+
+############################# PROJECT INFORMATION ##############################
+
+# Set project name
+set(PRJ_NAME SCC)
+project(${PRJ_NAME})
+
+# Print current system
+message("Current system is ${CMAKE_SYSTEM_NAME}")
+
+# Set Version
+set(PRJ_VERSION_MAJOR 0)
+set(PRJ_VERSION_MINOR 9)
+set(PRJ_VERSION_PATCH 0)
+set(PRJ_VERSION "${PRJ_VERSION_MAJOR}\
+.${PRJ_VERSION_MINOR}\
+.${PRJ_VERSION_PATCH}")
 
 # Set developers
-set(SCC_MAINTAINERS "Artyom Fartygin, Roman Korostinskiy")
+set(PRJ_MAINTAINERS "Artyom Fartygin, Roman Korostinskiy")
 
-# Cross-compilation
-if (APPLE)
-    message("Are you using ${CMAKE_SYSTEM_NAME}?")
-elseif (WIN32)
-    message("Are you using ${CMAKE_SYSTEM_NAME}?")
 
-    # Set compilation flags
-    if (PACKAGE)
-        message("Invoked the creation of a .msi package")
-        set(PACKAGE_CREATION_FLAG "-DCREATE_PACKAGE")
-        set(PACKAGE_TYPE_FLAG "-DMSI_PACKAGE")
-    endif ()
-    set(MACROS_FLAGS "-DSCC_VERSION=\"\\\"${SCC_VERSION}\\\"\" \
--DSCC_MAINTAINERS=\"\\\"${SCC_MAINTAINERS}\\\"\" ${PACKAGE_CREATION_FLAG} \
-${PACKAGE_TYPE_FLAG}")
-    set(COMPILATION_FLAGS "-Wall -Wextra -g ${MACROS_FLAGS}")
+########################## CROSS-PLATFORM COMPILATION ##########################
 
-    # Set C++ compiler's flags
-    set(CMAKE_CXX_FLAGS ${COMPILATION_FLAGS})
-
-    include_directories(include)
-    add_executable(scc
-            src/main.cpp
-            src/log.cpp
-            src/config.cpp
-            src/ast.cpp
-            src/lexical_analyzer.cpp
-            src/syntax_analyzer_general.cpp
-            src/syntax_analyzer_ddl.cpp
-            src/syntax_analyzer_dml.cpp
-            src/syntax_analyzer_other.cpp
-            src/ast_handler.cpp
-            src/query_assembler_general.cpp
-            src/query_assembler_ddl.cpp
-            src/query_assembler_dml.cpp
-            src/query_assembler_other.cpp
-            src/tree_dump.cpp)
-
-    ############################## INSTALLER CONFIGURATION ##############################
-
-    # Tell CPack to generate a .msi package
-    set(CPACK_GENERATOR "WIX")
-
-    # Set menu folder name
-    set(CPACK_WIX_PROGRAM_MENU_FOLDER "SCC")
-
-    # Binaries
-    install(TARGETS scc
-            DESTINATION bin)
-
-    # Create directory for the logs
-    install(DIRECTORY DESTINATION log DIRECTORY_PERMISSIONS
-            OWNER_WRITE OWNER_READ OWNER_EXECUTE
-            GROUP_WRITE GROUP_READ GROUP_EXECUTE
-            WORLD_WRITE WORLD_READ WORLD_EXECUTE)
-
-    ############################## PACKAGE CONFIGURATION ##############################
-
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY "SCC")
-
-    # Set a Package Version
-    set(CPACK_PACKAGE_VERSION ${SCC_VERSION})
-
-    # Set package name
-    set(CPACK_PACKAGE_NAME "SCC")
-
-    # Set a brief description
-    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SQL to CypherQL Converter")
-
-    # Set a long description
-    set(CPACK_PACKAGE_DESCRIPTION "The SCC is a tool, which allows you \
-to migrate data from the relational (MS SQL) \
-to the graph (neo4j) database.")
-
-    # Include CPack
-    include(CPack)
-elseif (UNIX)
-    message("Are you using ${CMAKE_SYSTEM_NAME}?")
-
-    # Set compilation flags
-    if (PACKAGE)
-        message("Invoked the creation of a .deb package")
-        set(PACKAGE_CREATION_FLAG "-DCREATE_PACKAGE")
-        set(PACKAGE_TYPE_FLAG "-DDEBIAN_PACKAGE")
-    endif ()
-    set(MACROS_FLAGS "-DSCC_VERSION=\"\\\"${SCC_VERSION}\\\"\" \
--DSCC_MAINTAINERS=\"\\\"${SCC_MAINTAINERS}\\\"\" ${PACKAGE_CREATION_FLAG} \
-${PACKAGE_TYPE_FLAG}")
-    set(COMPILATION_FLAGS "-Wall -Wextra -g ${MACROS_FLAGS}")
-
-    # Set C++ compiler's flags
-    set(CMAKE_CXX_FLAGS ${COMPILATION_FLAGS})
-
-    include_directories(include)
-    add_executable(scc
-            src/main.cpp
-            src/log.cpp
-            src/config.cpp
-            src/ast.cpp
-            src/lexical_analyzer.cpp
-            src/syntax_analyzer_general.cpp
-            src/syntax_analyzer_ddl.cpp
-            src/syntax_analyzer_dml.cpp
-            src/syntax_analyzer_other.cpp
-            src/ast_handler.cpp
-            src/query_assembler_general.cpp
-            src/query_assembler_ddl.cpp
-            src/query_assembler_dml.cpp
-            src/query_assembler_other.cpp
-            src/tree_dump.cpp)
-
-    # Binaries
-    install(TARGETS scc
-            DESTINATION bin)
-
-    # Create directory for the logs
-    # /mnt/s/OneDrive\ -\ МФТИ/inf/4sem_proj/sql2cypher/SCC_log/
-    install(DIRECTORY DESTINATION "/var/log/SCC_log/")
-
-    # Tell CPack to generate a .deb package
-    set(CPACK_GENERATOR "DEB")
-
-    # Set a Package Maintainer.
-    set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${SCC_MAINTAINERS})
-
-    # Set a brief description
-    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SQL to CypherQL Converter")
-
-    # Set a long description
-    set(CPACK_PACKAGE_DESCRIPTION "The SCC is a tool, which allows you \
-to migrate data from the relational (MS SQL) \
-to the graph (neo4j) database.")
-
-    # Set a Package Version
-    set(CPACK_PACKAGE_VERSION ${SCC_VERSION})
-
-    # Set dependencies
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "graphviz (>= 2.42)")
-
-    # Set home page
-    set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/temikfart/sql2cypher")
-
-    # Include CPack
-    include(CPack)
-else ()
-    message("You are using unsupported by SCC system (${CMAKE_SYSTEM_NAME})")
+# If package is created, then set macros
+if (PACKAGE)
+    message("Invoked a creation of the \"${PACKAGE_TYPE}\" package")
+    set(MACROS_PACKAGE_FLAGS "-DCREATE_PACKAGE ${PACKAGE_TYPE_FLAG}")
 endif ()
 
-# Google Tests
-if (NOT PACKAGE AND NOT WIN32)
+# Set compilation flags
+set(MACROS_FLAGS "-DSCC_VERSION=\"\\\"${PRJ_VERSION}\\\"\" \
+-DSCC_MAINTAINERS=\"\\\"${PRJ_MAINTAINERS}\\\"\" ${MACROS_PACKAGE_FLAGS}")
+set(COMPILATION_FLAGS "-Wall -Wextra -g ${MACROS_FLAGS}")
+set(CMAKE_CXX_FLAGS ${COMPILATION_FLAGS})
+
+# Create executable or package
+include_directories(include)
+set(PRJ_TARGET scc)
+set(SOURCE_LIST src/main.cpp
+            src/log.cpp
+            src/config.cpp
+            src/ast.cpp
+            src/lexical_analyzer.cpp
+            src/syntax_analyzer_general.cpp
+            src/syntax_analyzer_ddl.cpp
+            src/syntax_analyzer_dml.cpp
+            src/syntax_analyzer_other.cpp
+            src/ast_handler.cpp
+            src/query_assembler_general.cpp
+            src/query_assembler_ddl.cpp
+            src/query_assembler_dml.cpp
+            src/query_assembler_other.cpp
+            src/tree_dump.cpp)
+
+# Set information about an application
+set(PRJ_SHORT_DESCRIPTION "SQL to CypherQL Converter")
+set(PRJ_LONG_DESCRIPTION "The SCC is a tool, which allows you \
+to migrate data from the relational (MS SQL) \
+to the graph (neo4j) database.")
+set(PRJ_HOMEPAGE "https://github.com/temikfart/sql2cypher")
+
+if (APPLE)
+    # Create bundle or executable
+    if (PACKAGE)
+        add_executable(${PRJ_TARGET} MACOSX_BUNDLE ${SOURCE_LIST})
+
+        set_target_properties(${PRJ_TARGET} PROPERTIES
+                BUNDLE True
+                MACOSX_BUNDLE_LOCATION "MacOS"
+                MACOSX_BUNDLE_BUNDLE_NAME ${PRJ_TARGET}
+                MACOSX_BUNDLE_BUNDLE_VERSION "${SCC_VERSION}"
+                MACOSX_BUNDLE_SHORT_VERSION_STRING "${SCC_VERSION}"
+                )
+    elseif ()
+        add_executable(${PRJ_TARGET} ${SOURCE_LIST})
+    endif ()
+
+elseif (WIN32)
+    add_executable(${PRJ_TARGET} WIN32
+            ${SOURCE_LIST})
+
+    # Create package with CPack
+    if (PACKAGE)
+        # Tell CPack to generate a .msi package
+        set(CPACK_GENERATOR "NSIS")
+
+        # Set menu folder name
+#        set(CPACK_WIX_PROGRAM_MENU_FOLDER "${PRJ_NAME}")
+
+        # Binaries
+        install(TARGETS ${PRJ_TARGET}
+                DESTINATION bin)
+
+        # Create directory for the logs
+        install(DIRECTORY DESTINATION log DIRECTORY_PERMISSIONS
+                OWNER_WRITE OWNER_READ OWNER_EXECUTE
+                GROUP_WRITE GROUP_READ GROUP_EXECUTE
+                WORLD_WRITE WORLD_READ WORLD_EXECUTE)
+
+            set(CPACK_PACKAGE_INSTALL_DIRECTORY "${PRJ_NAME}")
+
+        # Uninstall previous program before installing a new
+        set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+
+        # Set display name
+        set(CPACK_NSIS_DISPLAY_NAME ${PRJ_SHORT_DESCRIPTION})
+
+        # Set package name
+        set(CPACK_NSIS_PACKAGE_NAME ${PRJ_SHORT_DESCRIPTION})
+
+        # Set help link
+        set(CPACK_NSIS_HELP_LINK ${PRJ_HOMEPAGE})
+        set(CPACK_NSIS_URL_INFO_ABOUT ${PRJ_HOMEPAGE})
+
+        # Set a Package Version
+        set(CPACK_PACKAGE_VERSION ${SCC_VERSION})
+
+        # Set package name
+        set(CPACK_PACKAGE_NAME "${PRJ_NAME}")
+
+        # Set a brief description
+        set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PRJ_SHORT_DESCRIPTION})
+
+        # Set a long description
+        set(CPACK_PACKAGE_DESCRIPTION ${PRJ_LONG_DESCRIPTION})
+
+        # Include CPack
+        include(CPack)
+    endif()
+elseif (UNIX)
+    add_executable(${PRJ_TARGET} ${SOURCE_LIST})
+
+    # Create package with CPack
+    if (PACKAGE)
+        # Tell CPack to generate a .deb package
+        set(CPACK_GENERATOR "DEB")
+
+        # Binaries
+        install(TARGETS scc
+                DESTINATION bin)
+
+        # Create directory for the logs
+        install(DIRECTORY DESTINATION "/var/log/${PRJ_NAME}_log/")
+
+        # Set a Package Maintainer.
+        set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${PRJ_MAINTAINERS})
+
+        # Set a brief description
+        set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PRJ_SHORT_DESCRIPTION})
+
+        # Set a long description
+        set(CPACK_PACKAGE_DESCRIPTION ${PRJ_LONG_DESCRIPTION})
+
+        # Set a Package Version
+        set(CPACK_PACKAGE_VERSION ${PRJ_VERSION})
+
+        # Set dependencies
+        set(CPACK_DEBIAN_PACKAGE_DEPENDS "graphviz (>= 2.42)")
+
+        # Set home page
+        set(CPACK_DEBIAN_PACKAGE_HOMEPAGE ${PRJ_HOMEPAGE})
+
+        # Include CPack
+        include(CPack)
+    endif()
+endif ()
+
+
+################################ ENABLE TESTING ################################
+
+set(TEST_TARGET ${PRJ_TARGET}_test)
+
+# Include Google Tests
+if (NOT PACKAGE)
     include(FetchContent)
     FetchContent_Declare(
             googletest
             GIT_REPOSITORY https://github.com/google/googletest.git
-            GIT_TAG e2239ee6043f73722e7aa812a459f54a28552929
-    )
+            GIT_TAG e2239ee6043f73722e7aa812a459f54a28552929)
     # For Windows: Prevent overriding the parent project's compiler/linker settings
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(googletest)
 
     enable_testing()
 
-    set(TestExec SCC_Test_System)
     include_directories(include)
-    add_executable(${TestExec}
-            test/config_test/config_test.cpp src/config.cpp
-            test/log_test/log_test.cpp src/log.cpp
-            test/ast_test/ast_test.cpp src/ast.cpp
+    # Make sure, that source files are mentioned ONE time
+    set(CONFIG_TEST
+            test/config_test/config_test.cpp src/config.cpp)
+    set(LOG_TEST
+            test/log_test/log_test.cpp src/log.cpp)
+    set(AST_TEST
+            test/ast_test/ast_test.cpp src/ast.cpp)
+    set(LEXICAL_ANALYZER_TEST
             test/lexical_analyzer_test/lexical_analyzer_test.cpp src/lexical_analyzer.cpp)
+    add_executable(${TEST_TARGET}
+            ${CONFIG_TEST}
+            ${LOG_TEST}
+            ${AST_TEST}
+            ${LEXICAL_ANALYZER_TEST})
 
     target_link_libraries(
-            ${TestExec}
+            ${TEST_TARGET}
             gtest_main
-            gmock
-    )
+            gmock)
 
     include(GoogleTest)
-    gtest_discover_tests(${TestExec})
+    gtest_discover_tests(${TEST_TARGET})
 endif()

@@ -69,6 +69,8 @@ public:
   std::string get_cypher_path() const;
   void set_is_need_dump(bool value);
   bool get_is_need_dump() const;
+  void set_is_silent_print(bool value);
+  bool get_is_silent_print() const;
 
   void Start(int argc, char *argv[]);
   void GetConsoleArguments(int argc, char *const *argv);
@@ -104,6 +106,7 @@ private:
 
   std::string log_dir_;
 
+  bool is_silent_print_ = false;
   bool is_need_dump_ = false;
 
   std::map<ConfigIsSet, bool> is_config_set_ = {
@@ -129,8 +132,8 @@ private:
   void SetFlag(OptFlag flag);
   bool IsFlagSet(OptFlag flag) const;
 
-  void PrintHelp() const;
-  void PrintVersion() const;
+  void PrintHelp();
+  void PrintVersion();
   void SetOptFlagDaemon(OptFlag flag);
   void SetOptFlagInteractive(OptFlag flag);
   void SetOptFlagLogLvl(OptFlag flag);

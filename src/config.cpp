@@ -27,6 +27,12 @@ void end(int exit_code) {
     ec_lvl = ERROR;
   }
   LOG(ec_lvl, "System ended with exit code " << exit_code);
+  // TODO: remove "ifndef", when logs will be repaired on WIN
+#ifndef MSI_PACKAGE
+  if (!config.get_is_silent_print() && !SCC_log.get_is_buffer_load()) {
+    SCC_log.LoadBufferedLogs();
+  }
+#endif // MSI_PACKAGE
   exit(exit_code);
 }
 
@@ -65,6 +71,12 @@ void Config::set_is_need_dump(bool value) {
 bool Config::get_is_need_dump() const {
   return is_need_dump_;
 }
+void Config::set_is_silent_print(bool value) {
+  is_silent_print_ = value;
+}
+bool Config::get_is_silent_print() const {
+  return is_silent_print_;
+}
 
 void Config::Start(int argc, char* argv[]) {
   LOG(INFO, "configuring system...");
@@ -72,7 +84,11 @@ void Config::Start(int argc, char* argv[]) {
   if (argc > 1) {
     config.GetConsoleArguments(argc, argv);
   } else {
+    // TODO: print help if no arguments (tests failed, if printed)
+#ifdef CREATE_PACKAGE
+    std::cout << "PIZDEC";
     this->PrintHelp();
+#endif // CREATE_PACKAGE
     // TODO: Parse config.ini
   }
 
@@ -173,6 +189,7 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
         break;
       default:
         char invalid_flag = short_options[optind + 1];
+        // TODO: change the conditions (optind = index of argv, it's used incorrectly)
         if (short_options[optind + 2] == ':') {
           LOG(ERROR,
               "flag must have an argument");
@@ -263,49 +280,53 @@ bool Config::IsFlagSet(OptFlag flag) const {
   return is_config_set_.at(flag_to_config_.at(flag));
 }
 
-void Config::PrintHelp() const {
+void Config::PrintHelp() {
+  std::cout << "Usage:\n";
+  std::cout << "\tscc --sql=file1 --cypher=file2 [options]...\n";
+  std::cout << "Options:\n";
   std::cout << std::left;
-  std::cout << std::setw(20) << "-h, --help"
+  std::cout << "  " << std::setw(20) << "-h, --help"
             << "Prints Usage and information about acceptable flags.\n";
-  std::cout << std::setw(20) << "-v, --version"
+  std::cout << "  " << std::setw(20) << "-v, --version"
             << "Prints current version.\n";
-  std::cout << std::setw(20) << "-m, --mode=[mode]"
+  std::cout << "  " << std::setw(20) << "-m, --mode=[mode]"
             << "Starts the SCC in special mode (by default: interactive)\n";
-  std::cout << std::setw(20) << "-i, --interactive"
+  std::cout << "  " << std::setw(20) << "-i, --interactive"
             << "Starts the SCC in interactive mode.\n";
-  std::cout << std::setw(20) << ""
+  std::cout << "  " << std::setw(20) << ""
             << "(logs will be printed in console)\n";
   // TODO: uncomment when daemon mode will be implemented
-//  std::cout << std::setw(20) << "-d, --daemon"
+//  std::cout << "  " << std::setw(20) << "-d, --daemon"
 //            << "Starts the SCC in daemon mode.\n";
-  std::cout << std::setw(20) << ""
+  std::cout << "  " << std::setw(20) << ""
             << "(logs will be printed in the special log files "
                "into \"log/\")\n";
-  std::cout << std::setw(20) << "--dump"
+  std::cout << "  " << std::setw(20) << "--dump"
             << "Creates Tree Dump image of the AST.\n";
-  std::cout << std::setw(20) << "-l, --loglvl=lvl"
+  std::cout << "  " << std::setw(20) << "-l, --loglvl=lvl"
             << "Sets logging level to \"lvl\".\n";
-  std::cout << std::setw(20) << ""
+  std::cout << "  " << std::setw(20) << ""
             << "Acceptable levels: SILENT, FATAL, "
                "ERROR, INFO, TRACE, DEBUG.\n";
-  std::cout << std::setw(20) << "--logdir=[path]"
+  std::cout << "  " << std::setw(20) << "--logdir=[path]"
             << "Path to the log directory, where will be created log file\n";
-  std::cout << std::setw(20) << "--sql=[path]"
+  std::cout << "  " << std::setw(20) << "--sql=[path]"
             << "Path to the file with SQL queries, "
                "which will be converted (SQL).\n";
-  std::cout << std::setw(20) << "--cypher=[path]"
+  std::cout << "  " << std::setw(20) << "--cypher=[path]"
             << "Path to the file, "
                "where will be converted queries (CQL).\n";
-  std::cout << std::setw(20) << "--dump=[path]"
+  std::cout << "  " << std::setw(20) << "--dump=[path]"
             << "Path to the file, "
                "where will be created image of AST of SQL queries \n";
-  std::cout << std::setw(20) << ""
+  std::cout << "  " << std::setw(20) << ""
             << "(by default, the image is not created)\n";
   std::cout.flush();
 
+  this->set_is_silent_print(true);
   end(EXIT_SUCCESS);
 }
-void Config::PrintVersion() const {
+void Config::PrintVersion() {
   LOG(INFO, "printing version of the SCC...");
 
   std::cout << std::left;
@@ -314,6 +335,7 @@ void Config::PrintVersion() const {
   std::cout << std::setw(13) << "Developers:" << DEVELOPERS;
   std::cout << std::endl;
 
+  this->set_is_silent_print(true);
   end(EXIT_SUCCESS);
 }
 void Config::SetOptFlagDaemon(OptFlag flag) {
