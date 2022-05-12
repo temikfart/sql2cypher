@@ -28,11 +28,11 @@ void end(int exit_code) {
   }
   LOG(ec_lvl, "System ended with exit code " << exit_code);
   // TODO: remove "ifndef", when logs will be repaired on WIN
-#ifndef MSI_PACKAGE
+#ifndef EXE_PACKAGE
   if (!config.get_is_silent_print() && !SCC_log.get_is_buffer_load()) {
     SCC_log.LoadBufferedLogs();
   }
-#endif // MSI_PACKAGE
+#endif // EXE_PACKAGE
   exit(exit_code);
 }
 
@@ -86,7 +86,6 @@ void Config::Start(int argc, char* argv[]) {
   } else {
     // TODO: print help if no arguments (tests failed, if printed)
 #ifdef CREATE_PACKAGE
-    std::cout << "PIZDEC";
     this->PrintHelp();
 #endif // CREATE_PACKAGE
     // TODO: Parse config.ini
@@ -122,6 +121,7 @@ void Config::Start(int argc, char* argv[]) {
   if (log_dir_.empty()) {
     SCC_log.set_log_path(Log::GetLogDir());
   } else {
+    SCC_log.set_is_logdir_set(true);
     SCC_log.set_log_path(log_dir_);
   }
   SCC_log.Start();
@@ -140,19 +140,27 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
   int flag;
   opterr = 0;
 
-  const char short_options[] = "dhil:m:v";
+  const char short_options[] = "dhil:L:m:v";
   const struct option long_options[] = {
-      {"cypher", required_argument, nullptr, OptFlag::kCypherFlag},
+      // Has the short form
       {"daemon", 0, nullptr, OptFlag::kDaemonFlag},
       {"help", 0, nullptr, OptFlag::kHelpFlag},
       {"interactive", 0, nullptr, OptFlag::kInteractiveFlag},
       {"loglvl", required_argument, nullptr, OptFlag::kLogLvlFlag},
       {"logdir", required_argument, nullptr, OptFlag::kLogDirFlag},
       {"mode", required_argument, nullptr, OptFlag::kModeFlag},
-      {"sql", required_argument, nullptr, OptFlag::kSQLFlag},
       {"version", 0, nullptr, OptFlag::kVersionFlag},
+      // Does not have the short form
+      {"cypher", required_argument, nullptr, OptFlag::kCypherFlag},
+      {"sql", required_argument, nullptr, OptFlag::kSQLFlag},
       {nullptr, 0, nullptr, 0},
   };
+
+  std::map<char, bool> has_argument;
+  for (int i = 0; long_options[i].name != nullptr; i++) {
+    has_argument[(char) (long_options[i].val)] = long_options[i].has_arg;
+  }
+
   while ((flag = getopt_long(argc,
                              argv,
                              short_options,
@@ -188,14 +196,16 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
         this->SetOptFlagCypher(OF_flag);
         break;
       default:
-        char invalid_flag = short_options[optind + 1];
-        // TODO: change the conditions (optind = index of argv, it's used incorrectly)
-        if (short_options[optind + 2] == ':') {
-          LOG(ERROR,
-              "flag must have an argument");
-        } else {
-          LOG(ERROR, "undefined flag: " << invalid_flag);
-        }
+        // TODO: change the conditions (use optind, now it's used incorrectly)
+//        auto arg = argv[optind - 1];
+//        if (has_argument.count(arg[1]) != 0
+//            && has_argument.at(arg[1]) == 1) {
+//          LOG(ERROR, "flag \'-" << (char)(arg[1]) << "\' "
+//                                                     "required an argument");
+//        } else {
+//          LOG(ERROR, "invalid flag \'-" << (char)(arg[1]) << "\'");
+//        }
+        LOG(ERROR, "invalid flag, see help");
         end(EXIT_FAILURE);
     }
   }
@@ -301,8 +311,8 @@ void Config::PrintHelp() {
   std::cout << "  " << std::setw(20) << ""
             << "(logs will be printed in the special log files "
                "into \"log/\")\n";
-  std::cout << "  " << std::setw(20) << "--dump"
-            << "Creates Tree Dump image of the AST.\n";
+  std::cout << "  " << std::setw(20) << "--dump=[path]"
+            << "Creates Tree Dump image of the AST in the [path].\n";
   std::cout << "  " << std::setw(20) << "-l, --loglvl=lvl"
             << "Sets logging level to \"lvl\".\n";
   std::cout << "  " << std::setw(20) << ""

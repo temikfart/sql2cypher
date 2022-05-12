@@ -2,14 +2,15 @@
 
 #include <sys/stat.h>
 
+#include <algorithm>
+#include <ctime>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <sstream>
-#include <fstream>
-#include <string>
-#include <ctime>
-#include <algorithm>
 #include <map>
+#include <sstream>
+#include <string>
+#include <vector>
 
 #define LOG(level, msg) do {                                    \
   std::string path = __FILE__;                                  \
@@ -25,13 +26,13 @@
 #define SCC_LOG_DIR "/var/log/SCC_log/"
 #endif // DEBIAN_PACKAGE
 
-#ifdef MSI_PACKAGE
+#ifdef EXE_PACKAGE
 #define SCC_LOG_DIR "C:/Program Files/SCC/log/"
-#endif // MSI_PACKAGE
+#endif // EXE_PACKAGE
 
-#ifdef PKG_PACKAGE
+#ifdef APP_PACKAGE
 #define SCC_LOG_DIR ""
-#endif // PKG_PACKAGE
+#endif // APP_PACKAGE
 
 enum LogLevel {
   SILENT,
@@ -55,11 +56,12 @@ public:
   void set_is_system_configured(bool value);
   bool get_is_system_configured() const;
   bool get_is_buffer_load() const;
+  void set_is_logdir_set(bool value);
 
   void Start();
   void AddLog(LogLevel level, const std::string& msg);
   void LoadBufferedLogs();
-  static std::string GetLogDir() ;
+  static std::string GetLogDir();
   LogLevel StringToLogLevel(std::string level) const;
   bool CloseLogFile();
 
@@ -69,7 +71,8 @@ private:
   LogLevel log_level_ = LogLevel::INFO;
 
   std::vector<std::pair<LogLevel, std::string>> buffered_logs_;
-  bool is_buffer_load = false;
+  bool is_buffer_load_ = false;
+  bool is_logdir_set_ = false;
   bool is_system_configured_ = false;
 
   std::map<LogLevel, std::string> lvl2str_ = {
@@ -93,7 +96,7 @@ private:
   std::string TimeToLogFilename(std::string timestamp) const;
   static bool IsFileExists(const std::string& path);
 
-  static void ValidateLogLevel(LogLevel level) ;
+  static void ValidateLogLevel(LogLevel level);
   void ValidateLogLevel(std::string& level) const;
   void ValidateDoesFileExist(const std::string& path) const;
   void ValidateIsLogFileOpen() const;

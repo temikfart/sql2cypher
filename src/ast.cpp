@@ -67,7 +67,7 @@ bool Node::IsNodesEqual(const std::shared_ptr<Node>& node1,
       }
       break;
     case DataType::PUNCTUATION:
-    case DataType::BRACKET: //TODO: decide how to check node type: make a functions or make a new field node_type_
+    case DataType::BRACKET:
       if (std::dynamic_pointer_cast<CharNode>(node1)->get_data() !=
           std::dynamic_pointer_cast<CharNode>(node2)->get_data()) {
         return false;

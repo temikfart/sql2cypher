@@ -14,9 +14,9 @@ LogLevel Log::get_log_level() const {
 }
 void Log::set_log_path(const std::string& dir) {
   filepath_ = dir.substr(0, dir.find_last_of('/') + 1);
-#ifndef MSI_PACKAGE
+#ifndef EXE_PACKAGE
   this->ValidateDoesFileExist(filepath_);
-#endif // MSI_PACKAGE
+#endif // EXE_PACKAGE
   filepath_ += this->TimeToLogFilename(Log::GetTimestamp());
 }
 std::string Log::get_log_path() const {
@@ -29,15 +29,21 @@ bool Log::get_is_system_configured() const {
   return is_system_configured_;
 }
 bool Log::get_is_buffer_load() const {
-  return is_buffer_load;
+  return is_buffer_load_;
+}
+void Log::set_is_logdir_set(bool value) {
+  is_logdir_set_ = value;
 }
 
 void Log::Start() {
-#ifndef MSI_PACKAGE
+#ifdef EXE_PACKAGE
+  if (!is_logdir_set_) {
+    return;
+  }
+#endif // EXE_PACKAGE
   output_.open(this->get_log_path(), std::ios::out);
   this->ValidateDoesFileExist(filepath_);
   this->ValidateIsLogFileOpen();
-#endif // MSI_PACKAGE
 }
 void Log::AddLog(LogLevel level, const std::string& msg) {
   Log::ValidateLogLevel(level);
@@ -49,28 +55,28 @@ void Log::AddLog(LogLevel level, const std::string& msg) {
     buffered_logs_.emplace_back(level, output.str());
     return;
   } else {
-    if (!is_buffer_load) {
+    if (!is_buffer_load_) {
       this->LoadBufferedLogs();
     }
   }
-#ifndef MSI_PACKAGE
+#ifndef EXE_PACKAGE
   output_ << output.str();
-#endif // MSI_PACKAGE
+#endif // EXE_PACKAGE
 
   if (log_level_ >= level) {
     std::cout << output.str();
   }
 }
 void Log::LoadBufferedLogs() {
-  for (const auto& m : buffered_logs_) {
-#ifndef MSI_PACKAGE
+  for (const auto& m: buffered_logs_) {
+#ifndef EXE_PACKAGE
     output_ << m.second;
-#endif // MSI_PACKAGE
+#endif // EXE_PACKAGE
     if (log_level_ >= m.first) {
       std::cout << m.second;
     }
   }
-  is_buffer_load = true;
+  is_buffer_load_ = true;
 }
 LogLevel Log::StringToLogLevel(std::string level) const {
   for_each(begin(level), end(level),
@@ -80,7 +86,6 @@ LogLevel Log::StringToLogLevel(std::string level) const {
   this->ValidateLogLevel(level);
   return str2lvl_.at(level);
 }
-
 
 std::string Log::GetLogDir() {
   std::string path;
@@ -92,7 +97,6 @@ std::string Log::GetLogDir() {
   path = cwf_path.substr(0, cwf_path.find(cwf));
   path += "../log/";
 #endif // CREATE_PACKAGE
-
 
   return path;
 }
@@ -154,7 +158,7 @@ void Log::ValidateDoesFileExist(const std::string& path) const {
 }
 void Log::ValidateIsLogFileOpen() const {
   if (!output_.is_open()) {
-    std::cout <<"input file stream is not opened" << std::endl;
+    std::cout << "input file stream is not opened" << std::endl;
     exit(EXIT_FAILURE);
   }
 }

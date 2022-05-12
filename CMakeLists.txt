@@ -13,8 +13,8 @@ if (APPLE)
 #    set(IS_COMPILERS_SET true)
 
     # Set compilation flag (package)
-    set(PACKAGE_TYPE ".dmg")
-    set(PACKAGE_TYPE_FLAG "-DPKG_PACKAGE")
+    set(PACKAGE_TYPE ".app")
+    set(PACKAGE_TYPE_FLAG "-DAPP_PACKAGE")
 elseif (WIN32)
     message("Set C/C++ compilers for Windows")
 
@@ -24,8 +24,8 @@ elseif (WIN32)
 #    set(IS_COMPILERS_SET true)
 
     # Set compilation flag (package)
-    set(PACKAGE_TYPE ".msi")
-    set(PACKAGE_TYPE_FLAG "-DMSI_PACKAGE")
+    set(PACKAGE_TYPE ".exe")
+    set(PACKAGE_TYPE_FLAG "-DEXE_PACKAGE")
 elseif (UNIX)
     message("Set C/C++ compilers for Linux")
 
@@ -121,24 +121,20 @@ if (APPLE)
                 BUNDLE True
                 MACOSX_BUNDLE_LOCATION "MacOS"
                 MACOSX_BUNDLE_BUNDLE_NAME ${PRJ_TARGET}
-                MACOSX_BUNDLE_BUNDLE_VERSION "${SCC_VERSION}"
-                MACOSX_BUNDLE_SHORT_VERSION_STRING "${SCC_VERSION}"
+                MACOSX_BUNDLE_BUNDLE_VERSION "${PRJ_VERSION}"
+                MACOSX_BUNDLE_SHORT_VERSION_STRING "${PRJ_VERSION}"
                 )
     elseif ()
         add_executable(${PRJ_TARGET} ${SOURCE_LIST})
     endif ()
 
 elseif (WIN32)
-    add_executable(${PRJ_TARGET} WIN32
-            ${SOURCE_LIST})
+    add_executable(${PRJ_TARGET} ${SOURCE_LIST})
 
     # Create package with CPack
     if (PACKAGE)
-        # Tell CPack to generate a .msi package
+        # Tell CPack to generate a .exe package
         set(CPACK_GENERATOR "NSIS")
-
-        # Set menu folder name
-#        set(CPACK_WIX_PROGRAM_MENU_FOLDER "${PRJ_NAME}")
 
         # Binaries
         install(TARGETS ${PRJ_TARGET}
@@ -166,7 +162,7 @@ elseif (WIN32)
         set(CPACK_NSIS_URL_INFO_ABOUT ${PRJ_HOMEPAGE})
 
         # Set a Package Version
-        set(CPACK_PACKAGE_VERSION ${SCC_VERSION})
+        set(CPACK_PACKAGE_VERSION ${PRJ_VERSION})
 
         # Set package name
         set(CPACK_PACKAGE_NAME "${PRJ_NAME}")

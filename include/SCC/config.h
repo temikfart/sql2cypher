@@ -43,7 +43,7 @@ enum OptFlag {
   kCypherFlag = 'z' + 1,
   kSQLFlag = 'z' + 2,
   kTreeDumpFlag = 'z' + 3,
-  kLogDirFlag = 'z' + 4
+  kLogDirFlag = 'L'
 };
 
 enum ConfigIsSet {
@@ -72,8 +72,8 @@ public:
   void set_is_silent_print(bool value);
   bool get_is_silent_print() const;
 
-  void Start(int argc, char *argv[]);
-  void GetConsoleArguments(int argc, char *const *argv);
+  void Start(int argc, char* argv[]);
+  void GetConsoleArguments(int argc, char* const* argv);
 
   static std::string GetConfigPath();
   char GetSQLSymbol();
