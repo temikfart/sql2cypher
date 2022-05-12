@@ -12,8 +12,10 @@ int main(int argc, char* argv[]) {
   std::shared_ptr<Node> AST =
       syntax_analyzer.Analyze(tokenizer.get_tokens_array());
 
-  TreeDump dump;
-  dump.DumpTree(AST);
+  if (config.get_is_need_dump()) {
+    TreeDump dump;
+    dump.DumpTree(AST);
+  }
 
   QueryAssembler query_assembler;
   query_assembler.Translate(AST);
