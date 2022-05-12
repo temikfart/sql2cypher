@@ -41,7 +41,8 @@ void Log::Start() {
     return;
   }
 #endif // EXE_PACKAGE
-  output_.open(this->get_log_path(), std::ios::out);
+  this->CloseLogFile();
+  output_.open(filepath_, std::ios::out);
   this->ValidateDoesFileExist(filepath_);
   this->ValidateIsLogFileOpen();
 }
