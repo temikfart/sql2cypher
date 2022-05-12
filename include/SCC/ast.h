@@ -7,6 +7,9 @@
 
 #include "SCC/config.h"
 
+/**
+ * Enum with SQL statement types.
+ */
 enum StatementType {
   EMPTY_TYPE,
   Program,
@@ -66,6 +69,9 @@ enum StatementType {
   StTypeCount
 };
 
+/**
+ * Enum with all data types for AST nodes.
+ */
 enum DataType {
   ROOT,
   SERVICE,
@@ -78,6 +84,9 @@ enum DataType {
   STRING
 };
 
+/**
+ * Base class for nodes.
+ */
 class Node {
 public:
   explicit Node(DataType type);
