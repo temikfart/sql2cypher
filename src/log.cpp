@@ -61,6 +61,7 @@ void Log::AddLog(LogLevel level, const std::string& msg) {
   }
 #ifndef EXE_PACKAGE
   output_ << output.str();
+  output_.flush();
 #endif // EXE_PACKAGE
 
   if (log_level_ >= level) {

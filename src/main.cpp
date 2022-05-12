@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
 
   if (config.get_is_need_dump()) {
     TreeDump dump;
-    dump.Dump(AST);
+    dump.DumpTree(AST);
   }
 
   QueryAssembler query_assembler;

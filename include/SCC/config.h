@@ -38,21 +38,21 @@ enum OptFlag {
   kHelpFlag = 'h',
   kInteractiveFlag = 'i',
   kLogLvlFlag = 'l',
+  kLogDirFlag = 'L',
   kModeFlag = 'm',
   kVersionFlag = 'v',
   kCypherFlag = 'z' + 1,
   kSQLFlag = 'z' + 2,
-  kTreeDumpFlag = 'z' + 3,
-  kLogDirFlag = 'L'
+  kTreeDumpFlag = 'z' + 3
 };
 
 enum ConfigIsSet {
   kConfigLogLvl,
+  kConfigLogDir,
   kConfigMode,
   kConfigSQL,
   kConfigCypher,
-  kConfigTreeDump,
-  kConfigLogDir
+  kConfigTreeDump
 };
 
 void end(int exit_code);
@@ -71,6 +71,8 @@ public:
   bool get_is_need_dump() const;
   void set_is_silent_print(bool value);
   bool get_is_silent_print() const;
+  void set_tree_dump_path(const std::string& new_tree_dump_path);
+  std::string get_tree_dump_path() const;
 
   void Start(int argc, char* argv[]);
   void GetConsoleArguments(int argc, char* const* argv);
@@ -80,8 +82,10 @@ public:
   char PeekSQLSymbol();
   std::ifstream& ReadSQL();
   std::ofstream& WriteCypher();
+  std::ofstream& WriteTreeDump();
   bool CloseInputFile();
   bool CloseOutputFile();
+  bool CloseTreeDumpFile();
 
   SCCMode StringToSCCMode(std::string mode) const;
   std::string SCCModeToString(SCCMode mode) const;
@@ -105,27 +109,29 @@ private:
   std::ofstream output_;
 
   std::string log_dir_;
-
   bool is_silent_print_ = false;
+  
   bool is_need_dump_ = false;
+  std::string tree_dump_path_;
+  std::ofstream tree_dump_;
 
   std::map<ConfigIsSet, bool> is_config_set_ = {
       {ConfigIsSet::kConfigLogLvl, false},
+      {ConfigIsSet::kConfigLogDir, false},
       {ConfigIsSet::kConfigMode, false},
       {ConfigIsSet::kConfigSQL, false},
       {ConfigIsSet::kConfigCypher, false},
-      {ConfigIsSet::kConfigTreeDump, false},
-      {ConfigIsSet::kConfigLogDir, false}
+      {ConfigIsSet::kConfigTreeDump, false}
   };
   const std::map<OptFlag, ConfigIsSet> flag_to_config_ = {
       {OptFlag::kDaemonFlag, ConfigIsSet::kConfigMode},
       {OptFlag::kInteractiveFlag, ConfigIsSet::kConfigMode},
       {OptFlag::kLogLvlFlag, ConfigIsSet::kConfigLogLvl},
+      {OptFlag::kLogDirFlag, ConfigIsSet::kConfigLogDir},
       {OptFlag::kModeFlag, ConfigIsSet::kConfigMode},
       {OptFlag::kCypherFlag, ConfigIsSet::kConfigCypher},
       {OptFlag::kSQLFlag, ConfigIsSet::kConfigSQL},
-      {OptFlag::kTreeDumpFlag, ConfigIsSet::kConfigTreeDump},
-      {OptFlag::kLogDirFlag, ConfigIsSet::kConfigLogDir},
+      {OptFlag::kTreeDumpFlag, ConfigIsSet::kConfigTreeDump}
   };
 
   static bool IsFileExists(const std::string& path);
@@ -141,13 +147,16 @@ private:
   void SetOptFlagMode(OptFlag flag);
   void SetOptFlagSQL(OptFlag flag);
   void SetOptFlagCypher(OptFlag flag);
+  void SetOptFlagTreeDump(OptFlag flag);
 
   void ValidateMode(SCCMode mode) const;
   void ValidateMode(const std::string& mode) const;
   void ValidateSQLPath(const std::string& sql_path) const;
-  void ValidateCypherPath(const std::string& cypher_path) const;
+  void ValidateCypherPath() const;
+  void ValidateTreeDumpPath() const;
   void ValidateIsInputStreamOpen() const;
   void ValidateIsOutputStreamOpen() const;
+  void ValidateIsTreeDumpStreamOpen() const;
   void ValidateIsFlagSet(OptFlag flag) const;
 };
 

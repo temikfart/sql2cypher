@@ -15,6 +15,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
+    - name: SetUp
+      run: sudo apt install graphviz
+    
     - name: Build
       run: cmake -S . -B build
       
