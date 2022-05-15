@@ -2,9 +2,6 @@
 
 Log SCC_log;
 
-Log::Log() = default;
-Log::~Log() = default;
-
 void Log::set_log_level(LogLevel level) {
   Log::ValidateLogLevel(level);
   log_level_ = level;
@@ -38,7 +35,8 @@ void Log::set_is_logdir_set(bool value) {
 void Log::Start() {
 #ifdef EXE_PACKAGE
   if (!is_logdir_set_) {
-    return;
+    std::cout << "log directory must be set with flag \"logdir\"";
+    exit(EXIT_FAILURE);
   }
 #endif // EXE_PACKAGE
   this->CloseLogFile();
@@ -80,15 +78,6 @@ void Log::LoadBufferedLogs() {
   }
   is_buffer_load_ = true;
 }
-LogLevel Log::StringToLogLevel(std::string level) const {
-  for_each(begin(level), end(level),
-           [](char& c) {
-             c = (char) ::toupper(c);
-           });
-  this->ValidateLogLevel(level);
-  return str2lvl_.at(level);
-}
-
 std::string Log::GetLogDir() {
   std::string path;
 #ifdef CREATE_PACKAGE
@@ -102,6 +91,30 @@ std::string Log::GetLogDir() {
 
   return path;
 }
+LogLevel Log::StringToLogLevel(std::string level) const {
+  for_each(begin(level), end(level),
+           [](char& c) {
+             c = (char) ::toupper(c);
+           });
+  this->ValidateLogLevel(level);
+  return str2lvl_.at(level);
+}
+bool Log::CloseLogFile() {
+  LOG(TRACE, "closing output file...");
+  if (output_.is_open()) {
+    output_.close();
+    if (output_.good()) {
+      LOG(TRACE, "output file closed successfully");
+    } else {
+      LOG(ERROR, "output file close error");
+      return false;
+    }
+  } else {
+    LOG(TRACE, "output file is already closed");
+  }
+  return true;
+}
+
 std::string Log::GetTimestamp() {
   time_t now;
   time(&now);
@@ -121,21 +134,6 @@ std::string Log::TimeToLogFilename(std::string timestamp) const {
 bool Log::IsFileExists(const std::string& path) {
   struct stat buffer{};
   return (stat(path.c_str(), &buffer) == 0);
-}
-bool Log::CloseLogFile() {
-  LOG(TRACE, "closing output file...");
-  if (output_.is_open()) {
-    output_.close();
-    if (output_.good()) {
-      LOG(TRACE, "output file closed successfully");
-    } else {
-      LOG(ERROR, "output file close error");
-      return false;
-    }
-  } else {
-    LOG(TRACE, "output file is already closed");
-  }
-  return true;
 }
 
 void Log::ValidateLogLevel(LogLevel level) {
