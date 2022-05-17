@@ -208,14 +208,17 @@ public:
   bool CloseLogFile();
 
 private:
-  std::string filepath_;
-  std::ofstream output_;
-  LogLevel log_level_ = LogLevel::INFO;
+  std::string filepath_;    ///< is path to the log file
+  std::ofstream output_;    ///< is output stream (opened log file)
+  LogLevel log_level_ = LogLevel::INFO;   ///< current log level
 
+  ///< log messages, which were been buffered for some moment
   std::vector<std::pair<LogLevel, std::string>> buffered_logs_;
-  bool is_buffer_load_ = false;
-  bool is_logdir_set_ = false;
-  bool is_system_configured_ = false;
+  bool is_buffer_load_ = false;       ///< shows, that buffered logs were loaded
+  bool is_logdir_set_ = false;        ///< shows, that config option log
+                                      ///< directory was set
+  bool is_system_configured_ = false; ///< shows, that the process of the system
+                                      ///< configuration was ended
 
   std::map<LogLevel, std::string> lvl2str_ = {
       {LogLevel::SILENT, "SILENT"},
@@ -224,7 +227,7 @@ private:
       {LogLevel::INFO, "INFO"},
       {LogLevel::TRACE, "TRACE"},
       {LogLevel::DEBUG, "DEBUG"},
-  };
+  };      ///< map container, which contains pairs of log levels: enum -> string
   std::map<std::string, LogLevel> str2lvl_ = {
       {"SILENT", LogLevel::SILENT},
       {"FATAL", LogLevel::FATAL},
@@ -232,16 +235,72 @@ private:
       {"INFO", LogLevel::INFO},
       {"TRACE", LogLevel::TRACE},
       {"DEBUG", LogLevel::DEBUG}
-  };
+  };      ///< map container, which contains pairs of log levels: string -> enum
 
+  /**
+   * \brief Static method, which return datetime as string
+   *
+   * \details The method gets current time (MSC: GMT+3 timezone) and return it
+   * as string in ISO formatting (YYYY-MM-DDThh:mm:ss).
+   *
+   * @return date and time as string in ISO formatting
+   */
   static std::string GetTimestamp();
+  /**
+   * \brief Transformation timestamp in ISO formatting to the name for the log
+   * file
+   *
+   * \details The method gets timestamp in ISO formatting (YYYY-MM-DDThh:mm:ss),
+   * replaces all colons with dashes and add \".log\" at the end.
+   *
+   * @param[in] timestamp timestamp in ISO formatting (YYYY-MM-DDThh:mm:ss)
+   * @return the name for the log file
+   */
   std::string TimeToLogFilename(std::string timestamp) const;
+  /**
+   * \brief Checks filepath for existence
+   *
+   * \details Uses stat file information for know about existence of the file.
+   *
+   * @param[in] path path to the some file
+   * @return true if file exists, false otherwise
+   */
   static bool IsFileExists(const std::string& path);
 
+  /**
+   * \brief Validates log level (enum member candidate)
+   *
+   * \details if \"level\" is not contained in LogLevel enum, then error
+   * occurred.
+   *
+   * @param[in] level checking log level
+   */
   static void ValidateLogLevel(LogLevel level);
+  /**
+   * \brief Validates log level (string)
+   *
+   * \details If \"level\" in uppercase is not contained in the str2lvl, then
+   * error occurred and the SCC ends its work.
+   *
+   * @param level log level as string
+   */
   void ValidateLogLevel(std::string& level) const;
+  /**
+   * \brief Validates file existence
+   *
+   * \details If filepath incorrect or the file does not exist, then error
+   * occurred and the SCC ends its work
+   *
+   * @param[in] path path to the file
+   */
   void ValidateDoesFileExist(const std::string& path) const;
+  /**
+   * \brief Validates, that log file is opened
+   *
+   * \details If log file is not opened, then error occurred and the SCC ends
+   * its work
+   */
   void ValidateIsLogFileOpen() const;
 };
 
-extern Log SCC_log;
+extern Log SCC_log;   ///< global variable for the logging process
