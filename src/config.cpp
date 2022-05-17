@@ -341,14 +341,14 @@ void Config::PrintHelp() {
             << "Starts the SCC in special mode (by default: interactive)\n";
   std::cout << "  " << std::setw(20) << "-i, --interactive"
             << "Starts the SCC in interactive mode.\n";
-  std::cout << "  " << std::setw(20) << ""
-            << "(logs will be printed in console)\n";
+//  std::cout << "  " << std::setw(20) << ""
+//            << "(logs will be printed in console)\n";
   // TODO: uncomment when daemon mode will be implemented
 //  std::cout << "  " << std::setw(20) << "-d, --daemon"
 //            << "Starts the SCC in daemon mode.\n";
-  std::cout << "  " << std::setw(20) << ""
-            << "(logs will be printed in the special log files "
-               "into \"log/\")\n";
+//  std::cout << "  " << std::setw(20) << ""
+//            << "(logs will be printed in the special log files "
+//               "into \"log/\")\n";
   std::cout << "  " << std::setw(20) << "--dump=[path]"
             << "Creates Tree Dump image of the AST in the [path].\n";
   std::cout << "  " << std::setw(20) << "-l, --loglvl=lvl"
