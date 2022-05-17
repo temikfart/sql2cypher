@@ -22,6 +22,21 @@ void QueryAssembler::TranslateDMLStatement(std::shared_ptr<Node> node) {
   }
 }
 
-void QueryAssembler::TranslateInsert(std::shared_ptr<Node> node) {}
-void QueryAssembler::TranslateDelete(std::shared_ptr<Node> node) {}
-void QueryAssembler::TranslateUpdate(std::shared_ptr<Node> node) {}
+void QueryAssembler::TranslateInsert(std::shared_ptr<Node> node) {
+  if (node->get_children_amount() == 0) {
+    LOG(ERROR, "insert statement without body");
+    end(EXIT_FAILURE);
+  }
+}
+void QueryAssembler::TranslateDelete(std::shared_ptr<Node> node) {
+  if (node->get_children_amount() == 0) {
+    LOG(ERROR, "delete statement without body");
+    end(EXIT_FAILURE);
+  }
+}
+void QueryAssembler::TranslateUpdate(std::shared_ptr<Node> node) {
+  if (node->get_children_amount() == 0) {
+    LOG(ERROR, "update statement without body");
+    end(EXIT_FAILURE);
+  }
+}
