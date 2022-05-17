@@ -126,10 +126,12 @@ void Config::Start(int argc, char* argv[]) {
   this->ValidateCypherPath();
   this->ValidateIsOutputStreamOpen();
 
-  tree_dump_.open(tree_dump_path_, std::ios::out);
-  this->ValidateTreeDumpPath();
-  this->ValidateIsTreeDumpStreamOpen();
-  
+  if (is_need_dump_) {
+    tree_dump_.open(tree_dump_path_, std::ios::out);
+    this->ValidateTreeDumpPath();
+    this->ValidateIsTreeDumpStreamOpen();
+  }
+
   LOG(TRACE, "all i/o files are opened");
 
   SCC_log.set_is_system_configured(true);
