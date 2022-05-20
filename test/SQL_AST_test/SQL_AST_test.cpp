@@ -41,6 +41,9 @@ protected:
                       std::istreambuf_iterator<char>(file2.rdbuf()));
   }
 
+  void SetUp() override {
+    config.set_is_need_dump(true);
+  }
   void TearDown() override {
     config.CloseInputFile();
     config.CloseOutputFile();
@@ -308,6 +311,9 @@ protected:
                       std::istreambuf_iterator<char>(file2.rdbuf()));
   }
 
+  void SetUp() override {
+    config.set_is_need_dump(true);
+  }
   void TearDown() override {
     config.CloseInputFile();
     config.CloseOutputFile();
@@ -455,6 +461,9 @@ protected:
                       std::istreambuf_iterator<char>(file2.rdbuf()));
   }
 
+  void SetUp() override {
+    config.set_is_need_dump(true);
+  }
   void TearDown() override {
     config.CloseInputFile();
     config.CloseOutputFile();
