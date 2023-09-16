@@ -4,20 +4,20 @@
 
 void SyntaxAnalyzer::ValidateNotEmpty() const {
   if (tokens_array_.empty()) {
-    LOG(ERROR, "expected that tokens' array is not empty");
+    LOG_OLD(ERROR, "expected that tokens' array is not empty");
     end(EXIT_FAILURE);
   }
 }
 void SyntaxAnalyzer::ValidateIsWord(std::shared_ptr<Node>& node) const {
   if (node->get_type() != DataType::WORD) {
-    LOG(ERROR, "expected word in line " << node->get_line());
+    LOG_OLD(ERROR, "expected word in line " << node->get_line());
     end(EXIT_FAILURE);
   }
 }
 void SyntaxAnalyzer::ValidateIsOpeningRoundBracket(
     std::shared_ptr<Node>& node) const {
   if (!SyntaxAnalyzer::IsOpeningRoundBracket(node)) {
-    LOG(ERROR, "expected an opening round bracket in line "
+    LOG_OLD(ERROR, "expected an opening round bracket in line "
         << node->get_line());
     end(EXIT_FAILURE);
   }
@@ -25,20 +25,20 @@ void SyntaxAnalyzer::ValidateIsOpeningRoundBracket(
 void SyntaxAnalyzer::ValidateIsClosingRoundBracket(
     std::shared_ptr<Node>& node) const {
   if (!SyntaxAnalyzer::IsClosingRoundBracket(node)) {
-    LOG(ERROR, "expected a closing round bracket in line "
+    LOG_OLD(ERROR, "expected a closing round bracket in line "
         << node->get_line());
     end(EXIT_FAILURE);
   }
 }
 void SyntaxAnalyzer::ValidateIsSingleQuote(std::shared_ptr<Node>& node) const {
   if (!SyntaxAnalyzer::IsSingleQuote(node)) {
-    LOG(ERROR, "expected a single quote in line " << node->get_line());
+    LOG_OLD(ERROR, "expected a single quote in line " << node->get_line());
     end(EXIT_FAILURE);
   }
 }
 void SyntaxAnalyzer::ValidateIsDoubleQuote(std::shared_ptr<Node>& node) const {
   if (!SyntaxAnalyzer::IsSingleQuote(node)) {
-    LOG(ERROR, "expected a double quote in line " << node->get_line());
+    LOG_OLD(ERROR, "expected a double quote in line " << node->get_line());
     end(EXIT_FAILURE);
   }
 }

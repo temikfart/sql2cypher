@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#define LOG(level, msg) do {                                    \
+#define LOG_OLD(level, msg) do {                                    \
   std::string path = __FILE__;                                  \
   std::ostringstream new_log;                                   \
   new_log << path.substr(path.find_last_of('/') + 1)            \

@@ -1,9 +1,9 @@
 #include "SCC/main.h"
 
 int main(int argc, char* argv[]) {
-  LOG(INFO, "Starting system...");
+  LOG_OLD(INFO, "Starting system...");
   config.Start(argc, argv);
-  LOG(INFO, "System started");
+  LOG_OLD(INFO, "System started");
 
   Tokenizer tokenizer;
   tokenizer.Tokenize();
