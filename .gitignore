@@ -41,3 +41,6 @@ resources/tree_dump/*.png
 
 # CMake
 cmake-build-debug
+
+# MacOS system
+.DS_Store
