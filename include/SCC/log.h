@@ -19,8 +19,7 @@
     << ": " << __FUNCTION__ << "(): " << __LINE__ << ": "       \
     << msg << std::endl;                                        \
   SCC_log.AddLog(level, new_log.str());                         \
-  break;                                                        \
-} while(true)
+} while(false)
 
 #ifdef DEBIAN_PACKAGE
 #define SCC_LOG_DIR "/var/log/SCC_log/"
