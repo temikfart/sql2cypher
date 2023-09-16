@@ -124,7 +124,7 @@ if (APPLE)
                 MACOSX_BUNDLE_BUNDLE_VERSION "${PRJ_VERSION}"
                 MACOSX_BUNDLE_SHORT_VERSION_STRING "${PRJ_VERSION}"
                 )
-    elseif ()
+    else ()
         add_executable(${PRJ_TARGET} ${SOURCE_LIST})
     endif ()
 
