@@ -100,17 +100,17 @@ LogLevel Log::StringToLogLevel(std::string level) const {
   return str2lvl_.at(level);
 }
 bool Log::CloseLogFile() {
-  LOG(TRACE, "closing output file...");
+  LOG_OLD(TRACE, "closing output file...");
   if (output_.is_open()) {
     output_.close();
     if (output_.good()) {
-      LOG(TRACE, "output file closed successfully");
+      LOG_OLD(TRACE, "output file closed successfully");
     } else {
-      LOG(ERROR, "output file close error");
+      LOG_OLD(ERROR, "output file close error");
       return false;
     }
   } else {
-    LOG(TRACE, "output file is already closed");
+    LOG_OLD(TRACE, "output file is already closed");
   }
   return true;
 }
@@ -145,10 +145,10 @@ void Log::ValidateLogLevel(LogLevel level) {
 }
 void Log::ValidateLogLevel(std::string& level) const {
   if (str2lvl_.count(level) == 0) {
-    LOG(ERROR, "incorrect SCC log level: " + level);
+    LOG_OLD(ERROR, "incorrect SCC log level: " + level);
     exit(EXIT_FAILURE);
   }
-  LOG(DEBUG, "log level is valid");
+  LOG_OLD(DEBUG, "log level is valid");
 }
 void Log::ValidateDoesFileExist(const std::string& path) const {
   if (!(this->IsFileExists(path))) {
