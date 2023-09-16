@@ -1,6 +1,8 @@
 #include "SCC/main.h"
 
 int main(int argc, char* argv[]) {
+  logger::init(logger::debug, logger::cout);
+
   LOG_OLD(INFO, "Starting system...");
   config.Start(argc, argv);
   LOG_OLD(INFO, "System started");
