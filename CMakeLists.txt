@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 
 ########################### COMPILER'S CONFIGURATION ###########################
 
@@ -104,6 +104,14 @@ set(SOURCE_LIST src/main.cpp
             src/query_assembler_dml.cpp
             src/query_assembler_other.cpp
             src/tree_dump.cpp)
+
+include(FetchContent)
+FetchContent_Declare(
+        logger
+        GIT_REPOSITORY https://github.com/temikfart/logger.git
+        GIT_TAG main
+)
+FetchContent_MakeAvailable(logger)
 
 # Set information about an application
 set(PRJ_SHORT_DESCRIPTION "SQL to CypherQL Converter")
@@ -213,6 +221,8 @@ elseif (UNIX)
         include(CPack)
     endif()
 endif ()
+
+target_link_libraries(${PRJ_TARGET} PRIVATE liblogger)
 
 
 ################################ ENABLE TESTING ################################
