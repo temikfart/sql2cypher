@@ -2,7 +2,7 @@
 
 void QueryAssembler::TranslateDMLStatement(std::shared_ptr<Node> node) {
   if (node->get_children_amount() == 0) {
-    LOG_OLD(TRACE, "empty DML query");
+    LOGT << "empty DML query";
   }
 
   auto statement = node->get_child(0);
@@ -17,26 +17,26 @@ void QueryAssembler::TranslateDMLStatement(std::shared_ptr<Node> node) {
       this->TranslateUpdate(statement);
       break;
     default:
-      LOG_OLD(ERROR, "unknown DML statement");
+      LOGE << "unknown DML statement";
       end(EXIT_FAILURE);
   }
 }
 
 void QueryAssembler::TranslateInsert(std::shared_ptr<Node> node) {
   if (node->get_children_amount() == 0) {
-    LOG_OLD(ERROR, "insert statement without body");
+    LOGE << "insert statement without body";
     end(EXIT_FAILURE);
   }
 }
 void QueryAssembler::TranslateDelete(std::shared_ptr<Node> node) {
   if (node->get_children_amount() == 0) {
-    LOG_OLD(ERROR, "delete statement without body");
+    LOGE << "delete statement without body";
     end(EXIT_FAILURE);
   }
 }
 void QueryAssembler::TranslateUpdate(std::shared_ptr<Node> node) {
   if (node->get_children_amount() == 0) {
-    LOG_OLD(ERROR, "update statement without body");
+    LOGE << "update statement without body";
     end(EXIT_FAILURE);
   }
 }

@@ -15,6 +15,8 @@
 
 #include "SCC/config.h"
 
+#include "logger/log.hpp"
+
 /**
  * \brief Set of SQL statement types for the AST
  *

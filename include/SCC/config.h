@@ -14,6 +14,8 @@
 
 #include "SCC/log.h"
 
+#include "logger/log.hpp"
+
 #ifdef SCC_MAINTAINERS
 #define DEVELOPERS SCC_MAINTAINERS
 #else

@@ -12,8 +12,8 @@ StatementType SyntaxAnalyzer::GetDDLStType() {
 
   // Get second token
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "invalid DDL query in line "
-        << line << ": second key word is missed");
+    LOGE << "invalid DDL query in line "
+        << line << ": second key word is missed";
     end(EXIT_FAILURE);
   }
   line = this->peek_first_token()->get_line();
@@ -24,7 +24,7 @@ StatementType SyntaxAnalyzer::GetDDLStType() {
   this->pop_first_token();
 
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "body of the DDL statement is missed in line " << line);
+    LOGE << "body of the DDL statement is missed in line " << line;
     end(EXIT_FAILURE);
   }
 
@@ -41,20 +41,20 @@ StatementType SyntaxAnalyzer::GetDDLStType() {
     if (is_DATABASE) { DDLStType = StatementType::createDatabaseStatement; }
     else if (is_TABLE) { DDLStType = StatementType::createTableStatement; }
     else {
-      LOG_OLD(ERROR, "unknown CREATE DDL statement in line " << line);
+      LOGE << "unknown CREATE DDL statement in line " << line;
       end(EXIT_FAILURE);
     }
   } else if (is_ALTER) {
     if (is_TABLE) { DDLStType = StatementType::alterTableStatement; }
     else {
-      LOG_OLD(ERROR, "unknown ALTER DDL statement in line " << line);
+      LOGE << "unknown ALTER DDL statement in line " << line;
       end(EXIT_FAILURE);
     }
   } else if (is_DROP) {
     if (is_DATABASE) { DDLStType = StatementType::dropDatabaseStatement; }
     else if (is_TABLE) { DDLStType = StatementType::dropTableStatement; }
     else {
-      LOG_OLD(ERROR, "unknown DROP DDL statement in line " << line);
+      LOGE << "unknown DROP DDL statement in line " << line;
       end(EXIT_FAILURE);
     }
   }
@@ -62,7 +62,7 @@ StatementType SyntaxAnalyzer::GetDDLStType() {
   return DDLStType;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetDDLSt() {
-  LOG_OLD(TRACE, "getting DDL statement...");
+  LOGT << "getting DDL statement...";
   std::shared_ptr<Node> node, statement;
   node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::ddlStatement);
@@ -71,26 +71,26 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDDLSt() {
   switch (this->GetDDLStType()) {
     case StatementType::createDatabaseStatement:
       statement = this->GetCreateDatabaseSt();
-      LOG_OLD(TRACE, "got CREATE DATABASE statement");
+      LOGT << "got CREATE DATABASE statement";
       break;
     case StatementType::createTableStatement:
       statement = this->GetCreateTableSt();
-      LOG_OLD(TRACE, "got CREATE TABLE statement");
+      LOGT << "got CREATE TABLE statement";
       break;
     case StatementType::alterTableStatement:
       statement = this->GetAlterTableSt();
-      LOG_OLD(TRACE, "got ALTER TABLE statement");
+      LOGT << "got ALTER TABLE statement";
       break;
     case StatementType::dropDatabaseStatement:
       statement = this->GetDropDatabaseSt();
-      LOG_OLD(TRACE, "got DROP DATABASE statement");
+      LOGT << "got DROP DATABASE statement";
       break;
     case StatementType::dropTableStatement:
       statement = this->GetDropTableSt();
-      LOG_OLD(TRACE, "got DROP TABLE statement");
+      LOGT << "got DROP TABLE statement";
       break;
     default:
-      LOG_OLD(ERROR, "unknown DDL statement near line " << line);
+      LOGE << "unknown DDL statement near line " << line;
       end(EXIT_FAILURE);
   }
   SyntaxAnalyzer::MakeKinship(node, statement);
@@ -106,7 +106,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetCreateDatabaseSt() {
   node->set_st_type(StatementType::createDatabaseStatement);
 
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "database name is missed");
+    LOGE << "database name is missed";
   }
   this->ValidateIsWord(this->peek_first_token());
   database_name = this->GetName();
@@ -121,7 +121,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetCreateTableSt() {
 
   // Get tableName
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "tableName is missed");
+    LOGE << "tableName is missed";
     return node;
   }
   int line = this->peek_first_token()->get_line();
@@ -130,7 +130,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetCreateTableSt() {
   SyntaxAnalyzer::MakeKinship(node, table_name);
 
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "expected opening round bracket in line " << line);
+    LOGE << "expected opening round bracket in line " << line;
     end(EXIT_FAILURE);
   }
   line = this->peek_first_token()->get_line();
@@ -138,7 +138,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetCreateTableSt() {
   this->pop_first_token();
 
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "expected table definition in line " << line);
+    LOGE << "expected table definition in line " << line;
     end(EXIT_FAILURE);
   }
   line = this->peek_first_token()->get_line();
@@ -147,7 +147,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetCreateTableSt() {
   SyntaxAnalyzer::MakeKinship(node, table_definition);
 
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "expected closing round bracket in line " << line);
+    LOGE << "expected closing round bracket in line " << line;
   }
   this->ValidateIsClosingRoundBracket(this->peek_first_token());
   this->pop_first_token();
@@ -166,8 +166,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetAlterTableSt() {
 
   // Get action (ADD | DROP)
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "invalid alter table query in line "
-        << line << ": expected action");
+    LOGE << "invalid alter table query in line "
+        << line << ": expected action";
     end(EXIT_FAILURE);
   }
   line = this->peek_first_token()->get_line();
@@ -178,8 +178,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetAlterTableSt() {
       std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
 
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "invalid alter table query: "
-               "expected action's body in line " << line);
+    LOGE << "invalid alter table query: "
+               "expected action's body in line " << line;
     end(EXIT_FAILURE);
   }
   line = this->peek_first_token()->get_line();
@@ -193,8 +193,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetAlterTableSt() {
     action->set_st_type(StatementType::alterActionDROP);
     argument = this->GetDropListDefinition();
   } else {
-    LOG_OLD(ERROR, "invalid alter table query: incorrect action \'"
-        << action_str << "\' in line " << line);
+    LOGE << "invalid alter table query: incorrect action \'"
+        << action_str << "\' in line " << line;
     end(EXIT_FAILURE);
   }
   SyntaxAnalyzer::MakeKinship(node, action);
@@ -209,7 +209,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDropDatabaseSt() {
 
   // First database_name
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "databaseName is missed");
+    LOGE << "databaseName is missed";
   }
   this->ValidateIsWord(this->peek_first_token());
   database_name = this->GetName();
@@ -230,7 +230,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDropTableSt() {
 
   // First tableName
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "table name is missed");
+    LOGE << "table name is missed";
   }
   this->ValidateIsWord(peek_first_token());
   table_name = this->GetName();
@@ -296,7 +296,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetColumnDefinition() {
 
   // Get datatype
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "expected column datatype in line " << line);
+    LOGE << "expected column datatype in line " << line;
     end(EXIT_FAILURE);
   }
   this->ValidateIsWord(this->peek_first_token());
@@ -330,7 +330,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableConstraint() {
     SyntaxAnalyzer::MakeKinship(table_constraint, constraint_kw);
 
     if (tokens_array_.empty()) {
-      LOG_OLD(ERROR, "expected constraint name in line " << line);
+      LOGE << "expected constraint name in line " << line;
       end(EXIT_FAILURE);
     }
     constraint_name = this->GetIdentifier();
@@ -339,7 +339,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableConstraint() {
 
   // Get PRIMARY | FOREIGN KEY
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "expected constraint in line " << line);
+    LOGE << "expected constraint in line " << line;
     end(EXIT_FAILURE);
   }
 
@@ -352,8 +352,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableConstraint() {
 
   // Get 'KEY' key word
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "invalid constraint definition: "
-               "expected \'KEY\' in line " << line);
+    LOGE << "invalid constraint definition: "
+               "expected \'KEY\' in line " << line;
     end(EXIT_FAILURE);
   }
   line = this->peek_first_token()->get_line();
@@ -362,14 +362,14 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableConstraint() {
       std::dynamic_pointer_cast<StringNode>(
           this->get_first_token())->get_data();
   if (KEY_kw != "KEY") {
-    LOG_OLD(ERROR, "expected \'KEY\', got \'"
-        << KEY_kw << "\' in line " << line);
+    LOGE << "expected \'KEY\', got \'"
+        << KEY_kw << "\' in line " << line;
     end(EXIT_FAILURE);
   }
 
   // Get key definition
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "expected constraint definition in line " << line);
+    LOGE << "expected constraint definition in line " << line;
     end(EXIT_FAILURE);
   }
   line = this->peek_first_token()->get_line();
@@ -378,8 +378,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableConstraint() {
   } else if (kind_of_key == "FOREIGN") {
     key = this->GetForeignKey();
   } else {
-    LOG_OLD(ERROR, "unknown kind of constraint in line "
-        << line << ": " << kind_of_key);
+    LOGE << "unknown kind of constraint in line "
+        << line << ": " << kind_of_key;
     end(EXIT_FAILURE);
   }
   SyntaxAnalyzer::MakeKinship(table_constraint, key);
@@ -438,16 +438,16 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDropObject() {
   bool is_column = key_word == "COLUMN";
 
   if (!(is_tableConstraint || is_column)) {
-    LOG_OLD(ERROR, "invalid drop list: incorrect key word \'"
-        << key_word << "\' in line " << line);
+    LOGE << "invalid drop list: incorrect key word \'"
+        << key_word << "\' in line " << line;
     end(EXIT_FAILURE);
   }
 
   line = this->peek_first_token()->get_line();
   object = this->get_first_token();
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "invalid drop list: expected "
-        << (is_column ? "constraint" : "column_name") << " in line " << line);
+    LOGE << "invalid drop list: expected "
+        << (is_column ? "constraint" : "column_name") << " in line " << line;
     end(EXIT_FAILURE);
   }
 
@@ -458,7 +458,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDropObject() {
   }
 
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "invalid drop list: expected identifier in line " << line);
+    LOGE << "invalid drop list: expected identifier in line " << line;
     end(EXIT_FAILURE);
   }
   argument = this->GetIdentifier();

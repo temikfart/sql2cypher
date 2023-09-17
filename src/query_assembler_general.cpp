@@ -1,12 +1,12 @@
 #include "SCC/query_assembler.h"
 
 void QueryAssembler::Translate(std::shared_ptr<Node> AST) {
-  LOG_OLD(INFO, "starting translation...");
+  LOGI << "starting translation...";
 
   ast_ = std::move(AST);
 
   if (ast_ == nullptr) {
-    LOG_OLD(INFO, "translation is ended: nothing to translate");
+    LOGI << "translation is ended: nothing to translate";
     return;
   }
 
@@ -14,16 +14,16 @@ void QueryAssembler::Translate(std::shared_ptr<Node> AST) {
     if (ast_->get_children_amount() > 0) {
       this->TranslateProgram(ast_);
     } else {
-      LOG_OLD(INFO, "translation is ended: only one node in AST");
+      LOGI << "translation is ended: only one node in AST";
       return;
     }
   } else {
-    LOG_OLD(ERROR,
-        "invalid AST: root should be with \'Program\' statement type");
+    LOGE <<
+        "invalid AST: root should be with \'Program\' statement type";
     end(EXIT_FAILURE);
   }
 
-  LOG_OLD(INFO, "translation is ended");
+  LOGI << "translation is ended";
 }
 
 void QueryAssembler::TranslateProgram(std::shared_ptr<Node> node) {
@@ -31,7 +31,7 @@ void QueryAssembler::TranslateProgram(std::shared_ptr<Node> node) {
   if (query->get_st_type() == StatementType::query) {
     this->TranslateQuery(query);
   } else {
-    LOG_OLD(ERROR, "first child is not a query");
+    LOGE << "first child is not a query";
     end(EXIT_FAILURE);
   }
 
@@ -42,14 +42,14 @@ void QueryAssembler::TranslateProgram(std::shared_ptr<Node> node) {
         this->TranslateProgram(other_queries);
       }
     } else {
-      LOG_OLD(ERROR, "invalid delimiter between queries");
+      LOGE << "invalid delimiter between queries";
       end(EXIT_FAILURE);
     }
   }
 }
 void QueryAssembler::TranslateQuery(std::shared_ptr<Node> node) {
   if (node->get_children_amount() == 0) {
-    LOG_OLD(TRACE, "empty query");
+    LOGT << "empty query";
     return;
   }
 
@@ -62,7 +62,7 @@ void QueryAssembler::TranslateQuery(std::shared_ptr<Node> node) {
       this->TranslateDMLStatement(data_language);
       break;
     default:
-      LOG_OLD(ERROR, "unknown query data language");
+      LOGE << "unknown query data language";
       end(EXIT_FAILURE);
   }
 }

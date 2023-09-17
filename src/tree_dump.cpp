@@ -1,26 +1,26 @@
 #include "SCC/tree_dump.h"
 
 void TreeDump::DumpTree(const std::shared_ptr<Node>& AST) {
-  LOG_OLD(INFO, "creating tree dump of the AST");
+  LOGI << "creating tree dump of the AST";
   if (AST == nullptr) {
-    LOG_OLD(INFO, "creation is ended: AST is empty");
+    LOGI << "creation is ended: AST is empty";
     return;
   }
 
   dot_file_ << "digraph Dump\n"
             << "{\n";
   this->PrintDumpInfo();
-  LOG_OLD(INFO, "recursive AST pass and dump creation...");
+  LOGI << "recursive AST pass and dump creation...";
   this->RecursiveTreeDump(AST, -1);
   dot_file_ << "\n}";
-  LOG_OLD(INFO, "dump is created");
+  LOGI << "dump is created";
 
   config.CloseTreeDumpFile();
   this->MakeDumpPng();
-  LOG_OLD(INFO, "graphviz dot file is written and image is created");
+  LOGI << "graphviz dot file is written and image is created";
 }
 void TreeDump::PrintDumpInfo() {
-  LOG_OLD(INFO, "printing dump info to the dot file");
+  LOGI << "printing dump info to the dot file";
   dot_file_ << "\tsubgraph info {\n"
             << "\t\tedge [color = white];\n"
             << "\t\tnode [color = black, shape = record];\n"
@@ -51,7 +51,7 @@ void TreeDump::PrintDumpInfo() {
             << "\t\tlabel = \"graph info\";\n"
             << "\t\tcolor = black;\n"
             << "\t}\n";
-  LOG_OLD(INFO, "dump info is printed");
+  LOGI << "dump info is printed";
 }
 void TreeDump::RecursiveTreeDump(const std::shared_ptr<Node>& node,
                                  int parent_node_num) {
@@ -141,7 +141,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<Node>& node,
                    "fontcolor = black];\n";
       break;
     default:
-      LOG_OLD(ERROR, "wrong node type");
+      LOGE << "wrong node type";
       end(EXIT_FAILURE);
   }
 
@@ -155,21 +155,21 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<Node>& node,
 }
 
 void TreeDump::MakeDumpPng() {
-  LOG_OLD(INFO, "invoking dot command for creation the image...");
+  LOGI << "invoking dot command for creation the image...";
   std::string png_file_path =
       dot_file_path_.substr(0, dot_file_path_.find_last_of('.')) + ".png";
   std::ostringstream txt_to_png;
   txt_to_png << "dot \"" << dot_file_path_ << "\" -T png -o \""
              << png_file_path << "\"";
 
-  LOG_OLD(TRACE, "executing: " << txt_to_png.str());
+  LOGT << "executing: " << txt_to_png.str();
 
   int wait_status = std::system(txt_to_png.str().c_str());
   if (wait_status) {
-    LOG_OLD(ERROR, "execution ended with error, wait status is " << wait_status);
+    LOGE << "execution ended with error, wait status is " << wait_status;
   } else {
-    LOG_OLD(INFO, "the image with tree dump "
-              "was created at \'" << png_file_path << "\'");
+    LOGI << "the image with tree dump "
+              "was created at \'" << png_file_path << "\'";
   }
 }
 
@@ -271,7 +271,7 @@ std::string TreeDump::GetServiceNodeData(StatementType statement_type) {
       return "SQL_varchar";
 
     default:
-      LOG_OLD(ERROR, "unknown statement type");
+      LOGE << "unknown statement type";
       end(EXIT_FAILURE);
       return "";
   }

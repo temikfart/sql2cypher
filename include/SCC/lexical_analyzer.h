@@ -7,6 +7,8 @@
 #include "SCC/config.h"
 #include "SCC/log.h"
 
+#include "logger/log.hpp"
+
 class Tokenizer {
 public:
   void Tokenize();
