@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 
+#include "logger/log.hpp"
+
 #define LOG_OLD(level, msg) do {                                    \
   std::string path = __FILE__;                                  \
   std::ostringstream new_log;                                   \

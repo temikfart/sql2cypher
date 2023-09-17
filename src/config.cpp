@@ -3,34 +3,34 @@
 Config config;
 
 void end(int exit_code) {
-  LOG_OLD(TRACE, "end-function is invoked");
-  LOG_OLD(TRACE, "closing files...");
+  LOGT << "end-function is invoked";
+  LOGT << "closing files...";
 
   bool is_all_files_closed = true;
   if (!config.CloseInputFile()) {
-    LOG_OLD(ERROR, "closing input file error");
+    LOGE << "closing input file error";
     is_all_files_closed = false;
   }
   if (!config.CloseOutputFile()) {
-    LOG_OLD(ERROR, "closing output file error");
+    LOGE << "closing output file error";
     is_all_files_closed = false;
   }
   if (!config.CloseTreeDumpFile()) {
-    LOG_OLD(ERROR, "closing tree dump file error");
+    LOGE << "closing tree dump file error";
     is_all_files_closed = false;
   }
   if (is_all_files_closed) {
-    LOG_OLD(TRACE, "all I/O files are closed");
+    LOGT << "all I/O files are closed";
   } else {
-    LOG_OLD(ERROR, "some files was not closed");
+    LOGE << "some files was not closed";
     exit_code = EXIT_FAILURE;
   }
 
-  LogLevel ec_lvl = INFO;
+  logger::Severity ec_lvl = logger::info;
   if (exit_code != 0) {
-    ec_lvl = ERROR;
+    ec_lvl = logger::error;
   }
-  LOG_OLD(ec_lvl, "System ended with exit code " << exit_code);
+  LOG(ec_lvl) << "System ended with exit code " << exit_code;
   // TODO: remove "ifndef", when logs will be repaired on WIN
 #ifndef EXE_PACKAGE
   if (!config.get_is_silent_print() && !SCC_log.get_is_buffer_load()) {
@@ -90,7 +90,7 @@ std::string Config::get_tree_dump_path() const {
 }
 
 void Config::Start(int argc, char* argv[]) {
-  LOG_OLD(INFO, "configuring system...");
+  LOGI << "configuring system...";
 
   if (argc > 1) {
     config.GetConsoleArguments(argc, argv);
@@ -104,20 +104,20 @@ void Config::Start(int argc, char* argv[]) {
 
 #ifdef CREATE_PACKAGE
   if (!this->IsFlagSet(OptFlag::kSQLFlag)) {
-    LOG_OLD(ERROR, "expected path to input SQL queries "
-               "(the file must exist)");
+    LOGE << "expected path to input SQL queries "
+               "(the file must exist)";
     SCC_log.LoadBufferedLogs();
     end(EXIT_FAILURE);
   }
   if (!this->IsFlagSet(OptFlag::kCypherFlag)) {
-    LOG_OLD(ERROR, "expected path to output CypherQL file "
-               "(the file will be created, if not exists)");
+    LOGE << "expected path to output CypherQL file "
+               "(the file will be created, if not exists)";
     SCC_log.LoadBufferedLogs();
     end(EXIT_FAILURE);
   }
 #endif // CREATE_PACKAGE
 
-  LOG_OLD(TRACE, "opening i/o files...");
+  LOGT << "opening i/o files...";
 
   input_.open(sql_path_, std::ios::in);
   this->ValidateIsInputStreamOpen();
@@ -132,7 +132,7 @@ void Config::Start(int argc, char* argv[]) {
     this->ValidateIsTreeDumpStreamOpen();
   }
 
-  LOG_OLD(TRACE, "all i/o files are opened");
+  LOGT << "all i/o files are opened";
 
   SCC_log.set_is_system_configured(true);
   if (log_dir_.empty()) {
@@ -144,15 +144,15 @@ void Config::Start(int argc, char* argv[]) {
   SCC_log.Start();
 
   if (config.get_mode() == SCCMode::kDaemon) {
-    LOG_OLD(TRACE, "daemon mode cannot be activated "
-               "(not implemented, for now)");
+    LOGT << "daemon mode cannot be activated "
+               "(not implemented, for now)";
     // TODO: implement SCC mode=daemon behavior.
   }
 
-  LOG_OLD(INFO, "configuration is completed");
+  LOGI << "configuration is completed";
 }
 void Config::GetConsoleArguments(int argc, char* const* argv) {
-  LOG_OLD(TRACE, "parsing console arguments...");
+  LOGT << "parsing console arguments...";
 
   int flag;
   opterr = 0;
@@ -221,16 +221,16 @@ void Config::GetConsoleArguments(int argc, char* const* argv) {
 //        auto arg = argv[optind - 1];
 //        if (has_argument.count(arg[1]) != 0
 //            && has_argument.at(arg[1]) == 1) {
-//          LOG_OLD(ERROR, "flag \'-" << (char)(arg[1]) << "\' "
-//                                                     "required an argument");
+//          LOGE << "flag \'-" << (char)(arg[1]) << "\' "
+//                                                     "required an argument";
 //        } else {
-//          LOG_OLD(ERROR, "invalid flag \'-" << (char)(arg[1]) << "\'");
+//          LOGE << "invalid flag \'-" << (char)(arg[1]) << "\'";
 //        }
-        LOG_OLD(ERROR, "invalid flag, see help");
+        LOGE << "invalid flag, see help";
         end(EXIT_FAILURE);
     }
   }
-  LOG_OLD(DEBUG, "all console arguments are parsed");
+  LOGD << "all console arguments are parsed";
 }
 
 std::string Config::GetConfigPath() {
@@ -261,47 +261,47 @@ std::ofstream& Config::WriteTreeDump() {
   return tree_dump_;
 }
 bool Config::CloseInputFile() {
-  LOG_OLD(TRACE, "closing input file...");
+  LOGT << "closing input file...";
   if (input_.is_open()) {
     input_.close();
     if (input_.good() || input_.eof()) {
-      LOG_OLD(TRACE, "input file closed successfully");
+      LOGT << "input file closed successfully";
     } else {
-      LOG_OLD(ERROR, "input file close error");
+      LOGE << "input file close error";
       return false;
     }
   } else {
-    LOG_OLD(TRACE, "input file is already closed");
+    LOGT << "input file is already closed";
   }
   return true;
 }
 bool Config::CloseOutputFile() {
-  LOG_OLD(TRACE, "closing output file...");
+  LOGT << "closing output file...";
   if (output_.is_open()) {
     output_.close();
     if (output_.good()) {
-      LOG_OLD(TRACE, "output file closed successfully");
+      LOGT << "output file closed successfully";
     } else {
-      LOG_OLD(ERROR, "output file close error");
+      LOGE << "output file close error";
       return false;
     }
   } else {
-    LOG_OLD(TRACE, "output file is already closed");
+    LOGT << "output file is already closed";
   }
   return true;
 }
 bool Config::CloseTreeDumpFile() {
-  LOG_OLD(TRACE, "closing tree dump file...");
+  LOGT << "closing tree dump file...";
   if (tree_dump_.is_open()) {
     tree_dump_.close();
     if (tree_dump_.good()) {
-      LOG_OLD(TRACE, "dot tree dump file closed successfully");
+      LOGT << "dot tree dump file closed successfully";
     } else {
-      LOG_OLD(ERROR, "dot dump file close error");
+      LOGE << "dot dump file close error";
       return false;
     }
   } else {
-    LOG_OLD(TRACE, "dot tree dump file is already closed");
+    LOGT << "dot tree dump file is already closed";
   }
   return true;
 }
@@ -377,7 +377,7 @@ void Config::PrintHelp() {
   end(EXIT_SUCCESS);
 }
 void Config::PrintVersion() {
-  LOG_OLD(INFO, "printing version of the SCC...");
+  LOGI << "printing version of the SCC...";
 
   std::cout << std::left;
   std::cout << "<===| SCC (The SQL to CypherQL Converter) |===>\n";
@@ -390,54 +390,54 @@ void Config::PrintVersion() {
 }
 void Config::SetOptFlagDaemon(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
-  LOG_OLD(TRACE, "set SCC mode=DAEMON");
+  LOGT << "set SCC mode=DAEMON";
   this->set_mode(SCCMode::kDaemon);
   this->SetFlag(flag);
 }
 void Config::SetOptFlagInteractive(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
-  LOG_OLD(TRACE, "set SCC mode=INTERACTIVE");
+  LOGT << "set SCC mode=INTERACTIVE";
   this->set_mode(SCCMode::kInteractive);
   this->SetFlag(flag);
 }
 void Config::SetOptFlagLogLvl(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
-  LOG_OLD(TRACE, "set LogLevel=" << optarg);
+  LOGT << "set LogLevel=" << optarg;
   std::string tmp_log_level = optarg;
   SCC_log.set_log_level(SCC_log.StringToLogLevel(tmp_log_level));
   this->SetFlag(flag);
 }
 void Config::SetOptFlagLogDir(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
-  LOG_OLD(TRACE, "set path to log directory as \'" << optarg << "\'");
+  LOGT << "set path to log directory as \'" << optarg << "\'";
   std::string dir = optarg;
   log_dir_ = dir;
   this->SetFlag(flag);
 }
 void Config::SetOptFlagMode(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
-  LOG_OLD(TRACE, "set SCC mode=" << optarg);
+  LOGT << "set SCC mode=" << optarg;
   std::string tmp_mode = optarg;
   this->set_mode(this->StringToSCCMode(tmp_mode));
   this->SetFlag(flag);
 }
 void Config::SetOptFlagSQL(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
-  LOG_OLD(TRACE, "set file with SQL queries as \'" << optarg << "\'");
+  LOGT << "set file with SQL queries as \'" << optarg << "\'";
   std::string path = optarg;
   this->set_sql_path(path);
   this->SetFlag(flag);
 }
 void Config::SetOptFlagCypher(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
-  LOG_OLD(TRACE, "set file with CypherQL queries as \'" << optarg << "\'");
+  LOGT << "set file with CypherQL queries as \'" << optarg << "\'";
   std::string tmp = optarg;
   this->set_cypher_path(tmp);
   this->SetFlag(flag);
 }
 void Config::SetOptFlagTreeDump(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
-  LOG_OLD(TRACE, "set Tree Dump path = " << optarg);
+  LOGT << "set Tree Dump path = " << optarg;
   std::string tmp = optarg;
   this->set_is_need_dump(true);
   this->set_tree_dump_path(tmp);
@@ -446,55 +446,55 @@ void Config::SetOptFlagTreeDump(OptFlag flag) {
 
 void Config::ValidateMode(SCCMode mode) const {
   if (SCCMode::kSCCModeCount <= mode) {
-    LOG_OLD(ERROR, "incorrect SCC mode: " << mode);
+    LOGE << "incorrect SCC mode: " << mode;
     end(EXIT_FAILURE);
   }
 }
 void Config::ValidateMode(const std::string& mode) const {
   if (str2modes_.count(mode) == 0) {
-    LOG_OLD(ERROR, "invalid SCC mode: " << mode);
+    LOGE << "invalid SCC mode: " << mode;
     end(EXIT_FAILURE);
   }
 }
 void Config::ValidateSQLPath(const std::string& sql_path) const {
   if (!(this->IsFileExists(sql_path))) {
-    LOG_OLD(ERROR, "file with SQL queries does not exist: " << sql_path);
+    LOGE << "file with SQL queries does not exist: " << sql_path;
     end(EXIT_FAILURE);
   }
 }
 void Config::ValidateCypherPath() const {
   if (!(this->IsFileExists(cypher_path_))) {
-    LOG_OLD(ERROR, "file with CypherQL queries does not exist: " << cypher_path_);
+    LOGE << "file with CypherQL queries does not exist: " << cypher_path_;
     end(EXIT_FAILURE);
   }
 }
 void Config::ValidateTreeDumpPath() const {
   if (!(this->IsFileExists(tree_dump_path_))) {
-    LOG_OLD(ERROR, "Tree Dump file does not exist: " << tree_dump_path_);
+    LOGE << "Tree Dump file does not exist: " << tree_dump_path_;
     end(EXIT_FAILURE);
   }
 }
 void Config::ValidateIsInputStreamOpen() const {
   if (!input_.is_open()) {
-    LOG_OLD(ERROR, "input file stream is not opened");
+    LOGE << "input file stream is not opened";
     end(EXIT_FAILURE);
   }
 }
 void Config::ValidateIsOutputStreamOpen() const {
   if (!output_.is_open()) {
-    LOG_OLD(ERROR, "output file stream is not opened");
+    LOGE << "output file stream is not opened";
     end(EXIT_FAILURE);
   }
 }
 void Config::ValidateIsTreeDumpStreamOpen() const {
   if (!tree_dump_.is_open()) {
-    LOG_OLD(ERROR, "dump file stream is not opened");
+    LOGE << "dump file stream is not opened";
     end(EXIT_FAILURE);
   }
 }
 void Config::ValidateIsFlagSet(OptFlag flag) const {
   if (this->IsFlagSet(flag)) {
-    LOG_OLD(ERROR, "conflicting flags");
+    LOGE << "conflicting flags";
     end(EXIT_FAILURE);
   }
 }

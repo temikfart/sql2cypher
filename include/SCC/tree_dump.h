@@ -4,6 +4,8 @@
 
 #include "SCC/ast.h"
 
+#include "logger/log.hpp"
+
 class TreeDump {
 public:
   void DumpTree(const std::shared_ptr<Node>& AST);

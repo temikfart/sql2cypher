@@ -3,7 +3,7 @@
 //-------------------Tokenizer-------------------
 
 void Tokenizer::Tokenize() {
-  LOG_OLD(INFO, "tokenizing...");
+  LOGI << "tokenizing...";
 
   line_number_ = 1;
   while (true) {
@@ -25,13 +25,13 @@ void Tokenizer::Tokenize() {
     } else if (another_symbol == EOF || another_symbol == '\0') {
       break;
     } else {
-      LOG_OLD(ERROR, "Unknown symbol \'" << another_symbol
-                                     << "\' in line " << line_number_);
+      LOGE << "Unknown symbol \'" << another_symbol
+                                     << "\' in line " << line_number_;
       end(EXIT_FAILURE);
     }
   }
 
-  LOG_OLD(INFO, "lexical analysis is ended");
+  LOGI << "lexical analysis is ended";
 }
 
 std::shared_ptr<Node>& Tokenizer::peek_first_token() {
@@ -66,7 +66,7 @@ bool Tokenizer::IsCharacterFromArray(char ch, const std::string& array) {
 }
 
 void Tokenizer::PrintTokens() {
-  LOG_OLD(TRACE, "starting print tokens' array");
+  LOGT << "starting print tokens' array";
   for (const auto& token : tokens_array_) {
     std::cout << "data: ", token->PrintData(std::cout);
     std::cout << " | ";
@@ -74,11 +74,11 @@ void Tokenizer::PrintTokens() {
     std::cout << std::endl;
   }
   std::cout << std::endl;
-  LOG_OLD(TRACE, "token's array is printed");
+  LOGT << "token's array is printed";
 }
 
 void Tokenizer::GetNumber() {
-  LOG_OLD(TRACE, "getting a number...");
+  LOGT << "getting a number...";
 
   double data = 0.0;
   double power = 1.0;
@@ -90,7 +90,7 @@ void Tokenizer::GetNumber() {
     config.GetSQLSymbol();
   } else {
     tokens_array_.push_back(std::make_shared<IntNumNode>((int) data));
-    LOG_OLD(TRACE, "got the integer number");
+    LOGT << "got the integer number";
     return;
   }
 
@@ -103,10 +103,10 @@ void Tokenizer::GetNumber() {
   auto num_node = std::make_shared<FloatNumNode>(data);
   num_node->set_line(line_number_);
   tokens_array_.push_back(num_node);
-  LOG_OLD(TRACE, "got the float number");
+  LOGT << "got the float number";
 }
 void Tokenizer::GetWord() {
-  LOG_OLD(TRACE, "getting a word...");
+  LOGT << "getting a word...";
   std::ostringstream data;
 
   char another_symbol = config.PeekSQLSymbol();
@@ -119,10 +119,10 @@ void Tokenizer::GetWord() {
   auto word_node = std::make_shared<StringNode>(data.str(), DataType::WORD);
   word_node->set_line(line_number_);
   tokens_array_.push_back(word_node);
-  LOG_OLD(TRACE, "got the word");
+  LOGT << "got the word";
 }
 void Tokenizer::GetOperator() {
-  LOG_OLD(TRACE, "getting an operator...");
+  LOGT << "getting an operator...";
   std::ostringstream data;
 
   data << config.GetSQLSymbol();
@@ -132,12 +132,12 @@ void Tokenizer::GetOperator() {
   auto op_node = std::make_shared<StringNode>(data.str(), DataType::OPERATOR);
   op_node->set_line(line_number_);
   tokens_array_.push_back(op_node);
-  LOG_OLD(TRACE, "got the operator");
+  LOGT << "got the operator";
 }
 void Tokenizer::GetCharacter(DataType type) {
-  LOG_OLD(TRACE, "getting a character...");
+  LOGT << "getting a character...";
   auto char_node = std::make_shared<CharNode>(config.GetSQLSymbol(), type);
   char_node->set_line(line_number_);
   tokens_array_.push_back(char_node);
-  LOG_OLD(TRACE, "got the character");
+  LOGT << "got the character";
 }

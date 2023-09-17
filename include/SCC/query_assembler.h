@@ -11,6 +11,8 @@
 #include "SCC/log.h"
 #include "SCC/syntax_analyzer.h"
 
+#include "logger/log.hpp"
+
 // Column as property with standard data
 using StdProperty = std::tuple<std::string, std::string>;
 

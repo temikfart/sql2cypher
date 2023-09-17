@@ -11,7 +11,7 @@ StatementType SyntaxAnalyzer::GetDMLStType() {
   this->pop_first_token();
 
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "body of the DDL statement is missed in line " << line);
+    LOGE << "body of the DDL statement is missed in line " << line;
     end(EXIT_FAILURE);
   }
 
@@ -24,14 +24,14 @@ StatementType SyntaxAnalyzer::GetDMLStType() {
   else if (is_DELETE) { DMLStType = StatementType::deleteStatement; }
   else if (is_INSERT) { DMLStType = StatementType::insertStatement; }
   else {
-    LOG_OLD(ERROR, "unknown DML statement type in line " << line);
+    LOGE << "unknown DML statement type in line " << line;
     end(EXIT_FAILURE);
   }
 
   return DMLStType;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetDMLSt() {
-  LOG_OLD(TRACE, "getting DML statement...");
+  LOGT << "getting DML statement...";
   std::shared_ptr<Node> node, statement;
   node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::dmlStatement);
@@ -40,18 +40,18 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDMLSt() {
   switch (this->GetDMLStType()) {
     case StatementType::updateStatement:
       statement = this->GetUpdateSt();
-      LOG_OLD(TRACE, "got UPDATE statement");
+      LOGT << "got UPDATE statement";
       break;
     case StatementType::deleteStatement:
       statement = this->GetDeleteSt();
-      LOG_OLD(TRACE, "got DELETE statement");
+      LOGT << "got DELETE statement";
       break;
     case StatementType::insertStatement:
       statement = this->GetInsertSt();
-      LOG_OLD(TRACE, "got INSERT statement");
+      LOGT << "got INSERT statement";
       break;
     default:
-      LOG_OLD(ERROR, "unknown DML statement near line " << line);
+      LOGE << "unknown DML statement near line " << line;
       end(EXIT_FAILURE);
   }
   SyntaxAnalyzer::MakeKinship(node, statement);
@@ -114,8 +114,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetORCondition() {
       this->pop_first_token();
 
       if (tokens_array_.empty()) {
-        LOG_OLD(ERROR, "invalid OR-condition: expected AND-condition "
-                   "after the \'OR\' logical operator in line " << line);
+        LOGE << "invalid OR-condition: expected AND-condition "
+                   "after the \'OR\' logical operator in line " << line;
         end(EXIT_FAILURE);
       }
       next_AND_conditions = this->GetANDCondition();
@@ -143,8 +143,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetANDCondition() {
         this->pop_first_token();
 
         if (tokens_array_.empty()) {
-          LOG_OLD(ERROR, "invalid AND-condition: expected NOT-condition "
-                     "after the \\'AND\\' operator in line " << line);
+          LOGE << "invalid AND-condition: expected NOT-condition "
+                     "after the \\'AND\\' operator in line " << line;
           end(EXIT_FAILURE);
         }
         next_NOT_conditions = this->GetNOTCondition();
@@ -174,8 +174,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetNOTCondition() {
 
   // Get predicate
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "invalid NOT-condition: expected predicate in line "
-        << line);
+    LOGE << "invalid NOT-condition: expected predicate in line "
+        << line;
     end(EXIT_FAILURE);
   }
   predicate = this->GetPredicate();
@@ -193,8 +193,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetPredicate() {
   SyntaxAnalyzer::MakeKinship(node, lhs);
 
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "invalid predicate: expected "
-               "binary operator in line " << line);
+    LOGE << "invalid predicate: expected "
+               "binary operator in line " << line;
     end(EXIT_FAILURE);
   }
   if (SyntaxAnalyzer::IsBinaryOperator(this->peek_first_token())) {
@@ -203,14 +203,14 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetPredicate() {
 
     SyntaxAnalyzer::MakeKinship(node, bin_operator);
   } else {
-    LOG_OLD(ERROR, "invalid predicate in line "
-        << line << ": operator should be binary");
+    LOGE << "invalid predicate in line "
+        << line << ": operator should be binary";
     end(EXIT_FAILURE);
   }
 
   if (tokens_array_.empty()) {
-    LOG_OLD(ERROR, "invalid predicate: expected "
-               "right hand side expression in line " << line);
+    LOGE << "invalid predicate: expected "
+               "right hand side expression in line " << line;
     end(EXIT_FAILURE);
   }
   rhs = this->GetExpression();
@@ -252,9 +252,9 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetExpression() {
     SyntaxAnalyzer::MakeKinship(node, u_operator);
 
     if (tokens_array_.empty()) {
-      LOG_OLD(ERROR,
+      LOGE <<
           "invalid expression in line "
-              << line << ": an unary operator without an operand");
+              << line << ": an unary operator without an operand";
       end(EXIT_FAILURE);
     }
     expression = this->GetExpression();
@@ -267,16 +267,16 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetExpression() {
   if (SyntaxAnalyzer::IsOpeningRoundBracket(this->peek_first_token())) {
     this->pop_first_token();
     if (tokens_array_.empty()) {
-      LOG_OLD(ERROR, "invalid expression in line "
-          << line << ": bad bracket sequence \'(.\'");
+      LOGE << "invalid expression in line "
+          << line << ": bad bracket sequence \'(.\'";
       end(EXIT_FAILURE);
     }
     line = this->peek_first_token()->get_line();
     node = this->GetExpression();
 
     if (tokens_array_.empty()) {
-      LOG_OLD(ERROR, "invalid expression in line "
-          << line << ": bad bracket sequence \'(.\'");
+      LOGE << "invalid expression in line "
+          << line << ": bad bracket sequence \'(.\'";
       end(EXIT_FAILURE);
     }
     this->pop_first_token();
@@ -289,8 +289,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetExpression() {
       || SyntaxAnalyzer::IsDoubleQuote(this->peek_first_token())) {
     this->pop_first_token();
     if (tokens_array_.empty()) {
-      LOG_OLD(ERROR, "invalid expression in line "
-          << line << ": invalid string");
+      LOGE << "invalid expression in line "
+          << line << ": invalid string";
       end(EXIT_FAILURE);
     }
     std::shared_ptr<Node> str = this->GetString();
@@ -331,15 +331,15 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetMathSum() {
       std::string operator_str =
           std::dynamic_pointer_cast<StringNode>(op_node)->get_data();
       if (operator_str != "+" || operator_str != "-") {
-        LOG_OLD(ERROR, "invalid Math expression in line "
-            << line << ": wrong operator \'" << operator_str << "\'");
+        LOGE << "invalid Math expression in line "
+            << line << ": wrong operator \'" << operator_str << "\'";
         end(EXIT_FAILURE);
       }
 
       // Get next powers
       if (tokens_array_.empty()) {
-        LOG_OLD(ERROR, "invalid Math expression: expected second operand for "
-                   "the \'" << operator_str << "\' in line " << line);
+        LOGE << "invalid Math expression: expected second operand for "
+                   "the \'" << operator_str << "\' in line " << line;
         end(EXIT_FAILURE);
       }
       product_2 = this->GetMathProduct();
@@ -369,15 +369,15 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetMathProduct() {
       std::string operator_str =
           std::dynamic_pointer_cast<StringNode>(op_node)->get_data();
       if (operator_str != "*" || operator_str != "/") {
-        LOG_OLD(ERROR, "invalid Math expression in line "
-            << line << ": wrong operator \'" << operator_str << "\'");
+        LOGE << "invalid Math expression in line "
+            << line << ": wrong operator \'" << operator_str << "\'";
         end(EXIT_FAILURE);
       }
 
       // Get next powers
       if (tokens_array_.empty()) {
-        LOG_OLD(ERROR, "invalid Math expression: expected second operand for "
-                   "the \'" << operator_str << "\' in line " << line);
+        LOGE << "invalid Math expression: expected second operand for "
+                   "the \'" << operator_str << "\' in line " << line;
         end(EXIT_FAILURE);
       }
       power_2 = this->GetMathPower();
@@ -408,8 +408,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetMathPower() {
         degree_op = this->get_first_token();
 
         if (tokens_array_.empty()) {
-          LOG_OLD(ERROR, "invalid Math expression in line "
-              << line << ": power missing");
+          LOGE << "invalid Math expression in line "
+              << line << ": power missing";
           end(EXIT_FAILURE);
         }
         degree = this->GetMathPower();
@@ -433,8 +433,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetMathValue() {
     this->pop_first_token();
 
     if (tokens_array_.empty()) {
-      LOG_OLD(ERROR, "invalid Math expression: "
-                 "expected closing round bracket in line " << line);
+      LOGE << "invalid Math expression: "
+                 "expected closing round bracket in line " << line;
       end(EXIT_FAILURE);
     }
     line = this->peek_first_token()->get_line();
@@ -443,8 +443,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetMathValue() {
     if (SyntaxAnalyzer::IsClosingRoundBracket(this->peek_first_token())) {
       this->pop_first_token();
     } else {
-      LOG_OLD(ERROR, "invalid Math expression: "
-                 "expected closing round bracket in line " << line);
+      LOGE << "invalid Math expression: "
+                 "expected closing round bracket in line " << line;
       end(EXIT_FAILURE);
     }
   }

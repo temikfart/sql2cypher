@@ -9,6 +9,8 @@
 #include "SCC/config.h"
 #include "SCC/log.h"
 
+#include "logger/log.hpp"
+
 class SyntaxAnalyzer {
 public:
   std::shared_ptr<Node> Analyze(
