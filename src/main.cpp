@@ -1,11 +1,9 @@
 #include "SCC/main.h"
 
 int main(int argc, char* argv[]) {
-  logger::init(logger::debug, logger::cout);
+  logger::init(logger::info, logger::cout);
 
-  LOGI << "Starting system...";
   config.Start(argc, argv);
-  LOGI << "System started";
 
   Tokenizer tokenizer;
   tokenizer.Tokenize();
