@@ -4,6 +4,7 @@
 #include "SCC/lexical_analyzer.h"
 #include "SCC/syntax_analyzer.h"
 #include "SCC/tree_dump.h"
+#include "logger/initializers/console_appender_initializer.hpp"
 
 using namespace testing;
 
@@ -43,6 +44,7 @@ protected:
 
   void SetUp() override {
     config.set_is_need_dump(true);
+    logger::init(logger::Severity::silent, logger::StreamType::cout);
   }
   void TearDown() override {
     config.CloseInputFile();
