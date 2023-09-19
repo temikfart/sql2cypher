@@ -92,6 +92,10 @@ public:
   SCCMode StringToSCCMode(std::string mode) const;
   std::string SCCModeToString(SCCMode mode) const;
 
+public:
+  logger::Severity log_severity = logger::info;
+  std::string log_directory = SCC_LOG_DIR;
+
 private:
   SCCMode mode_ = SCCMode::kInteractive;
 
@@ -110,7 +114,6 @@ private:
   std::string cypher_path_;
   std::ofstream output_;
 
-  std::string log_dir_;
   bool is_silent_print_ = false;
   
   bool is_need_dump_ = false;
