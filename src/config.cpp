@@ -352,13 +352,13 @@ void Config::SetOptFlagInteractive(OptFlag flag) {
 void Config::SetOptFlagLogLvl(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
   std::string severity = optarg;
-  SCCLogger::set_severity(severity);
+  log_severity = SCCLogger::to_severity(severity);
   this->SetFlag(flag);
 }
 void Config::SetOptFlagLogDir(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
   std::string dir = optarg;
-  log_dir_ = dir;
+  log_directory = dir;
   this->SetFlag(flag);
 }
 void Config::SetOptFlagMode(OptFlag flag) {

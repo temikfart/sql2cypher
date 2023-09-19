@@ -1,9 +1,9 @@
 #include "SCC/main.h"
 
 int main(int argc, char* argv[]) {
-  logger::init(logger::info, logger::cout);
-
   config.Start(argc, argv);
+
+  logger::init(config.log_severity, config.log_directory);
 
   Tokenizer tokenizer;
   tokenizer.Tokenize();
