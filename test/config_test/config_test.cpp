@@ -33,7 +33,6 @@ TEST(SetGetConfigTests, ValidModeTest) {
 }
 TEST(SetGetConfigTests, InvalidModeTest) {
   Config tConf;
-  SCC_log.set_log_level(LogLevel::SILENT);
 
   EXPECT_EXIT(tConf.set_mode(SCCMode::kSCCModeCount),
               ExitedWithCode(EXIT_FAILURE),
@@ -47,7 +46,6 @@ TEST(SetGetConfigTests, InvalidModeTest) {
 }
 TEST(SetGetConfigTests, SQLPathTest) {
   Config tConf;
-  SCC_log.set_log_level(LogLevel::SILENT);
 
   std::string SQL_path = tConf.GetConfigPath()
                          + "../resources/config_test_resources/";
@@ -130,7 +128,6 @@ protected:
   SCCMode def_mode;
   std::string def_sql_path;
   std::string def_cypher_path;
-  LogLevel def_log_level;
 
   int argc = 1;
   char* argv[10];
@@ -140,7 +137,6 @@ protected:
     def_mode = tConf.get_mode();
     def_sql_path = tConf.get_sql_path();
     def_cypher_path = tConf.get_cypher_path();
-    def_log_level = SCC_log.get_log_level();
 
     for (auto & i : argv) {
       i = nullptr;
@@ -162,12 +158,9 @@ TEST_F(GetConsoleArgumentsTests, WithoutArguments) {
   EXPECT_THAT(tConf.get_mode(), Eq(def_mode));
   EXPECT_THAT(tConf.get_sql_path(), Eq(def_sql_path));
   EXPECT_THAT(tConf.get_cypher_path(), Eq(def_cypher_path));
-  EXPECT_THAT(SCC_log.get_log_level(), Eq(def_log_level));
 }
 // TODO: come up with how test GetConsoleArguments() method.
 //TEST_F(GetConsoleArgumentsTests, ValidModeFlagTest1) {
-//  SCC_log.set_log_level(LogLevel::SILENT);
-//
 //  argc = 2;
 //  strcpy(argv[0], "./SCC");
 //  strcpy(argv[1], "--mode=inTEracTIVE");
@@ -177,11 +170,8 @@ TEST_F(GetConsoleArgumentsTests, WithoutArguments) {
 //  EXPECT_THAT(tConf.get_mode(), Eq(SCCMode::INTERACTIVE));
 //  EXPECT_THAT(tConf.get_sql_path(), Eq(def_sql_path));
 //  EXPECT_THAT(tConf.get_cypher_path(), Eq(def_cypher_path));
-//  EXPECT_THAT(SCC_log.get_log_level(), Eq(LogLevel::SILENT));
 //}
 //TEST_F(GetConsoleArgumentsTests, InvalidModeFlagTest1) {
-//  SCC_log.set_log_level(LogLevel::SILENT);
-//
 //  argc = 2;
 //  strcpy(argv[0], "./SCC");
 //  strcpy(argv[1], "--mode=inTEracT");
@@ -192,8 +182,6 @@ TEST_F(GetConsoleArgumentsTests, WithoutArguments) {
 //    << "\"inTEracT\" is an invalid mode";
 //}
 //TEST_F(GetConsoleArgumentsTests, ValidModeFlagTest2) {
-//  SCC_log.set_log_level(LogLevel::INFO);
-//
 //  argc = 3;
 //  strcpy(argv[0], "./SCC");
 //  strcpy(argv[1], "--mode");
@@ -204,12 +192,8 @@ TEST_F(GetConsoleArgumentsTests, WithoutArguments) {
 //  EXPECT_THAT(tConf.get_mode(), Eq(SCCMode::DAEMON));
 //  EXPECT_THAT(tConf.get_sql_path(), Eq(def_sql_path));
 //  EXPECT_THAT(tConf.get_cypher_path(), Eq(def_cypher_path));
-////  EXPECT_THAT(SCC_log.get_log_level(), Eq(LogLevel::SILENT));
-//  EXPECT_THAT(SCC_log.get_log_level(), Eq(LogLevel::INFO));
 //}
 //TEST_F(GetConsoleArgumentsTests, InvalidModeFlagTest2) {
-//  SCC_log.set_log_level(LogLevel::SILENT);
-//
 //  argc = 3;
 //  strcpy(argv[0], "./SCC");
 //  strcpy(argv[1], "--mode");
@@ -220,8 +204,6 @@ TEST_F(GetConsoleArgumentsTests, WithoutArguments) {
 //    << "flag --mode must have an argument";
 //}
 //TEST_F(GetConsoleArgumentsTests, ValidModeFlagTest3) {
-//  SCC_log.set_log_level(LogLevel::SILENT);
-//
 //  argc = 2;
 //  strcpy(argv[0], "./SCC");
 //  strcpy(argv[1], "-m=interactive");
@@ -231,11 +213,8 @@ TEST_F(GetConsoleArgumentsTests, WithoutArguments) {
 //  EXPECT_THAT(tConf.get_mode(), Eq(SCCMode::INTERACTIVE));
 //  EXPECT_THAT(tConf.get_sql_path(), Eq(def_sql_path));
 //  EXPECT_THAT(tConf.get_cypher_path(), Eq(def_cypher_path));
-//  EXPECT_THAT(SCC_log.get_log_level(), Eq(LogLevel::SILENT));
 //}
 //TEST_F(GetConsoleArgumentsTests, InvalidModeFlagTest3) {
-//  SCC_log.set_log_level(LogLevel::SILENT);
-//
 //  argc = 2;
 //  strcpy(argv[0], "./SCC");
 //  strcpy(argv[1], "-m=nteractive");
@@ -247,8 +226,6 @@ TEST_F(GetConsoleArgumentsTests, WithoutArguments) {
 //    << "\"nteractive\" is an invalid mode";
 //}
 //TEST_F(GetConsoleArgumentsTests, ValidModeFlagTest4) {
-//  SCC_log.set_log_level(LogLevel::SILENT);
-//
 //  argc = 3;
 //  strcpy(argv[0], "./SCC");
 //  strcpy(argv[1], "-m");
@@ -259,11 +236,8 @@ TEST_F(GetConsoleArgumentsTests, WithoutArguments) {
 //  EXPECT_THAT(tConf.get_mode(), Eq(SCCMode::DAEMON));
 //  EXPECT_THAT(tConf.get_sql_path(), Eq(def_sql_path));
 //  EXPECT_THAT(tConf.get_cypher_path(), Eq(def_cypher_path));
-//  EXPECT_THAT(SCC_log.get_log_level(), Eq(LogLevel::SILENT));
 //}
 //TEST_F(GetConsoleArgumentsTests, InvalidModeFlagTest4) {
-//  SCC_log.set_log_level(LogLevel::SILENT);
-//
 //  argc = 3;
 //  strcpy(argv[0], "./SCC");
 //  strcpy(argv[1], "-m");
