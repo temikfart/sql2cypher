@@ -66,7 +66,7 @@ bool Tokenizer::IsCharacterFromArray(char ch, const std::string& array) {
 }
 
 void Tokenizer::PrintTokens() {
-  LOGT << "starting print tokens' array";
+  LOGD << "starting print tokens' array";
   for (const auto& token : tokens_array_) {
     std::cout << "data: ", token->PrintData(std::cout);
     std::cout << " | ";
@@ -74,11 +74,11 @@ void Tokenizer::PrintTokens() {
     std::cout << std::endl;
   }
   std::cout << std::endl;
-  LOGT << "token's array is printed";
+  LOGD << "token's array is printed";
 }
 
 void Tokenizer::GetNumber() {
-  LOGT << "getting a number...";
+  LOGD << "getting a number...";
 
   double data = 0.0;
   double power = 1.0;
@@ -90,7 +90,7 @@ void Tokenizer::GetNumber() {
     config.GetSQLSymbol();
   } else {
     tokens_array_.push_back(std::make_shared<IntNumNode>((int) data));
-    LOGT << "got the integer number";
+    LOGD << "got the integer number";
     return;
   }
 
@@ -103,10 +103,10 @@ void Tokenizer::GetNumber() {
   auto num_node = std::make_shared<FloatNumNode>(data);
   num_node->set_line(line_number_);
   tokens_array_.push_back(num_node);
-  LOGT << "got the float number";
+  LOGD << "got the float number";
 }
 void Tokenizer::GetWord() {
-  LOGT << "getting a word...";
+  LOGD << "getting a word...";
   std::ostringstream data;
 
   char another_symbol = config.PeekSQLSymbol();
@@ -119,10 +119,10 @@ void Tokenizer::GetWord() {
   auto word_node = std::make_shared<StringNode>(data.str(), DataType::WORD);
   word_node->set_line(line_number_);
   tokens_array_.push_back(word_node);
-  LOGT << "got the word";
+  LOGD << "got the word";
 }
 void Tokenizer::GetOperator() {
-  LOGT << "getting an operator...";
+  LOGD << "getting an operator...";
   std::ostringstream data;
 
   data << config.GetSQLSymbol();
@@ -132,12 +132,12 @@ void Tokenizer::GetOperator() {
   auto op_node = std::make_shared<StringNode>(data.str(), DataType::OPERATOR);
   op_node->set_line(line_number_);
   tokens_array_.push_back(op_node);
-  LOGT << "got the operator";
+  LOGD << "got the operator";
 }
 void Tokenizer::GetCharacter(DataType type) {
-  LOGT << "getting a character...";
+  LOGD << "getting a character...";
   auto char_node = std::make_shared<CharNode>(config.GetSQLSymbol(), type);
   char_node->set_line(line_number_);
   tokens_array_.push_back(char_node);
-  LOGT << "got the character";
+  LOGD << "got the character";
 }

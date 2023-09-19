@@ -44,7 +44,7 @@ bool Node::IsNodesEqual(const std::shared_ptr<Node>& node1,
   if (node1->get_type() != node2->get_type() ||
       node1->get_children_amount()
           != node2->get_children_amount()) { //TODO: add parent ptr comparison
-    LOGD << "not equal: comparing nodes with different "
+    LOGT << "not equal: comparing nodes with different "
                "numbers of children or have different types";
     return false;
   }
@@ -55,14 +55,14 @@ bool Node::IsNodesEqual(const std::shared_ptr<Node>& node1,
     case DataType::INT_NUMBER:
       if (std::dynamic_pointer_cast<IntNumNode>(node1)->get_data() !=
           std::dynamic_pointer_cast<IntNumNode>(node2)->get_data()) {
-        LOGD << "not equal: different integer number data";
+        LOGT << "not equal: different integer number data";
         return false;
       }
       break;
     case DataType::FLOAT_NUMBER:
       if (std::dynamic_pointer_cast<FloatNumNode>(node1)->get_data() !=
           std::dynamic_pointer_cast<FloatNumNode>(node2)->get_data()) {
-        LOGD << "not equal: different float number data";
+        LOGT << "not equal: different float number data";
         return false;
       }
       break;
@@ -77,7 +77,7 @@ bool Node::IsNodesEqual(const std::shared_ptr<Node>& node1,
     case DataType::OPERATOR:
       if (std::dynamic_pointer_cast<StringNode>(node1)->get_data() !=
           std::dynamic_pointer_cast<StringNode>(node2)->get_data()) {
-        LOGD << "not equal: different string data";
+        LOGT << "not equal: different string data";
         return false;
       }
       break;
@@ -90,12 +90,12 @@ bool Node::IsNodesEqual(const std::shared_ptr<Node>& node1,
   for (size_t i = 0; i < children_amount; i++) {
     if (!IsNodesEqual(node1->get_child(i),
                       node2->get_child(i))) {
-      LOGD << "not equal: different subtrees";
+      LOGT << "not equal: different subtrees";
       return false;
     }
   }
 
-  LOGD << "nodes are equal";
+  LOGT << "nodes are equal";
   return true;
 }
 

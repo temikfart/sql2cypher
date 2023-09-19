@@ -62,7 +62,7 @@ StatementType SyntaxAnalyzer::GetDDLStType() {
   return DDLStType;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetDDLSt() {
-  LOGT << "getting DDL statement...";
+  LOGD << "getting DDL statement...";
   std::shared_ptr<Node> node, statement;
   node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::ddlStatement);
@@ -71,23 +71,23 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDDLSt() {
   switch (this->GetDDLStType()) {
     case StatementType::createDatabaseStatement:
       statement = this->GetCreateDatabaseSt();
-      LOGT << "got CREATE DATABASE statement";
+      LOGD << "got CREATE DATABASE statement";
       break;
     case StatementType::createTableStatement:
       statement = this->GetCreateTableSt();
-      LOGT << "got CREATE TABLE statement";
+      LOGD << "got CREATE TABLE statement";
       break;
     case StatementType::alterTableStatement:
       statement = this->GetAlterTableSt();
-      LOGT << "got ALTER TABLE statement";
+      LOGD << "got ALTER TABLE statement";
       break;
     case StatementType::dropDatabaseStatement:
       statement = this->GetDropDatabaseSt();
-      LOGT << "got DROP DATABASE statement";
+      LOGD << "got DROP DATABASE statement";
       break;
     case StatementType::dropTableStatement:
       statement = this->GetDropTableSt();
-      LOGT << "got DROP TABLE statement";
+      LOGD << "got DROP TABLE statement";
       break;
     default:
       LOGE << "unknown DDL statement near line " << line;

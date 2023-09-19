@@ -2,7 +2,7 @@
 
 void QueryAssembler::TranslateDMLStatement(std::shared_ptr<Node> node) {
   if (node->get_children_amount() == 0) {
-    LOGT << "empty DML query";
+    LOGD << "empty DML query";
   }
 
   auto statement = node->get_child(0);
