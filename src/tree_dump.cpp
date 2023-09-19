@@ -162,7 +162,7 @@ void TreeDump::MakeDumpPng() {
   txt_to_png << "dot \"" << dot_file_path_ << "\" -T png -o \""
              << png_file_path << "\"";
 
-  LOGT << "executing: " << txt_to_png.str();
+  LOGD << "executing: " << txt_to_png.str();
 
   int wait_status = std::system(txt_to_png.str().c_str());
   if (wait_status) {

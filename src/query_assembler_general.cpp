@@ -49,7 +49,7 @@ void QueryAssembler::TranslateProgram(std::shared_ptr<Node> node) {
 }
 void QueryAssembler::TranslateQuery(std::shared_ptr<Node> node) {
   if (node->get_children_amount() == 0) {
-    LOGT << "empty query";
+    LOGD << "empty query";
     return;
   }
 

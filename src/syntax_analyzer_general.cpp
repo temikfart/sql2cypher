@@ -3,9 +3,9 @@
 std::shared_ptr<Node> SyntaxAnalyzer::Analyze(
     std::deque<std::shared_ptr<Node>> tokens_array) {
   LOGI << "starting syntax analysis...";
-  LOGT << "loading tokens' array...";
+  LOGD << "loading tokens' array...";
   tokens_array_ = std::move(tokens_array);
-  LOGT << "tokens' array is loaded";
+  LOGD << "tokens' array is loaded";
 
   std::shared_ptr<Node> root;
   root = std::dynamic_pointer_cast<Node>(std::make_shared<RootNode>());

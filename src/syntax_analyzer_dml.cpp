@@ -31,7 +31,7 @@ StatementType SyntaxAnalyzer::GetDMLStType() {
   return DMLStType;
 }
 std::shared_ptr<Node> SyntaxAnalyzer::GetDMLSt() {
-  LOGT << "getting DML statement...";
+  LOGD << "getting DML statement...";
   std::shared_ptr<Node> node, statement;
   node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::dmlStatement);
@@ -40,15 +40,15 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDMLSt() {
   switch (this->GetDMLStType()) {
     case StatementType::updateStatement:
       statement = this->GetUpdateSt();
-      LOGT << "got UPDATE statement";
+      LOGD << "got UPDATE statement";
       break;
     case StatementType::deleteStatement:
       statement = this->GetDeleteSt();
-      LOGT << "got DELETE statement";
+      LOGD << "got DELETE statement";
       break;
     case StatementType::insertStatement:
       statement = this->GetInsertSt();
-      LOGT << "got INSERT statement";
+      LOGD << "got INSERT statement";
       break;
     default:
       LOGE << "unknown DML statement near line " << line;

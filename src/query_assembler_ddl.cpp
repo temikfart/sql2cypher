@@ -2,7 +2,7 @@
 
 void QueryAssembler::TranslateDDLStatement(std::shared_ptr<Node> node) {
   if (node->get_children_amount() == 0) {
-    LOGT << "empty DDL query";
+    LOGD << "empty DDL query";
     return;
   }
 
