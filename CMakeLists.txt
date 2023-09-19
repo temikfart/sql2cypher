@@ -265,8 +265,9 @@ if (NOT PACKAGE)
 
     target_link_libraries(
             ${TEST_TARGET}
-            gtest_main
-            gmock)
+            GTest::gtest_main
+            GTest::gmock
+            liblogger)
 
     include(GoogleTest)
     gtest_discover_tests(${TEST_TARGET})
