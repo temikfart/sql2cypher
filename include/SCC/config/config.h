@@ -13,6 +13,7 @@
 #include <sstream>
 
 #include "SCC/log.h"
+#include "scc_mode.h"
 
 #ifdef SCC_MAINTAINERS
 #define DEVELOPERS SCC_MAINTAINERS
@@ -25,13 +26,6 @@
 #else
 #define VERSION "0.9.0-rc"
 #endif // SCC_VERSION
-
-enum SCCMode {
-  kInteractive,
-  kDaemon,
-
-  kSCCModeCount
-};
 
 enum OptFlag {
   kDaemonFlag = 'd',
@@ -61,8 +55,6 @@ class Config {
 public:
   Config();
 
-  void set_mode(SCCMode mode);
-  SCCMode get_mode() const;
   void set_sql_path(const std::string& new_sql_path);
   std::string get_sql_path() const;
   void set_cypher_path(const std::string& new_cypher_path);
@@ -87,25 +79,12 @@ public:
   bool CloseOutputFile();
   bool CloseTreeDumpFile();
 
-  SCCMode StringToSCCMode(std::string mode) const;
-  std::string SCCModeToString(SCCMode mode) const;
-
 public:
   logger::Severity log_severity = logger::info;
   std::string log_directory = SCC_LOG_DIR;
 
+  SCCMode mode = SCCMode::kInteractive;
 private:
-  SCCMode mode_ = SCCMode::kInteractive;
-
-  const std::map<std::string, SCCMode> str2modes_ = {
-      {"INTERACTIVE", SCCMode::kInteractive},
-      {"DAEMON", SCCMode::kDaemon},
-  };
-  const std::map<SCCMode, std::string> modes2str_ = {
-      {SCCMode::kInteractive, "INTERACTIVE"},
-      {SCCMode::kDaemon, "DAEMON"}
-  };
-
   std::string sql_path_;
   std::ifstream input_;
 
@@ -152,8 +131,6 @@ private:
   void SetOptFlagCypher(OptFlag flag);
   void SetOptFlagTreeDump(OptFlag flag);
 
-  void ValidateMode(SCCMode mode) const;
-  void ValidateMode(const std::string& mode) const;
   void ValidateSQLPath(const std::string& sql_path) const;
   void ValidateCypherPath() const;
   void ValidateTreeDumpPath() const;

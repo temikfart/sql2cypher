@@ -1,4 +1,4 @@
-#include "SCC/config.h"
+#include "SCC/config/config.h"
 
 Config config;
 
@@ -25,22 +25,14 @@ void end(int exit_code) {
 }
 
 Config::Config() {
-  mode_ = SCCMode::kInteractive;
 #ifndef CREATE_PACKAGE
   sql_path_ = cypher_path_ = Config::GetConfigPath();
-  sql_path_ += "../resources/sql_queries.sql";
-  cypher_path_ += "../resources/cypher_queries.cypher";
-  tree_dump_path_ += "../resources/tree_dump/tree_dump.txt";
+  sql_path_ += "../../resources/sql_queries.sql";
+  cypher_path_ += "../../resources/cypher_queries.cypher";
+  tree_dump_path_ += "../../resources/tree_dump/tree_dump.txt";
 #endif // CREATE_PACKAGE
 }
 
-void Config::set_mode(SCCMode mode) {
-  this->ValidateMode(mode);
-  mode_ = mode;
-}
-SCCMode Config::get_mode() const {
-  return mode_;
-}
 void Config::set_sql_path(const std::string& new_sql_path) {
   this->ValidateSQLPath(new_sql_path);
   sql_path_ = new_sql_path;
@@ -112,7 +104,7 @@ void Config::Start(int argc, char* argv[]) {
     this->ValidateIsTreeDumpStreamOpen();
   }
 
-  if (config.get_mode() == SCCMode::kDaemon) {
+  if (mode == SCCMode::kDaemon) {
     // TODO: implement SCC mode=daemon behavior.
   }
 }
@@ -259,19 +251,6 @@ bool Config::CloseTreeDumpFile() {
   return true;
 }
 
-SCCMode Config::StringToSCCMode(std::string mode) const {
-  for_each(begin(mode), end(mode),
-           [](char& c) {
-             c = (char) ::toupper(c);
-           });
-  this->ValidateMode(mode);
-  return str2modes_.at(mode);
-}
-std::string Config::SCCModeToString(SCCMode mode) const {
-  this->ValidateMode(mode);
-  return modes2str_.at(mode);
-}
-
 bool Config::IsFileExists(const std::string& path) {
   struct stat buffer{};
   return (stat(path.c_str(), &buffer) == 0);
@@ -341,12 +320,12 @@ void Config::PrintVersion() {
 }
 void Config::SetOptFlagDaemon(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
-  this->set_mode(SCCMode::kDaemon);
+  mode = SCCMode::kDaemon;
   this->SetFlag(flag);
 }
 void Config::SetOptFlagInteractive(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
-  this->set_mode(SCCMode::kInteractive);
+  mode = SCCMode::kInteractive;
   this->SetFlag(flag);
 }
 void Config::SetOptFlagLogLvl(OptFlag flag) {
@@ -364,7 +343,7 @@ void Config::SetOptFlagLogDir(OptFlag flag) {
 void Config::SetOptFlagMode(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
   std::string tmp_mode = optarg;
-  this->set_mode(this->StringToSCCMode(tmp_mode));
+  mode = SCCMode(tmp_mode);
   this->SetFlag(flag);
 }
 void Config::SetOptFlagSQL(OptFlag flag) {
@@ -387,18 +366,6 @@ void Config::SetOptFlagTreeDump(OptFlag flag) {
   this->SetFlag(flag);
 }
 
-void Config::ValidateMode(SCCMode mode) const {
-  if (SCCMode::kSCCModeCount <= mode) {
-    std::cerr << "incorrect SCC mode: " << mode << std::endl;
-    end(EXIT_FAILURE);
-  }
-}
-void Config::ValidateMode(const std::string& mode) const {
-  if (str2modes_.count(mode) == 0) {
-    std::cerr << "invalid SCC mode: " << mode << std::endl;
-    end(EXIT_FAILURE);
-  }
-}
 void Config::ValidateSQLPath(const std::string& sql_path) const {
   if (!(this->IsFileExists(sql_path))) {
     std::cerr << "file with SQL queries does not exist: " << sql_path << std::endl;
