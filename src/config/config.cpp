@@ -26,37 +26,31 @@ void end(int exit_code) {
 
 Config::Config() {
 #ifndef CREATE_PACKAGE
-  sql_path_ = cypher_path_ = Config::GetConfigPath();
-  sql_path_ += "../../resources/sql_queries.sql";
-  cypher_path_ += "../../resources/cypher_queries.cypher";
-  tree_dump_path_ += "../../resources/tree_dump/tree_dump.txt";
+  std::string config_path = Config::GetConfigPath();
+  sql_file_ = config_path + "../../resources/sql_queries.sql";
+  cypher_file_ = config_path + "../../resources/cypher_queries.cypher";
+  ast_dump_file_ = config_path + "../../resources/tree_dump/tree_dump.txt";
 #endif // CREATE_PACKAGE
 }
 
-void Config::set_sql_path(const std::string& new_sql_path) {
-  this->ValidateSQLPath(new_sql_path);
-  sql_path_ = new_sql_path;
+void Config::set_sql_file(const fs::path& new_sql_file) {
+  ValidateFileExists(new_sql_file);
+  sql_file_ = new_sql_file;
 }
-std::string Config::get_sql_path() const {
-  return sql_path_;
+const fs::path& Config::sql_file() const {
+  return sql_file_;
 }
-void Config::set_cypher_path(const std::string& new_cypher_path) {
-  cypher_path_ = new_cypher_path;
+void Config::set_cypher_file(const fs::path& new_cypher_file) {
+  cypher_file_ = fs::weakly_canonical(new_cypher_file);
 }
-std::string Config::get_cypher_path() const {
-  return cypher_path_;
+const fs::path& Config::cypher_file() const {
+  return cypher_file_;
 }
-void Config::set_is_need_dump(bool value) {
-  is_need_dump_ = value;
+void Config::set_ast_dump_file(const fs::path& new_ast_dump_file) {
+  ast_dump_file_ = fs::weakly_canonical(new_ast_dump_file);
 }
-bool Config::get_is_need_dump() const {
-  return is_need_dump_;
-}
-void Config::set_tree_dump_path(const std::string& new_tree_dump_path) {
-  tree_dump_path_ = new_tree_dump_path;
-}
-std::string Config::get_tree_dump_path() const {
-  return tree_dump_path_;
+const fs::path& Config::ast_dump_file() const {
+  return ast_dump_file_;
 }
 
 void Config::Start(int argc, char* argv[]) {
@@ -85,16 +79,16 @@ void Config::Start(int argc, char* argv[]) {
   }
 #endif // CREATE_PACKAGE
 
-  input_.open(sql_path_, std::ios::in);
+  input_.open(sql_file_, std::ios::in);
   this->ValidateIsInputStreamOpen();
 
-  output_.open(cypher_path_, std::ios::out);
-  this->ValidateCypherPath();
+  output_.open(cypher_file_, std::ios::out);
+  ValidateFileExists(cypher_file_);
   this->ValidateIsOutputStreamOpen();
 
-  if (is_need_dump_) {
-    tree_dump_.open(tree_dump_path_, std::ios::out);
-    this->ValidateTreeDumpPath();
+  if (need_ast_dump) {
+    tree_dump_.open(ast_dump_file_, std::ios::out);
+    ValidateFileExists(ast_dump_file_);
     this->ValidateIsTreeDumpStreamOpen();
   }
 
@@ -241,10 +235,6 @@ bool Config::CloseTreeDumpFile() {
   return true;
 }
 
-bool Config::IsFileExists(const std::string& path) {
-  struct stat buffer{};
-  return (stat(path.c_str(), &buffer) == 0);
-}
 void Config::SetFlag(OptFlag flag) {
   is_config_set_[flag_to_config_.at(flag)] = true;
 }
@@ -337,38 +327,26 @@ void Config::SetOptFlagMode(OptFlag flag) {
 void Config::SetOptFlagSQL(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
   std::string path = optarg;
-  this->set_sql_path(path);
+  this->set_sql_file(path);
   this->SetFlag(flag);
 }
 void Config::SetOptFlagCypher(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
   std::string tmp = optarg;
-  this->set_cypher_path(tmp);
+  this->set_cypher_file(tmp);
   this->SetFlag(flag);
 }
 void Config::SetOptFlagTreeDump(OptFlag flag) {
   this->ValidateIsFlagSet(flag);
   std::string tmp = optarg;
-  this->set_is_need_dump(true);
-  this->set_tree_dump_path(tmp);
+  need_ast_dump = true;
+  this->set_ast_dump_file(tmp);
   this->SetFlag(flag);
 }
 
-void Config::ValidateSQLPath(const std::string& sql_path) const {
-  if (!(this->IsFileExists(sql_path))) {
-    std::cerr << "file with SQL queries does not exist: " << sql_path << std::endl;
-    end(EXIT_FAILURE);
-  }
-}
-void Config::ValidateCypherPath() const {
-  if (!(this->IsFileExists(cypher_path_))) {
-    std::cerr << "file with CypherQL queries does not exist: " << cypher_path_ << std::endl;
-    end(EXIT_FAILURE);
-  }
-}
-void Config::ValidateTreeDumpPath() const {
-  if (!(this->IsFileExists(tree_dump_path_))) {
-    std::cerr << "Tree Dump file does not exist: " << tree_dump_path_ << std::endl;
+void Config::ValidateFileExists(const fs::path& path) {
+  if (!fs::exists(path)) {
+    std::cerr << "file does not exist: " << path << std::endl;
     end(EXIT_FAILURE);
   }
 }

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <fstream>
+#include <filesystem>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -26,6 +27,8 @@
 #else
 #define VERSION "0.9.0-rc"
 #endif // SCC_VERSION
+
+namespace fs = std::filesystem;
 
 enum OptFlag {
   kDaemonFlag = 'd',
@@ -55,14 +58,12 @@ class Config {
 public:
   Config();
 
-  void set_sql_path(const std::string& new_sql_path);
-  std::string get_sql_path() const;
-  void set_cypher_path(const std::string& new_cypher_path);
-  std::string get_cypher_path() const;
-  void set_is_need_dump(bool value);
-  bool get_is_need_dump() const;
-  void set_tree_dump_path(const std::string& new_tree_dump_path);
-  std::string get_tree_dump_path() const;
+  void set_sql_file(const fs::path& new_sql_file);
+  const fs::path& sql_file() const;
+  void set_cypher_file(const fs::path& new_cypher_file);
+  const fs::path& cypher_file() const;
+  void set_ast_dump_file(const fs::path& new_ast_dump_file);
+  const fs::path& ast_dump_file() const;
 
   void Start(int argc, char* argv[]);
   void GetConsoleArguments(int argc, char* const* argv);
@@ -81,15 +82,14 @@ public:
   std::string log_directory = SCC_LOG_DIR;
 
   SCCMode mode = SCCMode::kInteractive;
+  bool need_ast_dump = false;
 private:
-  std::string sql_path_;
-  std::ifstream input_;
+  std::filesystem::path sql_file_;
+  std::filesystem::path cypher_file_;
+  std::filesystem::path ast_dump_file_;
 
-  std::string cypher_path_;
+  std::ifstream input_;
   std::ofstream output_;
-  
-  bool is_need_dump_ = false;
-  std::string tree_dump_path_;
   std::ofstream tree_dump_;
 
   std::map<ConfigIsSet, bool> is_config_set_ = {
@@ -111,7 +111,6 @@ private:
       {OptFlag::kTreeDumpFlag, ConfigIsSet::kConfigTreeDump}
   };
 
-  static bool IsFileExists(const std::string& path);
   void SetFlag(OptFlag flag);
   bool IsFlagSet(OptFlag flag) const;
 
@@ -126,9 +125,7 @@ private:
   void SetOptFlagCypher(OptFlag flag);
   void SetOptFlagTreeDump(OptFlag flag);
 
-  void ValidateSQLPath(const std::string& sql_path) const;
-  void ValidateCypherPath() const;
-  void ValidateTreeDumpPath() const;
+  static void ValidateFileExists(const fs::path& path);
   void ValidateIsInputStreamOpen() const;
   void ValidateIsOutputStreamOpen() const;
   void ValidateIsTreeDumpStreamOpen() const;

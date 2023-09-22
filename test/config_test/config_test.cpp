@@ -2,10 +2,14 @@
 #include "gmock/gmock.h"
 #include "SCC/config/config.h"
 
+#include <filesystem>
+
 #include <cstdlib>
 #include <cstring>
 
 using namespace testing;
+
+namespace fs = std::filesystem;
 
 TEST(SetGetConfigTests, DefaultConfigTest) {
   Config tConf;
@@ -17,9 +21,9 @@ TEST(SetGetConfigTests, DefaultConfigTest) {
   std::string SQL_path = ConfigPath + "../../resources/sql_queries.sql";
   std::string Cypher_path = ConfigPath + "../../resources/cypher_queries.cypher";
 
-  EXPECT_EQ(SQL_path, tConf.get_sql_path())
+  EXPECT_EQ(SQL_path, tConf.sql_file())
     << "default sql_path should be \"" << SQL_path << "\"";
-  EXPECT_EQ(Cypher_path, tConf.get_cypher_path())
+  EXPECT_EQ(Cypher_path, tConf.cypher_file())
     << "default cypher_path should be \"" << Cypher_path << "\"";
 }
 TEST(SetGetConfigTests, ValidModeTest) {
@@ -39,11 +43,11 @@ TEST(SetGetConfigTests, SQLPathTest) {
   std::string Valid_SQL_path = SQL_path + "sql_path_test.sql";
   std::string Invalid_SQL_path = SQL_path + "invalid.sql";
 
-  tConf.set_sql_path(Valid_SQL_path);
-  EXPECT_EQ(Valid_SQL_path, tConf.get_sql_path())
+  tConf.set_sql_file(Valid_SQL_path);
+  EXPECT_EQ(Valid_SQL_path, tConf.sql_file())
                 << Valid_SQL_path << " should be set as SQL path";
 
-  EXPECT_EXIT(tConf.set_sql_path(Invalid_SQL_path),
+  EXPECT_EXIT(tConf.set_sql_file(Invalid_SQL_path),
               ExitedWithCode(EXIT_FAILURE),
               "")
                 << Invalid_SQL_path
@@ -56,8 +60,8 @@ TEST(SetGetConfigTests, CypherPathTest) {
                             + "../../resources/config_test_resources/";
   std::string Valid_Cypher_path = Cypher_path + "cypher_path_test.cypher";
 
-  tConf.set_cypher_path(Valid_Cypher_path);
-  EXPECT_EQ(Valid_Cypher_path, tConf.get_cypher_path())
+  tConf.set_cypher_file(Valid_Cypher_path);
+  EXPECT_EQ(fs::canonical(Valid_Cypher_path), fs::canonical(tConf.cypher_file()))
                 << Valid_Cypher_path << " should be set as Cypher path";
 }
 
@@ -73,8 +77,8 @@ protected:
 
   void SetUp() override {
     def_mode = tConf.mode;
-    def_sql_path = tConf.get_sql_path();
-    def_cypher_path = tConf.get_cypher_path();
+    def_sql_path = tConf.sql_file();
+    def_cypher_path = tConf.cypher_file();
 
     for (auto & i : argv) {
       i = nullptr;
@@ -94,8 +98,8 @@ TEST_F(GetConsoleArgumentsTests, WithoutArguments) {
   tConf.GetConsoleArguments(argc, argv);
 
   EXPECT_THAT(tConf.mode, Eq(def_mode));
-  EXPECT_THAT(tConf.get_sql_path(), Eq(def_sql_path));
-  EXPECT_THAT(tConf.get_cypher_path(), Eq(def_cypher_path));
+  EXPECT_THAT(tConf.sql_file(), Eq(def_sql_path));
+  EXPECT_THAT(tConf.cypher_file(), Eq(def_cypher_path));
 }
 // TODO: come up with how test GetConsoleArguments() method.
 //TEST_F(GetConsoleArgumentsTests, ValidModeFlagTest1) {
