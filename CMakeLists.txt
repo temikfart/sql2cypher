@@ -48,7 +48,7 @@ if (IS_COMPILERS_SET)
 endif ()
 
 # Set C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 
 ############################# PROJECT INFORMATION ##############################
@@ -89,9 +89,18 @@ set(CMAKE_CXX_FLAGS ${COMPILATION_FLAGS})
 # Create executable or package
 include_directories(include)
 set(PRJ_TARGET scc)
+
+set(COMMON_SRC
+        src/common/string_utils.cpp)
+set(LOG_SRC
+        src/log.cpp)
+set(CONFIG_SRC
+        src/config/config.cpp
+        src/config/scc_mode.cpp)
 set(SOURCE_LIST src/main.cpp
-            src/log.cpp
-            src/config.cpp
+        ${COMMON_SRC}
+        ${LOG_SRC}
+        ${CONFIG_SRC}
             src/ast.cpp
             src/lexical_analyzer.cpp
             src/syntax_analyzer_general.cpp
@@ -244,20 +253,28 @@ if (NOT PACKAGE)
 
     include_directories(include)
     # Make sure, that source files are mentioned ONE time
+    set(COMMON_TEST
+            src/common/string_utils.cpp)
     set(CONFIG_TEST
-            test/config_test/config_test.cpp src/config.cpp)
+            test/config_test/config_test.cpp
+            src/config/config.cpp
+            src/config/scc_mode.cpp)
     set(LOG_TEST
-            test/log_test/log_test.cpp src/log.cpp)
+            test/log_test/log_test.cpp
+            src/log.cpp)
     set(AST_TEST
-            test/ast_test/ast_test.cpp src/ast.cpp)
+            test/ast_test/ast_test.cpp
+            src/ast.cpp)
     set(LEXICAL_ANALYZER_TEST
-            test/lexical_analyzer_test/lexical_analyzer_test.cpp src/lexical_analyzer.cpp)
+            test/lexical_analyzer_test/lexical_analyzer_test.cpp
+            src/lexical_analyzer.cpp)
     # Broken tests
 #    set(SQL_AST_TEST
 #            test/SQL_AST_test/SQL_AST_test.cpp src/syntax_analyzer_general.cpp
 #            src/syntax_analyzer_other.cpp src/syntax_analyzer_ddl.cpp src/syntax_analyzer_dml.cpp
 #            src/tree_dump.cpp)
     add_executable(${TEST_TARGET}
+            ${COMMON_TEST}
             ${CONFIG_TEST}
             ${LOG_TEST}
             ${AST_TEST}
