@@ -7,7 +7,7 @@
 #include <sstream>
 
 #include "SCC/ast.h"
-#include "SCC/config.h"
+#include "SCC/config/config.h"
 #include "SCC/log.h"
 #include "SCC/syntax_analyzer.h"
 
