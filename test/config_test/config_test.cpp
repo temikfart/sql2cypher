@@ -21,9 +21,9 @@ TEST(SetGetConfigTests, DefaultConfigTest) {
   std::string SQL_path = ConfigPath + "../../resources/sql_queries.sql";
   std::string Cypher_path = ConfigPath + "../../resources/cypher_queries.cypher";
 
-  EXPECT_EQ(SQL_path, tConf.sql_file())
+  EXPECT_EQ(fs::canonical(SQL_path), fs::canonical(tConf.sql_file()))
     << "default sql_path should be \"" << SQL_path << "\"";
-  EXPECT_EQ(Cypher_path, tConf.cypher_file())
+  EXPECT_EQ(fs::canonical(Cypher_path), fs::canonical(tConf.cypher_file()))
     << "default cypher_path should be \"" << Cypher_path << "\"";
 }
 TEST(SetGetConfigTests, ValidModeTest) {
@@ -44,7 +44,7 @@ TEST(SetGetConfigTests, SQLPathTest) {
   std::string Invalid_SQL_path = SQL_path + "invalid.sql";
 
   tConf.set_sql_file(Valid_SQL_path);
-  EXPECT_EQ(Valid_SQL_path, tConf.sql_file())
+  EXPECT_EQ(fs::canonical(Valid_SQL_path), fs::canonical(tConf.sql_file()))
                 << Valid_SQL_path << " should be set as SQL path";
 
   EXPECT_EXIT(tConf.set_sql_file(Invalid_SQL_path),

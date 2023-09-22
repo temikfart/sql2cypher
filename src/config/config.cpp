@@ -26,16 +26,16 @@ void end(int exit_code) {
 
 Config::Config() {
 #ifndef CREATE_PACKAGE
-  std::string config_path = Config::GetConfigPath();
-  sql_file_ = config_path + "../../resources/sql_queries.sql";
-  cypher_file_ = config_path + "../../resources/cypher_queries.cypher";
-  ast_dump_file_ = config_path + "../../resources/tree_dump/tree_dump.txt";
+  fs::path config_path = Config::GetConfigPath();
+  set_sql_file(config_path / "../../resources/sql_queries.sql");
+  set_cypher_file(config_path / "../../resources/cypher_queries.cypher");
+  set_ast_dump_file(config_path / "../../resources/tree_dump/tree_dump.txt");
 #endif // CREATE_PACKAGE
 }
 
 void Config::set_sql_file(const fs::path& new_sql_file) {
   ValidateFileExists(new_sql_file);
-  sql_file_ = new_sql_file;
+  sql_file_ = fs::weakly_canonical(new_sql_file);
 }
 const fs::path& Config::sql_file() const {
   return sql_file_;
