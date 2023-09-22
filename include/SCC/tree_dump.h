@@ -19,5 +19,5 @@ public:
 
 private:
   std::ofstream& dot_file_ = config.WriteTreeDump();
-  std::string dot_file_path_ = config.get_tree_dump_path();
+  std::string dot_file_path_ = config.ast_dump_file();
 };
