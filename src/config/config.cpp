@@ -52,12 +52,6 @@ void Config::set_is_need_dump(bool value) {
 bool Config::get_is_need_dump() const {
   return is_need_dump_;
 }
-void Config::set_is_silent_print(bool value) {
-  is_silent_print_ = value;
-}
-bool Config::get_is_silent_print() const {
-  return is_silent_print_;
-}
 void Config::set_tree_dump_path(const std::string& new_tree_dump_path) {
   tree_dump_path_ = new_tree_dump_path;
 }
@@ -202,10 +196,6 @@ char Config::PeekSQLSymbol() {
   this->ValidateIsInputStreamOpen();
   return (char) input_.peek();
 }
-std::ifstream& Config::ReadSQL() {
-  this->ValidateIsInputStreamOpen();
-  return input_;
-}
 std::ofstream& Config::WriteCypher() {
   this->ValidateIsOutputStreamOpen();
   return output_;
@@ -305,7 +295,6 @@ void Config::PrintHelp() {
             << "(by default, the image is not created)\n";
   std::cout.flush();
 
-  this->set_is_silent_print(true);
   end(EXIT_SUCCESS);
 }
 void Config::PrintVersion() {
@@ -315,7 +304,6 @@ void Config::PrintVersion() {
   std::cout << std::setw(13) << "Developers:" << DEVELOPERS;
   std::cout << std::endl;
 
-  this->set_is_silent_print(true);
   end(EXIT_SUCCESS);
 }
 void Config::SetOptFlagDaemon(OptFlag flag) {
