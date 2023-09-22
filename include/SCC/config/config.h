@@ -61,8 +61,6 @@ public:
   std::string get_cypher_path() const;
   void set_is_need_dump(bool value);
   bool get_is_need_dump() const;
-  void set_is_silent_print(bool value);
-  bool get_is_silent_print() const;
   void set_tree_dump_path(const std::string& new_tree_dump_path);
   std::string get_tree_dump_path() const;
 
@@ -72,7 +70,6 @@ public:
   static std::string GetConfigPath();
   char GetSQLSymbol();
   char PeekSQLSymbol();
-  std::ifstream& ReadSQL();
   std::ofstream& WriteCypher();
   std::ofstream& WriteTreeDump();
   bool CloseInputFile();
@@ -90,8 +87,6 @@ private:
 
   std::string cypher_path_;
   std::ofstream output_;
-
-  bool is_silent_print_ = false;
   
   bool is_need_dump_ = false;
   std::string tree_dump_path_;
