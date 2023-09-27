@@ -121,6 +121,12 @@ FetchContent_Declare(
         GIT_TAG main
 )
 FetchContent_MakeAvailable(logger)
+FetchContent_Declare(
+        argparse
+        GIT_REPOSITORY https://github.com/p-ranav/argparse.git
+        GIT_TAG 997da9255618311d1fcb0135ce86022729d1f1cb # release-2.9
+)
+FetchContent_MakeAvailable(argparse)
 
 # Set information about an application
 set(PRJ_SHORT_DESCRIPTION "SQL to CypherQL Converter")
@@ -231,7 +237,7 @@ elseif (UNIX)
     endif()
 endif ()
 
-target_link_libraries(${PRJ_TARGET} PRIVATE liblogger)
+target_link_libraries(${PRJ_TARGET} PRIVATE liblogger argparse)
 
 
 ################################ ENABLE TESTING ################################
@@ -240,7 +246,6 @@ set(TEST_TARGET ${PRJ_TARGET}_test)
 
 # Include Google Tests
 if (NOT PACKAGE)
-    include(FetchContent)
     FetchContent_Declare(
             googletest
             GIT_REPOSITORY https://github.com/google/googletest.git
@@ -285,7 +290,8 @@ if (NOT PACKAGE)
             ${TEST_TARGET}
             GTest::gtest_main
             GTest::gmock
-            liblogger)
+            liblogger
+            argparse)
 
     include(GoogleTest)
     gtest_discover_tests(${TEST_TARGET})
