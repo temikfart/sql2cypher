@@ -65,6 +65,10 @@ void SCCArgs::ParseArgs(int argc, char* argv[]) {
   parse_args(argc, argv);
 }
 
+bool SCCArgs::IsUsed(const std::string& arg_name) const {
+  return is_used(arg_name);
+}
+
 void SCCArgs::PrintHelpAndExit() const {
   std::cout << help().str();
   exit(EXIT_SUCCESS);
