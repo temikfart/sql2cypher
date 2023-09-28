@@ -1,6 +1,8 @@
 #pragma once
 
 #include "argparse/argparse.hpp"
+#include "logger/severity.hpp"
+#include "SCC/config/scc_mode.h"
 
 #define CONTRIBUTE_LINK "https://github.com/temikfart/sql2cypher"
 #define PROGRAM_NAME "scc"

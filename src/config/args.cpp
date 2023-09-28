@@ -10,7 +10,7 @@ SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, default_arguments::no
       .action([this](const std::string& /*unused*/) {
         PrintHelpAndExit();
       })
-      .help("Show this message")
+      .help("Show this info")
       .default_value(false)
       .implicit_value(true)
       .nargs(0);
@@ -24,6 +24,38 @@ SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, default_arguments::no
       .default_value(false)
       .implicit_value(true)
       .nargs(0);
+
+  add_argument("--sql")
+      .required()
+      .help("Specify path to the file with SQL queries to be converted")
+      .metavar("FILENAME");
+
+  add_argument("--cypher")
+      .help("Specify path to the file with the result CypherQL queries")
+      .metavar("FILENAME");
+
+  add_argument("--dump")
+      .help("Specify path to the PNG image with the dump of SQL AST")
+      .metavar("FILENAME");
+
+  add_argument("-m", "--mode")
+      .help("Run the SCC in special mode: interactive/daemon")
+      .metavar("MODE")
+      .default_value(SCCMode::kInteractive);
+
+  add_argument("-d", "--daemon")
+      .help("Run the SCC as daemon")
+      .default_value(false)
+      .implicit_value(true);
+
+  add_argument("-l", "--log-severity")
+      .help("Specify severity of logging. Acceptable values: silent/fatal/error/info/debug/trace")
+      .metavar("SEVERITY")
+      .default_value(logger::Severity::info);
+
+  add_argument("--logdir")
+      .help("Specify path to the directory with log files")
+      .metavar("DIRNAME");
 }
 
 void SCCArgs::ParseArgs(int argc, char* argv[]) {
