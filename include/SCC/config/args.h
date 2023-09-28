@@ -27,6 +27,23 @@ public:
 
   void ParseArgs(int argc, char* argv[]);
 
+  template<typename T = std::string>
+  auto Get(const std::string& arg_name) const {
+    return get<T>(arg_name);
+  }
+
+  template<typename T = std::string>
+  std::optional<T> Present(const std::string& arg_name) const {
+    return present(arg_name);
+  }
+
+  bool IsUsed(const std::string& arg_name) const;
+
+  template<typename T = std::string>
+  auto operator[](const std::string& arg_name) const {
+    return Get<T>(arg_name);
+  }
+
 private:
   void PrintHelpAndExit() const;
 
