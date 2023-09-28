@@ -46,6 +46,4 @@ public:
 
 private:
   void PrintHelpAndExit() const;
-
-  std::string version_;
 };
