@@ -1,6 +1,8 @@
 #include "SCC/config/args.h"
 
 SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, default_arguments::none) {
+  set_assign_chars("= ");
+
   add_description("Translates SQL queries for MS SQL Server into queries for Neo4j DBMS.");
   add_epilog("Contribute to SCC: " CONTRIBUTE_LINK);
 
