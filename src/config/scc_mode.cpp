@@ -6,7 +6,7 @@ SCCMode::SCCMode(Value value) {
   this->value_ = value;
 }
 SCCMode::SCCMode(const std::string& str_mode) {
-  std::string mode = LowerCase(str_mode);
+  std::string mode = scc::common::LowerCase(str_mode);
   if (mode == INTERACTIVE)
     this->value_ = kInteractive;
   else if (mode == DAEMON)
