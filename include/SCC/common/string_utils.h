@@ -2,4 +2,8 @@
 
 #include <string>
 
-std::string LowerCase(const std::string& str);
+namespace scc::common {
+
+std::string LowerCase(const std::string &str);
+
+} // scc::common
