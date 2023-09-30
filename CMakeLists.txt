@@ -92,6 +92,7 @@ set(PRJ_TARGET scc)
 
 set(COMMON_SRC
         src/common/file_utils.cpp
+        src/common/singleton.cpp
         src/common/string_utils.cpp)
 set(LOG_SRC
         src/log.cpp)
