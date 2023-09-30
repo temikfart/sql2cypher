@@ -5,16 +5,6 @@
 
 #include "logger/log.hpp"
 
-#if defined(DEBIAN_PACKAGE)
-#define SCC_LOG_DIR "/var/log/SCC_log/"
-#elif defined(EXE_PACKAGE)
-#define SCC_LOG_DIR "C:/Program Files/SCC/log/"
-#elif defined(APP_PACKAGE)
-#define SCC_LOG_DIR ""
-#else
-#define SCC_LOG_DIR "../log"
-#endif
-
 // TODO: change to namespace without class.
 class SCCLogger {
 public:
