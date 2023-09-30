@@ -4,11 +4,11 @@ void SCCLogger::set_severity(logger::Severity severity) {
   SCCLogger::ValidateSeverity(severity);
   logger::Logger::get()->set_severity(severity);
 }
-void SCCLogger::set_severity(std::string& str_severity) {
+void SCCLogger::set_severity(const std::string& str_severity) {
   logger::Severity new_severity = to_severity(str_severity);
   set_severity(new_severity);
 }
-logger::Severity SCCLogger::to_severity(std::string& str_severity) {
+logger::Severity SCCLogger::to_severity(const std::string& str_severity) {
   return logger::to_severity(str_severity);
 }
 std::optional<logger::Severity> SCCLogger::get_severity() {
