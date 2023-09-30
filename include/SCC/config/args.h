@@ -1,5 +1,7 @@
 #pragma once
 
+#include <filesystem>
+
 #include "argparse/argparse.hpp"
 #include "logger/severity.hpp"
 #include "SCC/config/scc_mode.h"
@@ -18,6 +20,16 @@
 #else
 #define DEVELOPERS "Artyom Fartygin, Roman Korostinkiy"
 #endif // SCC_MAINTAINERS
+
+#if defined(DEBIAN_PACKAGE)
+#define SCC_LOG_DIR "/var/log/SCC_log/"
+#elif defined(EXE_PACKAGE)
+#define SCC_LOG_DIR "C:/Program Files/SCC/log/"
+#elif defined(APP_PACKAGE)
+#define SCC_LOG_DIR ""
+#else
+#define SCC_LOG_DIR "../log"
+#endif
 
 using namespace argparse;
 

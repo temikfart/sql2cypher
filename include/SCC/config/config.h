@@ -15,6 +15,7 @@
 
 #include "SCC/log.h"
 #include "scc_mode.h"
+#include "args.h"
 
 #ifdef SCC_MAINTAINERS
 #define DEVELOPERS SCC_MAINTAINERS

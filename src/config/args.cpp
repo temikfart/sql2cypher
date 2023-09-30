@@ -30,9 +30,11 @@ SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, default_arguments::no
       .help("Specify path to the file with SQL queries to be converted")
       .metavar("FILENAME");
 
+  std::string default_cypher_file = (std::filesystem::current_path() / "out.cypher").string();
   add_argument("--cypher")
       .help("Specify path to the file with the result CypherQL queries")
-      .metavar("FILENAME");
+      .metavar("FILENAME")
+      .default_value(default_cypher_file);
 
   add_argument("--dump")
       .help("Specify path to the PNG image with the dump of SQL AST")
@@ -55,7 +57,8 @@ SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, default_arguments::no
 
   add_argument("--logdir")
       .help("Specify path to the directory with log files")
-      .metavar("DIRNAME");
+      .metavar("DIRNAME")
+      .default_value(SCC_LOG_DIR);
 }
 
 void SCCArgs::ParseArgs(int argc, char* argv[]) {
