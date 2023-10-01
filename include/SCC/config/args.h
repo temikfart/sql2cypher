@@ -1,5 +1,6 @@
 #pragma once
 
+#include <exception>
 #include <filesystem>
 
 #include "argparse/argparse.hpp"
@@ -33,15 +34,25 @@
 
 using namespace argparse;
 
-class SCCArgs : private ArgumentParser {
+class no_argument_error : public std::runtime_error {
+public:
+  explicit no_argument_error(const std::string& message);
+};
+
+class SCCArgs : public ArgumentParser {
 public:
   explicit SCCArgs();
 
   void ParseArgs(int argc, char* argv[]);
 
   template<typename T = std::string>
-  auto Get(const std::string& arg_name) const {
-    return get<T>(arg_name);
+  auto Get(const std::string& arg_name) const
+      -> std::conditional_t<details::IsContainer<T>, T, const T &> {
+    try {
+      return get<T>(arg_name);
+    } catch (const std::logic_error& e) {
+      throw no_argument_error(e.what());
+    }
   }
 
   template<typename T = std::string>
