@@ -15,6 +15,7 @@
 
 #include "SCC/log.h"
 #include "scc_mode.h"
+#include "SCC/common/singleton.h"
 #include "args.h"
 
 #ifdef SCC_MAINTAINERS
@@ -44,19 +45,16 @@ enum OptFlag {
   kTreeDumpFlag = 'z' + 3
 };
 
-enum ConfigIsSet {
-  kConfigLogLvl,
-  kConfigLogDir,
-  kConfigMode,
-  kConfigSQL,
-  kConfigCypher,
-  kConfigTreeDump
-};
-
 void end(int exit_code);
 
 class Config {
 public:
+  logger::Severity log_severity = logger::info;
+  std::string log_directory = SCC_LOG_DIR;
+
+  SCCMode mode = SCCMode::kInteractive;
+  bool need_ast_dump = false;
+
   Config();
 
   void set_sql_file(const fs::path& new_sql_file);
@@ -78,12 +76,6 @@ public:
   bool CloseOutputFile();
   bool CloseTreeDumpFile();
 
-public:
-  logger::Severity log_severity = logger::info;
-  std::string log_directory = SCC_LOG_DIR;
-
-  SCCMode mode = SCCMode::kInteractive;
-  bool need_ast_dump = false;
 private:
   std::filesystem::path sql_file_;
   std::filesystem::path cypher_file_;
@@ -93,44 +85,10 @@ private:
   std::ofstream output_;
   std::ofstream tree_dump_;
 
-  std::map<ConfigIsSet, bool> is_config_set_ = {
-      {ConfigIsSet::kConfigLogLvl, false},
-      {ConfigIsSet::kConfigLogDir, false},
-      {ConfigIsSet::kConfigMode, false},
-      {ConfigIsSet::kConfigSQL, false},
-      {ConfigIsSet::kConfigCypher, false},
-      {ConfigIsSet::kConfigTreeDump, false}
-  };
-  const std::map<OptFlag, ConfigIsSet> flag_to_config_ = {
-      {OptFlag::kDaemonFlag, ConfigIsSet::kConfigMode},
-      {OptFlag::kInteractiveFlag, ConfigIsSet::kConfigMode},
-      {OptFlag::kLogLvlFlag, ConfigIsSet::kConfigLogLvl},
-      {OptFlag::kLogDirFlag, ConfigIsSet::kConfigLogDir},
-      {OptFlag::kModeFlag, ConfigIsSet::kConfigMode},
-      {OptFlag::kCypherFlag, ConfigIsSet::kConfigCypher},
-      {OptFlag::kSQLFlag, ConfigIsSet::kConfigSQL},
-      {OptFlag::kTreeDumpFlag, ConfigIsSet::kConfigTreeDump}
-  };
-
-  void SetFlag(OptFlag flag);
-  bool IsFlagSet(OptFlag flag) const;
-
-  void PrintHelp();
-  void PrintVersion();
-  void SetOptFlagDaemon(OptFlag flag);
-  void SetOptFlagInteractive(OptFlag flag);
-  void SetOptFlagLogLvl(OptFlag flag);
-  void SetOptFlagLogDir(OptFlag flag);
-  void SetOptFlagMode(OptFlag flag);
-  void SetOptFlagSQL(OptFlag flag);
-  void SetOptFlagCypher(OptFlag flag);
-  void SetOptFlagTreeDump(OptFlag flag);
-
   static void ValidateFileExists(const fs::path& path);
   void ValidateIsInputStreamOpen() const;
   void ValidateIsOutputStreamOpen() const;
   void ValidateIsTreeDumpStreamOpen() const;
-  void ValidateIsFlagSet(OptFlag flag) const;
 };
 
 extern Config config;

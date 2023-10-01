@@ -99,6 +99,7 @@ set(LOG_SRC
 set(CONFIG_SRC
         src/config/args.cpp
         src/config/config.cpp
+        src/config/scc_config.cpp
         src/config/scc_mode.cpp)
 set(SOURCE_LIST src/main.cpp
         ${COMMON_SRC}
