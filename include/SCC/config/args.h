@@ -62,11 +62,6 @@ public:
 
   bool IsUsed(const std::string& arg_name) const;
 
-  template<typename T = std::string>
-  auto operator[](const std::string& arg_name) const {
-    return Get<T>(arg_name);
-  }
-
 private:
   void PrintHelpAndExit() const;
 };
