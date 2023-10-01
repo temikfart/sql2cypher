@@ -1,5 +1,8 @@
 #include "SCC/config/args.h"
 
+no_argument_error::no_argument_error(const std::string& message)
+: std::runtime_error(message) {}
+
 SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, default_arguments::none) {
   set_assign_chars("= ");
 
