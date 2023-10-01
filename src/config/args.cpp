@@ -43,7 +43,7 @@ SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, default_arguments::no
   add_argument("-m", "--mode")
       .help("Run the SCC in special mode: interactive/daemon")
       .metavar("MODE")
-      .default_value(SCCMode::kInteractive);
+      .default_value(SCCMode(SCCMode::kInteractive));
 
   add_argument("-d", "--daemon")
       .help("Run the SCC as daemon")
@@ -55,10 +55,10 @@ SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, default_arguments::no
       .metavar("SEVERITY")
       .default_value(logger::Severity::info);
 
-  add_argument("--logdir")
+  add_argument("--log-directory")
       .help("Specify path to the directory with log files")
       .metavar("DIRNAME")
-      .default_value(SCC_LOG_DIR);
+      .default_value(std::string(SCC_LOG_DIR));
 }
 
 void SCCArgs::ParseArgs(int argc, char* argv[]) {
