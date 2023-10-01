@@ -1,7 +1,8 @@
 #pragma once
 
-#include <string>
+#include <iostream>
 #include <stdexcept>
+#include <string>
 
 #include "SCC/common/string_utils.h"
 
@@ -34,3 +35,5 @@ public:
 private:
   Value value_;
 };
+
+std::ostream& operator<<(std::ostream& os, const SCCMode& mode);

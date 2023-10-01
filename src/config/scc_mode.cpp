@@ -23,3 +23,8 @@ std::string SCCMode::ToString() const {
       return DAEMON;
   }
 }
+
+std::ostream& operator<<(std::ostream& os, const SCCMode& mode) {
+  os << mode.ToString();
+  return os;
+}
