@@ -1,5 +1,21 @@
 #include "SCC/query_assembler.h"
 
+QueryAssembler::QueryAssembler(const std::filesystem::path& out_path)
+: out_(out_path) {}
+
+bool QueryAssembler::CloseOutputFile() {
+  if (out_.is_open()) {
+    out_.close();
+    if (out_.good()) {
+      ;
+    } else {
+      std::cerr << "output file close error" << std::endl;
+      return false;
+    }
+  }
+  return true;
+}
+
 void QueryAssembler::Translate(std::shared_ptr<Node> AST) {
   LOGI << "starting translation...";
 

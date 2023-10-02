@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <filesystem>
+#include <fstream>
 
 #include "logger/severity.hpp"
 
@@ -9,6 +10,8 @@
 #include "SCC/config/args.h"
 #include "SCC/config/scc_mode.h"
 #include "SCC/log.h"
+
+void end(int exit_code);
 
 namespace scc {
 
@@ -26,6 +29,7 @@ public:
 
   const fs::path& get_sql_file() const;
   const fs::path& get_cypher_file() const;
+  const fs::path& get_ast_dump_file() const;
 
 private:
   fs::path sql_file_;

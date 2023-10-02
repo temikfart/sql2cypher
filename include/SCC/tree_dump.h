@@ -8,6 +8,8 @@
 
 class TreeDump {
 public:
+  explicit TreeDump(const std::filesystem::path& out_path);
+
   void DumpTree(const std::shared_ptr<Node>& AST);
   void PrintDumpInfo();
   void RecursiveTreeDump(const std::shared_ptr<Node>& node,
@@ -18,6 +20,8 @@ public:
   static std::string GetServiceNodeData(StatementType statement_type);
 
 private:
-  std::ofstream& dot_file_ = config.WriteTreeDump();
-  std::string dot_file_path_ = config.ast_dump_file();
+  std::ofstream dot_file_;
+  std::string dot_file_path_;
+
+  bool CloseTreeDumpFile();
 };

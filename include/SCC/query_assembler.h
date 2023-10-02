@@ -2,12 +2,13 @@
 
 #include <algorithm>
 #include <iostream>
+#include <filesystem>
 #include <memory>
 #include <tuple>
 #include <sstream>
 
 #include "SCC/ast.h"
-#include "SCC/config/config.h"
+#include "SCC/config/scc_config.h"
 #include "SCC/log.h"
 #include "SCC/syntax_analyzer.h"
 
@@ -18,11 +19,15 @@ using StdProperty = std::tuple<std::string, std::string>;
 
 class QueryAssembler {
 public:
+  explicit QueryAssembler(const std::filesystem::path& out_path);
+
+  bool CloseOutputFile();
+  
   void Translate(std::shared_ptr<Node> AST);
 
 private:
   std::shared_ptr<Node> ast_;
-  std::ofstream& out_ = config.WriteCypher();
+  std::ofstream out_;
 
   int constraint_counter = 0;
   int relationship_counter = 0;

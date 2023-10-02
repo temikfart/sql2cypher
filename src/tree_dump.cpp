@@ -1,5 +1,8 @@
 #include "SCC/tree_dump.h"
 
+TreeDump::TreeDump(const std::filesystem::path& out_path)
+: dot_file_(out_path), dot_file_path_(out_path.string()) {}
+
 void TreeDump::DumpTree(const std::shared_ptr<Node>& AST) {
   LOGI << "creating tree dump of the AST";
   if (AST == nullptr) {
@@ -15,7 +18,7 @@ void TreeDump::DumpTree(const std::shared_ptr<Node>& AST) {
   dot_file_ << "\n}";
   LOGI << "dump is created";
 
-  config.CloseTreeDumpFile();
+  CloseTreeDumpFile();
   this->MakeDumpPng();
   LOGI << "graphviz dot file is written and image is created";
 }
@@ -275,4 +278,17 @@ std::string TreeDump::GetServiceNodeData(StatementType statement_type) {
       end(EXIT_FAILURE);
       return "";
   }
+}
+
+bool TreeDump::CloseTreeDumpFile() {
+  if (dot_file_.is_open()) {
+    dot_file_.close();
+    if (dot_file_.good()) {
+      ;
+    } else {
+      std::cerr << "dot dump file close error" << std::endl;
+      return false;
+    }
+  }
+  return true;
 }

@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-#include "SCC/config/config.h"
+#include "SCC/config/scc_config.h"
 
 #include "logger/log.hpp"
 
