@@ -98,7 +98,6 @@ set(LOG_SRC
         src/log.cpp)
 set(CONFIG_SRC
         src/config/args.cpp
-        src/config/config.cpp
         src/config/scc_config.cpp
         src/config/scc_mode.cpp)
 set(SOURCE_LIST src/main.cpp
@@ -266,7 +265,7 @@ if (NOT PACKAGE)
             src/common/string_utils.cpp)
     set(CONFIG_TEST
             test/config_test/config_test.cpp
-            src/config/config.cpp
+            src/config/scc_config.cpp
             src/config/scc_mode.cpp)
     set(LOG_TEST
             test/log_test/log_test.cpp

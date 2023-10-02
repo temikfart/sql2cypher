@@ -1,16 +1,19 @@
 #pragma once
 
 #include <deque>
+#include <filesystem>
 #include <sstream>
 
 #include "SCC/ast.h"
-#include "SCC/config/config.h"
+#include "SCC/config/scc_config.h"
 #include "SCC/log.h"
 
 #include "logger/log.hpp"
 
 class Tokenizer {
 public:
+  explicit Tokenizer(const std::filesystem::path& input_path);
+
   void Tokenize();
 
   std::shared_ptr<Node>& peek_first_token();
@@ -27,8 +30,13 @@ public:
   void PrintTokens();
 
 private:
+  std::ifstream input_;
   int line_number_ = 0;
   std::deque<std::shared_ptr<Node>> tokens_array_;
+
+  char GetSQLSymbol();
+  char PeekSQLSymbol();
+  bool CloseInputFile();
 
   void GetNumber();
   void GetWord();

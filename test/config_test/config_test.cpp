@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include "SCC/config/config.h"
+#include "SCC/config/scc_config.h"
 
 #include <filesystem>
 
@@ -10,9 +10,10 @@
 using namespace testing;
 
 namespace fs = std::filesystem;
+using namespace scc;
 
 TEST(SetGetConfigTests, DefaultConfigTest) {
-  Config tConf;
+  SCCConfig tConf;
   
   EXPECT_EQ(SCCMode::kInteractive, tConf.mode)
     << "default mode should be INTERACTIVE";
@@ -27,7 +28,7 @@ TEST(SetGetConfigTests, DefaultConfigTest) {
     << "default cypher_path should be \"" << Cypher_path << "\"";
 }
 TEST(SetGetConfigTests, ValidModeTest) {
-  Config tConf;
+  SCCConfig tConf;
 
   tConf.mode = SCCMode::kInteractive;
   EXPECT_EQ(SCCMode::kInteractive, tConf.mode);
@@ -36,7 +37,7 @@ TEST(SetGetConfigTests, ValidModeTest) {
   EXPECT_EQ(SCCMode::kDaemon, tConf.mode);
 }
 TEST(SetGetConfigTests, SQLPathTest) {
-  Config tConf;
+  SCCConfig tConf;
 
   std::string SQL_path = tConf.GetConfigPath()
                          + "../../resources/config_test_resources/";
@@ -54,7 +55,7 @@ TEST(SetGetConfigTests, SQLPathTest) {
                 << " does not exist, so should not be set as SQL path";
 }
 TEST(SetGetConfigTests, CypherPathTest) {
-  Config tConf;
+  SCCConfig tConf;
 
   std::string Cypher_path = tConf.GetConfigPath()
                             + "../../resources/config_test_resources/";
@@ -67,7 +68,7 @@ TEST(SetGetConfigTests, CypherPathTest) {
 
 class GetConsoleArgumentsTests : public ::testing::Test {
 protected:
-  Config tConf;
+  SCCConfig tConf;
   SCCMode def_mode;
   std::string def_sql_path;
   std::string def_cypher_path;
@@ -101,6 +102,7 @@ TEST_F(GetConsoleArgumentsTests, WithoutArguments) {
   EXPECT_THAT(tConf.sql_file(), Eq(def_sql_path));
   EXPECT_THAT(tConf.cypher_file(), Eq(def_cypher_path));
 }
+
 // TODO: come up with how test GetConsoleArguments() method.
 //TEST_F(GetConsoleArgumentsTests, ValidModeFlagTest1) {
 //  argc = 2;

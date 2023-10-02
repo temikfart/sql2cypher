@@ -2,16 +2,19 @@
 
 //-------------------Tokenizer-------------------
 
+Tokenizer::Tokenizer(const std::filesystem::path& input_path)
+: input_(input_path) {}
+
 void Tokenizer::Tokenize() {
   LOGI << "tokenizing...";
 
   line_number_ = 1;
   while (true) {
-    char another_symbol = config.PeekSQLSymbol();
+    char another_symbol = PeekSQLSymbol();
     if (std::isspace(another_symbol)) {
       if (another_symbol == '\n')
         line_number_++;
-      config.GetSQLSymbol();
+      GetSQLSymbol();
     } else if (std::isdigit(another_symbol)) {
       this->GetNumber();
     } else if (std::isalpha(another_symbol)) {
@@ -77,25 +80,44 @@ void Tokenizer::PrintTokens() {
   LOGD << "token's array is printed";
 }
 
+char Tokenizer::GetSQLSymbol() {
+  return (char) input_.get();
+}
+char Tokenizer::PeekSQLSymbol() {
+  return (char) input_.peek();
+}
+bool Tokenizer::CloseInputFile() {
+  if (input_.is_open()) {
+    input_.close();
+    if (input_.good() || input_.eof()) {
+      ;
+    } else {
+      std::cerr << "input file close error" << std::endl;
+      return false;
+    }
+  }
+  return true;
+}
+
 void Tokenizer::GetNumber() {
   LOGD << "getting a number...";
 
   double data = 0.0;
   double power = 1.0;
 
-  while (isdigit(config.PeekSQLSymbol()))
-    data = 10.0 * data + config.GetSQLSymbol() - '0';
+  while (isdigit(PeekSQLSymbol()))
+    data = 10.0 * data + GetSQLSymbol() - '0';
 
-  if (config.PeekSQLSymbol() == '.') {
-    config.GetSQLSymbol();
+  if (PeekSQLSymbol() == '.') {
+    GetSQLSymbol();
   } else {
     tokens_array_.push_back(std::make_shared<IntNumNode>((int) data));
     LOGD << "got the integer number";
     return;
   }
 
-  while (isdigit(config.PeekSQLSymbol())) {
-    data = 10.0 * data + config.GetSQLSymbol() - '0';
+  while (isdigit(PeekSQLSymbol())) {
+    data = 10.0 * data + GetSQLSymbol() - '0';
     power *= 10.0;
   }
   data = data / power;
@@ -109,11 +131,11 @@ void Tokenizer::GetWord() {
   LOGD << "getting a word...";
   std::ostringstream data;
 
-  char another_symbol = config.PeekSQLSymbol();
+  char another_symbol = PeekSQLSymbol();
   while (isalpha(another_symbol) || isdigit(another_symbol)
       || another_symbol == '_') {
-    data << config.GetSQLSymbol();
-    another_symbol = config.PeekSQLSymbol();
+    data << GetSQLSymbol();
+    another_symbol = PeekSQLSymbol();
   }
 
   auto word_node = std::make_shared<StringNode>(data.str(), DataType::WORD);
@@ -125,9 +147,9 @@ void Tokenizer::GetOperator() {
   LOGD << "getting an operator...";
   std::ostringstream data;
 
-  data << config.GetSQLSymbol();
-  while (IsOperator(config.PeekSQLSymbol()))
-    data << config.GetSQLSymbol();
+  data << GetSQLSymbol();
+  while (IsOperator(PeekSQLSymbol()))
+    data << GetSQLSymbol();
 
   auto op_node = std::make_shared<StringNode>(data.str(), DataType::OPERATOR);
   op_node->set_line(line_number_);
@@ -136,7 +158,7 @@ void Tokenizer::GetOperator() {
 }
 void Tokenizer::GetCharacter(DataType type) {
   LOGD << "getting a character...";
-  auto char_node = std::make_shared<CharNode>(config.GetSQLSymbol(), type);
+  auto char_node = std::make_shared<CharNode>(GetSQLSymbol(), type);
   char_node->set_line(line_number_);
   tokens_array_.push_back(char_node);
   LOGD << "got the character";
