@@ -9,9 +9,11 @@
 #define INTERACTIVE "interactive"
 #define DAEMON "daemon"
 
+namespace scc {
+
 class SCCMode {
 public:
-  enum Value: unsigned char {
+  enum Value : unsigned char {
     kInteractive,
     kDaemon,
   };
@@ -37,3 +39,5 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& os, const SCCMode& mode);
+
+} // scc

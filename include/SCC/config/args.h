@@ -32,14 +32,14 @@
 #define SCC_LOG_DIR "../log"
 #endif
 
-using namespace argparse;
+namespace scc {
 
 class no_argument_error : public std::runtime_error {
 public:
   explicit no_argument_error(const std::string& message);
 };
 
-class SCCArgs : public ArgumentParser {
+class SCCArgs : public argparse::ArgumentParser {
 public:
   explicit SCCArgs();
 
@@ -47,7 +47,7 @@ public:
 
   template<typename T = std::string>
   auto Get(const std::string& arg_name) const
-      -> std::conditional_t<details::IsContainer<T>, T, const T &> {
+  -> std::conditional_t<argparse::details::IsContainer<T>, T, const T&> {
     try {
       return get<T>(arg_name);
     } catch (const std::logic_error& e) {
@@ -65,3 +65,5 @@ public:
 private:
   void PrintHelpAndExit() const;
 };
+
+} // scc

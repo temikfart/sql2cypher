@@ -1,9 +1,11 @@
 #include "SCC/config/args.h"
 
-no_argument_error::no_argument_error(const std::string& message)
-: std::runtime_error(message) {}
+namespace scc {
 
-SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, default_arguments::none) {
+no_argument_error::no_argument_error(const std::string& message)
+    : std::runtime_error(message) {}
+
+SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, argparse::default_arguments::none) {
   set_assign_chars("= ");
 
   add_description("Translates SQL queries for MS SQL Server into queries for Neo4j DBMS.");
@@ -79,3 +81,5 @@ void SCCArgs::PrintHelpAndExit() const {
   std::cout << help().str();
   exit(EXIT_SUCCESS);
 }
+
+} // scc

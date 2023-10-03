@@ -1,5 +1,7 @@
 #include "SCC/config/scc_mode.h"
 
+namespace scc {
+
 SCCMode::SCCMode(Value value) {
   if (value > kDaemon)
     throw std::invalid_argument("Incorrect value for SCC Mode");
@@ -28,3 +30,5 @@ std::ostream& operator<<(std::ostream& os, const SCCMode& mode) {
   os << mode.ToString();
   return os;
 }
+
+} // scc
