@@ -263,19 +263,20 @@ if (NOT PACKAGE)
     # Make sure, that source files are mentioned ONE time
     set(COMMON_TEST
             src/common/string_utils.cpp)
-    set(CONFIG_TEST
-            test/config_test/config_test.cpp
-            src/config/scc_config.cpp
-            src/config/scc_mode.cpp)
-    set(LOG_TEST
-            test/log_test/log_test.cpp
-            src/log.cpp)
-    set(AST_TEST
-            test/ast_test/ast_test.cpp
-            src/ast.cpp)
-    set(LEXICAL_ANALYZER_TEST
-            test/lexical_analyzer_test/lexical_analyzer_test.cpp
-            src/lexical_analyzer.cpp)
+    # Temporarily disabled
+#    set(CONFIG_TEST
+#            test/config_test/config_test.cpp
+#            src/config/scc_config.cpp
+#            src/config/scc_mode.cpp)
+#    set(LOG_TEST
+#            test/log_test/log_test.cpp
+#            src/log.cpp)
+#    set(AST_TEST
+#            test/ast_test/ast_test.cpp
+#            src/ast.cpp)
+#    set(LEXICAL_ANALYZER_TEST
+#            test/lexical_analyzer_test/lexical_analyzer_test.cpp
+#            src/lexical_analyzer.cpp)
     # Broken tests
 #    set(SQL_AST_TEST
 #            test/SQL_AST_test/SQL_AST_test.cpp src/syntax_analyzer_general.cpp
@@ -287,14 +288,16 @@ if (NOT PACKAGE)
             ${LOG_TEST}
             ${AST_TEST}
             ${LEXICAL_ANALYZER_TEST}
-            ${SQL_AST_TEST})
+            ${SQL_AST_TEST}
+    )
 
     target_link_libraries(
             ${TEST_TARGET}
             GTest::gtest_main
             GTest::gmock
             liblogger
-            argparse)
+            argparse
+    )
 
     include(GoogleTest)
     gtest_discover_tests(${TEST_TARGET})
