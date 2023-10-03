@@ -262,6 +262,9 @@ if (NOT PACKAGE)
     include_directories(include)
     # Make sure, that source files are mentioned ONE time
     set(COMMON_TEST
+            test/common/file_utils_test.cpp
+            src/common/file_utils.cpp
+
             src/common/string_utils.cpp)
     # Temporarily disabled
 #    set(CONFIG_TEST
