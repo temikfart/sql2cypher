@@ -4,6 +4,6 @@
 
 namespace scc::common {
 
-std::string LowerCase(const std::string &str);
+std::string LowerCase(const std::string& str);
 
 } // scc::common

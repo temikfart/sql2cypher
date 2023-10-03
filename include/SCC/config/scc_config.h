@@ -15,8 +15,6 @@ void end(int exit_code);
 
 namespace scc {
 
-namespace fs = std::filesystem;
-
 class SCCConfig : public common::Singleton<SCCConfig> {
 public:
   logger::Severity log_severity;
@@ -27,14 +25,14 @@ public:
 
   void SetParamsFrom(const SCCArgs& args);
 
-  const fs::path& get_sql_file() const;
-  const fs::path& get_cypher_file() const;
-  const fs::path& get_ast_dump_file() const;
+  const std::filesystem::path& get_sql_file() const;
+  const std::filesystem::path& get_cypher_file() const;
+  const std::filesystem::path& get_ast_dump_file() const;
 
 private:
-  fs::path sql_file_;
-  fs::path cypher_file_;
-  fs::path ast_dump_file_;
+  std::filesystem::path sql_file_;
+  std::filesystem::path cypher_file_;
+  std::filesystem::path ast_dump_file_;
 };
 
 SCCConfig& InitConfig(const SCCArgs& args);

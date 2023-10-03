@@ -2,7 +2,7 @@
 
 namespace scc::common {
 
-std::string LowerCase(const std::string &str) {
+std::string LowerCase(const std::string& str) {
   std::string result = str;
   std::transform(result.begin(), result.end(), result.begin(),
                  [](unsigned char c) {

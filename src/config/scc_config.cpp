@@ -6,8 +6,10 @@ void end(int exit_code) {
 
 namespace scc {
 
+namespace fs = std::filesystem;
+
 SCCConfig* SCCConfig::Get() {
-  auto *instance = get_instance();
+  auto* instance = get_instance();
   if (instance == nullptr)
     std::cerr << "SCC: ERROR! Could not start: the configuration is not initialized." << std::endl;
   return instance;

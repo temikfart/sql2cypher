@@ -1,13 +1,13 @@
 #include "SCC/main.h"
 
 int main(int argc, char* argv[]) {
-  SCCArgs scc_args = SCCArgs();
+  scc::SCCArgs scc_args;
   scc_args.ParseArgs(argc, argv);
 
   scc::InitConfig(scc_args);
   scc::SCCConfig* config = scc::SCCConfig::Get();
 
-  logger::init(config.log_severity, config.log_directory);
+  logger::init(config->log_severity, config->log_directory);
 
   Tokenizer tokenizer(config->get_sql_file());
   tokenizer.Tokenize();
