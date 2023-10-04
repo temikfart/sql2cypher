@@ -35,7 +35,7 @@ public:
   constexpr bool operator>=(const Value& value) const { return value_ >= value; }
 
 private:
-  Value value_;
+  Value value_ = Value::kInteractive;
 };
 
 std::ostream& operator<<(std::ostream& os, const SCCMode& mode);
