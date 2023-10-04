@@ -97,7 +97,7 @@ set(COMMON_SRC
 set(LOG_SRC
         src/log.cpp)
 set(CONFIG_SRC
-        src/config/args.cpp
+        src/config/scc_args.cpp
         src/config/scc_config.cpp
         src/config/scc_mode.cpp)
 set(SOURCE_LIST src/main.cpp

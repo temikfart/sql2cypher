@@ -1,4 +1,4 @@
-#include "SCC/config/args.h"
+#include "SCC/config/scc_args.h"
 
 namespace scc {
 

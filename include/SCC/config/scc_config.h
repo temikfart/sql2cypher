@@ -7,7 +7,7 @@
 #include "logger/severity.hpp"
 
 #include "SCC/common/singleton.h"
-#include "SCC/config/args.h"
+#include "SCC/config/scc_args.h"
 #include "SCC/config/scc_mode.h"
 #include "SCC/log.h"
 
