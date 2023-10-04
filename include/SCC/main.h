@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "SCC/ast.h"
-#include "SCC/config/args.h"
+#include "SCC/config/scc_args.h"
 #include "SCC/config/scc_config.h"
 #include "SCC/lexical_analyzer.h"
 #include "SCC/log.h"
