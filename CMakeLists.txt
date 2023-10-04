@@ -265,7 +265,9 @@ if (NOT PACKAGE)
             test/common/file_utils_test.cpp
             src/common/file_utils.cpp
 
-            src/common/string_utils.cpp)
+            test/common/string_utils_test.cpp
+            src/common/string_utils.cpp
+    )
     # Temporarily disabled
 #    set(CONFIG_TEST
 #            test/config_test/config_test.cpp
