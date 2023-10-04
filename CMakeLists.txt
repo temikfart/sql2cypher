@@ -268,6 +268,10 @@ if (NOT PACKAGE)
             test/common/string_utils_test.cpp
             src/common/string_utils.cpp
     )
+    set(CONFIG_TEST
+            test/config/scc_mode_test.cpp
+            src/config/scc_mode.cpp
+    )
     # Temporarily disabled
 #    set(CONFIG_TEST
 #            test/config_test/config_test.cpp
