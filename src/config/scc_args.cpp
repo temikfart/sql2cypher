@@ -13,7 +13,7 @@ SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, argparse::default_arg
 
   add_argument("-h", "--help")
       .action([this](const std::string& /*unused*/) {
-        PrintHelpAndExit();
+        PrintHelpAndExit(EXIT_SUCCESS);
       })
       .help("Show this info")
       .default_value(false)
@@ -68,18 +68,23 @@ SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, argparse::default_arg
 
 void SCCArgs::ParseArgs(int argc, char* argv[]) {
   if (argc == 1)
-    PrintHelpAndExit();
+    PrintHelpAndExit(EXIT_SUCCESS);
 
-  parse_args(argc, argv);
+  try {
+    parse_args(argc, argv);
+  } catch (const std::runtime_error& e) {
+    std::cerr << e.what() << std::endl;
+    PrintHelpAndExit(EXIT_FAILURE);
+  }
 }
 
 bool SCCArgs::IsUsed(const std::string& arg_name) const {
   return is_used(arg_name);
 }
 
-void SCCArgs::PrintHelpAndExit() const {
+void SCCArgs::PrintHelpAndExit(int exit_code) const {
   std::cout << help().str();
-  exit(EXIT_SUCCESS);
+  exit(exit_code);
 }
 
 } // scc
