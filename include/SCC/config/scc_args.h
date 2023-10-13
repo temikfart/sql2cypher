@@ -63,7 +63,7 @@ public:
   bool IsUsed(const std::string& arg_name) const;
 
 private:
-  void PrintHelpAndExit() const;
+  void PrintHelpAndExit(int exit_code) const;
 };
 
 } // scc
