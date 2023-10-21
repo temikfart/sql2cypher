@@ -34,7 +34,7 @@
 
 namespace scc {
 
-class no_argument_error : public std::runtime_error {
+class no_argument_error : private std::runtime_error {
 public:
   explicit no_argument_error(const std::string& message);
 };
@@ -43,7 +43,7 @@ class SCCArgs : public argparse::ArgumentParser {
 public:
   explicit SCCArgs();
 
-  void ParseArgs(int argc, char* argv[]);
+  void ParseArgs(int argc, const char* const argv[]);
 
   template<typename T = std::string>
   auto Get(const std::string& arg_name) const

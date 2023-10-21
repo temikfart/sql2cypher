@@ -66,7 +66,7 @@ SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, argparse::default_arg
       .default_value(std::string(SCC_LOG_DIR));
 }
 
-void SCCArgs::ParseArgs(int argc, char* argv[]) {
+void SCCArgs::ParseArgs(int argc, const char* const argv[]) {
   if (argc == 1)
     PrintHelpAndExit(EXIT_SUCCESS);
 
