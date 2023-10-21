@@ -57,7 +57,7 @@ public:
 
   template<typename T = std::string>
   std::optional<T> Present(const std::string& arg_name) const {
-    return present(arg_name);
+    return present<T>(arg_name);
   }
 
   bool IsUsed(const std::string& arg_name) const;
