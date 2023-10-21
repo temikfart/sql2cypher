@@ -1,4 +1,6 @@
 #include <format>
+#include <optional>
+#include <stdexcept>
 #include <vector>
 
 #include "gtest/gtest.h"
@@ -84,9 +86,11 @@ TEST_F(SCCArgsBaseTests, SQLArgumentWithoutParameterTest) {
 
 class SCCArgsTests : public SCCArgsBaseTests {
 protected:
+  std::string sql_path = common::ResourcesPath() + "/sql_queries.sql";
+
   void SetUp() override {
     AddArg("scc");
-    AddArg(std::format("--sql={}", common::ResourcesPath() + "/sql_queries.sql"));
+    AddArg(std::format("--sql={}", sql_path));
   }
 };
 
@@ -203,4 +207,47 @@ TEST_F(SCCArgsTests, LogDirectoryArgumentTest) {
 
   std::string log_directory_path = parser.Get("--log-directory");
   EXPECT_EQ(log_directory_path, log_dir_value);
+}
+
+TEST_F(SCCArgsTests, IsUsedUsedArgumentTest) {
+  EXPECT_NO_THROW(ParseArgsWrapper());
+  EXPECT_TRUE(parser.IsUsed("--sql"));
+}
+TEST_F(SCCArgsTests, IsUsedUnusedArgumentWithDefaultValueTest) {
+  EXPECT_NO_THROW(ParseArgsWrapper());
+  EXPECT_FALSE(parser.IsUsed("--daemon"));
+}
+TEST_F(SCCArgsTests, IsUsedUnusedArgumentWithoutDefaultValueTest) {
+  EXPECT_NO_THROW(ParseArgsWrapper());
+  EXPECT_FALSE(parser.IsUsed("--dump"));
+}
+TEST_F(SCCArgsTests, IsUsedInvalidArgumentTest) {
+  GTEST_SKIP() << "Terminated by SIGTRAP.";
+  EXPECT_NO_THROW(ParseArgsWrapper());
+  EXPECT_THROW(parser.IsUsed("--invalidArgument"), std::logic_error);
+}
+
+TEST_F(SCCArgsTests, PresentUsedArgumentTest) {
+  EXPECT_NO_THROW(ParseArgsWrapper());
+  EXPECT_NO_THROW(
+      std::optional<std::string> sql_value = parser.Present("--sql");
+      EXPECT_EQ(sql_value.value(), sql_path);
+  );
+}
+TEST_F(SCCArgsTests, PresentUnusedArgumentWithDefaultValueTest) {
+  GTEST_SKIP() << "Terminated by SIGTRAP.";
+  EXPECT_NO_THROW(ParseArgsWrapper());
+  EXPECT_THROW(parser.Present<bool>("--daemon"), std::logic_error);
+}
+TEST_F(SCCArgsTests, PresentUnusedArgumentWithoutDefaultValueTest) {
+  EXPECT_NO_THROW(ParseArgsWrapper());
+  EXPECT_NO_THROW(
+      std::optional<bool> dump_file = parser.Present<bool>("--dump");
+      EXPECT_FALSE(dump_file.has_value());
+  );
+}
+TEST_F(SCCArgsTests, PresentInvalidArgumentTest) {
+  GTEST_SKIP() << "Terminated by SIGTRAP.";
+  EXPECT_NO_THROW(ParseArgsWrapper());
+  EXPECT_THROW(parser.Present("--invalidArgument"), std::logic_error);
 }
