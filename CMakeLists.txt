@@ -121,7 +121,7 @@ include(FetchContent)
 FetchContent_Declare(
         logger
         GIT_REPOSITORY https://github.com/temikfart/logger.git
-        GIT_TAG main
+        GIT_TAG main # latest
 )
 FetchContent_MakeAvailable(logger)
 FetchContent_Declare(
