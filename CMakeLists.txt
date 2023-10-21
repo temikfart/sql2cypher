@@ -270,6 +270,10 @@ if (NOT PACKAGE)
             src/common/string_utils.cpp
     )
     set(CONFIG_TEST
+            test/config/scc_args_test.cpp
+            src/config/scc_args.cpp
+            src/log.cpp
+
             test/config/scc_mode_test.cpp
             src/config/scc_mode.cpp
     )
