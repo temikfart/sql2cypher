@@ -78,7 +78,7 @@ TEST_F(SCCArgsBaseTests, SQLArgumentTest) {
   EXPECT_NO_THROW(ParseArgsWrapper());
 }
 TEST_F(SCCArgsBaseTests, SQLArgumentWithoutParameterTest) {
-  GTEST_SKIP() << "Terminated by SIGTRAP.";
+  GTEST_SKIP() << "Argument without value did not throw an exception.";
   AddArg("--sql");
 
   EXPECT_THROW(ParseArgsWrapper(), std::runtime_error);
@@ -101,7 +101,7 @@ TEST_F(SCCArgsTests, CypherArgumentDefaultValueTest) {
   EXPECT_TRUE(default_cypher_file.find("out.cypher") != std::string::npos);
 }
 TEST_F(SCCArgsTests, CypherArgumentWithoutParameterTest) {
-  GTEST_SKIP() << "Terminated by SIGTRAP.";
+  GTEST_SKIP() << "Argument without value did not throw an exception.";
   AddArg("--cypher");
 
   EXPECT_THROW(ParseArgsWrapper(), std::runtime_error);
@@ -139,7 +139,6 @@ TEST_F(SCCArgsTests, ModeArgumentInteractiveValueTest) {
   EXPECT_EQ(mode, SCCMode::kInteractive);
 }
 TEST_F(SCCArgsTests, ModeArgumentInvalidValueTest) {
-  GTEST_SKIP() << "Terminated by SIGTRAP.";
   AddArg(std::format("--mode={}", "invalid"));
 
   EXPECT_NO_THROW(ParseArgsWrapper());
@@ -184,7 +183,6 @@ TEST_F(SCCArgsTests, LogSeverityArgumentValidValueTest) {
   EXPECT_EQ(severity, logger::Severity::fatal);
 }
 TEST_F(SCCArgsTests, LogSeverityArgumentInvalidValueTest) {
-  GTEST_SKIP() << "Terminated by SIGTRAP.";
   AddArg(std::format("--log-severity={}", "invalid_severity"));
 
   EXPECT_NO_THROW(ParseArgsWrapper());
@@ -222,7 +220,6 @@ TEST_F(SCCArgsTests, IsUsedUnusedArgumentWithoutDefaultValueTest) {
   EXPECT_FALSE(parser.IsUsed("--dump"));
 }
 TEST_F(SCCArgsTests, IsUsedInvalidArgumentTest) {
-  GTEST_SKIP() << "Terminated by SIGTRAP.";
   EXPECT_NO_THROW(ParseArgsWrapper());
   EXPECT_THROW(parser.IsUsed("--invalidArgument"), std::logic_error);
 }
@@ -235,7 +232,6 @@ TEST_F(SCCArgsTests, PresentUsedArgumentTest) {
   );
 }
 TEST_F(SCCArgsTests, PresentUnusedArgumentWithDefaultValueTest) {
-  GTEST_SKIP() << "Terminated by SIGTRAP.";
   EXPECT_NO_THROW(ParseArgsWrapper());
   EXPECT_THROW(parser.Present<bool>("--daemon"), std::logic_error);
 }
@@ -247,7 +243,6 @@ TEST_F(SCCArgsTests, PresentUnusedArgumentWithoutDefaultValueTest) {
   );
 }
 TEST_F(SCCArgsTests, PresentInvalidArgumentTest) {
-  GTEST_SKIP() << "Terminated by SIGTRAP.";
   EXPECT_NO_THROW(ParseArgsWrapper());
   EXPECT_THROW(parser.Present("--invalidArgument"), std::logic_error);
 }
