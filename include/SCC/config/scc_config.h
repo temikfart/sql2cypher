@@ -6,6 +6,7 @@
 
 #include "logger/severity.hpp"
 
+#include "SCC/common/file_utils.h"
 #include "SCC/common/singleton.h"
 #include "SCC/config/scc_args.h"
 #include "SCC/config/scc_mode.h"
@@ -21,9 +22,9 @@ public:
   fs::path log_directory;
   SCCMode mode;
 
-  static SCCConfig* Get();
+  explicit SCCConfig(const SCCArgs& args);
 
-  void SetParamsFrom(const SCCArgs& args);
+  static SCCConfig* Get();
 
   const std::filesystem::path& get_sql_file() const;
   const std::filesystem::path& get_cypher_file() const;
