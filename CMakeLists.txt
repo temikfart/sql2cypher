@@ -265,6 +265,7 @@ if (NOT PACKAGE)
     # Make sure, that source files are mentioned ONE time
     set(TEST_FIXTURES
             test/fixtures/src/scc_args_fixtures.cpp
+            test/fixtures/src/scc_config_fixtures.cpp
     )
     set(COMMON_TEST
             test/common/file_utils_test.cpp
@@ -277,6 +278,9 @@ if (NOT PACKAGE)
             test/config/scc_args_test.cpp
             src/config/scc_args.cpp
             src/log.cpp
+
+            test/config/scc_config_test.cpp
+            src/config/scc_config.cpp
 
             test/config/scc_mode_test.cpp
             src/config/scc_mode.cpp

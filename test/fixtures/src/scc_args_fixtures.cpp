@@ -1,7 +1,6 @@
 #include "SCC/fixtures/scc_args_fixtures.h"
 
 using namespace scc;
-using namespace testing;
 
 void SCCArgsBaseTests::ParseArgsWrapper() {
   parser.ParseArgs(args.argc, args.argv.data());
