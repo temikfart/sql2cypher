@@ -261,7 +261,11 @@ if (NOT PACKAGE)
     enable_testing()
 
     include_directories(include)
+    include_directories(test/fixtures/include)
     # Make sure, that source files are mentioned ONE time
+    set(TEST_FIXTURES
+            test/fixtures/src/scc_args_fixtures.cpp
+    )
     set(COMMON_TEST
             test/common/file_utils_test.cpp
             src/common/file_utils.cpp
@@ -296,7 +300,7 @@ if (NOT PACKAGE)
 #            test/SQL_AST_test/SQL_AST_test.cpp src/syntax_analyzer_general.cpp
 #            src/syntax_analyzer_other.cpp src/syntax_analyzer_ddl.cpp src/syntax_analyzer_dml.cpp
 #            src/tree_dump.cpp)
-    add_executable(${TEST_TARGET}
+    add_executable(${TEST_TARGET} ${TEST_FIXTURES}
             ${COMMON_TEST}
             ${CONFIG_TEST}
             ${LOG_TEST}
