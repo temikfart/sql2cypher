@@ -1,49 +1,16 @@
 #include <format>
 #include <optional>
 #include <stdexcept>
-#include <vector>
 
 #include "gtest/gtest.h"
 
 #include "SCC/common/file_utils.h"
 #include "SCC/config/scc_args.h"
+#include "SCC/fixtures/scc_args_fixtures.h"
 #include "SCC/log.h"
 
 using namespace scc;
 using namespace testing;
-
-class SCCArgsBaseTests : public Test {
-protected:
-  struct Args {
-    int argc = 0;
-    std::vector<const char*> argv;
-  };
-
-  Args args;
-  SCCArgs parser;
-  const std::string resource_path = common::ResourcesPath();
-
-  void ParseArgsWrapper() {
-    parser.ParseArgs(args.argc, args.argv.data());
-  }
-
-  void AddArg(const std::string& option) {
-    char* arg = new char[option.length() + 1];
-    strcpy(arg, option.c_str());
-
-    args.argv.push_back(arg);
-    args.argc++;
-  }
-
-  void SetUp() override {
-    AddArg("scc");
-  }
-
-  void TearDown() override {
-    for (const char* arg : args.argv)
-      delete[] arg;
-  }
-};
 
 TEST_F(SCCArgsBaseTests, NoArgumentsTest) {
   EXPECT_EXIT(ParseArgsWrapper(), ExitedWithCode(EXIT_SUCCESS), ""); // TODO: add regex.
@@ -83,16 +50,6 @@ TEST_F(SCCArgsBaseTests, SQLArgumentWithoutParameterTest) {
 
   EXPECT_THROW(ParseArgsWrapper(), std::runtime_error);
 }
-
-class SCCArgsTests : public SCCArgsBaseTests {
-protected:
-  std::string sql_path = common::ResourcesPath() + "/sql_queries.sql";
-
-  void SetUp() override {
-    AddArg("scc");
-    AddArg(std::format("--sql={}", sql_path));
-  }
-};
 
 TEST_F(SCCArgsTests, CypherArgumentDefaultValueTest) {
   EXPECT_NO_THROW(ParseArgsWrapper());
