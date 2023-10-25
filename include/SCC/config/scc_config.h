@@ -36,6 +36,6 @@ private:
   std::filesystem::path ast_dump_file_;
 };
 
-SCCConfig& InitConfig(const SCCArgs& args);
+void InitConfig(const SCCArgs& args);
 
 } // scc

@@ -52,9 +52,8 @@ const fs::path& SCCConfig::get_ast_dump_file() const {
   return ast_dump_file_;
 }
 
-SCCConfig& InitConfig(const SCCArgs& args) {
+void InitConfig(const SCCArgs& args) {
   static SCCConfig scc_config(args);
-  return scc_config;
 }
 
 } // scc
