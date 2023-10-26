@@ -29,10 +29,13 @@ void SCCArgsBaseTests::TearDown() {
 }
 
 void SCCArgsTests::AddSqlArgWithDefaultValue() {
-  AddArg(std::format("--sql={}", sql_path));
+  AddArg("--sql={}", sql_path);
 }
 
 void SCCArgsTests::SetUp() {
-  AddProgramName();
+  SCCArgsBaseTests::SetUp();
   AddSqlArgWithDefaultValue();
+}
+void SCCArgsTests::TearDown() {
+  SCCArgsBaseTests::TearDown();
 }

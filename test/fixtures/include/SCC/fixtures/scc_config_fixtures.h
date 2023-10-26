@@ -10,5 +10,6 @@ protected:
   scc::SCCConfig* config = nullptr;
 
   void SetUp() override;
+  void TearDown() override;
 };
 

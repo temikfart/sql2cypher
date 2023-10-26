@@ -3,8 +3,10 @@
 using namespace scc;
 
 void SCCConfigBaseTests::SetUp() {
-  AddProgramName();
-  AddSqlArgWithDefaultValue();
+  SCCArgsTests::SetUp();
   ParseArgsWrapper();
+}
+void SCCConfigBaseTests::TearDown() {
+  SCCArgsTests::TearDown();
 }
 
