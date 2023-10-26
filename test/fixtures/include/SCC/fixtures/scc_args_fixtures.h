@@ -21,6 +21,10 @@ protected:
 
   void ParseArgsWrapper();
   void AddArg(const std::string& option);
+  template<typename... Values> // TODO: refactor to one value.
+  void AddArg(std::format_string<Values...> format_option, Values&&... values) {
+    AddArg(std::format(format_option, values...));
+  }
 
   void AddProgramName();
   void DeleteArgs();
@@ -36,4 +40,5 @@ protected:
   void AddSqlArgWithDefaultValue();
 
   void SetUp() override;
+  void TearDown() override;
 };
