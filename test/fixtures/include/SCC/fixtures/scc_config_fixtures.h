@@ -13,3 +13,20 @@ protected:
   void TearDown() override;
 };
 
+class SCCConfigTests : public SCCConfigBaseTests {
+protected:
+  void InitializeConfig();
+
+  void SetUp() override;
+  void TearDown() override;
+};
+
+class CustomSCCConfigTests : public SCCArgsBaseTests {
+protected:
+  scc::SCCConfig* config;
+
+  void InitializeConfig();
+
+  void SetUp() override;
+  void TearDown() override;
+};
