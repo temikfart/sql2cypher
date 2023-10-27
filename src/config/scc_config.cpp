@@ -18,9 +18,17 @@ namespace fs = std::filesystem;
 
 SCCConfig::SCCConfig(const SCCArgs& args) {
   try {
-    log_severity = args.Get<logger::Severity>("--log-severity");
+    if (args.IsUsed("--log-severity"))
+      log_severity = logger::to_severity(args.Get("--log-severity"));
+    else
+      log_severity = args.Get<logger::Severity>("--log-severity");
+
     log_directory = fs::weakly_canonical(args.Get("--log-directory"));
-    mode = args.Get<SCCMode>("--mode");
+
+    if (args.IsUsed("--mode"))
+      mode = SCCMode(args.Get("--mode"));
+    else
+      mode = args.Get<SCCMode>("--mode");
 
     std::string sql_file_path = args.Get("--sql");
     common::ValidateFileExists(sql_file_path);
