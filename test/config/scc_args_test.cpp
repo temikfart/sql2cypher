@@ -39,7 +39,7 @@ TEST_F(SCCArgsBaseTests, GetVersionShortOptionTest) {
 }
 
 TEST_F(SCCArgsBaseTests, SQLArgumentTest) {
-  const std::string sql_file = resource_path + "/sql_queries.sql";
+  const std::string sql_file = sql_path;
   AddArg("--sql={}", sql_file);
 
   EXPECT_NO_THROW(ParseArgsWrapper());
