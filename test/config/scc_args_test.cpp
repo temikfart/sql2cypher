@@ -40,7 +40,7 @@ TEST_F(SCCArgsBaseTests, GetVersionShortOptionTest) {
 
 TEST_F(SCCArgsBaseTests, SQLArgumentTest) {
   const std::string sql_file = sql_path;
-  AddArg("--sql={}", sql_file);
+  AddArg(std::format("--sql={}", sql_file));
 
   EXPECT_NO_THROW(ParseArgsWrapper());
 }
@@ -80,7 +80,7 @@ TEST_F(SCCArgsTests, ModeArgumentWithoutParameterTest) {
   EXPECT_THROW(ParseArgsWrapper(), std::runtime_error);
 }
 TEST_F(SCCArgsTests, ModeArgumentDaemonValueTest) {
-  AddArg("--mode={}", "daemon");
+  AddArg(std::format("--mode={}", "daemon"));
 
   EXPECT_NO_THROW(ParseArgsWrapper());
 
@@ -88,7 +88,7 @@ TEST_F(SCCArgsTests, ModeArgumentDaemonValueTest) {
   EXPECT_EQ(mode, SCCMode::kDaemon);
 }
 TEST_F(SCCArgsTests, ModeArgumentInteractiveValueTest) {
-  AddArg("--mode={}", "interactive");
+  AddArg(std::format("--mode={}", "interactive"));
 
   EXPECT_NO_THROW(ParseArgsWrapper());
 
@@ -96,7 +96,7 @@ TEST_F(SCCArgsTests, ModeArgumentInteractiveValueTest) {
   EXPECT_EQ(mode, SCCMode::kInteractive);
 }
 TEST_F(SCCArgsTests, ModeArgumentInvalidValueTest) {
-  AddArg("--mode={}", "invalid");
+  AddArg(std::format("--mode={}", "invalid"));
 
   EXPECT_NO_THROW(ParseArgsWrapper());
 
@@ -131,7 +131,7 @@ TEST_F(SCCArgsTests, LogSeverityArgumentDefaultValueTest) {
   EXPECT_EQ(default_log_severity_short, logger::Severity::info);
 }
 TEST_F(SCCArgsTests, LogSeverityArgumentValidValueTest) {
-  AddArg("--log-severity={}", "fatal");
+  AddArg(std::format("--log-severity={}", "fatal"));
 
   EXPECT_NO_THROW(ParseArgsWrapper());
 
@@ -140,7 +140,7 @@ TEST_F(SCCArgsTests, LogSeverityArgumentValidValueTest) {
   EXPECT_EQ(severity, logger::Severity::fatal);
 }
 TEST_F(SCCArgsTests, LogSeverityArgumentInvalidValueTest) {
-  AddArg("--log-severity={}", "invalid_severity");
+  AddArg(std::format("--log-severity={}", "invalid_severity"));
 
   EXPECT_NO_THROW(ParseArgsWrapper());
 
@@ -156,7 +156,7 @@ TEST_F(SCCArgsTests, LogDirectoryArgumentDefaultValueTest) {
 }
 TEST_F(SCCArgsTests, LogDirectoryArgumentTest) {
   std::string log_dir_value = "/path/to/log_dir";
-  AddArg("--log-directory={}", log_dir_value);
+  AddArg(std::format("--log-directory={}", log_dir_value));
 
   EXPECT_NO_THROW(ParseArgsWrapper());
 

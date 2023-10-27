@@ -29,7 +29,7 @@ void SCCArgsBaseTests::TearDown() {
 }
 
 void SCCArgsTests::AddSqlArgWithDefaultValue() {
-  AddArg("--sql={}", sql_path);
+  AddArg(std::format("--sql={}", sql_path));
 }
 
 void SCCArgsTests::SetUp() {
