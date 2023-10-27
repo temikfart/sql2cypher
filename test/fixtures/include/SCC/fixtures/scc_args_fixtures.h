@@ -17,7 +17,7 @@ protected:
 
   Args args;
   scc::SCCArgs parser;
-  const std::string resource_path = scc::common::ResourcesPath();
+  const std::string sql_path = scc::common::ResourcesPath() + "/sql_queries.sql";
 
   void ParseArgsWrapper();
   void AddArg(const std::string& option);
@@ -35,8 +35,6 @@ protected:
 
 class SCCArgsTests : public SCCArgsBaseTests {
 protected:
-  std::string sql_path = scc::common::ResourcesPath() + "/sql_queries.sql";
-
   void AddSqlArgWithDefaultValue();
 
   void SetUp() override;
