@@ -286,10 +286,6 @@ if (NOT PACKAGE)
             src/config/scc_mode.cpp
     )
     # Temporarily disabled
-#    set(CONFIG_TEST
-#            test/config_test/config_test.cpp
-#            src/config/scc_config.cpp
-#            src/config/scc_mode.cpp)
 #    set(LOG_TEST
 #            test/log_test/log_test.cpp
 #            src/log.cpp)
