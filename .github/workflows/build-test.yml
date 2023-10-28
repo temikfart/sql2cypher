@@ -12,19 +12,18 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-linux:
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
-    
-    - name: SetUp
+    - name: Install dependencies
       run: sudo apt install graphviz
-    
-    - name: Build
+    - name: Configure
       run: cmake -S . -B build
-      
-    - name: Make
+    - name: Build
       run: cd build && cmake --build .
-      
-    - name: Test
+    - name: Unit tests
       run: cd build && ctest
