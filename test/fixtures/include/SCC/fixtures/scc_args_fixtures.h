@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstring>
+
 #include <vector>
 #include <string>
 
@@ -9,6 +11,9 @@
 #include "SCC/config/scc_args.h"
 
 class SCCArgsBaseTests : public testing::Test {
+private:
+  char* CreateArg(const std::string& option, const std::string& value);
+
 protected:
   struct Args {
     int argc = 0;
@@ -21,6 +26,7 @@ protected:
 
   void ParseArgsWrapper();
   void AddArg(const std::string& option);
+  void AddArg(const std::string& option, const std::string& value);
 
   void AddProgramName();
   void DeleteArgs();

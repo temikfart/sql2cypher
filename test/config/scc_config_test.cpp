@@ -62,19 +62,19 @@ TEST_F(SCCConfigTests, DefaultConfigTest) {
 }
 TEST_F(CustomSCCConfigTests, CustomConfigTest) {
   std::string custom_sql_file = sql_path;
-  AddArg(std::format("--sql={}", custom_sql_file));
+  AddArg("--sql", custom_sql_file);
 
   std::string custom_log_severity = std::string{logger::to_string(logger::Severity::fatal)};
-  AddArg(std::format("--log-severity={}", custom_log_severity));
+  AddArg("--log-severity", custom_log_severity);
 
   std::string custom_log_directory = fs::current_path().string();
-  AddArg(std::format("--log-directory={}", custom_log_directory));
+  AddArg("--log-directory", custom_log_directory);
 
   std::string custom_mode = SCCMode{SCCMode::kDaemon}.ToString();
-  AddArg(std::format("--mode={}", custom_mode));
+  AddArg("--mode", custom_mode);
 
   std::string custom_cypher_file = (fs::current_path() / "custom.cypher").string();
-  AddArg(std::format("--cypher={}", custom_cypher_file));
+  AddArg("--cypher", custom_cypher_file);
 
   EXPECT_NO_THROW(
       ParseArgsWrapper();
@@ -88,7 +88,7 @@ TEST_F(CustomSCCConfigTests, CustomConfigTest) {
   EXPECT_EQ(fs::weakly_canonical(fs::path{custom_cypher_file}), config->get_cypher_file());
 }
 TEST_F(CustomSCCConfigTests, ConfigWithUnexistedSqlPathTest) {
-  AddArg(std::format("--sql={}", ""));
+  AddArg("--sql", "");
 
   EXPECT_NO_THROW(ParseArgsWrapper());
   EXPECT_THROW(InitializeConfig(), std::runtime_error);
