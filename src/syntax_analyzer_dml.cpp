@@ -30,10 +30,10 @@ StatementType SyntaxAnalyzer::GetDMLStType() {
 
   return DMLStType;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetDMLSt() {
+std::shared_ptr<INode> SyntaxAnalyzer::GetDMLSt() {
   LOGD << "getting DML statement...";
-  std::shared_ptr<Node> node, statement;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+  std::shared_ptr<INode> node, statement;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::dmlStatement);
 
   int line = this->peek_first_token()->get_line();
@@ -61,23 +61,23 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDMLSt() {
 
 // DML Statements
 
-std::shared_ptr<Node> SyntaxAnalyzer::GetInsertSt() {
-  std::shared_ptr<Node> node;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+std::shared_ptr<INode> SyntaxAnalyzer::GetInsertSt() {
+  std::shared_ptr<INode> node;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::insertStatement);
 
   return node;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetDeleteSt() {
-  std::shared_ptr<Node> node;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+std::shared_ptr<INode> SyntaxAnalyzer::GetDeleteSt() {
+  std::shared_ptr<INode> node;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::deleteStatement);
 
   return node;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetUpdateSt() {
-  std::shared_ptr<Node> node;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+std::shared_ptr<INode> SyntaxAnalyzer::GetUpdateSt() {
+  std::shared_ptr<INode> node;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::updateStatement);
 
   return node;
@@ -85,9 +85,9 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetUpdateSt() {
 
 // DML Basic statements
 
-std::shared_ptr<Node> SyntaxAnalyzer::GetCondition() {
-  std::shared_ptr<Node> node, OR_condition;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+std::shared_ptr<INode> SyntaxAnalyzer::GetCondition() {
+  std::shared_ptr<INode> node, OR_condition;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::condition);
 
   OR_condition = this->GetORCondition();
@@ -96,9 +96,9 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetCondition() {
 
   return node;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetORCondition() {
-  std::shared_ptr<Node> node, AND_condition, next_AND_conditions;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+std::shared_ptr<INode> SyntaxAnalyzer::GetORCondition() {
+  std::shared_ptr<INode> node, AND_condition, next_AND_conditions;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::ORcondition);
 
   AND_condition = this->GetANDCondition();
@@ -125,9 +125,9 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetORCondition() {
 
   return node;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetANDCondition() {
-  std::shared_ptr<Node> node, NOT_condition, next_NOT_conditions;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+std::shared_ptr<INode> SyntaxAnalyzer::GetANDCondition() {
+  std::shared_ptr<INode> node, NOT_condition, next_NOT_conditions;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::ANDcondition);
 
   NOT_condition = this->GetNOTCondition();
@@ -155,9 +155,9 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetANDCondition() {
 
   return node;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetNOTCondition() {
-  std::shared_ptr<Node> node, NOT_operator, predicate;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+std::shared_ptr<INode> SyntaxAnalyzer::GetNOTCondition() {
+  std::shared_ptr<INode> node, NOT_operator, predicate;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::NOTcondition);
 
   // Get NOT if present
@@ -183,9 +183,9 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetNOTCondition() {
 
   return node;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetPredicate() {
-  std::shared_ptr<Node> node, lhs, rhs, bin_operator;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+std::shared_ptr<INode> SyntaxAnalyzer::GetPredicate() {
+  std::shared_ptr<INode> node, lhs, rhs, bin_operator;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::predicate);
 
   int line = this->peek_first_token()->get_line();
@@ -218,16 +218,16 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetPredicate() {
 
   return node;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetExpression() {
-  std::shared_ptr<Node> node;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+std::shared_ptr<INode> SyntaxAnalyzer::GetExpression() {
+  std::shared_ptr<INode> node;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::expression);
 
   int line = this->peek_first_token()->get_line();
 
   // Is it [table_name.] column ?
   if (SyntaxAnalyzer::IsWord(this->peek_first_token())) {
-    std::shared_ptr<Node> name, dot;
+    std::shared_ptr<INode> name, dot;
 
     name = this->GetIdentifier();
 
@@ -246,7 +246,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetExpression() {
 
   // Is it unary operator ?
   if (SyntaxAnalyzer::IsUnaryOperator(this->peek_first_token())) {
-    std::shared_ptr<Node> u_operator, expression;
+    std::shared_ptr<INode> u_operator, expression;
     u_operator = this->get_first_token();
 
     SyntaxAnalyzer::MakeKinship(node, u_operator);
@@ -293,19 +293,19 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetExpression() {
           << line << ": invalid string";
       end(EXIT_FAILURE);
     }
-    std::shared_ptr<Node> str = this->GetString();
+    std::shared_ptr<INode> str = this->GetString();
     SyntaxAnalyzer::MakeKinship(node, str);
   }
 
   // So, it is Math expression
-  std::shared_ptr<Node> expression = this->GetMathExpression();
+  std::shared_ptr<INode> expression = this->GetMathExpression();
   SyntaxAnalyzer::MakeKinship(node, expression);
 
   return node;
 }
 
-std::shared_ptr<Node> SyntaxAnalyzer::GetMathExpression() {
-  std::shared_ptr<Node> node;
+std::shared_ptr<INode> SyntaxAnalyzer::GetMathExpression() {
+  std::shared_ptr<INode> node;
 
   // TODO: implement this PEG
   /* MathExpr   <-- Sum
@@ -318,8 +318,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetMathExpression() {
 
   return node;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetMathSum() {
-  std::shared_ptr<Node> product_1, op_node, product_2;
+std::shared_ptr<INode> SyntaxAnalyzer::GetMathSum() {
+  std::shared_ptr<INode> product_1, op_node, product_2;
 
   int line = this->peek_first_token()->get_line();
   product_1 = this->GetMathProduct();
@@ -356,8 +356,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetMathSum() {
 
   return product_1;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetMathProduct() {
-  std::shared_ptr<Node> power_1, op_node, power_2;
+std::shared_ptr<INode> SyntaxAnalyzer::GetMathProduct() {
+  std::shared_ptr<INode> power_1, op_node, power_2;
 
   int line = this->peek_first_token()->get_line();
   power_1 = this->GetMathPower();
@@ -394,8 +394,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetMathProduct() {
 
   return power_1;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetMathPower() {
-  std::shared_ptr<Node> power, degree_op, degree;
+std::shared_ptr<INode> SyntaxAnalyzer::GetMathPower() {
+  std::shared_ptr<INode> power, degree_op, degree;
 
   int line = this->peek_first_token()->get_line();
   power = this->GetMathValue();
@@ -423,8 +423,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetMathPower() {
 
   return power;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetMathValue() {
-  std::shared_ptr<Node> value;
+std::shared_ptr<INode> SyntaxAnalyzer::GetMathValue() {
+  std::shared_ptr<INode> value;
 
   int line = this->peek_first_token()->get_line();
   if (SyntaxAnalyzer::IsNumber(this->peek_first_token())) {

@@ -16,7 +16,7 @@ bool QueryAssembler::CloseOutputFile() {
   return true;
 }
 
-void QueryAssembler::Translate(std::shared_ptr<Node> AST) {
+void QueryAssembler::Translate(std::shared_ptr<INode> AST) {
   LOGI << "starting translation...";
 
   ast_ = std::move(AST);
@@ -42,7 +42,7 @@ void QueryAssembler::Translate(std::shared_ptr<Node> AST) {
   LOGI << "translation is ended";
 }
 
-void QueryAssembler::TranslateProgram(std::shared_ptr<Node> node) {
+void QueryAssembler::TranslateProgram(std::shared_ptr<INode> node) {
   auto query = node->get_child(0);
   if (query->get_st_type() == StatementType::query) {
     this->TranslateQuery(query);
@@ -63,7 +63,7 @@ void QueryAssembler::TranslateProgram(std::shared_ptr<Node> node) {
     }
   }
 }
-void QueryAssembler::TranslateQuery(std::shared_ptr<Node> node) {
+void QueryAssembler::TranslateQuery(std::shared_ptr<INode> node) {
   if (node->get_children_amount() == 0) {
     LOGD << "empty query";
     return;

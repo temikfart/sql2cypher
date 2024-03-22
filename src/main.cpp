@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
     tokenizer.Tokenize();
 
     SyntaxAnalyzer syntax_analyzer;
-    std::shared_ptr<Node> AST =
+    std::shared_ptr<INode> AST =
         syntax_analyzer.Analyze(tokenizer.get_tokens_array());
 
     if (scc_args.IsUsed("--dump")) {
