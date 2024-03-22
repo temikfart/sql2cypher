@@ -1,0 +1,13 @@
+#pragma once
+
+enum DataType {
+  ROOT,
+  SERVICE,
+  INT_NUMBER,
+  FLOAT_NUMBER,
+  BRACKET,
+  PUNCTUATION,
+  OPERATOR,
+  WORD,
+  STRING
+};
