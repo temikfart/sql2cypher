@@ -16,9 +16,6 @@ public:
 
   void Tokenize();
 
-  std::shared_ptr<Node>& peek_first_token();
-  std::shared_ptr<Node>& peek_last_token();
-  std::shared_ptr<Node> get_first_token();
   std::deque<std::shared_ptr<Node>> get_tokens_array() const;
 
   static bool IsOperator(char symbol);
@@ -27,8 +24,6 @@ public:
 
   static bool IsCharacterFromArray(char ch, const std::string& array);
 
-  void PrintTokens();
-
 private:
   std::ifstream input_;
   int line_number_ = 0;
@@ -36,7 +31,6 @@ private:
 
   char GetSQLSymbol();
   char PeekSQLSymbol();
-  bool CloseInputFile();
 
   void GetNumber();
   void GetWord();

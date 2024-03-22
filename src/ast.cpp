@@ -31,9 +31,6 @@ std::shared_ptr<Node>& Node::get_child(size_t node_num) {
 size_t Node::get_children_amount() const {
   return children_.size();
 }
-std::shared_ptr<Node>& Node::get_parent() {
-  return parent_;
-}
 
 void Node::AddChild(std::shared_ptr<Node> const& node) {
   this->ValidateAddChild(node);
@@ -124,14 +121,6 @@ IntNumNode::IntNumNode(int value, DataType type)
   this->ValidateType(type);
 }
 
-void IntNumNode::set_data(const int& data, DataType type) {
-  data_ = data;
-  this->ValidateType(type);
-  type_ = type;
-}
-void IntNumNode::set_data(const int& data) {
-  data_ = data;
-}
 int IntNumNode::get_data() const {
   return data_;
 }
@@ -156,14 +145,6 @@ FloatNumNode::FloatNumNode(double value, DataType type)
   this->ValidateType(type);
 }
 
-void FloatNumNode::set_data(const double& data, DataType type) {
-  data_ = data;
-  this->ValidateType(type);
-  type_ = type;
-}
-void FloatNumNode::set_data(const double& data) {
-  data_ = data;
-}
 double FloatNumNode::get_data() const {
   return data_;
 }
@@ -189,14 +170,6 @@ CharNode::CharNode(char ch, DataType type)
   this->ValidateType(type);
 }
 
-void CharNode::set_data(const char& data, DataType type) {
-  data_ = data;
-  this->ValidateType(type);
-  type_ = type;
-}
-void CharNode::set_data(const char& data) {
-  data_ = data;
-}
 char CharNode::get_data() const {
   return data_;
 }
