@@ -90,10 +90,10 @@ public:
   void set_st_type(StatementType type);
   StatementType get_st_type();
   void set_parent(std::shared_ptr<Node>& parent);
+  std::shared_ptr<Node>& get_parent();
   DataType get_type() const;
   std::shared_ptr<Node>& get_child(size_t node_num);
   size_t get_children_amount() const;
-  std::shared_ptr<Node>& get_parent();
 
   void AddChild(std::shared_ptr<Node> const& node);
   static bool IsNodesEqual(const std::shared_ptr<Node>& node1,

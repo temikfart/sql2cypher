@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include "SCC/ast.h"
+#include "SCC/ast/ast.h"
 
 using namespace testing;
 

@@ -5,7 +5,7 @@
 #include <memory>
 #include <utility>
 
-#include "SCC/ast.h"
+#include "SCC/ast/ast.h"
 #include "SCC/config/scc_config.h"
 #include "SCC/log.h"
 
