@@ -21,7 +21,6 @@ public:
   void set_st_type(StatementType type);
   StatementType get_st_type();
   void set_parent(std::shared_ptr<Node>& parent);
-  std::shared_ptr<Node>& get_parent();
   DataType get_type() const;
   std::shared_ptr<Node>& get_child(size_t node_num);
   size_t get_children_amount() const;
@@ -51,8 +50,6 @@ class IntNumNode : public Node {
 public:
   explicit IntNumNode(int value, DataType type = DataType::INT_NUMBER);
 
-  void set_data(const int& data, DataType type);
-  void set_data(const int& data);
   int get_data() const;
 
   void PrintData(std::ostream& stream) override;
@@ -68,8 +65,6 @@ class FloatNumNode : public Node {
 public:
   explicit FloatNumNode(double value, DataType type = DataType::FLOAT_NUMBER);
 
-  void set_data(const double& data, DataType type);
-  void set_data(const double& data);
   double get_data() const;
 
   void PrintData(std::ostream& stream) override;
@@ -85,8 +80,6 @@ class CharNode : public Node {
 public:
   explicit CharNode(char ch, DataType type);
 
-  void set_data(const char& data, DataType type);
-  void set_data(const char& data);
   char get_data() const;
 
   void PrintData(std::ostream& stream) override;

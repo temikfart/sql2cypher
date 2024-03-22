@@ -37,17 +37,6 @@ void Tokenizer::Tokenize() {
   LOGI << "lexical analysis is ended";
 }
 
-std::shared_ptr<Node>& Tokenizer::peek_first_token() {
-  return tokens_array_.front();
-}
-std::shared_ptr<Node>& Tokenizer::peek_last_token() {
-  return tokens_array_.back();
-}
-std::shared_ptr<Node> Tokenizer::get_first_token() {
-  std::shared_ptr<Node> node = tokens_array_.front();
-  tokens_array_.pop_front();
-  return node;
-}
 std::deque<std::shared_ptr<Node>> Tokenizer::get_tokens_array() const {
   return tokens_array_;
 }
@@ -68,37 +57,12 @@ bool Tokenizer::IsCharacterFromArray(char ch, const std::string& array) {
   });
 }
 
-void Tokenizer::PrintTokens() {
-  LOGD << "starting print tokens' array";
-  for (const auto& token : tokens_array_) {
-    std::cout << "data: ", token->PrintData(std::cout);
-    std::cout << " | ";
-    std::cout << "type: ", token->PrintType(std::cout);
-    std::cout << std::endl;
-  }
-  std::cout << std::endl;
-  LOGD << "token's array is printed";
-}
-
 char Tokenizer::GetSQLSymbol() {
   return (char) input_.get();
 }
 char Tokenizer::PeekSQLSymbol() {
   return (char) input_.peek();
 }
-bool Tokenizer::CloseInputFile() {
-  if (input_.is_open()) {
-    input_.close();
-    if (input_.good() || input_.eof()) {
-      ;
-    } else {
-      std::cerr << "input file close error" << std::endl;
-      return false;
-    }
-  }
-  return true;
-}
-
 void Tokenizer::GetNumber() {
   LOGD << "getting a number...";
 
