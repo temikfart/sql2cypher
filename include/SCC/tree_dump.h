@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "SCC/ast.h"
+#include "SCC/ast/ast.h"
 
 #include "logger/log.hpp"
 

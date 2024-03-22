@@ -1,4 +1,4 @@
-#include "SCC/ast.h"
+#include "SCC/ast/ast.h"
 
 /* ------------------ Node ------------------ */
 

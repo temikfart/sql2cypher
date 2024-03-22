@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "SCC/ast.h"
+#include "SCC/ast/ast.h"
 #include "SCC/config/scc_args.h"
 #include "SCC/config/scc_config.h"
 #include "SCC/lexical_analyzer.h"
