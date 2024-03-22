@@ -61,10 +61,10 @@ StatementType SyntaxAnalyzer::GetDDLStType() {
 
   return DDLStType;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetDDLSt() {
+std::shared_ptr<INode> SyntaxAnalyzer::GetDDLSt() {
   LOGD << "getting DDL statement...";
-  std::shared_ptr<Node> node, statement;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+  std::shared_ptr<INode> node, statement;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::ddlStatement);
 
   int line = this->peek_first_token()->get_line();
@@ -100,9 +100,9 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDDLSt() {
 
 // DDL Statements
 
-std::shared_ptr<Node> SyntaxAnalyzer::GetCreateDatabaseSt() {
-  std::shared_ptr<Node> node, database_name;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+std::shared_ptr<INode> SyntaxAnalyzer::GetCreateDatabaseSt() {
+  std::shared_ptr<INode> node, database_name;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::createDatabaseStatement);
 
   if (tokens_array_.empty()) {
@@ -114,9 +114,9 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetCreateDatabaseSt() {
 
   return node;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetCreateTableSt() {
-  std::shared_ptr<Node> node, table_name, table_definition;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+std::shared_ptr<INode> SyntaxAnalyzer::GetCreateTableSt() {
+  std::shared_ptr<INode> node, table_name, table_definition;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::createTableStatement);
 
   // Get tableName
@@ -154,9 +154,9 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetCreateTableSt() {
 
   return node;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetAlterTableSt() {
-  std::shared_ptr<Node> node, table_name, action_str_node, argument;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+std::shared_ptr<INode> SyntaxAnalyzer::GetAlterTableSt() {
+  std::shared_ptr<INode> node, table_name, action_str_node, argument;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::alterTableStatement);
 
   int line = this->peek_first_token()->get_line();
@@ -174,8 +174,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetAlterTableSt() {
   this->ValidateIsWord(this->peek_first_token());
   action_str_node = this->get_first_token();
 
-  std::shared_ptr<Node> action =
-      std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+  std::shared_ptr<INode> action =
+      std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
 
   if (tokens_array_.empty()) {
     LOGE << "invalid alter table query: "
@@ -202,9 +202,9 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetAlterTableSt() {
 
   return node;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetDropDatabaseSt() {
-  std::shared_ptr<Node> node, database_name, separator;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+std::shared_ptr<INode> SyntaxAnalyzer::GetDropDatabaseSt() {
+  std::shared_ptr<INode> node, database_name, separator;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::dropDatabaseStatement);
 
   // First database_name
@@ -223,9 +223,9 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDropDatabaseSt() {
 
   return node;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetDropTableSt() {
-  std::shared_ptr<Node> node, table_name, separator;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+std::shared_ptr<INode> SyntaxAnalyzer::GetDropTableSt() {
+  std::shared_ptr<INode> node, table_name, separator;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::dropTableStatement);
 
   // First tableName
@@ -247,9 +247,9 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDropTableSt() {
 
 // DDL Basic Statements
 
-std::shared_ptr<Node> SyntaxAnalyzer::GetTableDefinition() {
-  std::shared_ptr<Node> node, argument, separator, next_arguments;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+std::shared_ptr<INode> SyntaxAnalyzer::GetTableDefinition() {
+  std::shared_ptr<INode> node, argument, separator, next_arguments;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::tableDefinition);
 
   argument = this->GetTableDefinitionObject();
@@ -263,8 +263,8 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableDefinition() {
 
   return node;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetTableDefinitionObject() {
-  std::shared_ptr<Node> argument;
+std::shared_ptr<INode> SyntaxAnalyzer::GetTableDefinitionObject() {
+  std::shared_ptr<INode> argument;
 
   std::string key_word =
       std::dynamic_pointer_cast<StringNode>(
@@ -283,10 +283,10 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableDefinitionObject() {
   return argument;
 }
 
-std::shared_ptr<Node> SyntaxAnalyzer::GetColumnDefinition() {
-  std::shared_ptr<Node> column_def, column_name, datatype;
+std::shared_ptr<INode> SyntaxAnalyzer::GetColumnDefinition() {
+  std::shared_ptr<INode> column_def, column_name, datatype;
   column_def =
-      std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+      std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   column_def->set_st_type(StatementType::columnDefinition);
 
   // Get columnName
@@ -310,10 +310,10 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetColumnDefinition() {
 
   return column_def;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetTableConstraint() {
-  std::shared_ptr<Node> table_constraint, constraint_name, key;
+std::shared_ptr<INode> SyntaxAnalyzer::GetTableConstraint() {
+  std::shared_ptr<INode> table_constraint, constraint_name, key;
   table_constraint =
-      std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+      std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   table_constraint->set_st_type(StatementType::tableConstraint);
 
   // Get full form if present
@@ -323,7 +323,7 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableConstraint() {
           this->peek_first_token())->get_data();
   if (key_word == "CONSTRAINT") {
     this->pop_first_token();
-    std::shared_ptr<Node> constraint_kw =
+    std::shared_ptr<INode> constraint_kw =
         std::dynamic_pointer_cast<ServiceNode>(
             std::make_shared<ServiceNode>());
     constraint_kw->set_st_type(StatementType::kw_constraint);
@@ -387,9 +387,9 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetTableConstraint() {
   return table_constraint;
 }
 
-std::shared_ptr<Node> SyntaxAnalyzer::GetDropListDefinition() {
-  std::shared_ptr<Node> node, objects, separator;
-  node = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+std::shared_ptr<INode> SyntaxAnalyzer::GetDropListDefinition() {
+  std::shared_ptr<INode> node, objects, separator;
+  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->set_st_type(StatementType::dropList);
 
   objects = this->GetDropObject();
@@ -404,11 +404,11 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDropListDefinition() {
 
   return node;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetDropList() {
-  std::shared_ptr<Node> separator, objects, next_objects;
+std::shared_ptr<INode> SyntaxAnalyzer::GetDropList() {
+  std::shared_ptr<INode> separator, objects, next_objects;
   this->pop_first_token();
   separator =
-      std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+      std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   separator->set_st_type(StatementType::delimiter_comma);
 
   this->ValidateIsWord(this->peek_first_token());
@@ -425,10 +425,10 @@ std::shared_ptr<Node> SyntaxAnalyzer::GetDropList() {
 
   return separator;
 }
-std::shared_ptr<Node> SyntaxAnalyzer::GetDropObject() {
-  std::shared_ptr<Node> object, argument, next_arguments;
+std::shared_ptr<INode> SyntaxAnalyzer::GetDropObject() {
+  std::shared_ptr<INode> object, argument, next_arguments;
   // Mock
-  object = std::dynamic_pointer_cast<Node>(std::make_shared<ServiceNode>());
+  object = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
 
   int line = this->peek_first_token()->get_line();
   std::string key_word =

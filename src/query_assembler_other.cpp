@@ -3,7 +3,7 @@
 // Basic statements
 
 void QueryAssembler::TranslatePrimaryKey(
-    std::shared_ptr<Node> key,
+    std::shared_ptr<INode> key,
     std::string& constraint_name,
     std::string& table_name) {
   if (key->get_st_type() != StatementType::primaryKey) {
@@ -39,7 +39,7 @@ void QueryAssembler::TranslatePrimaryKey(
   }
 }
 void QueryAssembler::TranslateForeignKey(
-    std::shared_ptr<Node> key,
+    std::shared_ptr<INode> key,
     std::string& table_name) {
   if (key->get_st_type() != StatementType::foreignKey) {
     LOGE << "incorrect type for foreignKey node";
@@ -149,7 +149,7 @@ void QueryAssembler::RemoveProperties(
 }
 
 std::vector<std::string> QueryAssembler::GetListOf(
-    std::shared_ptr<Node> node,
+    std::shared_ptr<INode> node,
     StatementType type) {
   if (node->get_st_type() != StatementType::delimiter_comma) {
     LOGE << "invalid ListOf: delimiter is not a comma";
@@ -184,7 +184,7 @@ std::vector<std::string> QueryAssembler::GetListOf(
   return arguments;
 }
 
-std::string QueryAssembler::TranslateName(std::shared_ptr<Node> node) {
+std::string QueryAssembler::TranslateName(std::shared_ptr<INode> node) {
   if (node->get_children_amount() == 0) {
     LOGE << "empty name node";
     end(EXIT_FAILURE);
@@ -205,7 +205,7 @@ std::string QueryAssembler::TranslateName(std::shared_ptr<Node> node) {
   return name.str();
 }
 std::string QueryAssembler::TranslateIdentifiers(
-    std::shared_ptr<Node> node) {
+    std::shared_ptr<INode> node) {
   if (node->get_children_amount() == 0) {
     LOGE << "invalid list of identifiers";
     end(EXIT_FAILURE);
@@ -220,7 +220,7 @@ std::string QueryAssembler::TranslateIdentifiers(
 
   return identifiers.str();
 }
-std::string QueryAssembler::TranslateIdentifier(std::shared_ptr<Node> node) {
+std::string QueryAssembler::TranslateIdentifier(std::shared_ptr<INode> node) {
   if (node->get_children_amount() == 0) {
     LOGE << "empty identifier";
     end(EXIT_FAILURE);

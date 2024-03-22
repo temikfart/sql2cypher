@@ -3,7 +3,7 @@
 TreeDump::TreeDump(const std::filesystem::path& out_path)
 : dot_file_(out_path), dot_file_path_(out_path.string()) {}
 
-void TreeDump::DumpTree(const std::shared_ptr<Node>& AST) {
+void TreeDump::DumpTree(const std::shared_ptr<INode>& AST) {
   LOGI << "creating tree dump of the AST";
   if (AST == nullptr) {
     LOGI << "creation is ended: AST is empty";
@@ -56,7 +56,7 @@ void TreeDump::PrintDumpInfo() {
             << "\t}\n";
   LOGI << "dump info is printed";
 }
-void TreeDump::RecursiveTreeDump(const std::shared_ptr<Node>& node,
+void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
                                  int parent_node_num) {
   static int num_of_nodes = -1;
   if (parent_node_num == -1) {

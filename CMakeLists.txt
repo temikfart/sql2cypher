@@ -93,18 +93,30 @@ set(PRJ_TARGET scc)
 set(COMMON_SRC
         src/common/file_utils.cpp
         src/common/singleton.cpp
-        src/common/string_utils.cpp)
+        src/common/string_utils.cpp
+)
 set(LOG_SRC
-        src/log.cpp)
+        src/log.cpp
+)
 set(CONFIG_SRC
         src/config/scc_args.cpp
         src/config/scc_config.cpp
-        src/config/scc_mode.cpp)
+        src/config/scc_mode.cpp
+)
+set(AST_SRC
+        src/ast/nodes/inode.cpp
+        src/ast/nodes/char_node.cpp
+        src/ast/nodes/float_node.cpp
+        src/ast/nodes/int_node.cpp
+        src/ast/nodes/root_node.cpp
+        src/ast/nodes/service_node.cpp
+        src/ast/nodes/string_node.cpp
+)
 set(SOURCE_LIST src/main.cpp
         ${COMMON_SRC}
         ${LOG_SRC}
         ${CONFIG_SRC}
-            src/ast.cpp
+        ${AST_SRC}
             src/lexical_analyzer.cpp
             src/syntax_analyzer_general.cpp
             src/syntax_analyzer_ddl.cpp

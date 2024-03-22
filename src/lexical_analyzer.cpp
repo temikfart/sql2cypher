@@ -37,7 +37,7 @@ void Tokenizer::Tokenize() {
   LOGI << "lexical analysis is ended";
 }
 
-std::deque<std::shared_ptr<Node>> Tokenizer::get_tokens_array() const {
+std::deque<std::shared_ptr<INode>> Tokenizer::get_tokens_array() const {
   return tokens_array_;
 }
 
