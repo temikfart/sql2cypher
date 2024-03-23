@@ -87,7 +87,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       break;
     case DataType::kInt:
       dot_file_ << "\" {<data> "
-                << std::dynamic_pointer_cast<IntNumNode>(node)->get_data();
+                << std::dynamic_pointer_cast<IntNumNode>(node)->data;
       if (st_type != StmtType::kNone)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = green, "
@@ -95,7 +95,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       break;
     case DataType::kFloat:
       dot_file_ << "\" {<data> "
-                << std::dynamic_pointer_cast<FloatNumNode>(node)->get_data();
+                << std::dynamic_pointer_cast<FloatNumNode>(node)->data;
       if (st_type != StmtType::kNone)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = green, "
@@ -103,7 +103,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       break;
     case DataType::kBracket:
       dot_file_ << "\" {<data> "
-                << std::dynamic_pointer_cast<CharNode>(node)->get_data();
+                << std::dynamic_pointer_cast<CharNode>(node)->data;
       if (st_type != StmtType::kNone)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = lightblue, "
@@ -111,7 +111,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       break;
     case DataType::kPunctuation:
       dot_file_ << "\" {<data> \'"
-                << std::dynamic_pointer_cast<CharNode>(node)->get_data();
+                << std::dynamic_pointer_cast<CharNode>(node)->data;
       if (st_type != StmtType::kNone)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = blue, "
@@ -119,7 +119,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       break;
     case DataType::kWord:
       dot_file_ << R"(" {<data> \")"
-                << std::dynamic_pointer_cast<StringNode>(node)->get_data()
+                << std::dynamic_pointer_cast<StringNode>(node)->data
                 << R"(\")";
       if (st_type != StmtType::kNone)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
@@ -128,7 +128,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       break;
     case DataType::kOperator:
       dot_file_ << "\" {<data> "
-                << std::dynamic_pointer_cast<StringNode>(node)->get_data();
+                << std::dynamic_pointer_cast<StringNode>(node)->data;
       if (st_type != StmtType::kNone)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = orange, "
@@ -136,7 +136,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       break;
     case DataType::kString:
       dot_file_ << R"(" {<data> \")"
-                << std::dynamic_pointer_cast<StringNode>(node)->get_data()
+                << std::dynamic_pointer_cast<StringNode>(node)->data
                 << R"(\")";
       if (st_type != StmtType::kNone)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);

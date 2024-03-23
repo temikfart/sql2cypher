@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "inode.h"
+#include "SCC/ast/nodes/inode.h"
 #include "SCC/ast/data_types.h"
 
 class ServiceNode : public INode {
@@ -11,7 +11,4 @@ public:
 
   void PrintData(std::ostream& stream) override;
   void PrintType(std::ostream& stream) override;
-
-private:
-  void ValidateType(DataType type) const override;
 };

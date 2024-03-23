@@ -107,7 +107,7 @@ bool SyntaxAnalyzer::IsDoubleQuote(std::shared_ptr<INode>& node) {
 }
 bool SyntaxAnalyzer::IsUnaryOperator(std::shared_ptr<INode>& node) {
   if (node->data_type == DataType::kOperator) {
-    std::string data = std::dynamic_pointer_cast<StringNode>(node)->get_data();
+    std::string data = std::dynamic_pointer_cast<StringNode>(node)->data;
     if (data == "+" || data == "-") {
       return true;
     }
@@ -116,7 +116,7 @@ bool SyntaxAnalyzer::IsUnaryOperator(std::shared_ptr<INode>& node) {
 }
 bool SyntaxAnalyzer::IsBinaryOperator(std::shared_ptr<INode>& node) {
   if (node->data_type == DataType::kOperator) {
-    std::string data = std::dynamic_pointer_cast<StringNode>(node)->get_data();
+    std::string data = std::dynamic_pointer_cast<StringNode>(node)->data;
     std::vector<std::string> bin_operators = {
         "=", "<>", "!=",
         ">", ">=", "!>",
@@ -140,7 +140,7 @@ bool SyntaxAnalyzer::IsSemicolon(std::shared_ptr<INode>& node) {
 void SyntaxAnalyzer::MakeKinship(std::shared_ptr<INode>& parent,
                                  std::shared_ptr<INode>& child) {
   parent->AddChild(child);
-  child->set_parent(parent);
+  child->parent = parent;
 }
 
 // Work with deque of tokens

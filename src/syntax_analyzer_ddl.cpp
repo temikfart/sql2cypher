@@ -7,7 +7,7 @@ StmtType SyntaxAnalyzer::GetDDLStType() {
   int line = this->peek_first_token()->line;
   std::string fst_kw =
       std::dynamic_pointer_cast<StringNode>(
-          this->peek_first_token())->get_data();
+          this->peek_first_token())->data;
   this->pop_first_token();
 
   // Get second token
@@ -20,7 +20,7 @@ StmtType SyntaxAnalyzer::GetDDLStType() {
   this->ValidateIsWord(this->peek_first_token());
   std::string snd_kw =
       std::dynamic_pointer_cast<StringNode>(
-          this->peek_first_token())->get_data();
+          this->peek_first_token())->data;
   this->pop_first_token();
 
   if (tokens_array_.empty()) {
@@ -185,7 +185,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetAlterTableSt() {
   line = this->peek_first_token()->line;
   this->ValidateIsWord(this->peek_first_token());
   std::string action_str =
-      std::dynamic_pointer_cast<StringNode>(action_str_node)->get_data();
+      std::dynamic_pointer_cast<StringNode>(action_str_node)->data;
   if (action_str == "ADD") {
     action->stmt_type = StmtType::kAlterActionAdd;
     argument = this->GetTableDefinition();
@@ -268,7 +268,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetTableDefinitionObject() {
 
   std::string key_word =
       std::dynamic_pointer_cast<StringNode>(
-          this->peek_first_token())->get_data();
+          this->peek_first_token())->data;
   bool is_tableConstraint =
       key_word == "CONSTRAINT"
           || key_word == "PRIMARY"
@@ -320,7 +320,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetTableConstraint() {
   int line = this->peek_first_token()->line;
   std::string key_word =
       std::dynamic_pointer_cast<StringNode>(
-          this->peek_first_token())->get_data();
+          this->peek_first_token())->data;
   if (key_word == "CONSTRAINT") {
     this->pop_first_token();
     std::shared_ptr<INode> constraint_kw =
@@ -348,7 +348,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetTableConstraint() {
   this->ValidateIsWord(this->peek_first_token());
   std::string kind_of_key =
       std::dynamic_pointer_cast<StringNode>(
-          this->get_first_token())->get_data();
+          this->get_first_token())->data;
 
   // Get 'KEY' key word
   if (tokens_array_.empty()) {
@@ -360,7 +360,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetTableConstraint() {
   this->ValidateIsWord(this->peek_first_token());
   std::string KEY_kw =
       std::dynamic_pointer_cast<StringNode>(
-          this->get_first_token())->get_data();
+          this->get_first_token())->data;
   if (KEY_kw != "KEY") {
     LOGE << "expected \'KEY\', got \'"
         << KEY_kw << "\' in line " << line;
@@ -433,7 +433,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDropObject() {
   int line = this->peek_first_token()->line;
   std::string key_word =
       std::dynamic_pointer_cast<StringNode>(
-          this->peek_first_token())->get_data();
+          this->peek_first_token())->data;
   bool is_tableConstraint = key_word == "CONSTRAINT";
   bool is_column = key_word == "COLUMN";
 
@@ -471,7 +471,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDropObject() {
       if (SyntaxAnalyzer::IsWord(tokens_array_[1])) {
         std::string checking_word =
             std::dynamic_pointer_cast<StringNode>(
-                tokens_array_[1])->get_data();
+                tokens_array_[1])->data;
         if (checking_word == "CONSTRAINT" || checking_word == "COLUMN") {
           is_list = false;
         }

@@ -2,20 +2,15 @@
 
 #include <iostream>
 
-#include "inode.h"
+#include "SCC/ast/nodes/inode.h"
 #include "SCC/ast/data_types.h"
 
 class CharNode : public INode {
 public:
-  explicit CharNode(char ch, DataType type);
+  char data;
 
-  char get_data() const;
+  CharNode(char ch, DataType data_type);
 
   void PrintData(std::ostream& stream) override;
   void PrintType(std::ostream& stream) override;
-
-private:
-  char data_;
-
-  void ValidateType(DataType type) const override;
 };
