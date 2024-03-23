@@ -36,8 +36,3 @@ public:
 protected:
   std::vector<std::shared_ptr<INode>> children_ = {};
 };
-
-namespace Tree {
-void PrintTreeRecursive(std::shared_ptr<INode> const& node,
-                        std::ostream& stream);
-}
