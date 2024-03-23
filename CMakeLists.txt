@@ -114,12 +114,16 @@ set(AST_SRC
         src/ast/data_types.cpp
         src/ast/stmt_types.cpp
 )
+set(LEXER_SRC
+        src/lexer/lexical_analyzer.cpp
+        src/lexer/token_classifier.cpp
+)
 set(SOURCE_LIST src/main.cpp
         ${COMMON_SRC}
         ${LOG_SRC}
         ${CONFIG_SRC}
         ${AST_SRC}
-        src/lexer/lexical_analyzer.cpp
+        ${LEXER_SRC}
             src/syntax_analyzer_general.cpp
             src/syntax_analyzer_ddl.cpp
             src/syntax_analyzer_dml.cpp

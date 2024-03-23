@@ -10,12 +10,11 @@ int main(int argc, char* argv[]) {
 
     logger::init(config->log_severity, config->log_directory);
 
-    Tokenizer tokenizer(config->get_sql_file());
-    tokenizer.Tokenize();
+    Lexer lexer(config->get_sql_file());
+    std::deque<std::shared_ptr<INode>> tokens = lexer.Analyze();
 
-    SyntaxAnalyzer syntax_analyzer;
-    std::shared_ptr<INode> AST =
-        syntax_analyzer.Analyze(tokenizer.get_tokens_array());
+    SyntaxAnalyzer syntax_analyzer(std::move(tokens));
+    std::shared_ptr<INode> AST = syntax_analyzer.Analyze();
 
     if (scc_args.IsUsed("--dump")) {
       TreeDump dump(config->get_ast_dump_file());

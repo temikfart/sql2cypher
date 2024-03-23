@@ -1,17 +1,16 @@
 #include "SCC/syntax_analyzer.h"
 
-std::shared_ptr<INode> SyntaxAnalyzer::Analyze(
-    std::deque<std::shared_ptr<INode>> tokens_array) {
+SyntaxAnalyzer::SyntaxAnalyzer(std::deque<std::shared_ptr<INode>>&& tokens)
+    : tokens_(std::move(tokens)) {}
+
+std::shared_ptr<INode> SyntaxAnalyzer::Analyze() {
   LOGI << "starting syntax analysis...";
-  LOGD << "loading tokens' array...";
-  tokens_array_ = std::move(tokens_array);
-  LOGD << "tokens' array is loaded";
 
   std::shared_ptr<INode> root;
   root = std::dynamic_pointer_cast<INode>(std::make_shared<RootNode>());
   root->stmt_type = StmtType::kProgram;
 
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGI << "syntax analysis is ended: empty tokens' array";
     return nullptr;
   }
@@ -21,14 +20,14 @@ std::shared_ptr<INode> SyntaxAnalyzer::Analyze(
   query = this->GetDL();
   SyntaxAnalyzer::MakeKinship(root, query);
 
-  if (!tokens_array_.empty()) {
+  if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsSemicolon(this->peek_first_token())) {
       separator = this->General();
       SyntaxAnalyzer::MakeKinship(root, separator);
     }
   }
 
-  if (!tokens_array_.empty()) {
+  if (!tokens_.empty()) {
     LOGE << "syntax analysis is ended with not empty tokens' array";
     end(EXIT_FAILURE);
   }
@@ -45,12 +44,12 @@ std::shared_ptr<INode> SyntaxAnalyzer::General() {
   separator = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   separator->stmt_type = StmtType::kSemicolonDelimiter;
 
-  if (!tokens_array_.empty()) {
+  if (!tokens_.empty()) {
     query = this->GetDL();
     SyntaxAnalyzer::MakeKinship(separator, query);
   }
 
-  if (!tokens_array_.empty()) {
+  if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsSemicolon(this->peek_first_token())) {
       next_queries = this->General();
       SyntaxAnalyzer::MakeKinship(separator, next_queries);
@@ -151,7 +150,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetPrimaryKey() {
   this->pop_first_token();
 
   // Get PRIMARY KEY definition
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "column name is missed in line " << line;
     end(EXIT_FAILURE);
   }
@@ -159,14 +158,14 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetPrimaryKey() {
   SyntaxAnalyzer::MakeKinship(primary_key, column_name);
 
   // Get listOf(column_names)
-  if (!tokens_array_.empty()) {
+  if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsComma(this->peek_first_token())) {
       separator = this->GetListOf(StmtType::kIdentifier);
       SyntaxAnalyzer::MakeKinship(primary_key, separator);
     }
   }
 
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "closing round bracket is missed in line " << line;
     end(EXIT_FAILURE);
   }
@@ -187,7 +186,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetForeignKey() {
   this->pop_first_token();
 
   // Get FOREIGN KEY definition
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "columnName is missed in line " << line;
     end(EXIT_FAILURE);
   }
@@ -195,13 +194,13 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetForeignKey() {
   SyntaxAnalyzer::MakeKinship(foreign_key, column_name);
 
   // Get listOf(column_names)
-  if (!tokens_array_.empty()
+  if (!tokens_.empty()
       && SyntaxAnalyzer::IsComma(this->peek_first_token())) {
     separator = this->GetListOf(StmtType::kIdentifier);
     SyntaxAnalyzer::MakeKinship(foreign_key, separator);
   }
 
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "closing round bracket is missed in line " << line;
     end(EXIT_FAILURE);
   }
@@ -209,7 +208,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetForeignKey() {
   this->pop_first_token();
 
   // Get Reference
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "reference is missed in line " << line;
     end(EXIT_FAILURE);
   }
@@ -237,7 +236,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetReference() {
   reference->stmt_type = StmtType::kReference;
 
   // Get referenced table or columns
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "table name is missed in line " << line;
     end(EXIT_FAILURE);
   }
@@ -245,14 +244,14 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetReference() {
   SyntaxAnalyzer::MakeKinship(reference, ref_table_name);
 
   // Get columns if present
-  if (!tokens_array_.empty()
+  if (!tokens_.empty()
       && SyntaxAnalyzer::IsOpeningRoundBracket(this->peek_first_token())) {
     std::shared_ptr<INode> ref_column_name, next_ref_column_names;
 
     this->ValidateIsOpeningRoundBracket(this->peek_first_token());
     this->pop_first_token();
 
-    if (tokens_array_.empty()) {
+    if (tokens_.empty()) {
       LOGE << "invalid reference in line "
           << line << ": incorrect list of column names";
       end(EXIT_FAILURE);
@@ -260,7 +259,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetReference() {
     ref_column_name = this->GetIdentifier();
     SyntaxAnalyzer::MakeKinship(reference, ref_column_name);
 
-    if (tokens_array_.empty()) {
+    if (tokens_.empty()) {
       LOGE << "invalid reference in line "
           << line << ": closing round bracket is missed";
       end(EXIT_FAILURE);
@@ -271,7 +270,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetReference() {
       SyntaxAnalyzer::MakeKinship(reference, next_ref_column_names);
     }
 
-    if (tokens_array_.empty()) {
+    if (tokens_.empty()) {
       LOGE << "invalid reference in line "
           << line << ": closing round bracket is missed";
       end(EXIT_FAILURE);
@@ -291,7 +290,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetString() {
       SyntaxAnalyzer::IsSingleQuote(this->peek_first_token());
   this->pop_first_token();
 
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "invalid expression in line "
         << line << ": invalid string";
     end(EXIT_FAILURE);
@@ -333,7 +332,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetString() {
     str->data = new_data;
   }
 
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "invalid string in line "
         << line << ": closing quote is missed";
     end(EXIT_FAILURE);
@@ -358,7 +357,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetName() {
   identifier = this->GetIdentifier();
   SyntaxAnalyzer::MakeKinship(name, identifier);
 
-  if (!tokens_array_.empty()) {
+  if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsDot(this->peek_first_token())) {
       next_identifiers = this->GetIdentifiers();
       SyntaxAnalyzer::MakeKinship(name, next_identifiers);
@@ -374,14 +373,14 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetIdentifiers() {
   dot = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   dot->stmt_type = StmtType::kDotDelimiter;
 
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "bad name, which ends in a dot, in line " << line;
     end(EXIT_FAILURE);
   }
   identifier = this->GetIdentifier();
   SyntaxAnalyzer::MakeKinship(dot, identifier);
 
-  if (!tokens_array_.empty()) {
+  if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsDot(this->peek_first_token())) {
       next_identifiers = this->GetIdentifiers();
       SyntaxAnalyzer::MakeKinship(dot, next_identifiers);
@@ -414,7 +413,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetListOf(
   separator = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   separator->stmt_type = StmtType::kCommaDelimiter;
 
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "invalid listOf in line "
         << line << ": argument is missed";
     end(EXIT_FAILURE);
@@ -446,7 +445,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetListOf(
   }
   SyntaxAnalyzer::MakeKinship(separator, argument);
 
-  if (!tokens_array_.empty()
+  if (!tokens_.empty()
       && SyntaxAnalyzer::IsComma(this->peek_first_token())) {
     next_separator = this->GetListOf(get_function_type);
     SyntaxAnalyzer::MakeKinship(separator, next_separator);

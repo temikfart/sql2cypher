@@ -12,31 +12,24 @@
 #include "SCC/ast/nodes/service_node.h"
 #include "SCC/ast/nodes/string_node.h"
 #include "SCC/config/scc_config.h"
+#include "SCC/lexer/token_classifier.h"
 #include "SCC/log.h"
 
 #include "logger/log.hpp"
 
-class Tokenizer {
+class Lexer {
 public:
-  explicit Tokenizer(const std::filesystem::path& input_path);
+  explicit Lexer(const std::filesystem::path& input_path);
 
-  void Tokenize();
-
-  std::deque<std::shared_ptr<INode>> get_tokens_array() const;
-
-  static bool IsOperator(char symbol);
-  static bool IsBracket(char symbol);
-  static bool IsPunctuation(char symbol);
-
-  static bool IsCharacterFromArray(char ch, const std::string& array);
+  std::deque<std::shared_ptr<INode>> Analyze();
 
 private:
   std::ifstream input_;
-  int line_number_ = 0;
-  std::deque<std::shared_ptr<INode>> tokens_array_;
+  int line_number_ = 1;
+  std::deque<std::shared_ptr<INode>> tokens_;
 
-  char GetSQLSymbol();
-  char PeekSQLSymbol();
+  char GetSymbol();
+  char PeekSymbol();
 
   void GetNumber();
   void GetWord();

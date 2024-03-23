@@ -1,129 +1,109 @@
 #include "SCC/lexer/lexical_analyzer.h"
 
-//-------------------Tokenizer-------------------
+Lexer::Lexer(const std::filesystem::path& input_path)
+    : input_(input_path) {}
 
-Tokenizer::Tokenizer(const std::filesystem::path& input_path)
-: input_(input_path) {}
-
-void Tokenizer::Tokenize() {
+std::deque<std::shared_ptr<INode>> Lexer::Analyze() {
   LOGI << "tokenizing...";
 
-  line_number_ = 1;
   while (true) {
-    char another_symbol = PeekSQLSymbol();
-    if (std::isspace(another_symbol)) {
-      if (another_symbol == '\n')
+    char symbol = PeekSymbol();
+    if (TokenClassifier::IsSpace(symbol)) {
+      if (symbol == '\n')
         line_number_++;
-      GetSQLSymbol();
-    } else if (std::isdigit(another_symbol)) {
-      this->GetNumber();
-    } else if (std::isalpha(another_symbol)) {
-      this->GetWord();
-    } else if (Tokenizer::IsOperator(another_symbol)) {
-      this->GetOperator();
-    } else if (Tokenizer::IsBracket(another_symbol)) {
-      this->GetCharacter(DataType::kBracket);
-    } else if (Tokenizer::IsPunctuation(another_symbol)) {
-      this->GetCharacter(DataType::kPunctuation);
-    } else if (another_symbol == EOF || another_symbol == '\0') {
+      GetSymbol();
+    } else if (TokenClassifier::IsDigit(symbol)) {
+      GetNumber();
+    } else if (TokenClassifier::IsAlpha(symbol)) {
+      GetWord();
+    } else if (TokenClassifier::IsOperator(symbol)) {
+      GetOperator();
+    } else if (TokenClassifier::IsBracket(symbol)) {
+      GetCharacter(DataType::kBracket);
+    } else if (TokenClassifier::IsPunctuation(symbol)) {
+      GetCharacter(DataType::kPunctuation);
+    } else if (TokenClassifier::IsEOF(symbol) || TokenClassifier::IsNullTerminator(symbol)) {
       break;
     } else {
-      LOGE << "Unknown symbol \'" << another_symbol
-                                     << "\' in line " << line_number_;
+      LOGE << "Unknown symbol \'" << symbol
+           << "\' in line " << line_number_;
       end(EXIT_FAILURE);
     }
   }
 
   LOGI << "lexical analysis is ended";
+
+  return tokens_;
 }
 
-std::deque<std::shared_ptr<INode>> Tokenizer::get_tokens_array() const {
-  return tokens_array_;
-}
-
-bool Tokenizer::IsOperator(char symbol) {
-  return Tokenizer::IsCharacterFromArray(symbol, "+-*/^!=<>");
-}
-bool Tokenizer::IsBracket(char symbol) {
-  return Tokenizer::IsCharacterFromArray(symbol, "(){}[]");
-}
-bool Tokenizer::IsPunctuation(char symbol) {
-  return Tokenizer::IsCharacterFromArray(symbol, ":;.,\'\"");
-}
-
-bool Tokenizer::IsCharacterFromArray(char ch, const std::string& array) {
-  return std::any_of(array.begin(), array.end(), [ch](char op) {
-    return (ch == op);
-  });
-}
-
-char Tokenizer::GetSQLSymbol() {
+char Lexer::GetSymbol() {
   return (char) input_.get();
 }
-char Tokenizer::PeekSQLSymbol() {
+char Lexer::PeekSymbol() {
   return (char) input_.peek();
 }
-void Tokenizer::GetNumber() {
+
+void Lexer::GetNumber() {
   LOGD << "getting a number...";
 
   double data = 0.0;
   double power = 1.0;
 
-  while (isdigit(PeekSQLSymbol()))
-    data = 10.0 * data + GetSQLSymbol() - '0';
+  while (TokenClassifier::IsDigit(PeekSymbol()))
+    data = 10.0 * data + GetSymbol() - '0';
 
-  if (PeekSQLSymbol() == '.') {
-    GetSQLSymbol();
+  if (PeekSymbol() == '.') {
+    GetSymbol();
   } else {
-    tokens_array_.push_back(std::make_shared<IntNumNode>((int) data));
+    tokens_.push_back(std::make_shared<IntNumNode>((int) data));
     LOGD << "got the integer number";
     return;
   }
 
-  while (isdigit(PeekSQLSymbol())) {
-    data = 10.0 * data + GetSQLSymbol() - '0';
+  while (TokenClassifier::IsDigit(PeekSymbol())) {
+    data = 10.0 * data + GetSymbol() - '0';
     power *= 10.0;
   }
   data = data / power;
 
   auto num_node = std::make_shared<FloatNumNode>(data);
   num_node->line = line_number_;
-  tokens_array_.push_back(num_node);
+  tokens_.push_back(num_node);
   LOGD << "got the float number";
 }
-void Tokenizer::GetWord() {
+void Lexer::GetWord() {
   LOGD << "getting a word...";
   std::ostringstream data;
 
-  char another_symbol = PeekSQLSymbol();
-  while (isalpha(another_symbol) || isdigit(another_symbol)
+  char another_symbol = PeekSymbol();
+  while (TokenClassifier::IsAlpha(another_symbol) || TokenClassifier::IsDigit(another_symbol)
       || another_symbol == '_') {
-    data << GetSQLSymbol();
-    another_symbol = PeekSQLSymbol();
+    data << GetSymbol();
+    another_symbol = PeekSymbol();
   }
 
   auto word_node = std::make_shared<StringNode>(data.str(), DataType::kWord);
   word_node->line = line_number_;
-  tokens_array_.push_back(word_node);
+  tokens_.push_back(word_node);
   LOGD << "got the word";
 }
-void Tokenizer::GetOperator() {
+void Lexer::GetOperator() {
   LOGD << "getting an operator...";
   std::ostringstream data;
 
-  data << GetSQLSymbol();
-  while (IsOperator(PeekSQLSymbol()))
-    data << GetSQLSymbol();
+  data << GetSymbol();
+  while (TokenClassifier::IsOperator(PeekSymbol()))
+    data << GetSymbol();
 
   auto op_node = std::make_shared<StringNode>(data.str(), DataType::kOperator);
   op_node->line = line_number_;
-  tokens_array_.push_back(op_node);
+  tokens_.push_back(op_node);
   LOGD << "got the operator";
 }
-void Tokenizer::GetCharacter(DataType type) {
+void Lexer::GetCharacter(DataType type) {
   LOGD << "getting a character...";
-  auto char_node = std::make_shared<CharNode>(GetSQLSymbol(), type);
+  auto char_node = std::make_shared<CharNode>(GetSymbol(), type);
   char_node->line = line_number_;
-  tokens_array_.push_back(char_node);
+  tokens_.push_back(char_node);
   LOGD << "got the character";
 }

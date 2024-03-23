@@ -11,7 +11,7 @@ StmtType SyntaxAnalyzer::GetDDLStType() {
   this->pop_first_token();
 
   // Get second token
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "invalid DDL query in line "
         << line << ": second key word is missed";
     end(EXIT_FAILURE);
@@ -23,7 +23,7 @@ StmtType SyntaxAnalyzer::GetDDLStType() {
           this->peek_first_token())->data;
   this->pop_first_token();
 
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "body of the DDL statement is missed in line " << line;
     end(EXIT_FAILURE);
   }
@@ -105,7 +105,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetCreateDatabaseSt() {
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->stmt_type = StmtType::kCreateDatabaseStmt;
 
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "database name is missed";
   }
   this->ValidateIsWord(this->peek_first_token());
@@ -120,7 +120,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetCreateTableSt() {
   node->stmt_type = StmtType::kCreateTableStmt;
 
   // Get tableName
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "tableName is missed";
     return node;
   }
@@ -129,7 +129,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetCreateTableSt() {
   table_name = this->GetName();
   SyntaxAnalyzer::MakeKinship(node, table_name);
 
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "expected opening round bracket in line " << line;
     end(EXIT_FAILURE);
   }
@@ -137,7 +137,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetCreateTableSt() {
   this->ValidateIsOpeningRoundBracket(this->peek_first_token());
   this->pop_first_token();
 
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "expected table definition in line " << line;
     end(EXIT_FAILURE);
   }
@@ -146,7 +146,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetCreateTableSt() {
   table_definition = this->GetTableDefinition();
   SyntaxAnalyzer::MakeKinship(node, table_definition);
 
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "expected closing round bracket in line " << line;
   }
   this->ValidateIsClosingRoundBracket(this->peek_first_token());
@@ -165,7 +165,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetAlterTableSt() {
   SyntaxAnalyzer::MakeKinship(node, table_name);
 
   // Get action (ADD | DROP)
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "invalid alter table query in line "
         << line << ": expected action";
     end(EXIT_FAILURE);
@@ -177,7 +177,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetAlterTableSt() {
   std::shared_ptr<INode> action =
       std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
 
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "invalid alter table query: "
                "expected action's body in line " << line;
     end(EXIT_FAILURE);
@@ -208,14 +208,14 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDropDatabaseSt() {
   node->stmt_type = StmtType::kDropDatabaseStmt;
 
   // First database_name
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "databaseName is missed";
   }
   this->ValidateIsWord(this->peek_first_token());
   database_name = this->GetName();
   SyntaxAnalyzer::MakeKinship(node, database_name);
 
-  if (!tokens_array_.empty()
+  if (!tokens_.empty()
       && SyntaxAnalyzer::IsComma(this->peek_first_token())) {
     separator = this->GetListOf(StmtType::kName);
     SyntaxAnalyzer::MakeKinship(node, separator);
@@ -229,14 +229,14 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDropTableSt() {
   node->stmt_type = StmtType::kDropTableStmt;
 
   // First tableName
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "table name is missed";
   }
   this->ValidateIsWord(peek_first_token());
   table_name = this->GetName();
   SyntaxAnalyzer::MakeKinship(node, table_name);
 
-  if (!tokens_array_.empty()
+  if (!tokens_.empty()
       && SyntaxAnalyzer::IsComma(this->peek_first_token())) {
     separator = this->GetListOf(StmtType::kName);
     SyntaxAnalyzer::MakeKinship(node, separator);
@@ -255,7 +255,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetTableDefinition() {
   argument = this->GetTableDefinitionObject();
   SyntaxAnalyzer::MakeKinship(node, argument);
 
-  if (!tokens_array_.empty()
+  if (!tokens_.empty()
       && SyntaxAnalyzer::IsComma(this->peek_first_token())) {
     separator = this->GetListOf(StmtType::kTableDef);
     SyntaxAnalyzer::MakeKinship(node, separator);
@@ -295,7 +295,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetColumnDefinition() {
   SyntaxAnalyzer::MakeKinship(column_def, column_name);
 
   // Get datatype
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "expected column datatype in line " << line;
     end(EXIT_FAILURE);
   }
@@ -304,7 +304,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetColumnDefinition() {
   SyntaxAnalyzer::MakeKinship(column_def, datatype);
 
   // Get other options
-  if (!tokens_array_.empty()) {
+  if (!tokens_.empty()) {
     // TODO: get options such as IDENTITY or (NOT) NULL
   }
 
@@ -329,7 +329,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetTableConstraint() {
     constraint_kw->stmt_type = StmtType::kConstraintKW;
     SyntaxAnalyzer::MakeKinship(table_constraint, constraint_kw);
 
-    if (tokens_array_.empty()) {
+    if (tokens_.empty()) {
       LOGE << "expected constraint name in line " << line;
       end(EXIT_FAILURE);
     }
@@ -338,7 +338,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetTableConstraint() {
   }
 
   // Get PRIMARY | FOREIGN KEY
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "expected constraint in line " << line;
     end(EXIT_FAILURE);
   }
@@ -351,7 +351,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetTableConstraint() {
           this->get_first_token())->data;
 
   // Get 'KEY' key word
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "invalid constraint definition: "
                "expected \'KEY\' in line " << line;
     end(EXIT_FAILURE);
@@ -368,7 +368,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetTableConstraint() {
   }
 
   // Get key definition
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "expected constraint definition in line " << line;
     end(EXIT_FAILURE);
   }
@@ -395,7 +395,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDropListDefinition() {
   objects = this->GetDropObject();
   SyntaxAnalyzer::MakeKinship(node, objects);
 
-  if (!tokens_array_.empty()) {
+  if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsComma(this->peek_first_token())) {
       separator = this->GetDropList();
       SyntaxAnalyzer::MakeKinship(node, separator);
@@ -415,7 +415,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDropList() {
   objects = this->GetDropObject();
   SyntaxAnalyzer::MakeKinship(separator, objects);
 
-  if (!tokens_array_.empty()) {
+  if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsComma(this->peek_first_token())) {
       next_objects = this->GetDropList();
 
@@ -445,7 +445,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDropObject() {
 
   line = this->peek_first_token()->line;
   object = this->get_first_token();
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "invalid drop list: expected "
         << (is_column ? "constraint" : "column_name") << " in line " << line;
     end(EXIT_FAILURE);
@@ -457,21 +457,21 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDropObject() {
     object->stmt_type = StmtType::kDropColumn;
   }
 
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "invalid drop list: expected identifier in line " << line;
     end(EXIT_FAILURE);
   }
   argument = this->GetIdentifier();
   SyntaxAnalyzer::MakeKinship(object, argument);
 
-  if (!tokens_array_.empty()) {
+  if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsComma(this->peek_first_token())) {
       // Check key word after the comma
       bool is_list = true;
-      if (SyntaxAnalyzer::IsWord(tokens_array_[1])) {
+      if (SyntaxAnalyzer::IsWord(tokens_[1])) {
         std::string checking_word =
             std::dynamic_pointer_cast<StringNode>(
-                tokens_array_[1])->data;
+                tokens_[1])->data;
         if (checking_word == "CONSTRAINT" || checking_word == "COLUMN") {
           is_list = false;
         }
