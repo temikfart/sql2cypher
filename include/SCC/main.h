@@ -5,7 +5,7 @@
 #include "SCC/ast/nodes/inode.h"
 #include "SCC/config/scc_args.h"
 #include "SCC/config/scc_config.h"
-#include "SCC/lexical_analyzer.h"
+#include "SCC/lexer/lexical_analyzer.h"
 #include "SCC/log.h"
 #include "SCC/query_assembler.h"
 #include "SCC/tree_dump.h"

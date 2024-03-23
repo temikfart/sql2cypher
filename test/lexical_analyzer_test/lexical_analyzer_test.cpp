@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include "SCC/lexical_analyzer.h"
+#include "SCC/lexer/lexical_analyzer.h"
 
 using namespace testing;
 

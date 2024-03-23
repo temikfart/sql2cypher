@@ -119,7 +119,7 @@ set(SOURCE_LIST src/main.cpp
         ${LOG_SRC}
         ${CONFIG_SRC}
         ${AST_SRC}
-            src/lexical_analyzer.cpp
+        src/lexer/lexical_analyzer.cpp
             src/syntax_analyzer_general.cpp
             src/syntax_analyzer_ddl.cpp
             src/syntax_analyzer_dml.cpp
