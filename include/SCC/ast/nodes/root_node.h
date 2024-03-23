@@ -9,6 +9,5 @@ class RootNode : public INode {
 public:
   explicit RootNode();
 
-  void PrintData(std::ostream& stream) override;
-  void PrintType(std::ostream& stream) override;
+  std::ostream& operator<<(std::ostream& os) override;
 };

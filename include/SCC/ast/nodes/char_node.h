@@ -11,6 +11,5 @@ public:
 
   CharNode(char ch, DataType data_type);
 
-  void PrintData(std::ostream& stream) override;
-  void PrintType(std::ostream& stream) override;
+  std::ostream& operator<<(std::ostream& os) override;
 };

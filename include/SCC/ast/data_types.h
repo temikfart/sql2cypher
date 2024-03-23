@@ -2,6 +2,20 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <string>
+
+#include "SCC/common/string_utils.h"
+
+#define DT_NONE "none"
+#define DT_ROOT "root"
+#define DT_SERVICE "service"
+#define DT_INT "int"
+#define DT_FLOAT "float"
+#define DT_BRACKET "bracket"
+#define DT_PUNCTUATION "punctuation"
+#define DT_OPERATOR "operator"
+#define DT_WORD "word"
+#define DT_STRING "string"
 
 class DataType {
 public:
@@ -20,9 +34,9 @@ public:
 
   DataType() = default;
   DataType(Value value);
-//  explicit DataType(const std::string& data_type);
+  explicit DataType(const std::string& std_data_type);
 
-//  std::string ToString() const;
+  std::string ToString() const;
 
   explicit operator bool() const = delete;
   constexpr operator Value() const { return value_; }
@@ -38,4 +52,4 @@ private:
   Value value_ = Value::kNone;
 };
 
-//std::ostream& operator<<(std::ostream& os, const DataType& data_type);
+std::ostream& operator<<(std::ostream& os, const DataType& data_type);
