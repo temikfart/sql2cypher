@@ -17,7 +17,7 @@ void FloatNumNode::PrintType(std::ostream& stream) {
 }
 
 void FloatNumNode::ValidateType(DataType type) const {
-  if (data_type != DataType::FLOAT_NUMBER) {
+  if (data_type != DataType::kFloat) {
     LOGE << "invalid type for FloatNumNode: " << type;
     end(EXIT_FAILURE);
   }

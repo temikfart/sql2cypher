@@ -24,15 +24,15 @@ TEST(StmtTypeValueEnumTests, IsUnsignedCharTest) {
 
 TEST(StmtTypeCtorTests, DefaultValueTest) {
   StmtType type;
-  EXPECT_EQ(StmtType::EMPTY_TYPE, (StmtType::Value) type);
+  EXPECT_EQ(StmtType::kNone, (StmtType::Value) type);
 }
 
 TEST(StmtTypeCtorTests, ValueTest) {
-  EXPECT_EQ(StmtType::EMPTY_TYPE, (StmtType::Value) StmtType(StmtType::EMPTY_TYPE));
-  EXPECT_EQ(StmtType::Program, (StmtType::Value) StmtType(StmtType::Program));
-  EXPECT_EQ(StmtType::alterTableStatement, (StmtType::Value) StmtType(StmtType::alterTableStatement));
-  EXPECT_EQ(StmtType::reference, (StmtType::Value) StmtType(StmtType::reference));
-  EXPECT_EQ(StmtType::SQL_varchar, (StmtType::Value) StmtType(StmtType::SQL_varchar));
+  EXPECT_EQ(StmtType::kNone, (StmtType::Value) StmtType(StmtType::kNone));
+  EXPECT_EQ(StmtType::kProgram, (StmtType::Value) StmtType(StmtType::kProgram));
+  EXPECT_EQ(StmtType::kAlterTableStmt, (StmtType::Value) StmtType(StmtType::kAlterTableStmt));
+  EXPECT_EQ(StmtType::kReference, (StmtType::Value) StmtType(StmtType::kReference));
+  EXPECT_EQ(StmtType::kVarcharType, (StmtType::Value) StmtType(StmtType::kVarcharType));
 }
 
 TEST(StmtTypeCtorTests, InvalidValueTest) {
@@ -41,18 +41,18 @@ TEST(StmtTypeCtorTests, InvalidValueTest) {
 }
 
 TEST(StmtTypeCastTests, CastToValueTest) {
-  StmtType alter_table_stmt(StmtType::alterTableStatement);
+  StmtType alter_table_stmt(StmtType::kAlterTableStmt);
   auto alter_table_stmt_val = (StmtType::Value) alter_table_stmt;
-  EXPECT_EQ(StmtType::alterTableStatement, alter_table_stmt_val);
+  EXPECT_EQ(StmtType::kAlterTableStmt, alter_table_stmt_val);
 
-  StmtType drop_table_stmt(StmtType::dropTableStatement);
+  StmtType drop_table_stmt(StmtType::kDropTableStmt);
   auto drop_table_stmt_val = (StmtType::Value) drop_table_stmt;
-  EXPECT_EQ(StmtType::dropTableStatement, drop_table_stmt_val);
+  EXPECT_EQ(StmtType::kDropTableStmt, drop_table_stmt_val);
 }
 
 TEST(StmtTypeOperatorsTests, CompareTwoEqualTypesTest) {
-  StmtType first(StmtType::tableDefinition);
-  StmtType second(StmtType::tableDefinition);
+  StmtType first(StmtType::kTableDef);
+  StmtType second(StmtType::kTableDef);
 
   EXPECT_TRUE(first == second);
   EXPECT_TRUE(first <= second);
@@ -64,8 +64,8 @@ TEST(StmtTypeOperatorsTests, CompareTwoEqualTypesTest) {
 }
 
 TEST(StmtTypeOperatorsTests, CompareTwoDifferentTypesTest) {
-  StmtType first(StmtType::identifier);
-  StmtType second(StmtType::SQL_float);
+  StmtType first(StmtType::kIdentifier);
+  StmtType second(StmtType::kFloatType);
 
   EXPECT_TRUE(first != second);
   EXPECT_TRUE(first <= second);
@@ -78,8 +78,8 @@ TEST(StmtTypeOperatorsTests, CompareTwoDifferentTypesTest) {
 }
 
 TEST(StmtTypeOperatorsTests, CompareWithEqualValueTest) {
-  StmtType type(StmtType::primaryKey);
-  StmtType::Value value = StmtType::primaryKey;
+  StmtType type(StmtType::kPrimaryKey);
+  StmtType::Value value = StmtType::kPrimaryKey;
 
   EXPECT_TRUE(type == value);
   EXPECT_TRUE(type <= value);
@@ -90,8 +90,8 @@ TEST(StmtTypeOperatorsTests, CompareWithEqualValueTest) {
 }
 
 TEST(StmtTypeOperatorsTests, CompareWithDifferentValueTest) {
-  StmtType type(StmtType::createTableStatement);
-  StmtType::Value value = StmtType::columnDefinition;
+  StmtType type(StmtType::kCreateTableStmt);
+  StmtType::Value value = StmtType::kColumnDef;
 
   EXPECT_TRUE(type != value);
   EXPECT_TRUE(type <= value);

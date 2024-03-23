@@ -22,9 +22,9 @@ void Tokenizer::Tokenize() {
     } else if (Tokenizer::IsOperator(another_symbol)) {
       this->GetOperator();
     } else if (Tokenizer::IsBracket(another_symbol)) {
-      this->GetCharacter(DataType::BRACKET);
+      this->GetCharacter(DataType::kBracket);
     } else if (Tokenizer::IsPunctuation(another_symbol)) {
-      this->GetCharacter(DataType::PUNCTUATION);
+      this->GetCharacter(DataType::kPunctuation);
     } else if (another_symbol == EOF || another_symbol == '\0') {
       break;
     } else {
@@ -102,7 +102,7 @@ void Tokenizer::GetWord() {
     another_symbol = PeekSQLSymbol();
   }
 
-  auto word_node = std::make_shared<StringNode>(data.str(), DataType::WORD);
+  auto word_node = std::make_shared<StringNode>(data.str(), DataType::kWord);
   word_node->line = line_number_;
   tokens_array_.push_back(word_node);
   LOGD << "got the word";
@@ -115,7 +115,7 @@ void Tokenizer::GetOperator() {
   while (IsOperator(PeekSQLSymbol()))
     data << GetSQLSymbol();
 
-  auto op_node = std::make_shared<StringNode>(data.str(), DataType::OPERATOR);
+  auto op_node = std::make_shared<StringNode>(data.str(), DataType::kOperator);
   op_node->line = line_number_;
   tokens_array_.push_back(op_node);
   LOGD << "got the operator";

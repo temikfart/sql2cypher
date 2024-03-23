@@ -17,7 +17,7 @@ void IntNumNode::PrintType(std::ostream& stream) {
 }
 
 void IntNumNode::ValidateType(DataType type) const {
-  if (data_type != DataType::INT_NUMBER) {
+  if (data_type != DataType::kInt) {
     LOGE << "invalid type for IntNumNode: " << type;
     end(EXIT_FAILURE);
   }

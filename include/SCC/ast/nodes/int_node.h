@@ -7,7 +7,7 @@
 
 class IntNumNode : public INode {
 public:
-  explicit IntNumNode(int value, DataType type = DataType::INT_NUMBER);
+  explicit IntNumNode(int value, DataType type = DataType::kInt);
 
   int get_data() const;
 

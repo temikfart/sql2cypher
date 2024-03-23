@@ -14,10 +14,10 @@ void CharNode::PrintData(std::ostream& stream) {
 }
 void CharNode::PrintType(std::ostream& stream) {
   switch (data_type) {
-    case DataType::BRACKET:
+    case DataType::kBracket:
       stream << "BRACKET";
       break;
-    case DataType::PUNCTUATION:
+    case DataType::kPunctuation:
       stream << "PUNCTUATION";
       break;
     default:
@@ -28,8 +28,8 @@ void CharNode::PrintType(std::ostream& stream) {
 }
 
 void CharNode::ValidateType(DataType type) const {
-  bool is_BRACKET = type == DataType::BRACKET;
-  bool is_PUNCTUATION = type == DataType::PUNCTUATION;
+  bool is_BRACKET = type == DataType::kBracket;
+  bool is_PUNCTUATION = type == DataType::kPunctuation;
   if (!(is_BRACKET || is_PUNCTUATION)) {
     LOGE << "invalid type for CharNode: " << type;
     end(EXIT_FAILURE);

@@ -9,7 +9,7 @@ void SyntaxAnalyzer::ValidateNotEmpty() const {
   }
 }
 void SyntaxAnalyzer::ValidateIsWord(std::shared_ptr<INode>& node) const {
-  if (node->data_type != DataType::WORD) {
+  if (node->data_type != DataType::kWord) {
     LOGE << "expected word in line " << node->line;
     end(EXIT_FAILURE);
   }
@@ -46,21 +46,21 @@ void SyntaxAnalyzer::ValidateIsDoubleQuote(std::shared_ptr<INode>& node) const {
 // Defining Node Datatype
 
 bool SyntaxAnalyzer::IsBracket(std::shared_ptr<INode>& node) {
-  return (node->data_type == DataType::BRACKET);
+  return (node->data_type == DataType::kBracket);
 }
 bool SyntaxAnalyzer::IsPunctuation(std::shared_ptr<INode>& node) {
-  return (node->data_type == DataType::PUNCTUATION);
+  return (node->data_type == DataType::kPunctuation);
 }
 bool SyntaxAnalyzer::IsWord(std::shared_ptr<INode>& node) {
-  return (node->data_type == DataType::WORD);
+  return (node->data_type == DataType::kWord);
 }
 bool SyntaxAnalyzer::IsNumber(std::shared_ptr<INode>& node) {
-  bool is_int = node->data_type != DataType::INT_NUMBER;
-  bool is_float = node->data_type != DataType::FLOAT_NUMBER;
+  bool is_int = node->data_type != DataType::kInt;
+  bool is_float = node->data_type != DataType::kFloat;
   return (is_int || is_float);
 }
 bool SyntaxAnalyzer::IsOperator(std::shared_ptr<INode>& node) {
-  return (node->data_type == DataType::OPERATOR);
+  return (node->data_type == DataType::kOperator);
 }
 
 // Defining Node data
@@ -68,13 +68,13 @@ bool SyntaxAnalyzer::IsOperator(std::shared_ptr<INode>& node) {
 bool SyntaxAnalyzer::IsDot(std::shared_ptr<INode>& node) {
   std::shared_ptr<INode> dot =
       std::dynamic_pointer_cast<INode>(
-          std::make_shared<CharNode>('.', DataType::PUNCTUATION));
+          std::make_shared<CharNode>('.', DataType::kPunctuation));
   return INode::IsNodesEqual(dot, node);
 }
 bool SyntaxAnalyzer::IsComma(std::shared_ptr<INode>& node) {
   std::shared_ptr<INode> comma =
       std::dynamic_pointer_cast<INode>(
-          std::make_shared<CharNode>(',', DataType::PUNCTUATION));
+          std::make_shared<CharNode>(',', DataType::kPunctuation));
   return INode::IsNodesEqual(comma, node);
 }
 bool SyntaxAnalyzer::IsOpeningRoundBracket(std::shared_ptr<INode>& node) {
@@ -82,7 +82,7 @@ bool SyntaxAnalyzer::IsOpeningRoundBracket(std::shared_ptr<INode>& node) {
   std::shared_ptr<INode> ORB =
       std::dynamic_pointer_cast<INode>(
           std::make_shared<CharNode>(
-              '(', DataType::BRACKET));
+              '(', DataType::kBracket));
   return INode::IsNodesEqual(ORB, node);
 }
 bool SyntaxAnalyzer::IsClosingRoundBracket(std::shared_ptr<INode>& node) {
@@ -90,23 +90,23 @@ bool SyntaxAnalyzer::IsClosingRoundBracket(std::shared_ptr<INode>& node) {
   std::shared_ptr<INode> CRB =
       std::dynamic_pointer_cast<INode>(
           std::make_shared<CharNode>(
-              ')', DataType::BRACKET));
+              ')', DataType::kBracket));
   return INode::IsNodesEqual(CRB, node);
 }
 bool SyntaxAnalyzer::IsSingleQuote(std::shared_ptr<INode>& node) {
   std::shared_ptr<INode> single_quote =
       std::dynamic_pointer_cast<INode>(
-          std::make_shared<StringNode>("\'", DataType::PUNCTUATION));
+          std::make_shared<StringNode>("\'", DataType::kPunctuation));
   return INode::IsNodesEqual(single_quote, node);
 }
 bool SyntaxAnalyzer::IsDoubleQuote(std::shared_ptr<INode>& node) {
   std::shared_ptr<INode> double_quote =
       std::dynamic_pointer_cast<INode>(
-          std::make_shared<StringNode>("\"", DataType::PUNCTUATION));
+          std::make_shared<StringNode>("\"", DataType::kPunctuation));
   return INode::IsNodesEqual(double_quote, node);
 }
 bool SyntaxAnalyzer::IsUnaryOperator(std::shared_ptr<INode>& node) {
-  if (node->data_type == DataType::OPERATOR) {
+  if (node->data_type == DataType::kOperator) {
     std::string data = std::dynamic_pointer_cast<StringNode>(node)->get_data();
     if (data == "+" || data == "-") {
       return true;
@@ -115,7 +115,7 @@ bool SyntaxAnalyzer::IsUnaryOperator(std::shared_ptr<INode>& node) {
   return false;
 }
 bool SyntaxAnalyzer::IsBinaryOperator(std::shared_ptr<INode>& node) {
-  if (node->data_type == DataType::OPERATOR) {
+  if (node->data_type == DataType::kOperator) {
     std::string data = std::dynamic_pointer_cast<StringNode>(node)->get_data();
     std::vector<std::string> bin_operators = {
         "=", "<>", "!=",
@@ -133,7 +133,7 @@ bool SyntaxAnalyzer::IsBinaryOperator(std::shared_ptr<INode>& node) {
 bool SyntaxAnalyzer::IsSemicolon(std::shared_ptr<INode>& node) {
   std::shared_ptr<INode> semicolon =
       std::dynamic_pointer_cast<INode>(
-          std::make_shared<CharNode>(';', DataType::PUNCTUATION));
+          std::make_shared<CharNode>(';', DataType::kPunctuation));
   return INode::IsNodesEqual(semicolon, node);
 }
 

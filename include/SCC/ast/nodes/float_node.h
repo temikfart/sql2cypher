@@ -7,7 +7,7 @@
 
 class FloatNumNode : public INode {
 public:
-  explicit FloatNumNode(double value, DataType type = DataType::FLOAT_NUMBER);
+  explicit FloatNumNode(double value, DataType type = DataType::kFloat);
 
   double get_data() const;
 

@@ -6,60 +6,60 @@
 class StmtType {
 public:
   enum Value : unsigned char {
-    EMPTY_TYPE,
-    Program,
-    query,
-    ddlStatement,
-    dmlStatement,
+    kNone,
+    kProgram,
+    kQuery,
+    kDdlStmt,
+    kDmlStmt,
 
     // DDL Statements
-    alterTableStatement,
-    createDatabaseStatement,
-    createTableStatement,
-    dropDatabaseStatement,
-    dropTableStatement,
+    kAlterTableStmt,
+    kCreateDatabaseStmt,
+    kCreateTableStmt,
+    kDropDatabaseStmt,
+    kDropTableStmt,
 
     // DDL Basic Statements
-    tableDefinition,
-    columnDefinition,
-    tableConstraint,
-    alterActionADD,
-    alterActionDROP,
-    dropList,
-    dropConstraint,
-    dropColumn,
+    kTableDef,
+    kColumnDef,
+    kTableConstraint,
+    kAlterActionAdd,
+    kAlterActionDrop,
+    kDropList,
+    kDropConstraint,
+    kDropColumn,
 
     // DML Statements
-    deleteStatement,
-    insertStatement,
-    updateStatement,
+    kDeleteStmt,
+    kInsertStmt,
+    kUpdateStmt,
 
     // DML Basic Statements
-    condition,
-    ORcondition,
-    ANDcondition,
-    NOTcondition,
-    predicate,
-    expression,
+    kCondition,
+    kORCondition,
+    kANDCondition,
+    kNOTCondition,
+    kPredicate,
+    kExpression,
 
     // Basic Statements
-    primaryKey,
-    foreignKey,
-    reference,
-    name,
-    identifier,
-    delimiter_dot,
-    delimiter_comma,
-    delimiter_semicolon,
+    kPrimaryKey,
+    kForeignKey,
+    kReference,
+    kName,
+    kIdentifier,
+    kDotDelimiter,
+    kCommaDelimiter,
+    kSemicolonDelimiter,
 
     // Other key words
-    kw_constraint,
+    kConstraintKW,
 
-    // SQL datatypes
-    SQL_int,
-    SQL_float,
-    SQL_char,
-    SQL_varchar,
+    // SQL data types
+    kIntType,
+    kFloatType,
+    kCharType,
+    kVarcharType,
   };
 
   StmtType() = default;
@@ -79,7 +79,7 @@ public:
   constexpr bool operator>=(const Value& value) const { return value_ >= value; }
 
 private:
-  Value value_ = Value::EMPTY_TYPE;
+  Value value_ = Value::kNone;
 };
 
 //std::ostream& operator<<(std::ostream& os, const StmtType& stmt_type);

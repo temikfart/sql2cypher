@@ -73,72 +73,72 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
             << " [shape = record, color = black, label = ";
 
   switch (type) {
-    case DataType::ROOT:
+    case DataType::kRoot:
       dot_file_ << "\" {<data> ROOT";
-      if (st_type != StmtType::EMPTY_TYPE)
+      if (st_type != StmtType::kNone)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = gray];\n";
       break;
-    case DataType::SERVICE:
+    case DataType::kService:
       dot_file_ << "\" {<st_type> "
                 << GetServiceNodeData(st_type)
                 << " } \", style = filled, fillcolor = purple, "
                    "fontcolor = white];\n";
       break;
-    case DataType::INT_NUMBER:
+    case DataType::kInt:
       dot_file_ << "\" {<data> "
                 << std::dynamic_pointer_cast<IntNumNode>(node)->get_data();
-      if (st_type != StmtType::EMPTY_TYPE)
+      if (st_type != StmtType::kNone)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = green, "
                    "fontcolor = black];\n";
       break;
-    case DataType::FLOAT_NUMBER:
+    case DataType::kFloat:
       dot_file_ << "\" {<data> "
                 << std::dynamic_pointer_cast<FloatNumNode>(node)->get_data();
-      if (st_type != StmtType::EMPTY_TYPE)
+      if (st_type != StmtType::kNone)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = green, "
                    "fontcolor = black];\n";
       break;
-    case DataType::BRACKET:
+    case DataType::kBracket:
       dot_file_ << "\" {<data> "
                 << std::dynamic_pointer_cast<CharNode>(node)->get_data();
-      if (st_type != StmtType::EMPTY_TYPE)
+      if (st_type != StmtType::kNone)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = lightblue, "
                    "fontcolor = black];\n";
       break;
-    case DataType::PUNCTUATION:
+    case DataType::kPunctuation:
       dot_file_ << "\" {<data> \'"
                 << std::dynamic_pointer_cast<CharNode>(node)->get_data();
-      if (st_type != StmtType::EMPTY_TYPE)
+      if (st_type != StmtType::kNone)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = blue, "
                    "fontcolor = white];\n";
       break;
-    case DataType::WORD:
+    case DataType::kWord:
       dot_file_ << R"(" {<data> \")"
                 << std::dynamic_pointer_cast<StringNode>(node)->get_data()
                 << R"(\")";
-      if (st_type != StmtType::EMPTY_TYPE)
+      if (st_type != StmtType::kNone)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = red, "
                    "fontcolor = white];\n";
       break;
-    case DataType::OPERATOR:
+    case DataType::kOperator:
       dot_file_ << "\" {<data> "
                 << std::dynamic_pointer_cast<StringNode>(node)->get_data();
-      if (st_type != StmtType::EMPTY_TYPE)
+      if (st_type != StmtType::kNone)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = orange, "
                    "fontcolor = white];\n";
       break;
-    case DataType::STRING:
+    case DataType::kString:
       dot_file_ << R"(" {<data> \")"
                 << std::dynamic_pointer_cast<StringNode>(node)->get_data()
                 << R"(\")";
-      if (st_type != StmtType::EMPTY_TYPE)
+      if (st_type != StmtType::kNone)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = yellow, "
                    "fontcolor = black];\n";
@@ -178,99 +178,99 @@ void TreeDump::MakeDumpPng() {
 
 std::string TreeDump::GetServiceNodeData(StmtType statement_type) {
   switch (statement_type) {
-    case StmtType::EMPTY_TYPE:
+    case StmtType::kNone:
       return "EMPTY_TYPE";
-    case StmtType::Program:
+    case StmtType::kProgram:
       return "Program";
-    case StmtType::query:
+    case StmtType::kQuery:
       return "query";
-    case StmtType::ddlStatement:
+    case StmtType::kDdlStmt:
       return "ddlStatement";
-    case StmtType::dmlStatement:
+    case StmtType::kDmlStmt:
       return "dmlStatement";
 
       // DDL Statements
-    case StmtType::alterTableStatement:
+    case StmtType::kAlterTableStmt:
       return "alterTableStatement";
-    case StmtType::createDatabaseStatement:
+    case StmtType::kCreateDatabaseStmt:
       return "createDatabaseStatement";
-    case StmtType::createTableStatement:
+    case StmtType::kCreateTableStmt:
       return "createTableStatement";
-    case StmtType::dropDatabaseStatement:
+    case StmtType::kDropDatabaseStmt:
       return "dropDatabaseStatement";
-    case StmtType::dropTableStatement:
+    case StmtType::kDropTableStmt:
       return "dropTableStatement";
 
       // DDL Basic Statements
-    case StmtType::tableDefinition:
+    case StmtType::kTableDef:
       return "tableDefinition";
-    case StmtType::columnDefinition:
+    case StmtType::kColumnDef:
       return "columnDefinition";
-    case StmtType::tableConstraint:
+    case StmtType::kTableConstraint:
       return "tableConstraint";
-    case StmtType::alterActionADD:
+    case StmtType::kAlterActionAdd:
       return "alterActionADD";
-    case StmtType::alterActionDROP:
+    case StmtType::kAlterActionDrop:
       return "alterActionDROP";
-    case StmtType::dropList:
+    case StmtType::kDropList:
       return "dropList";
-    case StmtType::dropConstraint:
+    case StmtType::kDropConstraint:
       return "dropConstraint";
-    case StmtType::dropColumn:
+    case StmtType::kDropColumn:
       return "dropColumn";
 
       // DML Statements
-    case StmtType::deleteStatement:
+    case StmtType::kDeleteStmt:
       return "deleteStatement";
-    case StmtType::insertStatement:
+    case StmtType::kInsertStmt:
       return "insertStatement";
-    case StmtType::updateStatement:
+    case StmtType::kUpdateStmt:
       return "updateStatement";
 
       // DML Basic Statements
-    case StmtType::condition:
+    case StmtType::kCondition:
       return "condition";
-    case StmtType::ORcondition:
+    case StmtType::kORCondition:
       return "ORcondition";
-    case StmtType::ANDcondition:
+    case StmtType::kANDCondition:
       return "ANDcondition";
-    case StmtType::NOTcondition:
+    case StmtType::kNOTCondition:
       return "NOTcondition";
-    case StmtType::predicate:
+    case StmtType::kPredicate:
       return "predicate";
-    case StmtType::expression:
+    case StmtType::kExpression:
       return "expression";
 
       // Basic Statements
-    case StmtType::primaryKey:
+    case StmtType::kPrimaryKey:
       return "primaryKey";
-    case StmtType::foreignKey:
+    case StmtType::kForeignKey:
       return "foreignKey";
-    case StmtType::reference:
+    case StmtType::kReference:
       return "reference";
-    case StmtType::name:
+    case StmtType::kName:
       return "name";
-    case StmtType::identifier:
+    case StmtType::kIdentifier:
       return "identifier";
-    case StmtType::delimiter_dot:
+    case StmtType::kDotDelimiter:
       return "delimiter_dot";
-    case StmtType::delimiter_comma:
+    case StmtType::kCommaDelimiter:
       return "delimiter_comma";
-    case StmtType::delimiter_semicolon:
+    case StmtType::kSemicolonDelimiter:
       return "delimiter_semicolon";
 
       // Basic Statements
-    case StmtType::kw_constraint:
+    case StmtType::kConstraintKW:
       return "kw_constraint";
 
       // SQL datatypes
-    case StmtType::SQL_int:
+    case StmtType::kIntType:
       return "SQL_int";
-    case StmtType::SQL_float:
+    case StmtType::kFloatType:
       return "SQL_float";
-    case StmtType::SQL_char:
+    case StmtType::kCharType:
       return "SQL_char";
-    case StmtType::SQL_varchar:
+    case StmtType::kVarcharType:
       return "SQL_varchar";
 
     default:

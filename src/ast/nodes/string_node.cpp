@@ -17,10 +17,10 @@ void StringNode::PrintData(std::ostream& stream) {
 }
 void StringNode::PrintType(std::ostream& stream) {
   switch (data_type) {
-    case DataType::WORD:
+    case DataType::kWord:
       stream << "WORD";
       break;
-    case DataType::OPERATOR:
+    case DataType::kOperator:
       stream << "OPERATOR";
       break;
     default:
@@ -31,9 +31,9 @@ void StringNode::PrintType(std::ostream& stream) {
 }
 
 void StringNode::ValidateType(DataType type) const {
-  bool is_WORD = type == DataType::WORD;
-  bool is_OPERATOR = type == DataType::OPERATOR;
-  bool is_STRING = type == DataType::STRING;
+  bool is_WORD = type == DataType::kWord;
+  bool is_OPERATOR = type == DataType::kOperator;
+  bool is_STRING = type == DataType::kString;
   if (!(is_WORD || is_OPERATOR || is_STRING)) {
     LOGE << "invalid type for StringNode: " << type;
     end(EXIT_FAILURE);
