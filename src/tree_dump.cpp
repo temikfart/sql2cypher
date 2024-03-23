@@ -76,12 +76,12 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
     case DataType::kRoot:
       dot_file_ << "\" {<data> ROOT";
       if (st_type != StmtType::kNone)
-        dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
+        dot_file_ << " | <st_type>" << scc::common::UpperCase(st_type.ToString());
       dot_file_ << "} \", style = filled, fillcolor = gray];\n";
       break;
     case DataType::kService:
       dot_file_ << "\" {<st_type> "
-                << GetServiceNodeData(st_type)
+                << scc::common::UpperCase(st_type.ToString())
                 << " } \", style = filled, fillcolor = purple, "
                    "fontcolor = white];\n";
       break;
@@ -89,7 +89,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       dot_file_ << "\" {<data> "
                 << std::dynamic_pointer_cast<IntNumNode>(node)->data;
       if (st_type != StmtType::kNone)
-        dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
+        dot_file_ << " | <st_type>" << scc::common::UpperCase(st_type.ToString());
       dot_file_ << "} \", style = filled, fillcolor = green, "
                    "fontcolor = black];\n";
       break;
@@ -97,7 +97,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       dot_file_ << "\" {<data> "
                 << std::dynamic_pointer_cast<FloatNumNode>(node)->data;
       if (st_type != StmtType::kNone)
-        dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
+        dot_file_ << " | <st_type>" << scc::common::UpperCase(st_type.ToString());
       dot_file_ << "} \", style = filled, fillcolor = green, "
                    "fontcolor = black];\n";
       break;
@@ -105,7 +105,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       dot_file_ << "\" {<data> "
                 << std::dynamic_pointer_cast<CharNode>(node)->data;
       if (st_type != StmtType::kNone)
-        dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
+        dot_file_ << " | <st_type>" << scc::common::UpperCase(st_type.ToString());
       dot_file_ << "} \", style = filled, fillcolor = lightblue, "
                    "fontcolor = black];\n";
       break;
@@ -113,7 +113,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       dot_file_ << "\" {<data> \'"
                 << std::dynamic_pointer_cast<CharNode>(node)->data;
       if (st_type != StmtType::kNone)
-        dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
+        dot_file_ << " | <st_type>" << scc::common::UpperCase(st_type.ToString());
       dot_file_ << "} \", style = filled, fillcolor = blue, "
                    "fontcolor = white];\n";
       break;
@@ -122,7 +122,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
                 << std::dynamic_pointer_cast<StringNode>(node)->data
                 << R"(\")";
       if (st_type != StmtType::kNone)
-        dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
+        dot_file_ << " | <st_type>" << scc::common::UpperCase(st_type.ToString());
       dot_file_ << "} \", style = filled, fillcolor = red, "
                    "fontcolor = white];\n";
       break;
@@ -130,7 +130,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       dot_file_ << "\" {<data> "
                 << std::dynamic_pointer_cast<StringNode>(node)->data;
       if (st_type != StmtType::kNone)
-        dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
+        dot_file_ << " | <st_type>" << scc::common::UpperCase(st_type.ToString());
       dot_file_ << "} \", style = filled, fillcolor = orange, "
                    "fontcolor = white];\n";
       break;
@@ -139,7 +139,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
                 << std::dynamic_pointer_cast<StringNode>(node)->data
                 << R"(\")";
       if (st_type != StmtType::kNone)
-        dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
+        dot_file_ << " | <st_type>" << scc::common::UpperCase(st_type.ToString());
       dot_file_ << "} \", style = filled, fillcolor = yellow, "
                    "fontcolor = black];\n";
       break;
@@ -173,110 +173,6 @@ void TreeDump::MakeDumpPng() {
   } else {
     LOGI << "the image with tree dump "
               "was created at \'" << png_file_path << "\'";
-  }
-}
-
-std::string TreeDump::GetServiceNodeData(StmtType statement_type) {
-  switch (statement_type) {
-    case StmtType::kNone:
-      return "EMPTY_TYPE";
-    case StmtType::kProgram:
-      return "Program";
-    case StmtType::kQuery:
-      return "query";
-    case StmtType::kDdlStmt:
-      return "ddlStatement";
-    case StmtType::kDmlStmt:
-      return "dmlStatement";
-
-      // DDL Statements
-    case StmtType::kAlterTableStmt:
-      return "alterTableStatement";
-    case StmtType::kCreateDatabaseStmt:
-      return "createDatabaseStatement";
-    case StmtType::kCreateTableStmt:
-      return "createTableStatement";
-    case StmtType::kDropDatabaseStmt:
-      return "dropDatabaseStatement";
-    case StmtType::kDropTableStmt:
-      return "dropTableStatement";
-
-      // DDL Basic Statements
-    case StmtType::kTableDef:
-      return "tableDefinition";
-    case StmtType::kColumnDef:
-      return "columnDefinition";
-    case StmtType::kTableConstraint:
-      return "tableConstraint";
-    case StmtType::kAlterActionAdd:
-      return "alterActionADD";
-    case StmtType::kAlterActionDrop:
-      return "alterActionDROP";
-    case StmtType::kDropList:
-      return "dropList";
-    case StmtType::kDropConstraint:
-      return "dropConstraint";
-    case StmtType::kDropColumn:
-      return "dropColumn";
-
-      // DML Statements
-    case StmtType::kDeleteStmt:
-      return "deleteStatement";
-    case StmtType::kInsertStmt:
-      return "insertStatement";
-    case StmtType::kUpdateStmt:
-      return "updateStatement";
-
-      // DML Basic Statements
-    case StmtType::kCondition:
-      return "condition";
-    case StmtType::kORCondition:
-      return "ORcondition";
-    case StmtType::kANDCondition:
-      return "ANDcondition";
-    case StmtType::kNOTCondition:
-      return "NOTcondition";
-    case StmtType::kPredicate:
-      return "predicate";
-    case StmtType::kExpression:
-      return "expression";
-
-      // Basic Statements
-    case StmtType::kPrimaryKey:
-      return "primaryKey";
-    case StmtType::kForeignKey:
-      return "foreignKey";
-    case StmtType::kReference:
-      return "reference";
-    case StmtType::kName:
-      return "name";
-    case StmtType::kIdentifier:
-      return "identifier";
-    case StmtType::kDotDelimiter:
-      return "delimiter_dot";
-    case StmtType::kCommaDelimiter:
-      return "delimiter_comma";
-    case StmtType::kSemicolonDelimiter:
-      return "delimiter_semicolon";
-
-      // Basic Statements
-    case StmtType::kConstraintKW:
-      return "kw_constraint";
-
-      // SQL datatypes
-    case StmtType::kIntType:
-      return "SQL_int";
-    case StmtType::kFloatType:
-      return "SQL_float";
-    case StmtType::kCharType:
-      return "SQL_char";
-    case StmtType::kVarcharType:
-      return "SQL_varchar";
-
-    default:
-      LOGE << "unknown statement type";
-      end(EXIT_FAILURE);
-      return "";
   }
 }
 
