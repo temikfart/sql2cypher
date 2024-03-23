@@ -19,11 +19,12 @@
 
 class SyntaxAnalyzer {
 public:
-  std::shared_ptr<INode> Analyze(
-      std::deque<std::shared_ptr<INode>> tokens_array);
+  explicit SyntaxAnalyzer(std::deque<std::shared_ptr<INode>>&& tokens);
+
+  std::shared_ptr<INode> Analyze();
 
 private:
-  std::deque<std::shared_ptr<INode>> tokens_array_;
+  std::deque<std::shared_ptr<INode>> tokens_;
 
   // Start
 

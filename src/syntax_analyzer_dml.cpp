@@ -10,7 +10,7 @@ StmtType SyntaxAnalyzer::GetDMLStType() {
           this->peek_first_token())->data;
   this->pop_first_token();
 
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "body of the DDL statement is missed in line " << line;
     end(EXIT_FAILURE);
   }
@@ -106,14 +106,14 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetORCondition() {
   SyntaxAnalyzer::MakeKinship(node, AND_condition);
 
   int line = this->peek_first_token()->line;
-  if (!tokens_array_.empty()
+  if (!tokens_.empty()
       && SyntaxAnalyzer::IsWord(this->peek_first_token())) {
     std::shared_ptr<StringNode> tmp =
         std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
     if (tmp->data == "OR") {
       this->pop_first_token();
 
-      if (tokens_array_.empty()) {
+      if (tokens_.empty()) {
         LOGE << "invalid OR-condition: expected AND-condition "
                    "after the \'OR\' logical operator in line " << line;
         end(EXIT_FAILURE);
@@ -135,14 +135,14 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetANDCondition() {
   SyntaxAnalyzer::MakeKinship(node, NOT_condition);
 
   int line = this->peek_first_token()->line;
-  if (!tokens_array_.empty()) {
+  if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsWord(this->peek_first_token())) {
       std::shared_ptr<StringNode> tmp =
           std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
       if (tmp->data == "AND") {
         this->pop_first_token();
 
-        if (tokens_array_.empty()) {
+        if (tokens_.empty()) {
           LOGE << "invalid AND-condition: expected NOT-condition "
                      "after the \\'AND\\' operator in line " << line;
           end(EXIT_FAILURE);
@@ -173,7 +173,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetNOTCondition() {
   }
 
   // Get predicate
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "invalid NOT-condition: expected predicate in line "
         << line;
     end(EXIT_FAILURE);
@@ -192,7 +192,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetPredicate() {
   lhs = this->GetExpression();
   SyntaxAnalyzer::MakeKinship(node, lhs);
 
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "invalid predicate: expected "
                "binary operator in line " << line;
     end(EXIT_FAILURE);
@@ -208,7 +208,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetPredicate() {
     end(EXIT_FAILURE);
   }
 
-  if (tokens_array_.empty()) {
+  if (tokens_.empty()) {
     LOGE << "invalid predicate: expected "
                "right hand side expression in line " << line;
     end(EXIT_FAILURE);
@@ -233,7 +233,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetExpression() {
 
     SyntaxAnalyzer::MakeKinship(node, name);
 
-    if (!tokens_array_.empty()) {
+    if (!tokens_.empty()) {
       if (SyntaxAnalyzer::IsDot(this->peek_first_token())) {
         dot = this->GetIdentifiers();
 
@@ -251,7 +251,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetExpression() {
 
     SyntaxAnalyzer::MakeKinship(node, u_operator);
 
-    if (tokens_array_.empty()) {
+    if (tokens_.empty()) {
       LOGE <<
           "invalid expression in line "
               << line << ": an unary operator without an operand";
@@ -266,7 +266,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetExpression() {
   // Is it (expression) ?
   if (SyntaxAnalyzer::IsOpeningRoundBracket(this->peek_first_token())) {
     this->pop_first_token();
-    if (tokens_array_.empty()) {
+    if (tokens_.empty()) {
       LOGE << "invalid expression in line "
           << line << ": bad bracket sequence \'(.\'";
       end(EXIT_FAILURE);
@@ -274,7 +274,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetExpression() {
     line = this->peek_first_token()->line;
     node = this->GetExpression();
 
-    if (tokens_array_.empty()) {
+    if (tokens_.empty()) {
       LOGE << "invalid expression in line "
           << line << ": bad bracket sequence \'(.\'";
       end(EXIT_FAILURE);
@@ -288,7 +288,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetExpression() {
   if (SyntaxAnalyzer::IsSingleQuote(this->peek_first_token())
       || SyntaxAnalyzer::IsDoubleQuote(this->peek_first_token())) {
     this->pop_first_token();
-    if (tokens_array_.empty()) {
+    if (tokens_.empty()) {
       LOGE << "invalid expression in line "
           << line << ": invalid string";
       end(EXIT_FAILURE);
@@ -324,7 +324,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetMathSum() {
   int line = this->peek_first_token()->line;
   product_1 = this->GetMathProduct();
 
-  if (!tokens_array_.empty()) {
+  if (!tokens_.empty()) {
     while (SyntaxAnalyzer::IsOperator(this->peek_first_token())) {
       // Get ("+" | "-")
       op_node = this->get_first_token();
@@ -337,7 +337,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetMathSum() {
       }
 
       // Get next powers
-      if (tokens_array_.empty()) {
+      if (tokens_.empty()) {
         LOGE << "invalid Math expression: expected second operand for "
                    "the \'" << operator_str << "\' in line " << line;
         end(EXIT_FAILURE);
@@ -348,7 +348,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetMathSum() {
       SyntaxAnalyzer::MakeKinship(op_node, product_2);
       product_1 = op_node;
 
-      if (tokens_array_.empty()) {
+      if (tokens_.empty()) {
         break;
       }
     }
@@ -362,7 +362,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetMathProduct() {
   int line = this->peek_first_token()->line;
   power_1 = this->GetMathPower();
 
-  if (!tokens_array_.empty()) {
+  if (!tokens_.empty()) {
     while (SyntaxAnalyzer::IsOperator(this->peek_first_token())) {
       // Get ("*" | "/")
       op_node = this->get_first_token();
@@ -375,7 +375,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetMathProduct() {
       }
 
       // Get next powers
-      if (tokens_array_.empty()) {
+      if (tokens_.empty()) {
         LOGE << "invalid Math expression: expected second operand for "
                    "the \'" << operator_str << "\' in line " << line;
         end(EXIT_FAILURE);
@@ -386,7 +386,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetMathProduct() {
       SyntaxAnalyzer::MakeKinship(op_node, power_2);
       power_1 = op_node;
 
-      if (tokens_array_.empty()) {
+      if (tokens_.empty()) {
         break;
       }
     }
@@ -400,14 +400,14 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetMathPower() {
   int line = this->peek_first_token()->line;
   power = this->GetMathValue();
 
-  if (!tokens_array_.empty()) {
+  if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsOperator(this->peek_first_token())) {
       std::shared_ptr<StringNode> op_node =
           std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
       if (op_node->data == "^") {
         degree_op = this->get_first_token();
 
-        if (tokens_array_.empty()) {
+        if (tokens_.empty()) {
           LOGE << "invalid Math expression in line "
               << line << ": power missing";
           end(EXIT_FAILURE);
@@ -432,7 +432,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetMathValue() {
   } else if (SyntaxAnalyzer::IsOpeningRoundBracket(this->peek_first_token())) {
     this->pop_first_token();
 
-    if (tokens_array_.empty()) {
+    if (tokens_.empty()) {
       LOGE << "invalid Math expression: "
                  "expected closing round bracket in line " << line;
       end(EXIT_FAILURE);
