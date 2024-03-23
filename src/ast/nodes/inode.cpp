@@ -79,16 +79,3 @@ bool INode::IsNodesEqual(const std::shared_ptr<INode>& node1,
   LOGT << "nodes are equal";
   return true;
 }
-
-void Tree::PrintTreeRecursive(std::shared_ptr<INode> const& node,
-                              std::ostream& stream) {
-  node->PrintData(stream);
-  stream << std::endl;
-
-  if (node->get_children_amount() == 0)
-    return;
-
-  for (size_t i = 0; i < node->get_children_amount(); i++) {
-    PrintTreeRecursive(node->get_child(i), std::cout);
-  }
-}
