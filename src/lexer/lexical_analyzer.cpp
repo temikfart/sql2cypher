@@ -1,4 +1,4 @@
-#include "SCC/lexical_analyzer.h"
+#include "SCC/lexer/lexical_analyzer.h"
 
 //-------------------Tokenizer-------------------
 
