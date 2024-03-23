@@ -1,4 +1,5 @@
 #include <sstream>
+#include <stdexcept>
 
 #include "gtest/gtest.h"
 
