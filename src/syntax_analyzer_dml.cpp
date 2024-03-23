@@ -1,7 +1,7 @@
 #include "SCC/syntax_analyzer.h"
 
 StmtType SyntaxAnalyzer::GetDMLStType() {
-  StmtType DMLStType = StmtType::EMPTY_TYPE; // invalid value
+  StmtType DMLStType = StmtType::kNone; // invalid value
 
   // Get first token
   int line = this->peek_first_token()->line;
@@ -20,9 +20,9 @@ StmtType SyntaxAnalyzer::GetDMLStType() {
   bool is_DELETE = fst_kw == "DELETE";
   bool is_INSERT = fst_kw == "INSERT";
 
-  if (is_UPDATE) { DMLStType = StmtType::updateStatement; }
-  else if (is_DELETE) { DMLStType = StmtType::deleteStatement; }
-  else if (is_INSERT) { DMLStType = StmtType::insertStatement; }
+  if (is_UPDATE) { DMLStType = StmtType::kUpdateStmt; }
+  else if (is_DELETE) { DMLStType = StmtType::kDeleteStmt; }
+  else if (is_INSERT) { DMLStType = StmtType::kInsertStmt; }
   else {
     LOGE << "unknown DML statement type in line " << line;
     end(EXIT_FAILURE);
@@ -34,19 +34,19 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDMLSt() {
   LOGD << "getting DML statement...";
   std::shared_ptr<INode> node, statement;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::dmlStatement;
+  node->stmt_type = StmtType::kDmlStmt;
 
   int line = this->peek_first_token()->line;
   switch (this->GetDMLStType()) {
-    case StmtType::updateStatement:
+    case StmtType::kUpdateStmt:
       statement = this->GetUpdateSt();
       LOGD << "got UPDATE statement";
       break;
-    case StmtType::deleteStatement:
+    case StmtType::kDeleteStmt:
       statement = this->GetDeleteSt();
       LOGD << "got DELETE statement";
       break;
-    case StmtType::insertStatement:
+    case StmtType::kInsertStmt:
       statement = this->GetInsertSt();
       LOGD << "got INSERT statement";
       break;
@@ -64,21 +64,21 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDMLSt() {
 std::shared_ptr<INode> SyntaxAnalyzer::GetInsertSt() {
   std::shared_ptr<INode> node;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::insertStatement;
+  node->stmt_type = StmtType::kInsertStmt;
 
   return node;
 }
 std::shared_ptr<INode> SyntaxAnalyzer::GetDeleteSt() {
   std::shared_ptr<INode> node;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::deleteStatement;
+  node->stmt_type = StmtType::kDeleteStmt;
 
   return node;
 }
 std::shared_ptr<INode> SyntaxAnalyzer::GetUpdateSt() {
   std::shared_ptr<INode> node;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::updateStatement;
+  node->stmt_type = StmtType::kUpdateStmt;
 
   return node;
 }
@@ -88,7 +88,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetUpdateSt() {
 std::shared_ptr<INode> SyntaxAnalyzer::GetCondition() {
   std::shared_ptr<INode> node, OR_condition;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::condition;
+  node->stmt_type = StmtType::kCondition;
 
   OR_condition = this->GetORCondition();
 
@@ -99,7 +99,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetCondition() {
 std::shared_ptr<INode> SyntaxAnalyzer::GetORCondition() {
   std::shared_ptr<INode> node, AND_condition, next_AND_conditions;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::ORcondition;
+  node->stmt_type = StmtType::kORCondition;
 
   AND_condition = this->GetANDCondition();
 
@@ -128,7 +128,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetORCondition() {
 std::shared_ptr<INode> SyntaxAnalyzer::GetANDCondition() {
   std::shared_ptr<INode> node, NOT_condition, next_NOT_conditions;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::ANDcondition;
+  node->stmt_type = StmtType::kANDCondition;
 
   NOT_condition = this->GetNOTCondition();
 
@@ -158,7 +158,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetANDCondition() {
 std::shared_ptr<INode> SyntaxAnalyzer::GetNOTCondition() {
   std::shared_ptr<INode> node, NOT_operator, predicate;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::NOTcondition;
+  node->stmt_type = StmtType::kNOTCondition;
 
   // Get NOT if present
   int line = this->peek_first_token()->line;
@@ -186,7 +186,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetNOTCondition() {
 std::shared_ptr<INode> SyntaxAnalyzer::GetPredicate() {
   std::shared_ptr<INode> node, lhs, rhs, bin_operator;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::predicate;
+  node->stmt_type = StmtType::kPredicate;
 
   int line = this->peek_first_token()->line;
   lhs = this->GetExpression();
@@ -221,7 +221,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetPredicate() {
 std::shared_ptr<INode> SyntaxAnalyzer::GetExpression() {
   std::shared_ptr<INode> node;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::expression;
+  node->stmt_type = StmtType::kExpression;
 
   int line = this->peek_first_token()->line;
 

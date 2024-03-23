@@ -6,16 +6,16 @@
 class DataType {
 public:
   enum Value : unsigned char {
-    UNKNOWN,
-    ROOT,
-    SERVICE,
-    INT_NUMBER,
-    FLOAT_NUMBER,
-    BRACKET,
-    PUNCTUATION,
-    OPERATOR,
-    WORD,
-    STRING
+    kNone,
+    kRoot,
+    kService,
+    kInt,
+    kFloat,
+    kBracket,
+    kPunctuation,
+    kOperator,
+    kWord,
+    kString,
   };
 
   DataType() = default;
@@ -35,7 +35,7 @@ public:
   constexpr bool operator>=(const Value& value) const { return value_ >= value; }
 
 private:
-  Value value_ = Value::UNKNOWN;
+  Value value_ = Value::kNone;
 };
 
 //std::ostream& operator<<(std::ostream& os, const DataType& data_type);

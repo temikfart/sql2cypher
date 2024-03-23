@@ -1,7 +1,7 @@
 #include "SCC/syntax_analyzer.h"
 
 StmtType SyntaxAnalyzer::GetDDLStType() {
-  StmtType DDLStType = StmtType::EMPTY_TYPE; // invalid value
+  StmtType DDLStType = StmtType::kNone; // invalid value
 
   // Get first token
   int line = this->peek_first_token()->line;
@@ -38,21 +38,21 @@ StmtType SyntaxAnalyzer::GetDDLStType() {
 
   // Invoke necessary rule
   if (is_CREATE) {
-    if (is_DATABASE) { DDLStType = StmtType::createDatabaseStatement; }
-    else if (is_TABLE) { DDLStType = StmtType::createTableStatement; }
+    if (is_DATABASE) { DDLStType = StmtType::kCreateDatabaseStmt; }
+    else if (is_TABLE) { DDLStType = StmtType::kCreateTableStmt; }
     else {
       LOGE << "unknown CREATE DDL statement in line " << line;
       end(EXIT_FAILURE);
     }
   } else if (is_ALTER) {
-    if (is_TABLE) { DDLStType = StmtType::alterTableStatement; }
+    if (is_TABLE) { DDLStType = StmtType::kAlterTableStmt; }
     else {
       LOGE << "unknown ALTER DDL statement in line " << line;
       end(EXIT_FAILURE);
     }
   } else if (is_DROP) {
-    if (is_DATABASE) { DDLStType = StmtType::dropDatabaseStatement; }
-    else if (is_TABLE) { DDLStType = StmtType::dropTableStatement; }
+    if (is_DATABASE) { DDLStType = StmtType::kDropDatabaseStmt; }
+    else if (is_TABLE) { DDLStType = StmtType::kDropTableStmt; }
     else {
       LOGE << "unknown DROP DDL statement in line " << line;
       end(EXIT_FAILURE);
@@ -65,27 +65,27 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDDLSt() {
   LOGD << "getting DDL statement...";
   std::shared_ptr<INode> node, statement;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::ddlStatement;
+  node->stmt_type = StmtType::kDdlStmt;
 
   int line = this->peek_first_token()->line;
   switch (this->GetDDLStType()) {
-    case StmtType::createDatabaseStatement:
+    case StmtType::kCreateDatabaseStmt:
       statement = this->GetCreateDatabaseSt();
       LOGD << "got CREATE DATABASE statement";
       break;
-    case StmtType::createTableStatement:
+    case StmtType::kCreateTableStmt:
       statement = this->GetCreateTableSt();
       LOGD << "got CREATE TABLE statement";
       break;
-    case StmtType::alterTableStatement:
+    case StmtType::kAlterTableStmt:
       statement = this->GetAlterTableSt();
       LOGD << "got ALTER TABLE statement";
       break;
-    case StmtType::dropDatabaseStatement:
+    case StmtType::kDropDatabaseStmt:
       statement = this->GetDropDatabaseSt();
       LOGD << "got DROP DATABASE statement";
       break;
-    case StmtType::dropTableStatement:
+    case StmtType::kDropTableStmt:
       statement = this->GetDropTableSt();
       LOGD << "got DROP TABLE statement";
       break;
@@ -103,7 +103,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDDLSt() {
 std::shared_ptr<INode> SyntaxAnalyzer::GetCreateDatabaseSt() {
   std::shared_ptr<INode> node, database_name;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::createDatabaseStatement;
+  node->stmt_type = StmtType::kCreateDatabaseStmt;
 
   if (tokens_array_.empty()) {
     LOGE << "database name is missed";
@@ -117,7 +117,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetCreateDatabaseSt() {
 std::shared_ptr<INode> SyntaxAnalyzer::GetCreateTableSt() {
   std::shared_ptr<INode> node, table_name, table_definition;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::createTableStatement;
+  node->stmt_type = StmtType::kCreateTableStmt;
 
   // Get tableName
   if (tokens_array_.empty()) {
@@ -157,7 +157,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetCreateTableSt() {
 std::shared_ptr<INode> SyntaxAnalyzer::GetAlterTableSt() {
   std::shared_ptr<INode> node, table_name, action_str_node, argument;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::alterTableStatement;
+  node->stmt_type = StmtType::kAlterTableStmt;
 
   int line = this->peek_first_token()->line;
   this->ValidateIsWord(this->peek_first_token());
@@ -187,10 +187,10 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetAlterTableSt() {
   std::string action_str =
       std::dynamic_pointer_cast<StringNode>(action_str_node)->get_data();
   if (action_str == "ADD") {
-    action->stmt_type = StmtType::alterActionADD;
+    action->stmt_type = StmtType::kAlterActionAdd;
     argument = this->GetTableDefinition();
   } else if (action_str == "DROP") {
-    action->stmt_type = StmtType::alterActionDROP;
+    action->stmt_type = StmtType::kAlterActionDrop;
     argument = this->GetDropListDefinition();
   } else {
     LOGE << "invalid alter table query: incorrect action \'"
@@ -205,7 +205,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetAlterTableSt() {
 std::shared_ptr<INode> SyntaxAnalyzer::GetDropDatabaseSt() {
   std::shared_ptr<INode> node, database_name, separator;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::dropDatabaseStatement;
+  node->stmt_type = StmtType::kDropDatabaseStmt;
 
   // First database_name
   if (tokens_array_.empty()) {
@@ -217,7 +217,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDropDatabaseSt() {
 
   if (!tokens_array_.empty()
       && SyntaxAnalyzer::IsComma(this->peek_first_token())) {
-    separator = this->GetListOf(StmtType::name);
+    separator = this->GetListOf(StmtType::kName);
     SyntaxAnalyzer::MakeKinship(node, separator);
   }
 
@@ -226,7 +226,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDropDatabaseSt() {
 std::shared_ptr<INode> SyntaxAnalyzer::GetDropTableSt() {
   std::shared_ptr<INode> node, table_name, separator;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::dropTableStatement;
+  node->stmt_type = StmtType::kDropTableStmt;
 
   // First tableName
   if (tokens_array_.empty()) {
@@ -238,7 +238,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDropTableSt() {
 
   if (!tokens_array_.empty()
       && SyntaxAnalyzer::IsComma(this->peek_first_token())) {
-    separator = this->GetListOf(StmtType::name);
+    separator = this->GetListOf(StmtType::kName);
     SyntaxAnalyzer::MakeKinship(node, separator);
   }
 
@@ -250,14 +250,14 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDropTableSt() {
 std::shared_ptr<INode> SyntaxAnalyzer::GetTableDefinition() {
   std::shared_ptr<INode> node, argument, separator, next_arguments;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::tableDefinition;
+  node->stmt_type = StmtType::kTableDef;
 
   argument = this->GetTableDefinitionObject();
   SyntaxAnalyzer::MakeKinship(node, argument);
 
   if (!tokens_array_.empty()
       && SyntaxAnalyzer::IsComma(this->peek_first_token())) {
-    separator = this->GetListOf(StmtType::tableDefinition);
+    separator = this->GetListOf(StmtType::kTableDef);
     SyntaxAnalyzer::MakeKinship(node, separator);
   }
 
@@ -287,7 +287,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetColumnDefinition() {
   std::shared_ptr<INode> column_def, column_name, datatype;
   column_def =
       std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  column_def->stmt_type = StmtType::columnDefinition;
+  column_def->stmt_type = StmtType::kColumnDef;
 
   // Get columnName
   int line = this->peek_first_token()->line;
@@ -314,7 +314,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetTableConstraint() {
   std::shared_ptr<INode> table_constraint, constraint_name, key;
   table_constraint =
       std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  table_constraint->stmt_type = StmtType::tableConstraint;
+  table_constraint->stmt_type = StmtType::kTableConstraint;
 
   // Get full form if present
   int line = this->peek_first_token()->line;
@@ -326,7 +326,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetTableConstraint() {
     std::shared_ptr<INode> constraint_kw =
         std::dynamic_pointer_cast<ServiceNode>(
             std::make_shared<ServiceNode>());
-    constraint_kw->stmt_type = StmtType::kw_constraint;
+    constraint_kw->stmt_type = StmtType::kConstraintKW;
     SyntaxAnalyzer::MakeKinship(table_constraint, constraint_kw);
 
     if (tokens_array_.empty()) {
@@ -390,7 +390,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetTableConstraint() {
 std::shared_ptr<INode> SyntaxAnalyzer::GetDropListDefinition() {
   std::shared_ptr<INode> node, objects, separator;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::dropList;
+  node->stmt_type = StmtType::kDropList;
 
   objects = this->GetDropObject();
   SyntaxAnalyzer::MakeKinship(node, objects);
@@ -409,7 +409,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDropList() {
   this->pop_first_token();
   separator =
       std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  separator->stmt_type = StmtType::delimiter_comma;
+  separator->stmt_type = StmtType::kCommaDelimiter;
 
   this->ValidateIsWord(this->peek_first_token());
   objects = this->GetDropObject();
@@ -452,9 +452,9 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDropObject() {
   }
 
   if (is_tableConstraint) {
-    object->stmt_type = StmtType::dropConstraint;
+    object->stmt_type = StmtType::kDropConstraint;
   } else {
-    object->stmt_type = StmtType::dropColumn;
+    object->stmt_type = StmtType::kDropColumn;
   }
 
   if (tokens_array_.empty()) {
@@ -479,7 +479,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDropObject() {
 
       // Get listOf identifiers if present
       if (is_list) {
-        next_arguments = this->GetListOf(StmtType::identifier);
+        next_arguments = this->GetListOf(StmtType::kIdentifier);
         SyntaxAnalyzer::MakeKinship(object, next_arguments);
       }
     }

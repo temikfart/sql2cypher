@@ -7,13 +7,13 @@ void QueryAssembler::TranslateDMLStatement(std::shared_ptr<INode> node) {
 
   auto statement = node->get_child(0);
   switch (statement->stmt_type) {
-    case StmtType::insertStatement:
+    case StmtType::kInsertStmt:
       this->TranslateInsert(statement);
       break;
-    case StmtType::deleteStatement:
+    case StmtType::kDeleteStmt:
       this->TranslateDelete(statement);
       break;
-    case StmtType::updateStatement:
+    case StmtType::kUpdateStmt:
       this->TranslateUpdate(statement);
       break;
     default:

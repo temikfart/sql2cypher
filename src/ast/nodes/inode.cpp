@@ -34,31 +34,31 @@ bool INode::IsNodesEqual(const std::shared_ptr<INode>& node1,
   }
 
   switch (node1->data_type) {
-    case DataType::ROOT:
+    case DataType::kRoot:
       break;
-    case DataType::INT_NUMBER:
+    case DataType::kInt:
       if (std::dynamic_pointer_cast<IntNumNode>(node1)->get_data() !=
           std::dynamic_pointer_cast<IntNumNode>(node2)->get_data()) {
         LOGT << "not equal: different integer number data";
         return false;
       }
       break;
-    case DataType::FLOAT_NUMBER:
+    case DataType::kFloat:
       if (std::dynamic_pointer_cast<FloatNumNode>(node1)->get_data() !=
           std::dynamic_pointer_cast<FloatNumNode>(node2)->get_data()) {
         LOGT << "not equal: different float number data";
         return false;
       }
       break;
-    case DataType::PUNCTUATION:
-    case DataType::BRACKET:
+    case DataType::kPunctuation:
+    case DataType::kBracket:
       if (std::dynamic_pointer_cast<CharNode>(node1)->get_data() !=
           std::dynamic_pointer_cast<CharNode>(node2)->get_data()) {
         return false;
       }
       break;
-    case DataType::WORD:
-    case DataType::OPERATOR:
+    case DataType::kWord:
+    case DataType::kOperator:
       if (std::dynamic_pointer_cast<StringNode>(node1)->get_data() !=
           std::dynamic_pointer_cast<StringNode>(node2)->get_data()) {
         LOGT << "not equal: different string data";

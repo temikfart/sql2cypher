@@ -24,15 +24,15 @@ TEST(DataTypeValueEnumTests, IsUnsignedCharTest) {
 
 TEST(DataTypeCtorTests, DefaultValueTest) {
   DataType type;
-  EXPECT_EQ(DataType::UNKNOWN, (DataType::Value) type);
+  EXPECT_EQ(DataType::kNone, (DataType::Value) type);
 }
 
 TEST(DataTypeCtorTests, ValueTest) {
-  EXPECT_EQ(DataType::UNKNOWN, (DataType::Value) DataType(DataType::UNKNOWN));
-  EXPECT_EQ(DataType::ROOT, (DataType::Value) DataType(DataType::ROOT));
-  EXPECT_EQ(DataType::INT_NUMBER, (DataType::Value) DataType(DataType::INT_NUMBER));
-  EXPECT_EQ(DataType::BRACKET, (DataType::Value) DataType(DataType::BRACKET));
-  EXPECT_EQ(DataType::STRING, (DataType::Value) DataType(DataType::STRING));
+  EXPECT_EQ(DataType::kNone, (DataType::Value) DataType(DataType::kNone));
+  EXPECT_EQ(DataType::kRoot, (DataType::Value) DataType(DataType::kRoot));
+  EXPECT_EQ(DataType::kInt, (DataType::Value) DataType(DataType::kInt));
+  EXPECT_EQ(DataType::kBracket, (DataType::Value) DataType(DataType::kBracket));
+  EXPECT_EQ(DataType::kString, (DataType::Value) DataType(DataType::kString));
 }
 
 TEST(DataTypeCtorTests, InvalidValueTest) {
@@ -41,18 +41,18 @@ TEST(DataTypeCtorTests, InvalidValueTest) {
 }
 
 TEST(DataTypeCastTests, CastToValueTest) {
-  DataType bracket(DataType::BRACKET);
+  DataType bracket(DataType::kBracket);
   auto bracket_val = (DataType::Value) bracket;
-  EXPECT_EQ(DataType::BRACKET, bracket_val);
+  EXPECT_EQ(DataType::kBracket, bracket_val);
 
-  DataType punctuation(DataType::PUNCTUATION);
+  DataType punctuation(DataType::kPunctuation);
   auto punctuation_val = (DataType::Value) punctuation;
-  EXPECT_EQ(DataType::PUNCTUATION, punctuation_val);
+  EXPECT_EQ(DataType::kPunctuation, punctuation_val);
 }
 
 TEST(DataTypeOperatorsTests, CompareTwoEqualTypesTest) {
-  DataType first(DataType::INT_NUMBER);
-  DataType second(DataType::INT_NUMBER);
+  DataType first(DataType::kInt);
+  DataType second(DataType::kInt);
 
   EXPECT_TRUE(first == second);
   EXPECT_TRUE(first <= second);
@@ -64,8 +64,8 @@ TEST(DataTypeOperatorsTests, CompareTwoEqualTypesTest) {
 }
 
 TEST(DataTypeOperatorsTests, CompareTwoDifferentTypesTest) {
-  DataType first(DataType::INT_NUMBER);
-  DataType second(DataType::BRACKET);
+  DataType first(DataType::kInt);
+  DataType second(DataType::kBracket);
 
   EXPECT_TRUE(first != second);
   EXPECT_TRUE(first <= second);
@@ -78,8 +78,8 @@ TEST(DataTypeOperatorsTests, CompareTwoDifferentTypesTest) {
 }
 
 TEST(DataTypeOperatorsTests, CompareWithEqualValueTest) {
-  DataType type(DataType::SERVICE);
-  DataType::Value value = DataType::SERVICE;
+  DataType type(DataType::kService);
+  DataType::Value value = DataType::kService;
 
   EXPECT_TRUE(type == value);
   EXPECT_TRUE(type <= value);
@@ -90,8 +90,8 @@ TEST(DataTypeOperatorsTests, CompareWithEqualValueTest) {
 }
 
 TEST(DataTypeOperatorsTests, CompareWithDifferentValueTest) {
-  DataType type(DataType::ROOT);
-  DataType::Value value = DataType::PUNCTUATION;
+  DataType type(DataType::kRoot);
+  DataType::Value value = DataType::kPunctuation;
 
   EXPECT_TRUE(type != value);
   EXPECT_TRUE(type <= value);

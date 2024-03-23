@@ -1,7 +1,7 @@
 #include "SCC/ast/nodes/service_node.h"
 
-ServiceNode::ServiceNode() : INode(DataType::SERVICE) {
-  this->ValidateType(DataType::SERVICE);
+ServiceNode::ServiceNode() : INode(DataType::kService) {
+  this->ValidateType(DataType::kService);
 }
 
 void ServiceNode::PrintData(std::ostream& stream) {
@@ -12,7 +12,7 @@ void ServiceNode::PrintType(std::ostream& stream) {
 }
 
 void ServiceNode::ValidateType(DataType type) const {
-  if (data_type != DataType::SERVICE) {
+  if (data_type != DataType::kService) {
     LOGE << "invalid type for ServiceNode: " << type;
     end(EXIT_FAILURE);
   }

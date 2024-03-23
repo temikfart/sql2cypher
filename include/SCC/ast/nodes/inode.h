@@ -14,8 +14,8 @@
 class INode {
 public:
   int line = 0;
-  const DataType data_type;
-  StmtType stmt_type = StmtType::EMPTY_TYPE;
+  const DataType data_type = DataType::kNone;
+  StmtType stmt_type = StmtType::kNone;
 
   explicit INode(DataType data_type);
   virtual ~INode();
