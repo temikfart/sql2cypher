@@ -66,8 +66,8 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
   int current_node_num = num_of_nodes;
 
   size_t num_of_children = node->get_children_amount();
-  DataType type = node->get_type();
-  StatementType st_type = node->get_st_type();
+  DataType type = node->data_type;
+  StmtType st_type = node->stmt_type;
 
   dot_file_ << "\tNode" << current_node_num
             << " [shape = record, color = black, label = ";
@@ -75,7 +75,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
   switch (type) {
     case DataType::ROOT:
       dot_file_ << "\" {<data> ROOT";
-      if (st_type != EMPTY_TYPE)
+      if (st_type != StmtType::EMPTY_TYPE)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = gray];\n";
       break;
@@ -88,7 +88,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
     case DataType::INT_NUMBER:
       dot_file_ << "\" {<data> "
                 << std::dynamic_pointer_cast<IntNumNode>(node)->get_data();
-      if (st_type != EMPTY_TYPE)
+      if (st_type != StmtType::EMPTY_TYPE)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = green, "
                    "fontcolor = black];\n";
@@ -96,7 +96,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
     case DataType::FLOAT_NUMBER:
       dot_file_ << "\" {<data> "
                 << std::dynamic_pointer_cast<FloatNumNode>(node)->get_data();
-      if (st_type != EMPTY_TYPE)
+      if (st_type != StmtType::EMPTY_TYPE)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = green, "
                    "fontcolor = black];\n";
@@ -104,7 +104,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
     case DataType::BRACKET:
       dot_file_ << "\" {<data> "
                 << std::dynamic_pointer_cast<CharNode>(node)->get_data();
-      if (st_type != EMPTY_TYPE)
+      if (st_type != StmtType::EMPTY_TYPE)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = lightblue, "
                    "fontcolor = black];\n";
@@ -112,7 +112,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
     case DataType::PUNCTUATION:
       dot_file_ << "\" {<data> \'"
                 << std::dynamic_pointer_cast<CharNode>(node)->get_data();
-      if (st_type != EMPTY_TYPE)
+      if (st_type != StmtType::EMPTY_TYPE)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = blue, "
                    "fontcolor = white];\n";
@@ -121,7 +121,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       dot_file_ << R"(" {<data> \")"
                 << std::dynamic_pointer_cast<StringNode>(node)->get_data()
                 << R"(\")";
-      if (st_type != EMPTY_TYPE)
+      if (st_type != StmtType::EMPTY_TYPE)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = red, "
                    "fontcolor = white];\n";
@@ -129,7 +129,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
     case DataType::OPERATOR:
       dot_file_ << "\" {<data> "
                 << std::dynamic_pointer_cast<StringNode>(node)->get_data();
-      if (st_type != EMPTY_TYPE)
+      if (st_type != StmtType::EMPTY_TYPE)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = orange, "
                    "fontcolor = white];\n";
@@ -138,7 +138,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       dot_file_ << R"(" {<data> \")"
                 << std::dynamic_pointer_cast<StringNode>(node)->get_data()
                 << R"(\")";
-      if (st_type != EMPTY_TYPE)
+      if (st_type != StmtType::EMPTY_TYPE)
         dot_file_ << " | <st_type>" << GetServiceNodeData(st_type);
       dot_file_ << "} \", style = filled, fillcolor = yellow, "
                    "fontcolor = black];\n";
@@ -176,101 +176,101 @@ void TreeDump::MakeDumpPng() {
   }
 }
 
-std::string TreeDump::GetServiceNodeData(StatementType statement_type) {
+std::string TreeDump::GetServiceNodeData(StmtType statement_type) {
   switch (statement_type) {
-    case StatementType::EMPTY_TYPE:
+    case StmtType::EMPTY_TYPE:
       return "EMPTY_TYPE";
-    case StatementType::Program:
+    case StmtType::Program:
       return "Program";
-    case StatementType::query:
+    case StmtType::query:
       return "query";
-    case StatementType::ddlStatement:
+    case StmtType::ddlStatement:
       return "ddlStatement";
-    case StatementType::dmlStatement:
+    case StmtType::dmlStatement:
       return "dmlStatement";
 
       // DDL Statements
-    case StatementType::alterTableStatement:
+    case StmtType::alterTableStatement:
       return "alterTableStatement";
-    case StatementType::createDatabaseStatement:
+    case StmtType::createDatabaseStatement:
       return "createDatabaseStatement";
-    case StatementType::createTableStatement:
+    case StmtType::createTableStatement:
       return "createTableStatement";
-    case StatementType::dropDatabaseStatement:
+    case StmtType::dropDatabaseStatement:
       return "dropDatabaseStatement";
-    case StatementType::dropTableStatement:
+    case StmtType::dropTableStatement:
       return "dropTableStatement";
 
       // DDL Basic Statements
-    case StatementType::tableDefinition:
+    case StmtType::tableDefinition:
       return "tableDefinition";
-    case StatementType::columnDefinition:
+    case StmtType::columnDefinition:
       return "columnDefinition";
-    case StatementType::tableConstraint:
+    case StmtType::tableConstraint:
       return "tableConstraint";
-    case StatementType::alterActionADD:
+    case StmtType::alterActionADD:
       return "alterActionADD";
-    case StatementType::alterActionDROP:
+    case StmtType::alterActionDROP:
       return "alterActionDROP";
-    case StatementType::dropList:
+    case StmtType::dropList:
       return "dropList";
-    case StatementType::dropConstraint:
+    case StmtType::dropConstraint:
       return "dropConstraint";
-    case StatementType::dropColumn:
+    case StmtType::dropColumn:
       return "dropColumn";
 
       // DML Statements
-    case StatementType::deleteStatement:
+    case StmtType::deleteStatement:
       return "deleteStatement";
-    case StatementType::insertStatement:
+    case StmtType::insertStatement:
       return "insertStatement";
-    case StatementType::updateStatement:
+    case StmtType::updateStatement:
       return "updateStatement";
 
       // DML Basic Statements
-    case StatementType::condition:
+    case StmtType::condition:
       return "condition";
-    case StatementType::ORcondition:
+    case StmtType::ORcondition:
       return "ORcondition";
-    case StatementType::ANDcondition:
+    case StmtType::ANDcondition:
       return "ANDcondition";
-    case StatementType::NOTcondition:
+    case StmtType::NOTcondition:
       return "NOTcondition";
-    case StatementType::predicate:
+    case StmtType::predicate:
       return "predicate";
-    case StatementType::expression:
+    case StmtType::expression:
       return "expression";
 
       // Basic Statements
-    case StatementType::primaryKey:
+    case StmtType::primaryKey:
       return "primaryKey";
-    case StatementType::foreignKey:
+    case StmtType::foreignKey:
       return "foreignKey";
-    case StatementType::reference:
+    case StmtType::reference:
       return "reference";
-    case StatementType::name:
+    case StmtType::name:
       return "name";
-    case StatementType::identifier:
+    case StmtType::identifier:
       return "identifier";
-    case StatementType::delimiter_dot:
+    case StmtType::delimiter_dot:
       return "delimiter_dot";
-    case StatementType::delimiter_comma:
+    case StmtType::delimiter_comma:
       return "delimiter_comma";
-    case StatementType::delimiter_semicolon:
+    case StmtType::delimiter_semicolon:
       return "delimiter_semicolon";
 
       // Basic Statements
-    case StatementType::kw_constraint:
+    case StmtType::kw_constraint:
       return "kw_constraint";
 
       // SQL datatypes
-    case StatementType::SQL_int:
+    case StmtType::SQL_int:
       return "SQL_int";
-    case StatementType::SQL_float:
+    case StmtType::SQL_float:
       return "SQL_float";
-    case StatementType::SQL_char:
+    case StmtType::SQL_char:
       return "SQL_char";
-    case StatementType::SQL_varchar:
+    case StmtType::SQL_varchar:
       return "SQL_varchar";
 
     default:

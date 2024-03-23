@@ -9,7 +9,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::Analyze(
 
   std::shared_ptr<INode> root;
   root = std::dynamic_pointer_cast<INode>(std::make_shared<RootNode>());
-  root->set_st_type(StatementType::Program);
+  root->stmt_type = StmtType::Program;
 
   if (tokens_array_.empty()) {
     LOGI << "syntax analysis is ended: empty tokens' array";
@@ -43,7 +43,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::General() {
   std::shared_ptr<INode> separator, query, next_queries;
   this->pop_first_token();
   separator = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  separator->set_st_type(StatementType::delimiter_semicolon);
+  separator->stmt_type = StmtType::delimiter_semicolon;
 
   if (!tokens_array_.empty()) {
     query = this->GetDL();
@@ -59,8 +59,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::General() {
 
   return separator;
 }
-StatementType SyntaxAnalyzer::GetDLStType() {
-  StatementType DLStType = StatementType::StTypeCount;   // invalid value
+StmtType SyntaxAnalyzer::GetDLStType() {
+  StmtType DLStType = StmtType::EMPTY_TYPE;   // invalid value
 
   std::string key_word =
       std::dynamic_pointer_cast<StringNode>(
@@ -85,9 +85,9 @@ StatementType SyntaxAnalyzer::GetDLStType() {
                               });
 
   if (is_ddlSt) {
-    DLStType = StatementType::ddlStatement;
+    DLStType = StmtType::ddlStatement;
   } else if (is_dmlSt) {
-    DLStType = StatementType::dmlStatement;
+    DLStType = StmtType::dmlStatement;
   }
 
   return DLStType;
@@ -95,20 +95,20 @@ StatementType SyntaxAnalyzer::GetDLStType() {
 std::shared_ptr<INode> SyntaxAnalyzer::GetDL() {
   std::shared_ptr<INode> query, statement;
   query = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  query->set_st_type(StatementType::query);
+  query->stmt_type = StmtType::query;
 
   this->ValidateIsWord(this->peek_first_token());
 
   switch (this->GetDLStType()) {
-    case StatementType::ddlStatement:
+    case StmtType::ddlStatement:
       statement = this->GetDDLSt();
       break;
-    case StatementType::dmlStatement:
+    case StmtType::dmlStatement:
       statement = this->GetDMLSt();
       break;
     default:
       LOGE << "unknown DL on line "
-          << this->peek_first_token()->get_line();
+          << this->peek_first_token()->line;
       end(EXIT_FAILURE);
   }
   SyntaxAnalyzer::MakeKinship(query, statement);
@@ -123,20 +123,20 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDataType() {
 
   std::string datatype =
       std::dynamic_pointer_cast<StringNode>(node)->get_data();
-  StatementType SQL_datatype = StatementType::StTypeCount;  // invalid value
+  StmtType SQL_datatype = StmtType::EMPTY_TYPE;  // invalid value
   if (datatype == "int" || datatype == "integer") {
-    SQL_datatype = StatementType::SQL_int;
+    SQL_datatype = StmtType::SQL_int;
   } else if (datatype == "float") {
-    SQL_datatype = StatementType::SQL_float;
+    SQL_datatype = StmtType::SQL_float;
   } else if (datatype == "char") {
-    SQL_datatype = StatementType::SQL_char;
+    SQL_datatype = StmtType::SQL_char;
   } else if (datatype == "varchar") {
-    SQL_datatype = StatementType::SQL_varchar;
+    SQL_datatype = StmtType::SQL_varchar;
   } else {
-    LOGE << "invalid column datatype in line " << node->get_line();
+    LOGE << "invalid column datatype in line " << node->line;
     end(EXIT_FAILURE);
   }
-  node->set_st_type(SQL_datatype);
+  node->stmt_type = SQL_datatype;
 
   return node;
 }
@@ -144,9 +144,9 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetPrimaryKey() {
   std::shared_ptr<INode> primary_key, column_name, separator;
   primary_key =
       std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  primary_key->set_st_type(StatementType::primaryKey);
+  primary_key->stmt_type = StmtType::primaryKey;
 
-  int line = this->peek_first_token()->get_line();
+  int line = this->peek_first_token()->line;
   this->ValidateIsOpeningRoundBracket(this->peek_first_token());
   this->pop_first_token();
 
@@ -161,7 +161,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetPrimaryKey() {
   // Get listOf(column_names)
   if (!tokens_array_.empty()) {
     if (SyntaxAnalyzer::IsComma(this->peek_first_token())) {
-      separator = this->GetListOf(StatementType::identifier);
+      separator = this->GetListOf(StmtType::identifier);
       SyntaxAnalyzer::MakeKinship(primary_key, separator);
     }
   }
@@ -180,9 +180,9 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetForeignKey() {
   std::shared_ptr<INode> foreign_key, column_name, separator, reference;
   foreign_key =
       std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  foreign_key->set_st_type(StatementType::foreignKey);
+  foreign_key->stmt_type = StmtType::foreignKey;
 
-  int line = this->peek_first_token()->get_line();
+  int line = this->peek_first_token()->line;
   this->ValidateIsOpeningRoundBracket(this->peek_first_token());
   this->pop_first_token();
 
@@ -197,7 +197,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetForeignKey() {
   // Get listOf(column_names)
   if (!tokens_array_.empty()
       && SyntaxAnalyzer::IsComma(this->peek_first_token())) {
-    separator = this->GetListOf(StatementType::identifier);
+    separator = this->GetListOf(StmtType::identifier);
     SyntaxAnalyzer::MakeKinship(foreign_key, separator);
   }
 
@@ -223,7 +223,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetReference() {
   std::shared_ptr<INode> reference, ref_table_name;
 
   // Get REFERENCES
-  int line = this->peek_first_token()->get_line();
+  int line = this->peek_first_token()->line;
   std::string ref_kw =
       std::dynamic_pointer_cast<StringNode>(
           this->peek_first_token())->get_data();
@@ -234,7 +234,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetReference() {
   }
   this->pop_first_token();
   reference = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  reference->set_st_type(StatementType::reference);
+  reference->stmt_type = StmtType::reference;
 
   // Get referenced table or columns
   if (tokens_array_.empty()) {
@@ -267,7 +267,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetReference() {
     }
     if (SyntaxAnalyzer::IsComma(this->peek_first_token())) {
       next_ref_column_names =
-          this->GetListOf(StatementType::identifier);
+          this->GetListOf(StmtType::identifier);
       SyntaxAnalyzer::MakeKinship(reference, next_ref_column_names);
     }
 
@@ -286,7 +286,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetReference() {
 std::shared_ptr<INode> SyntaxAnalyzer::GetString() {
   std::shared_ptr<INode> node;
 
-  int line = this->peek_first_token()->get_line();
+  int line = this->peek_first_token()->line;
   bool is_single_quote =
       SyntaxAnalyzer::IsSingleQuote(this->peek_first_token());
   this->pop_first_token();
@@ -301,8 +301,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetString() {
   while (!SyntaxAnalyzer::IsSingleQuote(this->peek_first_token())
       || !SyntaxAnalyzer::IsDoubleQuote(this->peek_first_token())) {
     std::shared_ptr<INode> tmp = this->get_first_token();
-    line = tmp->get_line();
-    DataType tmp_type = tmp->get_type();
+    line = tmp->line;
+    DataType tmp_type = tmp->data_type;
     std::string new_data;
     if (!str->get_data().empty()) {
       new_data = str->get_data() + " ";
@@ -353,7 +353,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetString() {
 std::shared_ptr<INode> SyntaxAnalyzer::GetName() {
   std::shared_ptr<INode> name, identifier, next_identifiers;
   name = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  name->set_st_type(StatementType::name);
+  name->stmt_type = StmtType::name;
 
   identifier = this->GetIdentifier();
   SyntaxAnalyzer::MakeKinship(name, identifier);
@@ -369,10 +369,10 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetName() {
 }
 std::shared_ptr<INode> SyntaxAnalyzer::GetIdentifiers() {
   std::shared_ptr<INode> dot, identifier, next_identifiers;
-  int line = this->peek_first_token()->get_line();
+  int line = this->peek_first_token()->line;
   this->pop_first_token();
   dot = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  dot->set_st_type(StatementType::delimiter_dot);
+  dot->stmt_type = StmtType::delimiter_dot;
 
   if (tokens_array_.empty()) {
     LOGE << "bad name, which ends in a dot, in line " << line;
@@ -396,7 +396,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetIdentifier() {
   std::shared_ptr<INode> identifier;
   identifier =
       std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  identifier->set_st_type(StatementType::identifier);
+  identifier->stmt_type = StmtType::identifier;
 
   std::shared_ptr<INode> argument = this->get_first_token();
   SyntaxAnalyzer::MakeKinship(identifier, argument);
@@ -405,14 +405,14 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetIdentifier() {
 }
 
 std::shared_ptr<INode> SyntaxAnalyzer::GetListOf(
-    StatementType get_function_type) {
+    StmtType get_function_type) {
   std::shared_ptr<INode> argument, separator, next_separator;
 
   // Get separator (comma)
-  int line = this->peek_first_token()->get_line();
+  int line = this->peek_first_token()->line;
   this->pop_first_token();
   separator = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  separator->set_st_type(StatementType::delimiter_comma);
+  separator->stmt_type = StmtType::delimiter_comma;
 
   if (tokens_array_.empty()) {
     LOGE << "invalid listOf in line "
@@ -420,28 +420,28 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetListOf(
     end(EXIT_FAILURE);
   }
   switch (get_function_type) {
-    case StatementType::identifier:
+    case StmtType::identifier:
       argument = this->GetIdentifier();
       break;
-    case StatementType::tableDefinition:
+    case StmtType::tableDefinition:
       this->ValidateIsWord(this->peek_first_token());
       argument = this->GetTableDefinitionObject();
       break;
-    case StatementType::columnDefinition:
+    case StmtType::columnDefinition:
       this->ValidateIsWord(this->peek_first_token());
       argument = this->GetColumnDefinition();
       break;
-    case StatementType::tableConstraint:
+    case StmtType::tableConstraint:
       this->ValidateIsWord(this->peek_first_token());
       argument = this->GetTableConstraint();
       break;
-    case StatementType::name:
+    case StmtType::name:
       this->ValidateIsWord(this->peek_first_token());
       argument = this->GetName();
       break;
     default:
       LOGE << "unknown statement type for the listOf in line "
-          << this->peek_first_token()->get_line();
+          << this->peek_first_token()->line;
       end(EXIT_FAILURE);
   }
   SyntaxAnalyzer::MakeKinship(separator, argument);

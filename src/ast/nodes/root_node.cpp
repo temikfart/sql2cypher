@@ -12,7 +12,7 @@ void RootNode::PrintType(std::ostream& stream) {
 }
 
 void RootNode::ValidateType(DataType type) const {
-  if (type != DataType::ROOT) {
+  if (data_type != DataType::ROOT) {
     LOGE << "invalid type for RootNode: " << type;
     end(EXIT_FAILURE);
   }

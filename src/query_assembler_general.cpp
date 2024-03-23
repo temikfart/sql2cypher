@@ -26,7 +26,7 @@ void QueryAssembler::Translate(std::shared_ptr<INode> AST) {
     return;
   }
 
-  if (ast_->get_st_type() == StatementType::Program) {
+  if (ast_->stmt_type == StmtType::Program) {
     if (ast_->get_children_amount() > 0) {
       this->TranslateProgram(ast_);
     } else {
@@ -44,7 +44,7 @@ void QueryAssembler::Translate(std::shared_ptr<INode> AST) {
 
 void QueryAssembler::TranslateProgram(std::shared_ptr<INode> node) {
   auto query = node->get_child(0);
-  if (query->get_st_type() == StatementType::query) {
+  if (query->stmt_type == StmtType::query) {
     this->TranslateQuery(query);
   } else {
     LOGE << "first child is not a query";
@@ -53,7 +53,7 @@ void QueryAssembler::TranslateProgram(std::shared_ptr<INode> node) {
 
   if (node->get_children_amount() > 1) {
     auto other_queries = node->get_child(1);
-    if (other_queries->get_st_type() == StatementType::delimiter_semicolon) {
+    if (other_queries->stmt_type == StmtType::delimiter_semicolon) {
       if (other_queries->get_children_amount() > 0) {
         this->TranslateProgram(other_queries);
       }
@@ -70,11 +70,11 @@ void QueryAssembler::TranslateQuery(std::shared_ptr<INode> node) {
   }
 
   auto data_language = node->get_child(0);
-  switch (data_language->get_st_type()) {
-    case StatementType::ddlStatement:
+  switch (data_language->stmt_type) {
+    case StmtType::ddlStatement:
       this->TranslateDDLStatement(data_language);
       break;
-    case StatementType::dmlStatement:
+    case StmtType::dmlStatement:
       this->TranslateDMLStatement(data_language);
       break;
     default:

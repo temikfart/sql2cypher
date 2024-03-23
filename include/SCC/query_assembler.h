@@ -89,7 +89,7 @@ private:
                         const std::vector<std::string>& properties);
 
   std::vector<std::string> GetListOf(std::shared_ptr<INode> node,
-                                     StatementType type);
+                                     StmtType type);
 
   std::string TranslateName(std::shared_ptr<INode> node);
   std::string TranslateIdentifiers(std::shared_ptr<INode> node);

@@ -5,11 +5,6 @@ StringNode::StringNode(std::string string, DataType type)
   this->ValidateType(type);
 }
 
-void StringNode::set_data(const std::string& data, DataType type) {
-  data_ = data;
-  this->ValidateType(type);
-  type_ = type;
-}
 void StringNode::set_data(const std::string& data) {
   data_ = data;
 }
@@ -21,7 +16,7 @@ void StringNode::PrintData(std::ostream& stream) {
   stream << data_;
 }
 void StringNode::PrintType(std::ostream& stream) {
-  switch (type_) {
+  switch (data_type) {
     case DataType::WORD:
       stream << "WORD";
       break;

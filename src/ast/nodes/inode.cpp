@@ -5,27 +5,11 @@
 #include "SCC/ast/nodes/int_node.h"
 #include "SCC/ast/nodes/string_node.h"
 
-INode::INode(DataType type) : type_(type) {}
+INode::INode(DataType data_type) : data_type(data_type) {}
 INode::~INode() = default;
 
-void INode::set_line(int line) {
-  line_ = line;
-}
-int INode::get_line() {
-  return line_;
-}
-void INode::set_st_type(StatementType type) {
-  this->ValidateStType(type);
-  st_type_ = type;
-}
-StatementType INode::get_st_type() {
-  return st_type_;
-}
 void INode::set_parent(std::shared_ptr<INode>& node) {
   parent_ = node;
-}
-DataType INode::get_type() const {
-  return type_;
 }
 std::shared_ptr<INode>& INode::get_child(size_t node_num) {
   this->ValidateChildNumber(node_num);
@@ -41,7 +25,7 @@ void INode::AddChild(std::shared_ptr<INode> const& node) {
 }
 bool INode::IsNodesEqual(const std::shared_ptr<INode>& node1,
                          const std::shared_ptr<INode>& node2) {
-  if (node1->get_type() != node2->get_type() ||
+  if (node1->data_type != node2->data_type ||
       node1->get_children_amount()
           != node2->get_children_amount()) { //TODO: add parent ptr comparison
     LOGT << "not equal: comparing nodes with different "
@@ -49,7 +33,7 @@ bool INode::IsNodesEqual(const std::shared_ptr<INode>& node1,
     return false;
   }
 
-  switch (node1->get_type()) {
+  switch (node1->data_type) {
     case DataType::ROOT:
       break;
     case DataType::INT_NUMBER:
@@ -82,7 +66,7 @@ bool INode::IsNodesEqual(const std::shared_ptr<INode>& node1,
       }
       break;
     default:
-      LOGE << "invalid Datatype: " << node1->get_type();
+      LOGE << "invalid Datatype: " << node1->data_type;
       end(EXIT_FAILURE);
   }
 
@@ -108,12 +92,6 @@ void INode::ValidateChildNumber(size_t node_num) const {
 void INode::ValidateAddChild(std::shared_ptr<INode> const& node) const {
   if (node == nullptr) {
     LOGE << "nullptr can not be added to the tree";
-    end(EXIT_FAILURE);
-  }
-}
-void INode::ValidateStType(StatementType type) {
-  if (StatementType::StTypeCount <= type) {
-    LOGE << "invalid statement type: " << type;
     end(EXIT_FAILURE);
   }
 }

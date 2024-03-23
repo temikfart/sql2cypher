@@ -111,6 +111,8 @@ set(AST_SRC
         src/ast/nodes/root_node.cpp
         src/ast/nodes/service_node.cpp
         src/ast/nodes/string_node.cpp
+        src/ast/data_types.cpp
+        src/ast/stmt_types.cpp
 )
 set(SOURCE_LIST src/main.cpp
         ${COMMON_SRC}

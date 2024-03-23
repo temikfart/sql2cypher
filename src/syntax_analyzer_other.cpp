@@ -9,8 +9,8 @@ void SyntaxAnalyzer::ValidateNotEmpty() const {
   }
 }
 void SyntaxAnalyzer::ValidateIsWord(std::shared_ptr<INode>& node) const {
-  if (node->get_type() != DataType::WORD) {
-    LOGE << "expected word in line " << node->get_line();
+  if (node->data_type != DataType::WORD) {
+    LOGE << "expected word in line " << node->line;
     end(EXIT_FAILURE);
   }
 }
@@ -18,7 +18,7 @@ void SyntaxAnalyzer::ValidateIsOpeningRoundBracket(
     std::shared_ptr<INode>& node) const {
   if (!SyntaxAnalyzer::IsOpeningRoundBracket(node)) {
     LOGE << "expected an opening round bracket in line "
-        << node->get_line();
+        << node->line;
     end(EXIT_FAILURE);
   }
 }
@@ -26,19 +26,19 @@ void SyntaxAnalyzer::ValidateIsClosingRoundBracket(
     std::shared_ptr<INode>& node) const {
   if (!SyntaxAnalyzer::IsClosingRoundBracket(node)) {
     LOGE << "expected a closing round bracket in line "
-        << node->get_line();
+        << node->line;
     end(EXIT_FAILURE);
   }
 }
 void SyntaxAnalyzer::ValidateIsSingleQuote(std::shared_ptr<INode>& node) const {
   if (!SyntaxAnalyzer::IsSingleQuote(node)) {
-    LOGE << "expected a single quote in line " << node->get_line();
+    LOGE << "expected a single quote in line " << node->line;
     end(EXIT_FAILURE);
   }
 }
 void SyntaxAnalyzer::ValidateIsDoubleQuote(std::shared_ptr<INode>& node) const {
   if (!SyntaxAnalyzer::IsSingleQuote(node)) {
-    LOGE << "expected a double quote in line " << node->get_line();
+    LOGE << "expected a double quote in line " << node->line;
     end(EXIT_FAILURE);
   }
 }
@@ -46,21 +46,21 @@ void SyntaxAnalyzer::ValidateIsDoubleQuote(std::shared_ptr<INode>& node) const {
 // Defining Node Datatype
 
 bool SyntaxAnalyzer::IsBracket(std::shared_ptr<INode>& node) {
-  return (node->get_type() == DataType::BRACKET);
+  return (node->data_type == DataType::BRACKET);
 }
 bool SyntaxAnalyzer::IsPunctuation(std::shared_ptr<INode>& node) {
-  return (node->get_type() == DataType::PUNCTUATION);
+  return (node->data_type == DataType::PUNCTUATION);
 }
 bool SyntaxAnalyzer::IsWord(std::shared_ptr<INode>& node) {
-  return (node->get_type() == DataType::WORD);
+  return (node->data_type == DataType::WORD);
 }
 bool SyntaxAnalyzer::IsNumber(std::shared_ptr<INode>& node) {
-  bool is_int = node->get_type() != DataType::INT_NUMBER;
-  bool is_float = node->get_type() != DataType::FLOAT_NUMBER;
+  bool is_int = node->data_type != DataType::INT_NUMBER;
+  bool is_float = node->data_type != DataType::FLOAT_NUMBER;
   return (is_int || is_float);
 }
 bool SyntaxAnalyzer::IsOperator(std::shared_ptr<INode>& node) {
-  return (node->get_type() == DataType::OPERATOR);
+  return (node->data_type == DataType::OPERATOR);
 }
 
 // Defining Node data
@@ -106,7 +106,7 @@ bool SyntaxAnalyzer::IsDoubleQuote(std::shared_ptr<INode>& node) {
   return INode::IsNodesEqual(double_quote, node);
 }
 bool SyntaxAnalyzer::IsUnaryOperator(std::shared_ptr<INode>& node) {
-  if (node->get_type() == DataType::OPERATOR) {
+  if (node->data_type == DataType::OPERATOR) {
     std::string data = std::dynamic_pointer_cast<StringNode>(node)->get_data();
     if (data == "+" || data == "-") {
       return true;
@@ -115,7 +115,7 @@ bool SyntaxAnalyzer::IsUnaryOperator(std::shared_ptr<INode>& node) {
   return false;
 }
 bool SyntaxAnalyzer::IsBinaryOperator(std::shared_ptr<INode>& node) {
-  if (node->get_type() == DataType::OPERATOR) {
+  if (node->data_type == DataType::OPERATOR) {
     std::string data = std::dynamic_pointer_cast<StringNode>(node)->get_data();
     std::vector<std::string> bin_operators = {
         "=", "<>", "!=",

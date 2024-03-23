@@ -23,7 +23,7 @@ public:
 
   void MakeDumpPng();
 
-  static std::string GetServiceNodeData(StatementType statement_type);
+  static std::string GetServiceNodeData(StmtType statement_type);
 
 private:
   std::ofstream dot_file_;
