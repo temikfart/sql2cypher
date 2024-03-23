@@ -284,6 +284,9 @@ if (NOT PACKAGE)
     set(AST_TEST
             test/ast/data_types_test.cpp
             src/ast/data_types.cpp
+
+            test/ast/stmt_types_test.cpp
+            src/ast/stmt_types.cpp
     )
     set(COMMON_TEST
             test/common/file_utils_test.cpp
