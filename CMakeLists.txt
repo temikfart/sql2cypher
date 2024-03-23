@@ -281,6 +281,10 @@ if (NOT PACKAGE)
             test/fixtures/src/scc_args_fixtures.cpp
             test/fixtures/src/scc_config_fixtures.cpp
     )
+    set(AST_TEST
+            test/ast/data_types_test.cpp
+            src/ast/data_types.cpp
+    )
     set(COMMON_TEST
             test/common/file_utils_test.cpp
             src/common/file_utils.cpp
