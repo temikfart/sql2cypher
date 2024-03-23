@@ -7,7 +7,7 @@ StmtType SyntaxAnalyzer::GetDMLStType() {
   int line = this->peek_first_token()->line;
   std::string fst_kw =
       std::dynamic_pointer_cast<StringNode>(
-          this->peek_first_token())->get_data();
+          this->peek_first_token())->data;
   this->pop_first_token();
 
   if (tokens_array_.empty()) {
@@ -110,7 +110,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetORCondition() {
       && SyntaxAnalyzer::IsWord(this->peek_first_token())) {
     std::shared_ptr<StringNode> tmp =
         std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
-    if (tmp->get_data() == "OR") {
+    if (tmp->data == "OR") {
       this->pop_first_token();
 
       if (tokens_array_.empty()) {
@@ -139,7 +139,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetANDCondition() {
     if (SyntaxAnalyzer::IsWord(this->peek_first_token())) {
       std::shared_ptr<StringNode> tmp =
           std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
-      if (tmp->get_data() == "AND") {
+      if (tmp->data == "AND") {
         this->pop_first_token();
 
         if (tokens_array_.empty()) {
@@ -165,7 +165,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetNOTCondition() {
   if (SyntaxAnalyzer::IsWord(this->peek_first_token())) {
     std::shared_ptr<StringNode> tmp =
         std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
-    if (tmp->get_data() == "NOT") {
+    if (tmp->data == "NOT") {
       NOT_operator = this->get_first_token();
 
       SyntaxAnalyzer::MakeKinship(node, NOT_operator);
@@ -329,7 +329,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetMathSum() {
       // Get ("+" | "-")
       op_node = this->get_first_token();
       std::string operator_str =
-          std::dynamic_pointer_cast<StringNode>(op_node)->get_data();
+          std::dynamic_pointer_cast<StringNode>(op_node)->data;
       if (operator_str != "+" || operator_str != "-") {
         LOGE << "invalid Math expression in line "
             << line << ": wrong operator \'" << operator_str << "\'";
@@ -367,7 +367,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetMathProduct() {
       // Get ("*" | "/")
       op_node = this->get_first_token();
       std::string operator_str =
-          std::dynamic_pointer_cast<StringNode>(op_node)->get_data();
+          std::dynamic_pointer_cast<StringNode>(op_node)->data;
       if (operator_str != "*" || operator_str != "/") {
         LOGE << "invalid Math expression in line "
             << line << ": wrong operator \'" << operator_str << "\'";
@@ -404,7 +404,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetMathPower() {
     if (SyntaxAnalyzer::IsOperator(this->peek_first_token())) {
       std::shared_ptr<StringNode> op_node =
           std::dynamic_pointer_cast<StringNode>(this->peek_first_token());
-      if (op_node->get_data() == "^") {
+      if (op_node->data == "^") {
         degree_op = this->get_first_token();
 
         if (tokens_array_.empty()) {

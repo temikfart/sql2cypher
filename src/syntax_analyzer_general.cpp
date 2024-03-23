@@ -64,7 +64,7 @@ StmtType SyntaxAnalyzer::GetDLStType() {
 
   std::string key_word =
       std::dynamic_pointer_cast<StringNode>(
-          this->peek_first_token())->get_data();
+          this->peek_first_token())->data;
 
   std::vector<std::string> ddlSt_kws = {
       "CREATE", "ALTER", "DROP"
@@ -122,7 +122,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDataType() {
   std::shared_ptr<INode> node = this->get_first_token();
 
   std::string datatype =
-      std::dynamic_pointer_cast<StringNode>(node)->get_data();
+      std::dynamic_pointer_cast<StringNode>(node)->data;
   StmtType SQL_datatype = StmtType::kNone;  // invalid value
   if (datatype == "int" || datatype == "integer") {
     SQL_datatype = StmtType::kIntType;
@@ -226,7 +226,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetReference() {
   int line = this->peek_first_token()->line;
   std::string ref_kw =
       std::dynamic_pointer_cast<StringNode>(
-          this->peek_first_token())->get_data();
+          this->peek_first_token())->data;
   if (ref_kw != "REFERENCES") {
     LOGE << "incorrect reference key word in line "
         << line << ": " << ref_kw;
@@ -304,33 +304,33 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetString() {
     line = tmp->line;
     DataType tmp_type = tmp->data_type;
     std::string new_data;
-    if (!str->get_data().empty()) {
-      new_data = str->get_data() + " ";
+    if (!str->data.empty()) {
+      new_data = str->data + " ";
     }
     switch (tmp_type) {
       case DataType::kInt:
         new_data += std::to_string(
-            std::dynamic_pointer_cast<IntNumNode>(tmp)->get_data());
+            std::dynamic_pointer_cast<IntNumNode>(tmp)->data);
         break;
       case DataType::kFloat:
         new_data += std::to_string(
-            std::dynamic_pointer_cast<FloatNumNode>(tmp)->get_data());
+            std::dynamic_pointer_cast<FloatNumNode>(tmp)->data);
         break;
       case DataType::kWord:
       case DataType::kOperator:
-        new_data += std::dynamic_pointer_cast<StringNode>(tmp)->get_data();
+        new_data += std::dynamic_pointer_cast<StringNode>(tmp)->data;
         break;
       case DataType::kBracket:
       case DataType::kPunctuation:
         new_data += std::to_string(
-            std::dynamic_pointer_cast<CharNode>(tmp)->get_data());
+            std::dynamic_pointer_cast<CharNode>(tmp)->data);
         break;
       default:
         LOGE << "invalid string in line "
             << line << ": incorrect type of token inside the string";
         end(EXIT_FAILURE);
     }
-    str->set_data(new_data);
+    str->data = new_data;
   }
 
   if (tokens_array_.empty()) {

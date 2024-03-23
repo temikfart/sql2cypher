@@ -8,19 +8,16 @@
 INode::INode(DataType data_type) : data_type(data_type) {}
 INode::~INode() = default;
 
-void INode::set_parent(std::shared_ptr<INode>& node) {
-  parent_ = node;
-}
-std::shared_ptr<INode>& INode::get_child(size_t node_num) {
-  this->ValidateChildNumber(node_num);
+std::shared_ptr<INode> INode::get_child(std::size_t node_num) {
+  if (node_num >= children_.size())
+    return {};
   return children_[node_num];
 }
-size_t INode::get_children_amount() const {
+std::size_t INode::get_children_amount() const {
   return children_.size();
 }
 
 void INode::AddChild(std::shared_ptr<INode> const& node) {
-  this->ValidateAddChild(node);
   children_.push_back(node);
 }
 bool INode::IsNodesEqual(const std::shared_ptr<INode>& node1,
@@ -37,30 +34,30 @@ bool INode::IsNodesEqual(const std::shared_ptr<INode>& node1,
     case DataType::kRoot:
       break;
     case DataType::kInt:
-      if (std::dynamic_pointer_cast<IntNumNode>(node1)->get_data() !=
-          std::dynamic_pointer_cast<IntNumNode>(node2)->get_data()) {
+      if (std::dynamic_pointer_cast<IntNumNode>(node1)->data !=
+          std::dynamic_pointer_cast<IntNumNode>(node2)->data) {
         LOGT << "not equal: different integer number data";
         return false;
       }
       break;
     case DataType::kFloat:
-      if (std::dynamic_pointer_cast<FloatNumNode>(node1)->get_data() !=
-          std::dynamic_pointer_cast<FloatNumNode>(node2)->get_data()) {
+      if (std::dynamic_pointer_cast<FloatNumNode>(node1)->data !=
+          std::dynamic_pointer_cast<FloatNumNode>(node2)->data) {
         LOGT << "not equal: different float number data";
         return false;
       }
       break;
     case DataType::kPunctuation:
     case DataType::kBracket:
-      if (std::dynamic_pointer_cast<CharNode>(node1)->get_data() !=
-          std::dynamic_pointer_cast<CharNode>(node2)->get_data()) {
+      if (std::dynamic_pointer_cast<CharNode>(node1)->data !=
+          std::dynamic_pointer_cast<CharNode>(node2)->data) {
         return false;
       }
       break;
     case DataType::kWord:
     case DataType::kOperator:
-      if (std::dynamic_pointer_cast<StringNode>(node1)->get_data() !=
-          std::dynamic_pointer_cast<StringNode>(node2)->get_data()) {
+      if (std::dynamic_pointer_cast<StringNode>(node1)->data !=
+          std::dynamic_pointer_cast<StringNode>(node2)->data) {
         LOGT << "not equal: different string data";
         return false;
       }
@@ -81,19 +78,6 @@ bool INode::IsNodesEqual(const std::shared_ptr<INode>& node1,
 
   LOGT << "nodes are equal";
   return true;
-}
-
-void INode::ValidateChildNumber(size_t node_num) const {
-  if (node_num >= children_.size()) {
-    LOGE << "node number too big";
-    end(EXIT_FAILURE);
-  }
-}
-void INode::ValidateAddChild(std::shared_ptr<INode> const& node) const {
-  if (node == nullptr) {
-    LOGE << "nullptr can not be added to the tree";
-    end(EXIT_FAILURE);
-  }
 }
 
 void Tree::PrintTreeRecursive(std::shared_ptr<INode> const& node,

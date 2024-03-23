@@ -226,5 +226,5 @@ std::string QueryAssembler::TranslateIdentifier(std::shared_ptr<INode> node) {
     end(EXIT_FAILURE);
   }
 
-  return std::dynamic_pointer_cast<StringNode>(node->get_child(0))->get_data();
+  return std::dynamic_pointer_cast<StringNode>(node->get_child(0))->data;
 }
