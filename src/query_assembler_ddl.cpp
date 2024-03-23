@@ -7,20 +7,20 @@ void QueryAssembler::TranslateDDLStatement(std::shared_ptr<INode> node) {
   }
 
   auto statement = node->get_child(0);
-  switch (statement->get_st_type()) {
-    case StatementType::createDatabaseStatement:
+  switch (statement->stmt_type) {
+    case StmtType::createDatabaseStatement:
       this->TranslateCreateDatabase(statement);
       break;
-    case StatementType::createTableStatement:
+    case StmtType::createTableStatement:
       this->TranslateCreateTable(statement);
       break;
-    case StatementType::alterTableStatement:
+    case StmtType::alterTableStatement:
       this->TranslateAlterTable(statement);
       break;
-    case StatementType::dropDatabaseStatement:
+    case StmtType::dropDatabaseStatement:
       this->TranslateDropDatabase(statement);
       break;
-    case StatementType::dropTableStatement:
+    case StmtType::dropTableStatement:
       this->TranslateDropTable(statement);
       break;
     default:
@@ -60,7 +60,7 @@ void QueryAssembler::TranslateCreateTable(std::shared_ptr<INode> node) {
 
   // Get properties
   auto column_definition = table_definition->get_child(0);
-  if (column_definition->get_st_type() != StatementType::columnDefinition) {
+  if (column_definition->stmt_type != StmtType::columnDefinition) {
     LOGE << "table without columns should not be created";
     end(EXIT_FAILURE);
   }
@@ -74,7 +74,7 @@ void QueryAssembler::TranslateCreateTable(std::shared_ptr<INode> node) {
 
   if (table_definition->get_children_amount() > 1) {
     auto comma = table_definition->get_child(1);
-    if (comma->get_st_type() != StatementType::delimiter_comma) {
+    if (comma->stmt_type != StmtType::delimiter_comma) {
       LOGE << "invalid table definition: delimiter is not a comma";
       end(EXIT_FAILURE);
     }
@@ -83,8 +83,8 @@ void QueryAssembler::TranslateCreateTable(std::shared_ptr<INode> node) {
       LOGE << "invalid table definition: comma without children";
       end(EXIT_FAILURE);
     }
-    if (comma->get_child(0)->get_st_type()
-        == StatementType::columnDefinition) {
+    if (comma->get_child(0)->stmt_type
+        == StmtType::columnDefinition) {
       std::vector<StdProperty> other_props =
           this->TranslateListOfColumnDefinitions(comma);
       for (auto& i: other_props) {
@@ -117,9 +117,9 @@ void QueryAssembler::TranslateAlterTable(std::shared_ptr<INode> node) {
   }
 
   auto action_node = node->get_child(1);
-  if (action_node->get_st_type() == StatementType::alterActionADD) {
+  if (action_node->stmt_type == StmtType::alterActionADD) {
     this->TranslateAlterTableActionAdd(action_node, table_name);
-  } else if (action_node->get_st_type() == StatementType::alterActionDROP) {
+  } else if (action_node->stmt_type == StmtType::alterActionDROP) {
     this->TranslateAlterTableActionDrop(action_node, table_name);
   }
 }
@@ -135,7 +135,7 @@ void QueryAssembler::TranslateDropDatabase(std::shared_ptr<INode> node) {
 
   if (node->get_children_amount() > 1) {
     std::vector<std::string> other_db_names =
-        this->GetListOf(node->get_child(1), StatementType::name);
+        this->GetListOf(node->get_child(1), StmtType::name);
     for (auto& i: other_db_names) {
       out_ << "DROP DATABASE " << i << ";\n" << std::endl;
     }
@@ -154,7 +154,7 @@ void QueryAssembler::TranslateDropTable(std::shared_ptr<INode> node) {
 
   if (node->get_children_amount() > 1) {
     std::vector<std::string> other_table_names =
-        this->GetListOf(node->get_child(1), StatementType::name);
+        this->GetListOf(node->get_child(1), StmtType::name);
     for (auto& i: other_table_names) {
       out_ << "MATCH (x:" << i << ") DELETE x;\n" << std::endl;
     }
@@ -179,7 +179,7 @@ void QueryAssembler::TranslateAlterTableActionAdd(
   bool is_constraint_first = true;
 
   // Get column definitions
-  if (first_argument->get_st_type() == StatementType::columnDefinition) {
+  if (first_argument->stmt_type == StmtType::columnDefinition) {
     is_constraint_first = false;
 
     out_ << "MATCH (n:" << table_name << ")\n";
@@ -192,13 +192,13 @@ void QueryAssembler::TranslateAlterTableActionAdd(
 
     if (table_definition->get_children_amount() > 1) {
       auto comma = table_definition->get_child(1);
-      if (comma->get_st_type() != StatementType::delimiter_comma) {
+      if (comma->stmt_type != StmtType::delimiter_comma) {
         LOGE << "delimiter between column definitions is not a comma";
         end(EXIT_FAILURE);
       }
 
-      if (comma->get_child(0)->get_st_type()
-          == StatementType::columnDefinition) {
+      if (comma->get_child(0)->stmt_type
+          == StmtType::columnDefinition) {
         std::vector<StdProperty> other_props =
             this->TranslateListOfColumnDefinitions(comma);
 
@@ -252,7 +252,7 @@ std::vector<StdProperty> QueryAssembler::TranslateListOfColumnDefinitions(
     end(EXIT_FAILURE);
   }
   auto argument = node->get_child(0);
-  if (argument->get_st_type() != StatementType::columnDefinition) {
+  if (argument->stmt_type != StmtType::columnDefinition) {
     return {};
   }
 
@@ -260,8 +260,8 @@ std::vector<StdProperty> QueryAssembler::TranslateListOfColumnDefinitions(
   column_definitions.push_back(this->TranslateColumnDefinition(argument));
   if (node->get_children_amount() > 1) {
     auto comma = node->get_child(1);
-    if ((comma->get_child(0))->get_st_type()
-        == StatementType::columnDefinition) {
+    if ((comma->get_child(0))->stmt_type
+        == StmtType::columnDefinition) {
       std::vector<StdProperty> other_cols =
           this->TranslateListOfColumnDefinitions(node->get_child(1));
       column_definitions.insert(column_definitions.end(),
@@ -284,18 +284,18 @@ StdProperty QueryAssembler::TranslateColumnDefinition(
     LOGE << "invalid column definition: datatype is missed";
     end(EXIT_FAILURE);
   }
-  StatementType datatype = node->get_child(1)->get_st_type();
+  StmtType datatype = node->get_child(1)->stmt_type;
 
   std::string datatype_str;
   switch (datatype) {
-    case StatementType::SQL_int:
+    case StmtType::SQL_int:
       datatype_str = "0";
       break;
-    case StatementType::SQL_float:
+    case StmtType::SQL_float:
       datatype_str = "0.0";
       break;
-    case StatementType::SQL_char:
-    case StatementType::SQL_varchar:
+    case StmtType::SQL_char:
+    case StmtType::SQL_varchar:
       datatype_str = "\"\"";
       break;
     default:
@@ -327,7 +327,7 @@ void QueryAssembler::TranslateListOfTableConstraints(std::shared_ptr<INode> node
     key_node_number++;
 
     auto constraint_kw = constraint->get_child(0);
-    if (constraint_kw->get_st_type() != StatementType::kw_constraint
+    if (constraint_kw->stmt_type != StmtType::kw_constraint
         || constraint_kw->get_children_amount() == 0) {
       LOGE << "invalid CONSTRAINT key word node";
       end(EXIT_FAILURE);
@@ -345,9 +345,9 @@ void QueryAssembler::TranslateListOfTableConstraints(std::shared_ptr<INode> node
     end(EXIT_FAILURE);
   }
   auto key = constraint->get_child(key_node_number);
-  if (key->get_st_type() == StatementType::primaryKey) {
+  if (key->stmt_type == StmtType::primaryKey) {
     this->TranslatePrimaryKey(key, constraint_name, table_name);
-  } else if (key->get_st_type() == StatementType::foreignKey) {
+  } else if (key->stmt_type == StmtType::foreignKey) {
     this->TranslateForeignKey(key, table_name);
   }
 
@@ -365,7 +365,7 @@ std::shared_ptr<INode> QueryAssembler::FindConstraint(
   }
 
   auto left = node->get_child(0);
-  if (left->get_st_type() == StatementType::tableConstraint) {
+  if (left->stmt_type == StmtType::tableConstraint) {
     constraints = node;
   } else {
     if (node->get_children_amount() > 1) {
@@ -379,7 +379,7 @@ std::shared_ptr<INode> QueryAssembler::FindConstraint(
 void QueryAssembler::TranslateListOfDropObjects(
     std::shared_ptr<INode> node,
     std::string& table_name) {
-  if (node->get_st_type() != StatementType::dropList) {
+  if (node->stmt_type != StmtType::dropList) {
     LOGE << "invalid statement type for the dropList";
     end(EXIT_FAILURE);
   }
@@ -406,17 +406,17 @@ void QueryAssembler::TranslateDropObject(
   std::vector<std::string> other_arguments;
   if (node->get_children_amount() > 1) {
     other_arguments =
-        this->GetListOf(node->get_child(1), StatementType::identifier);
+        this->GetListOf(node->get_child(1), StmtType::identifier);
   }
 
-  if (node->get_st_type() == StatementType::dropColumn) {
+  if (node->stmt_type == StmtType::dropColumn) {
     out_ << "MATCH (n:" << table_name << ")\n";
     out_ << "SET n." << argument << " = null";
     for (auto& i: other_arguments) {
       out_ << ", n." << i << " = null";
     }
     out_ << ";\n" << std::endl;
-  } else if (node->get_st_type() == StatementType::dropConstraint) {
+  } else if (node->stmt_type == StmtType::dropConstraint) {
     out_ << "DROP CONSTRAINT " << argument << ";\n" << std::endl;
     for (auto& i: other_arguments) {
       out_ << "DROP CONSTRAINT " << i;

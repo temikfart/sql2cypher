@@ -13,7 +13,7 @@ void CharNode::PrintData(std::ostream& stream) {
   stream << data_;
 }
 void CharNode::PrintType(std::ostream& stream) {
-  switch (type_) {
+  switch (data_type) {
     case DataType::BRACKET:
       stream << "BRACKET";
       break;

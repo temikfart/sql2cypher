@@ -6,24 +6,23 @@
 #include <vector>
 
 #include "SCC/ast/data_types.h"
-#include "SCC/ast/statement_types.h"
+#include "SCC/ast/stmt_types.h"
 #include "SCC/config/scc_config.h"
 
 #include "logger/log.hpp"
 
 class INode {
 public:
-  explicit INode(DataType type);
+  int line = 0;
+  const DataType data_type;
+  StmtType stmt_type = StmtType::EMPTY_TYPE;
+
+  explicit INode(DataType data_type);
   virtual ~INode();
 
-  void set_line(int line);
-  int get_line();
-  void set_st_type(StatementType type);
-  StatementType get_st_type();
   void set_parent(std::shared_ptr<INode>& parent);
-  DataType get_type() const;
-  std::shared_ptr<INode>& get_child(size_t node_num);
-  size_t get_children_amount() const;
+  std::shared_ptr<INode>& get_child(std::size_t node_num);
+  std::size_t get_children_amount() const;
 
   void AddChild(std::shared_ptr<INode> const& node);
   static bool IsNodesEqual(const std::shared_ptr<INode>& node1,
@@ -33,16 +32,12 @@ public:
   virtual void PrintType(std::ostream& stream) = 0;
 
 protected:
-  int line_ = 0;
-  DataType type_;
-  StatementType st_type_ = StatementType::EMPTY_TYPE;
   std::shared_ptr<INode> parent_ = nullptr;
   std::vector<std::shared_ptr<INode>> children_;
 
 private:
-  void ValidateChildNumber(size_t node_num) const;
+  void ValidateChildNumber(std::size_t node_num) const;
   void ValidateAddChild(std::shared_ptr<INode> const& node) const;
-  void ValidateStType(StatementType type);
   virtual void ValidateType(DataType type) const = 0;
 };
 

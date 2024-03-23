@@ -12,7 +12,7 @@ void ServiceNode::PrintType(std::ostream& stream) {
 }
 
 void ServiceNode::ValidateType(DataType type) const {
-  if (type != DataType::SERVICE) {
+  if (data_type != DataType::SERVICE) {
     LOGE << "invalid type for ServiceNode: " << type;
     end(EXIT_FAILURE);
   }

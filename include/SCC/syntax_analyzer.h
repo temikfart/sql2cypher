@@ -28,15 +28,15 @@ private:
   // Start
 
   std::shared_ptr<INode> General();
-  StatementType GetDLStType();
+  StmtType GetDLStType();
   std::shared_ptr<INode> GetDL();
 
   // Define language (DDL | DML)
 
-  StatementType GetDDLStType();
+  StmtType GetDDLStType();
   std::shared_ptr<INode> GetDDLSt();
 
-  StatementType GetDMLStType();
+  StmtType GetDMLStType();
   std::shared_ptr<INode> GetDMLSt();
 
   // DDL Statements
@@ -103,7 +103,7 @@ private:
 
   // Gets listOf arguments with certain type
   std::shared_ptr<INode> GetListOf(
-      StatementType get_function_type);
+      StmtType get_function_type);
 
   // Validation
 

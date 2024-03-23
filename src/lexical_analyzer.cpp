@@ -87,7 +87,7 @@ void Tokenizer::GetNumber() {
   data = data / power;
 
   auto num_node = std::make_shared<FloatNumNode>(data);
-  num_node->set_line(line_number_);
+  num_node->line = line_number_;
   tokens_array_.push_back(num_node);
   LOGD << "got the float number";
 }
@@ -103,7 +103,7 @@ void Tokenizer::GetWord() {
   }
 
   auto word_node = std::make_shared<StringNode>(data.str(), DataType::WORD);
-  word_node->set_line(line_number_);
+  word_node->line = line_number_;
   tokens_array_.push_back(word_node);
   LOGD << "got the word";
 }
@@ -116,14 +116,14 @@ void Tokenizer::GetOperator() {
     data << GetSQLSymbol();
 
   auto op_node = std::make_shared<StringNode>(data.str(), DataType::OPERATOR);
-  op_node->set_line(line_number_);
+  op_node->line = line_number_;
   tokens_array_.push_back(op_node);
   LOGD << "got the operator";
 }
 void Tokenizer::GetCharacter(DataType type) {
   LOGD << "getting a character...";
   auto char_node = std::make_shared<CharNode>(GetSQLSymbol(), type);
-  char_node->set_line(line_number_);
+  char_node->line = line_number_;
   tokens_array_.push_back(char_node);
   LOGD << "got the character";
 }
