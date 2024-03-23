@@ -9,6 +9,7 @@
 #include "SCC/ast/nodes/root_node.h"
 #include "SCC/ast/nodes/service_node.h"
 #include "SCC/ast/nodes/string_node.h"
+#include "SCC/common/string_utils.h"
 
 #include "logger/log.hpp"
 
@@ -22,8 +23,6 @@ public:
                          int parent_node_num);
 
   void MakeDumpPng();
-
-  static std::string GetServiceNodeData(StmtType statement_type);
 
 private:
   std::ofstream dot_file_;
