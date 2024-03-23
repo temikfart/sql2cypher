@@ -2,9 +2,7 @@
 
 RootNode::RootNode() : INode(DataType::kRoot) {}
 
-void RootNode::PrintData(std::ostream& stream) {
-  stream << "ROOT";
-}
-void RootNode::PrintType(std::ostream& stream) {
-  stream << "ROOT";
+std::ostream& RootNode::operator<<(std::ostream& os) {
+  os << "root";
+  return os;
 }

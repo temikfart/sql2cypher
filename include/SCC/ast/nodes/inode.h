@@ -30,8 +30,7 @@ public:
   static bool IsNodesEqual(const std::shared_ptr<INode>& node1,
                            const std::shared_ptr<INode>& node2);
 
-  virtual void PrintData(std::ostream& stream) = 0;
-  virtual void PrintType(std::ostream& stream) = 0;
+  virtual std::ostream& operator<<(std::ostream& os) = 0;
 
 protected:
   std::vector<std::shared_ptr<INode>> children_ = {};

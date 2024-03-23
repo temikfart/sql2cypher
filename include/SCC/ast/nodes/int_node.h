@@ -11,6 +11,5 @@ public:
 
   explicit IntNumNode(int value);
 
-  void PrintData(std::ostream& stream) override;
-  void PrintType(std::ostream& stream) override;
+  std::ostream& operator<<(std::ostream& os) override;
 };

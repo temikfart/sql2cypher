@@ -3,9 +3,7 @@
 IntNumNode::IntNumNode(int value)
     : INode(DataType::kInt), data(value) {}
 
-void IntNumNode::PrintData(std::ostream& stream) {
-  stream << data;
-}
-void IntNumNode::PrintType(std::ostream& stream) {
-  stream << "INT_NUMBER";
+std::ostream& IntNumNode::operator<<(std::ostream& os) {
+  os << data;
+  return os;
 }
