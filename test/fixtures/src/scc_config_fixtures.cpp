@@ -1,6 +1,6 @@
 #include "SCC/fixtures/scc_config_fixtures.h"
 
-using namespace scc;
+using namespace scc::config;
 
 void SCCConfigBaseTests::SetUp() {
   SCCArgsTests::SetUp();

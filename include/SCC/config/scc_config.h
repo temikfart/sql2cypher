@@ -14,7 +14,7 @@
 
 void end(int exit_code);
 
-namespace scc {
+namespace scc::config {
 
 class SCCConfig : public common::Singleton<SCCConfig> {
 public:
@@ -38,4 +38,4 @@ private:
 
 void InitConfig(const SCCArgs& args);
 
-} // scc
+} // scc::config

@@ -6,10 +6,10 @@
 
 #include "SCC/config/scc_mode.h"
 
-using namespace scc;
+using namespace scc::config;
 using namespace testing;
 
-TEST(ValueEnumTests, IsUnsignedCharTest) {
+TEST(SCCModeValueEnumTests, IsUnsignedCharTest) {
   int N_0 = 0;
   EXPECT_EQ((unsigned char) N_0, SCCMode::Value(N_0));
 
@@ -26,22 +26,22 @@ TEST(ValueEnumTests, IsUnsignedCharTest) {
   EXPECT_EQ((unsigned char) N_256, SCCMode::Value(N_256));
 }
 
-TEST(CtorTests, DefaultValueTest) {
+TEST(SCCModeCtorTests, DefaultValueTest) {
   SCCMode mode;
   EXPECT_EQ(SCCMode::kInteractive, (SCCMode::Value) mode);
 }
 
-TEST(CtorTests, ValueTest) {
+TEST(SCCModeCtorTests, ValueTest) {
   EXPECT_EQ(SCCMode::kDaemon, (SCCMode::Value) SCCMode(SCCMode::kDaemon));
   EXPECT_EQ(SCCMode::kInteractive, (SCCMode::Value) SCCMode(SCCMode::Value(0)));
 }
 
-TEST(CtorTests, InvalidValueTest) {
+TEST(SCCModeCtorTests, InvalidValueTest) {
   EXPECT_THROW(SCCMode(SCCMode::Value(-1)), std::invalid_argument);
   EXPECT_THROW(SCCMode(SCCMode::Value(10)), std::invalid_argument);
 }
 
-TEST(CtorTests, StringValueTest) {
+TEST(SCCModeCtorTests, StringValueTest) {
   SCCMode interactive(INTERACTIVE);
   EXPECT_EQ(SCCMode::kInteractive, (SCCMode::Value) interactive);
 
@@ -52,27 +52,27 @@ TEST(CtorTests, StringValueTest) {
   EXPECT_EQ(SCCMode::kDaemon, (SCCMode::Value) mixed_case_daemon);
 }
 
-TEST(CtorTests, InvalidStringValueTest) {
+TEST(SCCModeCtorTests, InvalidStringValueTest) {
   EXPECT_THROW(SCCMode("invalid mode"), std::invalid_argument);
   EXPECT_THROW(SCCMode("dakmon"), std::invalid_argument);
 }
 
-TEST(ToStringTests, ToStringTest) {
+TEST(SCCModeoStringTests, ToStringTest) {
   EXPECT_EQ(DAEMON, SCCMode(SCCMode::kDaemon).ToString());
   EXPECT_EQ(INTERACTIVE, SCCMode(SCCMode::kInteractive).ToString());
 }
 
-TEST(CastTests, CastToValueTest) {
+TEST(SCCModeCastTests, CastToValueTest) {
   SCCMode interactive(SCCMode::kInteractive);
-  SCCMode::Value interactive_val = (SCCMode::Value) interactive;
+  auto interactive_val = (SCCMode::Value) interactive;
   EXPECT_EQ(SCCMode::kInteractive, interactive_val);
 
   SCCMode daemon(SCCMode::kDaemon);
-  SCCMode::Value daemon_val = (SCCMode::Value) daemon;
+  auto daemon_val = (SCCMode::Value) daemon;
   EXPECT_EQ(SCCMode::kDaemon, daemon_val);
 }
 
-TEST(OperatorsTests, OutputTest) {
+TEST(SCCModeOperatorsTests, OutputTest) {
   std::ostringstream oss_interactive;
   oss_interactive << SCCMode(SCCMode::kInteractive);
   EXPECT_EQ(INTERACTIVE, oss_interactive.str());
@@ -82,7 +82,7 @@ TEST(OperatorsTests, OutputTest) {
   EXPECT_EQ(DAEMON, oss_daemon.str());
 }
 
-TEST(OperatorsTests, CompareTwoEqualModesTest) {
+TEST(SCCModeOperatorsTests, CompareTwoEqualModesTest) {
   SCCMode first(SCCMode::kDaemon);
   SCCMode second(SCCMode::kDaemon);
 
@@ -95,7 +95,7 @@ TEST(OperatorsTests, CompareTwoEqualModesTest) {
   EXPECT_EQ(std::partial_ordering::equivalent, first <=> second);
 }
 
-TEST(OperatorsTests, CompareTwoDifferentModesTest) {
+TEST(SCCModeOperatorsTests, CompareTwoDifferentModesTest) {
   SCCMode first(SCCMode::kInteractive);
   SCCMode second(SCCMode::kDaemon);
 
@@ -109,7 +109,7 @@ TEST(OperatorsTests, CompareTwoDifferentModesTest) {
   EXPECT_EQ(std::partial_ordering::greater, second <=> first);
 }
 
-TEST(OperatorsTests, CompareWithEqualValueTest) {
+TEST(SCCModeOperatorsTests, CompareWithEqualValueTest) {
   SCCMode mode(SCCMode::kDaemon);
   SCCMode::Value value = SCCMode::kDaemon;
 
@@ -121,7 +121,7 @@ TEST(OperatorsTests, CompareWithEqualValueTest) {
   EXPECT_FALSE(mode > value);
 }
 
-TEST(OperatorsTests, CompareWithDifferentValueTest) {
+TEST(SCCModeOperatorsTests, CompareWithDifferentValueTest) {
   SCCMode mode(SCCMode::kInteractive);
   SCCMode::Value value = SCCMode::kDaemon;
 

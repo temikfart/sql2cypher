@@ -1,5 +1,9 @@
 #include "SCC/query_assembler.h"
 
+namespace scc::query_assembler {
+
+using namespace ast;
+
 QueryAssembler::QueryAssembler(const std::filesystem::path& out_path)
 : out_(out_path) {}
 
@@ -16,7 +20,7 @@ bool QueryAssembler::CloseOutputFile() {
   return true;
 }
 
-void QueryAssembler::Translate(std::shared_ptr<Node> AST) {
+void QueryAssembler::Translate(std::shared_ptr<INode> AST) {
   LOGI << "starting translation...";
 
   ast_ = std::move(AST);
@@ -26,7 +30,7 @@ void QueryAssembler::Translate(std::shared_ptr<Node> AST) {
     return;
   }
 
-  if (ast_->get_st_type() == StatementType::Program) {
+  if (ast_->stmt_type == StmtType::kProgram) {
     if (ast_->get_children_amount() > 0) {
       this->TranslateProgram(ast_);
     } else {
@@ -42,9 +46,9 @@ void QueryAssembler::Translate(std::shared_ptr<Node> AST) {
   LOGI << "translation is ended";
 }
 
-void QueryAssembler::TranslateProgram(std::shared_ptr<Node> node) {
+void QueryAssembler::TranslateProgram(std::shared_ptr<INode> node) {
   auto query = node->get_child(0);
-  if (query->get_st_type() == StatementType::query) {
+  if (query->stmt_type == StmtType::kQuery) {
     this->TranslateQuery(query);
   } else {
     LOGE << "first child is not a query";
@@ -53,7 +57,7 @@ void QueryAssembler::TranslateProgram(std::shared_ptr<Node> node) {
 
   if (node->get_children_amount() > 1) {
     auto other_queries = node->get_child(1);
-    if (other_queries->get_st_type() == StatementType::delimiter_semicolon) {
+    if (other_queries->stmt_type == StmtType::kSemicolonDelimiter) {
       if (other_queries->get_children_amount() > 0) {
         this->TranslateProgram(other_queries);
       }
@@ -63,18 +67,18 @@ void QueryAssembler::TranslateProgram(std::shared_ptr<Node> node) {
     }
   }
 }
-void QueryAssembler::TranslateQuery(std::shared_ptr<Node> node) {
+void QueryAssembler::TranslateQuery(std::shared_ptr<INode> node) {
   if (node->get_children_amount() == 0) {
     LOGD << "empty query";
     return;
   }
 
   auto data_language = node->get_child(0);
-  switch (data_language->get_st_type()) {
-    case StatementType::ddlStatement:
+  switch (data_language->stmt_type) {
+    case StmtType::kDdlStmt:
       this->TranslateDDLStatement(data_language);
       break;
-    case StatementType::dmlStatement:
+    case StmtType::kDmlStmt:
       this->TranslateDMLStatement(data_language);
       break;
     default:
@@ -82,3 +86,5 @@ void QueryAssembler::TranslateQuery(std::shared_ptr<Node> node) {
       end(EXIT_FAILURE);
   }
 }
+
+} // scc::query_assembler

@@ -93,19 +93,38 @@ set(PRJ_TARGET scc)
 set(COMMON_SRC
         src/common/file_utils.cpp
         src/common/singleton.cpp
-        src/common/string_utils.cpp)
+        src/common/string_utils.cpp
+)
 set(LOG_SRC
-        src/log.cpp)
+        src/log.cpp
+)
 set(CONFIG_SRC
         src/config/scc_args.cpp
         src/config/scc_config.cpp
-        src/config/scc_mode.cpp)
+        src/config/scc_mode.cpp
+)
+set(AST_SRC
+        src/ast/nodes/inode.cpp
+        src/ast/nodes/char_node.cpp
+        src/ast/nodes/float_node.cpp
+        src/ast/nodes/int_node.cpp
+        src/ast/nodes/root_node.cpp
+        src/ast/nodes/service_node.cpp
+        src/ast/nodes/string_node.cpp
+        src/ast/data_types.cpp
+        src/ast/stmt_types.cpp
+)
+set(LEXER_SRC
+        src/lexer/lexer.cpp
+        src/lexer/symbol_classifier.cpp
+        src/lexer/symbol_types.cpp
+)
 set(SOURCE_LIST src/main.cpp
         ${COMMON_SRC}
         ${LOG_SRC}
         ${CONFIG_SRC}
-            src/ast.cpp
-            src/lexical_analyzer.cpp
+        ${AST_SRC}
+        ${LEXER_SRC}
             src/syntax_analyzer_general.cpp
             src/syntax_analyzer_ddl.cpp
             src/syntax_analyzer_dml.cpp
@@ -267,6 +286,13 @@ if (NOT PACKAGE)
             test/fixtures/src/scc_args_fixtures.cpp
             test/fixtures/src/scc_config_fixtures.cpp
     )
+    set(AST_TEST
+            test/ast/data_types_test.cpp
+            src/ast/data_types.cpp
+
+            test/ast/stmt_types_test.cpp
+            src/ast/stmt_types.cpp
+    )
     set(COMMON_TEST
             test/common/file_utils_test.cpp
             src/common/file_utils.cpp
@@ -284,6 +310,13 @@ if (NOT PACKAGE)
 
             test/config/scc_mode_test.cpp
             src/config/scc_mode.cpp
+    )
+    set(LEXER_TEST
+            test/lexer/symbol_classifier_test.cpp
+            src/lexer/symbol_classifier.cpp
+
+            test/lexer/symbol_types_test.cpp
+            src/lexer/symbol_types.cpp
     )
     # Temporarily disabled
 #    set(LOG_TEST
@@ -303,6 +336,7 @@ if (NOT PACKAGE)
     add_executable(${TEST_TARGET} ${TEST_FIXTURES}
             ${COMMON_TEST}
             ${CONFIG_TEST}
+            ${LEXER_TEST}
             ${LOG_TEST}
             ${AST_TEST}
             ${LEXICAL_ANALYZER_TEST}

@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include "SCC/ast.h"
+#include "SCC/ast/nodes/inode.h"
 
 using namespace testing;
 
@@ -9,15 +9,15 @@ TEST(IntNumNodeTests, GetDataTest) {
 
   value = 0;
   std::shared_ptr<IntNumNode> node1 = std::make_shared<IntNumNode>(value);
-  EXPECT_EQ(node1->get_data(), value);
+  EXPECT_EQ(node1->data, value);
 
   value = 5;
   std::shared_ptr<IntNumNode> node2 = std::make_shared<IntNumNode>(value);
-  EXPECT_EQ(node2->get_data(), value);
+  EXPECT_EQ(node2->data, value);
 
   value = -5;
   std::shared_ptr<IntNumNode> node3 = std::make_shared<IntNumNode>(value);
-  EXPECT_EQ(node3->get_data(), value);
+  EXPECT_EQ(node3->data, value);
 }
 TEST(IntNumNodeTests, SetDataTest) {
   int value = 0;
@@ -25,15 +25,15 @@ TEST(IntNumNodeTests, SetDataTest) {
 
   value = 0;
   node->set_data(value);
-  EXPECT_EQ(node->get_data(), value);
+  EXPECT_EQ(node->data, value);
 
   value = 9;
   node->set_data(value);
-  EXPECT_EQ(node->get_data(), value);
+  EXPECT_EQ(node->data, value);
 
   value = -123;
   node->set_data(value);
-  EXPECT_EQ(node->get_data(), value);
+  EXPECT_EQ(node->data, value);
 }
 TEST(IntNumNodeTests, InvalidConstructorTest) {
   EXPECT_EXIT(std::make_shared<IntNumNode>(5, DataType::ROOT),
@@ -105,23 +105,23 @@ TEST(FloatNumNodeTests, GetDataTest) {
 
   value = 0;
   std::shared_ptr<FloatNumNode> node1 = std::make_shared<FloatNumNode>(value);
-  EXPECT_EQ(node1->get_data(), value);
+  EXPECT_EQ(node1->data, value);
 
   value = 5;
   std::shared_ptr<FloatNumNode> node2 = std::make_shared<FloatNumNode>(value);
-  EXPECT_EQ(node2->get_data(), value);
+  EXPECT_EQ(node2->data, value);
 
   value = 35.1234;
   std::shared_ptr<FloatNumNode> node3 = std::make_shared<FloatNumNode>(value);
-  EXPECT_EQ(node3->get_data(), value);
+  EXPECT_EQ(node3->data, value);
 
   value = -5;
   std::shared_ptr<FloatNumNode> node4 = std::make_shared<FloatNumNode>(value);
-  EXPECT_EQ(node4->get_data(), value);
+  EXPECT_EQ(node4->data, value);
 
   value = -34.21243;
   std::shared_ptr<FloatNumNode> node5 = std::make_shared<FloatNumNode>(value);
-  EXPECT_EQ(node5->get_data(), value);
+  EXPECT_EQ(node5->data, value);
 }
 TEST(FloatNumNodeTests, SetDataTest) {
   double value = 0;
@@ -129,23 +129,23 @@ TEST(FloatNumNodeTests, SetDataTest) {
 
   value = 0;
   node->set_data(value);
-  EXPECT_EQ(node->get_data(), value);
+  EXPECT_EQ(node->data, value);
 
   value = 9;
   node->set_data(value);
-  EXPECT_EQ(node->get_data(), value);
+  EXPECT_EQ(node->data, value);
 
   value = 45.1235;
   node->set_data(value);
-  EXPECT_EQ(node->get_data(), value);
+  EXPECT_EQ(node->data, value);
 
   value = -123;
   node->set_data(value);
-  EXPECT_EQ(node->get_data(), value);
+  EXPECT_EQ(node->data, value);
 
   value = -12345.12345;
   node->set_data(value);
-  EXPECT_EQ(node->get_data(), value);
+  EXPECT_EQ(node->data, value);
 }
 TEST(FloatNumNodeTests, InvalidConstructorTest) {
   EXPECT_EXIT(std::make_shared<FloatNumNode>(5, DataType::ROOT),
@@ -218,17 +218,17 @@ TEST(CharNodeTests, GetDataTest) {
   value = 0;
   std::shared_ptr<CharNode> node1 =
     std::make_shared<CharNode>(value, DataType::PUNCTUATION);
-  EXPECT_EQ(node1->get_data(), value);
+  EXPECT_EQ(node1->data, value);
 
   value = 'a';
   std::shared_ptr<CharNode> node2 =
     std::make_shared<CharNode>(value, DataType::PUNCTUATION);
-  EXPECT_EQ(node2->get_data(), value);
+  EXPECT_EQ(node2->data, value);
 
   value = '{';
   std::shared_ptr<CharNode> node3 =
     std::make_shared<CharNode>(value, DataType::BRACKET);
-  EXPECT_EQ(node3->get_data(), value);
+  EXPECT_EQ(node3->data, value);
 }
 TEST(CharNodeTests, SetDataTest) {
   char value = 0;
@@ -237,15 +237,15 @@ TEST(CharNodeTests, SetDataTest) {
 
   value = 0;
   node->set_data(value);
-  EXPECT_EQ(node->get_data(), value);
+  EXPECT_EQ(node->data, value);
 
   value = 'a';
   node->set_data(value);
-  EXPECT_EQ(node->get_data(), value);
+  EXPECT_EQ(node->data, value);
 
   value = '+';
   node->set_data(value);
-  EXPECT_EQ(node->get_data(), value);
+  EXPECT_EQ(node->data, value);
 }
 TEST(CharNodeTests, InvalidConstructorTest) {
   EXPECT_EXIT(std::make_shared<CharNode>(5, DataType::ROOT),
@@ -309,17 +309,17 @@ TEST(StringNodeTests, GetDataTest) {
   value = "String\n";
   std::shared_ptr<StringNode> node1 =
     std::make_shared<StringNode>(value, DataType::WORD);
-  EXPECT_EQ(node1->get_data(), value);
+  EXPECT_EQ(node1->data, value);
 
   value = ">=";
   std::shared_ptr<StringNode> node2 =
     std::make_shared<StringNode>(value, DataType::OPERATOR);
-  EXPECT_EQ(node2->get_data(), value);
+  EXPECT_EQ(node2->data, value);
 
   value = 'a';
   std::shared_ptr<StringNode> node3 =
     std::make_shared<StringNode>(value, DataType::WORD);
-  EXPECT_EQ(node3->get_data(), value);
+  EXPECT_EQ(node3->data, value);
 }
 TEST(StringNodeTests, SetDataTest) {
   std::string value;
@@ -328,15 +328,15 @@ TEST(StringNodeTests, SetDataTest) {
 
   value = "String\n";
   node->set_data(value);
-  EXPECT_EQ(node->get_data(), value);
+  EXPECT_EQ(node->data, value);
 
   value = "==";
   node->set_data(value, DataType::WORD);
-  EXPECT_EQ(node->get_data(), value);
+  EXPECT_EQ(node->data, value);
 
   value = 'a';
   node->set_data(value);
-  EXPECT_EQ(node->get_data(), value);
+  EXPECT_EQ(node->data, value);
 }
 TEST(StringNodeTests, InvalidConstructorTest) {
   EXPECT_EXIT(std::make_shared<CharNode>(5, DataType::ROOT),
@@ -454,23 +454,23 @@ TEST_F(GeneralNodeTests, GetChildTest) {
 
   node = root->get_child(0);
   EXPECT_EQ(node->get_type(), node0->get_type());
-  EXPECT_EQ(std::dynamic_pointer_cast<IntNumNode>(node)->get_data(),
-            node0->get_data());
+  EXPECT_EQ(std::dynamic_pointer_cast<IntNumNode>(node)->data,
+            node0->data);
 
   node = root->get_child(1);
   EXPECT_EQ(node->get_type(), node1->get_type());
-  EXPECT_EQ(std::dynamic_pointer_cast<FloatNumNode>(node)->get_data(),
-            node1->get_data());
+  EXPECT_EQ(std::dynamic_pointer_cast<FloatNumNode>(node)->data,
+            node1->data);
 
   node = root->get_child(2);
   EXPECT_EQ(node->get_type(), node2->get_type());
-  EXPECT_EQ(std::dynamic_pointer_cast<CharNode>(node)->get_data(),
-            node2->get_data());
+  EXPECT_EQ(std::dynamic_pointer_cast<CharNode>(node)->data,
+            node2->data);
 
   node = root->get_child(3);
   EXPECT_EQ(node->get_type(), node3->get_type());
-  EXPECT_EQ(std::dynamic_pointer_cast<StringNode>(node)->get_data(),
-            node3->get_data());
+  EXPECT_EQ(std::dynamic_pointer_cast<StringNode>(node)->data,
+            node3->data);
 }
 TEST_F(GeneralNodeTests, InvalidGetChildrenAmountTest) {
   EXPECT_EXIT(root->get_child(4), ExitedWithCode(EXIT_FAILURE), "")

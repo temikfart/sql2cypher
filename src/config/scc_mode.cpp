@@ -1,6 +1,6 @@
 #include "SCC/config/scc_mode.h"
 
-namespace scc {
+namespace scc::config {
 
 SCCMode::SCCMode(Value value) {
   if (value > kDaemon)
@@ -8,7 +8,7 @@ SCCMode::SCCMode(Value value) {
   this->value_ = value;
 }
 SCCMode::SCCMode(const std::string& str_mode) {
-  std::string mode = scc::common::LowerCase(str_mode);
+  std::string mode = common::LowerCase(str_mode);
   if (mode == INTERACTIVE)
     this->value_ = kInteractive;
   else if (mode == DAEMON)
@@ -31,4 +31,4 @@ std::ostream& operator<<(std::ostream& os, const SCCMode& mode) {
   return os;
 }
 
-} // scc
+} // scc::config

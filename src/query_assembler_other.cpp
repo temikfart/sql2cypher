@@ -1,12 +1,16 @@
 #include "SCC/query_assembler.h"
 
+namespace scc::query_assembler {
+
+using namespace ast;
+
 // Basic statements
 
 void QueryAssembler::TranslatePrimaryKey(
-    std::shared_ptr<Node> key,
+    std::shared_ptr<INode> key,
     std::string& constraint_name,
     std::string& table_name) {
-  if (key->get_st_type() != StatementType::primaryKey) {
+  if (key->stmt_type != StmtType::kPrimaryKey) {
     LOGE << "incorrect type for primaryKey node";
     end(EXIT_FAILURE);
   }
@@ -19,7 +23,7 @@ void QueryAssembler::TranslatePrimaryKey(
   properties.push_back(this->TranslateIdentifier(key->get_child(0)));
   if (key->get_children_amount() > 1) {
     std::vector<std::string> other_properties =
-        this->GetListOf(key->get_child(1), StatementType::identifier);
+        this->GetListOf(key->get_child(1), StmtType::kIdentifier);
     properties.insert(properties.end(),
                       other_properties.begin(),
                       other_properties.end());
@@ -39,9 +43,9 @@ void QueryAssembler::TranslatePrimaryKey(
   }
 }
 void QueryAssembler::TranslateForeignKey(
-    std::shared_ptr<Node> key,
+    std::shared_ptr<INode> key,
     std::string& table_name) {
-  if (key->get_st_type() != StatementType::foreignKey) {
+  if (key->stmt_type != StmtType::kForeignKey) {
     LOGE << "incorrect type for foreignKey node";
     end(EXIT_FAILURE);
   }
@@ -54,13 +58,13 @@ void QueryAssembler::TranslateForeignKey(
   std::vector<std::string> properties;
   properties.push_back(this->TranslateIdentifier(key->get_child(0)));
   if (key->get_children_amount() > 2) {
-    if (key->get_child(1)->get_st_type() != StatementType::delimiter_comma) {
+    if (key->get_child(1)->stmt_type != StmtType::kCommaDelimiter) {
       LOGE << "invalid delimiter between properties in foreign key";
       end(EXIT_FAILURE);
     }
     reference_child_num++;
     std::vector<std::string> other_properties =
-        this->GetListOf(key->get_child(1), StatementType::identifier);
+        this->GetListOf(key->get_child(1), StmtType::kIdentifier);
     properties.insert(properties.end(),
                       other_properties.begin(),
                       other_properties.end());
@@ -68,7 +72,7 @@ void QueryAssembler::TranslateForeignKey(
 
   // Get reference
   auto reference = key->get_child(reference_child_num);
-  if (reference->get_st_type() != StatementType::reference) {
+  if (reference->stmt_type != StmtType::kReference) {
     LOGE << "invalid foreign key: incorrect referene statement type";
     end(EXIT_FAILURE);
   }
@@ -86,7 +90,7 @@ void QueryAssembler::TranslateForeignKey(
     if (reference->get_children_amount() > 2) {
       std::vector<std::string> other_props =
           this->GetListOf(reference->get_child(2),
-                          StatementType::identifier);
+                          StmtType::kIdentifier);
       ref_columns.insert(ref_columns.end(),
                          other_props.begin(),
                          other_props.end());
@@ -149,9 +153,9 @@ void QueryAssembler::RemoveProperties(
 }
 
 std::vector<std::string> QueryAssembler::GetListOf(
-    std::shared_ptr<Node> node,
-    StatementType type) {
-  if (node->get_st_type() != StatementType::delimiter_comma) {
+    std::shared_ptr<INode> node,
+    StmtType type) {
+  if (node->stmt_type != StmtType::kCommaDelimiter) {
     LOGE << "invalid ListOf: delimiter is not a comma";
     end(EXIT_FAILURE);
   }
@@ -162,10 +166,10 @@ std::vector<std::string> QueryAssembler::GetListOf(
 
   std::vector<std::string> arguments;
   switch (type) {
-    case StatementType::name:
+    case StmtType::kName:
       arguments.push_back(this->TranslateName(node->get_child(0)));
       break;
-    case StatementType::identifier:
+    case StmtType::kIdentifier:
       arguments.push_back(this->TranslateIdentifier(node->get_child(0)));
       break;
     default:
@@ -184,7 +188,7 @@ std::vector<std::string> QueryAssembler::GetListOf(
   return arguments;
 }
 
-std::string QueryAssembler::TranslateName(std::shared_ptr<Node> node) {
+std::string QueryAssembler::TranslateName(std::shared_ptr<INode> node) {
   if (node->get_children_amount() == 0) {
     LOGE << "empty name node";
     end(EXIT_FAILURE);
@@ -194,7 +198,7 @@ std::string QueryAssembler::TranslateName(std::shared_ptr<Node> node) {
 
   name << this->TranslateIdentifier(node->get_child(0));
   if (node->get_children_amount() > 1) {
-    if (node->get_child(1)->get_st_type() == StatementType::delimiter_dot) {
+    if (node->get_child(1)->stmt_type == StmtType::kDotDelimiter) {
       name << this->TranslateIdentifiers(node->get_child(1));
     } else {
       LOGE << "invalid name: delimiter is not a dot";
@@ -205,7 +209,7 @@ std::string QueryAssembler::TranslateName(std::shared_ptr<Node> node) {
   return name.str();
 }
 std::string QueryAssembler::TranslateIdentifiers(
-    std::shared_ptr<Node> node) {
+    std::shared_ptr<INode> node) {
   if (node->get_children_amount() == 0) {
     LOGE << "invalid list of identifiers";
     end(EXIT_FAILURE);
@@ -220,11 +224,13 @@ std::string QueryAssembler::TranslateIdentifiers(
 
   return identifiers.str();
 }
-std::string QueryAssembler::TranslateIdentifier(std::shared_ptr<Node> node) {
+std::string QueryAssembler::TranslateIdentifier(std::shared_ptr<INode> node) {
   if (node->get_children_amount() == 0) {
     LOGE << "empty identifier";
     end(EXIT_FAILURE);
   }
 
-  return std::dynamic_pointer_cast<StringNode>(node->get_child(0))->get_data();
+  return std::dynamic_pointer_cast<StringNode>(node->get_child(0))->data;
 }
+
+} // scc::query_assembler

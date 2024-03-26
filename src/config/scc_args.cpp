@@ -1,6 +1,6 @@
 #include "SCC/config/scc_args.h"
 
-namespace scc {
+namespace scc::config {
 
 no_argument_error::no_argument_error(const std::string& message)
     : std::runtime_error(message) {}
@@ -87,4 +87,4 @@ void SCCArgs::PrintHelpAndExit(int exit_code) const {
   exit(exit_code);
 }
 
-} // scc
+} // scc::config
