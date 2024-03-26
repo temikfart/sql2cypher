@@ -12,7 +12,7 @@ SymbolType SymbolClassifier::DefineSymbolType(char c) {
   if (IsBracket(c))
     return SymbolType::kBracket;
   if (IsPunctuation(c))
-    return SymbolType::kOperator;
+    return SymbolType::kPunctuation;
   if (IsEOF(c))
     return SymbolType::kEOF;
   if (IsNullTerminator(c))
