@@ -64,57 +64,49 @@ int Lexer::GetDigit() {
   return static_cast<int>(GetSymbol() - '0');
 }
 std::shared_ptr<INode> Lexer::GetNumber() {
-  LOGD << "getting a number...";
-
   double data = 0.0;
   double power = 1.0;
+  const double kBase = 10.0;
 
   while (SymbolClassifier::IsDigit(PeekSymbol()))
-    data = 10.0 * data + GetDigit();
+    data = kBase * data + GetDigit();
 
   if (PeekSymbol() == '.') {
     GetSymbol();
   } else {
-    LOGD << "got the integer number";
     return std::make_shared<IntNumNode>(static_cast<int>(data));
   }
 
   while (SymbolClassifier::IsDigit(PeekSymbol())) {
-    data = 10.0 * data + GetSymbol() - '0';
-    power *= 10.0;
+    data = kBase * data + GetDigit();
+    power *= kBase;
   }
   data = data / power;
 
-  LOGD << "got the float number";
   return std::make_shared<FloatNumNode>(data);
 }
 std::shared_ptr<INode> Lexer::GetWord() {
-  LOGD << "getting a word...";
-  std::ostringstream data;
+  std::string data;
 
-  char another_symbol = PeekSymbol();
-  while (SymbolClassifier::IsAlpha(another_symbol) || SymbolClassifier::IsDigit(another_symbol)
-      || another_symbol == '_') {
-    data << GetSymbol();
-    another_symbol = PeekSymbol();
+  char symbol = PeekSymbol();
+  while (SymbolClassifier::IsAlpha(symbol)
+      || SymbolClassifier::IsDigit(symbol)
+      || symbol == '_') {
+    data += GetSymbol();
+    symbol = PeekSymbol();
   }
 
-  LOGD << "got the word";
-  return std::make_shared<StringNode>(data.str(), DataType::kWord);
+  return std::make_shared<StringNode>(data, DataType::kWord);
 }
 std::shared_ptr<INode> Lexer::GetOperator() {
-  LOGD << "getting an operator...";
-  std::ostringstream data;
+  std::string data;
 
-  data << GetSymbol();
+  data += GetSymbol();
   while (SymbolClassifier::IsOperator(PeekSymbol()))
-    data << GetSymbol();
+    data += GetSymbol();
 
-  LOGD << "got the operator";
-  return std::make_shared<StringNode>(data.str(), DataType::kOperator);
+  return std::make_shared<StringNode>(data, DataType::kOperator);
 }
-std::shared_ptr<INode> Lexer::GetCharacter(DataType type) {
-  LOGD << "getting a character...";
-  LOGD << "got the character";
-  return std::make_shared<CharNode>(GetSymbol(), type);
+std::shared_ptr<INode> Lexer::GetCharacter(DataType data_type) {
+  return std::make_shared<CharNode>(GetSymbol(), data_type);
 }
