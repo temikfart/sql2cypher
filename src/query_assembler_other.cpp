@@ -1,5 +1,9 @@
 #include "SCC/query_assembler.h"
 
+namespace scc::query_assembler {
+
+using namespace ast;
+
 // Basic statements
 
 void QueryAssembler::TranslatePrimaryKey(
@@ -228,3 +232,5 @@ std::string QueryAssembler::TranslateIdentifier(std::shared_ptr<INode> node) {
 
   return std::dynamic_pointer_cast<StringNode>(node->get_child(0))->data;
 }
+
+} // scc::query_assembler

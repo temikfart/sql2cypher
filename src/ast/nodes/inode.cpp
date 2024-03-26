@@ -5,6 +5,8 @@
 #include "SCC/ast/nodes/int_node.h"
 #include "SCC/ast/nodes/string_node.h"
 
+namespace scc::ast {
+
 INode::INode(DataType data_type) : data_type(data_type) {}
 INode::~INode() = default;
 
@@ -79,3 +81,5 @@ bool INode::IsNodesEqual(const std::shared_ptr<INode>& node1,
   LOGT << "nodes are equal";
   return true;
 }
+
+} // scc::ast

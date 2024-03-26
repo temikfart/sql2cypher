@@ -13,6 +13,10 @@
 
 #include "logger/log.hpp"
 
+namespace scc::dump {
+
+using namespace ast;
+
 class TreeDump {
 public:
   explicit TreeDump(const std::filesystem::path& out_path);
@@ -30,3 +34,5 @@ private:
 
   bool CloseTreeDumpFile();
 };
+
+} // scc::dump

@@ -1,5 +1,7 @@
 #include "SCC/lexer/symbol_types.h"
 
+namespace scc::lexer {
+
 SymbolType::SymbolType(Value value) {
   if (value > kNullTerminator)
     throw std::invalid_argument("Incorrect value for Symbol Type");
@@ -56,3 +58,5 @@ std::ostream& operator<<(std::ostream& os, const SymbolType& mode) {
   os << mode.ToString();
   return os;
 }
+
+} // scc::lexer

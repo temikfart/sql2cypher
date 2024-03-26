@@ -1,5 +1,9 @@
 #include "SCC/query_assembler.h"
 
+namespace scc::query_assembler {
+
+using namespace scc::ast;
+
 void QueryAssembler::TranslateDDLStatement(std::shared_ptr<INode> node) {
   if (node->get_children_amount() == 0) {
     LOGD << "empty DDL query";
@@ -427,3 +431,5 @@ void QueryAssembler::TranslateDropObject(
     end(EXIT_FAILURE);
   }
 }
+
+} // scc::query_assembler

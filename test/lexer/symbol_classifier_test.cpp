@@ -2,7 +2,7 @@
 
 #include "SCC/lexer/symbol_classifier.h"
 
-//using namespace scc;
+using namespace scc::lexer;
 using namespace testing;
 
 // TODO

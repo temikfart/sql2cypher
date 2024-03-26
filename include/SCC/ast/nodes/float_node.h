@@ -5,6 +5,8 @@
 #include "SCC/ast/nodes/inode.h"
 #include "SCC/ast/data_types.h"
 
+namespace scc::ast {
+
 class FloatNumNode : public INode {
 public:
   double data;
@@ -13,3 +15,5 @@ public:
 
   std::ostream& operator<<(std::ostream& os) override;
 };
+
+} // scc::ast

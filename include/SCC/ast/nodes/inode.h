@@ -12,6 +12,8 @@
 
 #include "logger/log.hpp"
 
+namespace scc::ast {
+
 class INode {
 public:
   int line = 0;
@@ -35,3 +37,5 @@ public:
 protected:
   std::vector<std::shared_ptr<INode>> children_ = {};
 };
+
+} // scc::ast

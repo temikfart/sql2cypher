@@ -5,7 +5,7 @@
 
 #include "SCC/ast/data_types.h"
 
-//using namespace scc;
+using namespace scc::ast;
 using namespace testing;
 
 TEST(DataTypeValueEnumTests, IsUnsignedCharTest) {

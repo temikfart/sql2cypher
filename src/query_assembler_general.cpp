@@ -1,5 +1,9 @@
 #include "SCC/query_assembler.h"
 
+namespace scc::query_assembler {
+
+using namespace ast;
+
 QueryAssembler::QueryAssembler(const std::filesystem::path& out_path)
 : out_(out_path) {}
 
@@ -82,3 +86,5 @@ void QueryAssembler::TranslateQuery(std::shared_ptr<INode> node) {
       end(EXIT_FAILURE);
   }
 }
+
+} // scc::query_assembler

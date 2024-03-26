@@ -10,18 +10,18 @@ int main(int argc, char* argv[]) {
 
     logger::init(config->log_severity, config->log_directory);
 
-    Lexer lexer(config->get_sql_file());
-    std::deque<std::shared_ptr<INode>> tokens = lexer.Analyze();
+    scc::lexer::Lexer lexer(config->get_sql_file());
+    std::deque<std::shared_ptr<scc::ast::INode>> tokens = lexer.Analyze();
 
-    SyntaxAnalyzer syntax_analyzer(std::move(tokens));
-    std::shared_ptr<INode> AST = syntax_analyzer.Analyze();
+    scc::parser::SyntaxAnalyzer syntax_analyzer(std::move(tokens));
+    std::shared_ptr<scc::ast::INode> AST = syntax_analyzer.Analyze();
 
     if (scc_args.IsUsed("--dump")) {
-      TreeDump dump(config->get_ast_dump_file());
+      scc::dump::TreeDump dump(config->get_ast_dump_file());
       dump.DumpTree(AST);
     }
 
-    QueryAssembler query_assembler(config->get_cypher_file());
+    scc::query_assembler::QueryAssembler query_assembler(config->get_cypher_file());
     query_assembler.Translate(AST);
 
     end(EXIT_SUCCESS);

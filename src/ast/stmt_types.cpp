@@ -1,5 +1,7 @@
 #include "SCC/ast/stmt_types.h"
 
+namespace scc::ast {
+
 StmtType::StmtType(Value value) {
   if (value > kVarcharType)
     throw std::invalid_argument("Incorrect value for Statement Type");
@@ -208,3 +210,5 @@ std::ostream& operator<<(std::ostream& os, const StmtType& stmt_type) {
   os << stmt_type.ToString();
   return os;
 }
+
+} // scc::ast

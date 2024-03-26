@@ -18,25 +18,29 @@
 
 #include "logger/log.hpp"
 
+namespace scc::lexer {
+
 class Lexer {
 public:
   explicit Lexer(const std::filesystem::path& input_path);
 
-  std::deque<std::shared_ptr<INode>> Analyze();
+  std::deque<std::shared_ptr<ast::INode>> Analyze();
 
 private:
   std::ifstream input_;
   int line_ = 1;
-  std::deque<std::shared_ptr<INode>> tokens_;
+  std::deque<std::shared_ptr<ast::INode>> tokens_;
 
-  std::shared_ptr<INode> GetToken(char symbol, SymbolType sym_type);
+  std::shared_ptr<ast::INode> GetToken(char symbol, SymbolType sym_type);
 
   char GetSymbol();
   char PeekSymbol();
 
   int GetDigit();
-  std::shared_ptr<INode> GetNumber();
-  std::shared_ptr<INode> GetWord();
-  std::shared_ptr<INode> GetOperator();
-  std::shared_ptr<INode> GetCharacter(DataType data_type);
+  std::shared_ptr<ast::INode> GetNumber();
+  std::shared_ptr<ast::INode> GetWord();
+  std::shared_ptr<ast::INode> GetOperator();
+  std::shared_ptr<ast::INode> GetCharacter(ast::DataType data_type);
 };
+
+} // std::lexer

@@ -1,5 +1,9 @@
 #include "SCC/syntax_analyzer.h"
 
+namespace scc::parser {
+
+using namespace ast;
+
 StmtType SyntaxAnalyzer::GetDMLStType() {
   StmtType DMLStType = StmtType::kNone; // invalid value
 
@@ -451,3 +455,5 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetMathValue() {
 
   return value;
 }
+
+} // scc::parser

@@ -1,7 +1,11 @@
 #include "SCC/tree_dump.h"
 
+namespace scc::dump {
+
+using namespace ast;
+
 TreeDump::TreeDump(const std::filesystem::path& out_path)
-: dot_file_(out_path), dot_file_path_(out_path.string()) {}
+    : dot_file_(out_path), dot_file_path_(out_path.string()) {}
 
 void TreeDump::DumpTree(const std::shared_ptr<INode>& AST) {
   LOGI << "creating tree dump of the AST";
@@ -172,15 +176,14 @@ void TreeDump::MakeDumpPng() {
     LOGE << "execution ended with error, wait status is " << wait_status;
   } else {
     LOGI << "the image with tree dump "
-              "was created at \'" << png_file_path << "\'";
+            "was created at \'" << png_file_path << "\'";
   }
 }
 
 bool TreeDump::CloseTreeDumpFile() {
   if (dot_file_.is_open()) {
     dot_file_.close();
-    if (dot_file_.good()) {
-      ;
+    if (dot_file_.good()) { ;
     } else {
       std::cerr << "dot dump file close error" << std::endl;
       return false;
@@ -188,3 +191,5 @@ bool TreeDump::CloseTreeDumpFile() {
   }
   return true;
 }
+
+} // scc::dump

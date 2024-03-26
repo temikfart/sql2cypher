@@ -54,6 +54,8 @@
 #define ST_CHAR_TYPE "char"
 #define ST_VARCHAR_TYPE "varchar"
 
+namespace scc::ast {
+
 class StmtType {
 public:
   enum Value : unsigned char {
@@ -134,3 +136,5 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& os, const StmtType& stmt_type);
+
+} // scc::ast
