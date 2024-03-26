@@ -116,7 +116,8 @@ set(AST_SRC
 )
 set(LEXER_SRC
         src/lexer/lexical_analyzer.cpp
-        src/lexer/token_classifier.cpp
+        src/lexer/symbol_classifier.cpp
+        src/lexer/symbol_types.cpp
 )
 set(SOURCE_LIST src/main.cpp
         ${COMMON_SRC}
