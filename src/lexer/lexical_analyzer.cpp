@@ -8,32 +8,49 @@ std::deque<std::shared_ptr<INode>> Lexer::Analyze() {
 
   while (true) {
     char symbol = PeekSymbol();
-    if (TokenClassifier::IsSpace(symbol)) {
+    SymbolType sym_type = SymbolClassifier::DefineSymbolType(symbol);
+
+    if (sym_type == SymbolType::kSpace) {
       if (symbol == '\n')
-        line_number_++;
+        line_++;
       GetSymbol();
-    } else if (TokenClassifier::IsDigit(symbol)) {
-      GetNumber();
-    } else if (TokenClassifier::IsAlpha(symbol)) {
-      GetWord();
-    } else if (TokenClassifier::IsOperator(symbol)) {
-      GetOperator();
-    } else if (TokenClassifier::IsBracket(symbol)) {
-      GetCharacter(DataType::kBracket);
-    } else if (TokenClassifier::IsPunctuation(symbol)) {
-      GetCharacter(DataType::kPunctuation);
-    } else if (TokenClassifier::IsEOF(symbol) || TokenClassifier::IsNullTerminator(symbol)) {
-      break;
-    } else {
-      LOGE << "Unknown symbol \'" << symbol
-           << "\' in line " << line_number_;
-      end(EXIT_FAILURE);
+      continue;
     }
+
+    std::shared_ptr<INode> token = GetToken(symbol, sym_type);
+    if (token == nullptr)
+      break;
+
+    token->line = line_;
+    tokens_.push_back(token);
   }
 
   LOGI << "lexical analysis is ended";
-
   return tokens_;
+}
+std::shared_ptr<INode> Lexer::GetToken(char symbol, SymbolType sym_type) {
+  switch (sym_type) {
+    case SymbolType::kDigit:
+      return GetNumber();
+    case SymbolType::kAlpha:
+      return GetWord();
+    case SymbolType::kOperator:
+      return GetOperator();
+    case SymbolType::kBracket:
+      return GetCharacter(DataType::kBracket);
+    case SymbolType::kPunctuation:
+      return GetCharacter(DataType::kPunctuation);
+    case SymbolType::kEOF:
+    case SymbolType::kNullTerminator:
+      return nullptr;
+    default:
+      std::string msg = "Unknown symbol \'"
+          + std::to_string(symbol)
+          + "\' in line "
+          + std::to_string(line_);
+      LOGE << msg;
+      throw std::invalid_argument(msg);
+  }
 }
 
 char Lexer::GetSymbol() {
@@ -43,67 +60,61 @@ char Lexer::PeekSymbol() {
   return (char) input_.peek();
 }
 
-void Lexer::GetNumber() {
+int Lexer::GetDigit() {
+  return static_cast<int>(GetSymbol() - '0');
+}
+std::shared_ptr<INode> Lexer::GetNumber() {
   LOGD << "getting a number...";
 
   double data = 0.0;
   double power = 1.0;
 
-  while (TokenClassifier::IsDigit(PeekSymbol()))
-    data = 10.0 * data + GetSymbol() - '0';
+  while (SymbolClassifier::IsDigit(PeekSymbol()))
+    data = 10.0 * data + GetDigit();
 
   if (PeekSymbol() == '.') {
     GetSymbol();
   } else {
-    tokens_.push_back(std::make_shared<IntNumNode>((int) data));
     LOGD << "got the integer number";
-    return;
+    return std::make_shared<IntNumNode>(static_cast<int>(data));
   }
 
-  while (TokenClassifier::IsDigit(PeekSymbol())) {
+  while (SymbolClassifier::IsDigit(PeekSymbol())) {
     data = 10.0 * data + GetSymbol() - '0';
     power *= 10.0;
   }
   data = data / power;
 
-  auto num_node = std::make_shared<FloatNumNode>(data);
-  num_node->line = line_number_;
-  tokens_.push_back(num_node);
   LOGD << "got the float number";
+  return std::make_shared<FloatNumNode>(data);
 }
-void Lexer::GetWord() {
+std::shared_ptr<INode> Lexer::GetWord() {
   LOGD << "getting a word...";
   std::ostringstream data;
 
   char another_symbol = PeekSymbol();
-  while (TokenClassifier::IsAlpha(another_symbol) || TokenClassifier::IsDigit(another_symbol)
+  while (SymbolClassifier::IsAlpha(another_symbol) || SymbolClassifier::IsDigit(another_symbol)
       || another_symbol == '_') {
     data << GetSymbol();
     another_symbol = PeekSymbol();
   }
 
-  auto word_node = std::make_shared<StringNode>(data.str(), DataType::kWord);
-  word_node->line = line_number_;
-  tokens_.push_back(word_node);
   LOGD << "got the word";
+  return std::make_shared<StringNode>(data.str(), DataType::kWord);
 }
-void Lexer::GetOperator() {
+std::shared_ptr<INode> Lexer::GetOperator() {
   LOGD << "getting an operator...";
   std::ostringstream data;
 
   data << GetSymbol();
-  while (TokenClassifier::IsOperator(PeekSymbol()))
+  while (SymbolClassifier::IsOperator(PeekSymbol()))
     data << GetSymbol();
 
-  auto op_node = std::make_shared<StringNode>(data.str(), DataType::kOperator);
-  op_node->line = line_number_;
-  tokens_.push_back(op_node);
   LOGD << "got the operator";
+  return std::make_shared<StringNode>(data.str(), DataType::kOperator);
 }
-void Lexer::GetCharacter(DataType type) {
+std::shared_ptr<INode> Lexer::GetCharacter(DataType type) {
   LOGD << "getting a character...";
-  auto char_node = std::make_shared<CharNode>(GetSymbol(), type);
-  char_node->line = line_number_;
-  tokens_.push_back(char_node);
   LOGD << "got the character";
+  return std::make_shared<CharNode>(GetSymbol(), type);
 }
