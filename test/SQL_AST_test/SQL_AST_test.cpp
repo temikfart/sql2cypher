@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "SCC/ast/nodes/inode.h"
-#include "SCC/lexer/lexical_analyzer.h"
+#include "SCC/lexer/lexer.h"
 #include "SCC/syntax_analyzer.h"
 #include "SCC/tree_dump.h"
 #include "logger/initializers/console_appender_initializer.hpp"
