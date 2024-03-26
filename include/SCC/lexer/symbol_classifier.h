@@ -5,8 +5,11 @@
 #include <algorithm>
 #include <string>
 
-class TokenClassifier {
+#include "SCC/lexer/symbol_types.h"
+
+class SymbolClassifier {
 public:
+  static SymbolType DefineSymbolType(char c);
   static bool IsSpace(char c);
   static bool IsDigit(char c);
   static bool IsAlpha(char c);
