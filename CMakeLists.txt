@@ -311,6 +311,13 @@ if (NOT PACKAGE)
             test/config/scc_mode_test.cpp
             src/config/scc_mode.cpp
     )
+    set(LEXER_TEST
+            test/lexer/symbol_classifier_test.cpp
+            src/lexer/symbol_classifier.cpp
+
+            test/lexer/symbol_types_test.cpp
+            src/lexer/symbol_types.cpp
+    )
     # Temporarily disabled
 #    set(LOG_TEST
 #            test/log_test/log_test.cpp
@@ -329,6 +336,7 @@ if (NOT PACKAGE)
     add_executable(${TEST_TARGET} ${TEST_FIXTURES}
             ${COMMON_TEST}
             ${CONFIG_TEST}
+            ${LEXER_TEST}
             ${LOG_TEST}
             ${AST_TEST}
             ${LEXICAL_ANALYZER_TEST}
