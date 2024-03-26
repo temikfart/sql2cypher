@@ -17,6 +17,8 @@
 #define DT_WORD "word"
 #define DT_STRING "string"
 
+namespace scc::ast {
+
 class DataType {
 public:
   enum Value : unsigned char {
@@ -53,3 +55,5 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& os, const DataType& data_type);
+
+} // scc::ast

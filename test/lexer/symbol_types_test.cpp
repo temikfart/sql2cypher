@@ -5,7 +5,7 @@
 
 #include "SCC/lexer/symbol_types.h"
 
-//using namespace scc;
+using namespace scc::lexer;
 using namespace testing;
 
 TEST(SymbolTypeValueEnumTests, IsUnsignedCharTest) {

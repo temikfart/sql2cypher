@@ -1,5 +1,9 @@
 #include "SCC/lexer/lexer.h"
 
+namespace scc::lexer {
+
+using namespace ast;
+
 Lexer::Lexer(const std::filesystem::path& input_path)
     : input_(input_path) {}
 
@@ -110,3 +114,5 @@ std::shared_ptr<INode> Lexer::GetOperator() {
 std::shared_ptr<INode> Lexer::GetCharacter(DataType data_type) {
   return std::make_shared<CharNode>(GetSymbol(), data_type);
 }
+
+} // scc::lexer

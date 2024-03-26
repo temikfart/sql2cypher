@@ -1,5 +1,9 @@
 #include "SCC/syntax_analyzer.h"
 
+namespace scc::parser {
+
+using namespace ast;
+
 SyntaxAnalyzer::SyntaxAnalyzer(std::deque<std::shared_ptr<INode>>&& tokens)
     : tokens_(std::move(tokens)) {}
 
@@ -453,3 +457,5 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetListOf(
 
   return separator;
 }
+
+} // scc::parser

@@ -1,5 +1,7 @@
 #include "SCC/ast/data_types.h"
 
+namespace scc::ast {
+
 DataType::DataType(Value value) {
   if (value > kString)
     throw std::invalid_argument("Incorrect value for Data Type");
@@ -60,3 +62,5 @@ std::ostream& operator<<(std::ostream& os, const DataType& data_type) {
   os << data_type.ToString();
   return os;
 }
+
+} // scc::ast

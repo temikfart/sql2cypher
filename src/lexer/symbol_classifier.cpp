@@ -1,5 +1,7 @@
 #include "SCC/lexer/symbol_classifier.h"
 
+namespace scc::lexer {
+
 SymbolType SymbolClassifier::DefineSymbolType(char c) {
   if (IsSpace(c))
     return SymbolType::kSpace;
@@ -50,3 +52,5 @@ bool SymbolClassifier::IsCharFromString(char c, const std::string& str) {
     return (c == op);
   });
 }
+
+} // scc::lexer

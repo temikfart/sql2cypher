@@ -7,6 +7,8 @@
 
 #include "SCC/lexer/symbol_types.h"
 
+namespace scc::lexer {
+
 class SymbolClassifier {
 public:
   static SymbolType DefineSymbolType(char c);
@@ -22,3 +24,5 @@ public:
 private:
   static bool IsCharFromString(char c, const std::string& str);
 };
+
+} // scc::lexer

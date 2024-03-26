@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -17,6 +15,8 @@
 #define SYMT_PUNCTUATION "punctuation"
 #define SYMT_EOF "eof"
 #define SYMT_NULL_TERMINATOR "null terminator"
+
+namespace scc::lexer {
 
 class SymbolType {
 public:
@@ -53,3 +53,5 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& os, const SymbolType& sym_type);
+
+} // scc::lexer

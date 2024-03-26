@@ -1,5 +1,9 @@
 #include "SCC/syntax_analyzer.h"
 
+namespace scc::parser {
+
+using namespace ast;
+
 // Validation
 
 void SyntaxAnalyzer::ValidateNotEmpty() const {
@@ -18,7 +22,7 @@ void SyntaxAnalyzer::ValidateIsOpeningRoundBracket(
     std::shared_ptr<INode>& node) const {
   if (!SyntaxAnalyzer::IsOpeningRoundBracket(node)) {
     LOGE << "expected an opening round bracket in line "
-        << node->line;
+         << node->line;
     end(EXIT_FAILURE);
   }
 }
@@ -26,7 +30,7 @@ void SyntaxAnalyzer::ValidateIsClosingRoundBracket(
     std::shared_ptr<INode>& node) const {
   if (!SyntaxAnalyzer::IsClosingRoundBracket(node)) {
     LOGE << "expected a closing round bracket in line "
-        << node->line;
+         << node->line;
     end(EXIT_FAILURE);
   }
 }
@@ -173,3 +177,5 @@ void SyntaxAnalyzer::pop_last_token() {
   this->ValidateNotEmpty();
   tokens_.pop_back();
 }
+
+} // scc::parser
