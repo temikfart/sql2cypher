@@ -8,7 +8,7 @@
 #include "SCC/fixtures/scc_args_fixtures.h"
 #include "SCC/log.h"
 
-using namespace scc;
+using namespace scc::config;
 using namespace testing;
 
 TEST_F(SCCArgsBaseTests, NoArgumentsTest) {
@@ -135,7 +135,7 @@ TEST_F(SCCArgsTests, LogSeverityArgumentValidValueTest) {
   EXPECT_NO_THROW(ParseArgsWrapper());
 
   std::string severity_str = parser.Get("-l");
-  logger::Severity severity = log::to_severity(severity_str);
+  logger::Severity severity = scc::log::to_severity(severity_str);
   EXPECT_EQ(severity, logger::Severity::fatal);
 }
 TEST_F(SCCArgsTests, LogSeverityArgumentInvalidValueTest) {
@@ -144,7 +144,7 @@ TEST_F(SCCArgsTests, LogSeverityArgumentInvalidValueTest) {
   EXPECT_NO_THROW(ParseArgsWrapper());
 
   std::string invalid_severity_str = parser.Get("-l");
-  EXPECT_THROW(log::to_severity(invalid_severity_str), std::invalid_argument);
+  EXPECT_THROW(scc::log::to_severity(invalid_severity_str), std::invalid_argument);
 }
 
 TEST_F(SCCArgsTests, LogDirectoryArgumentDefaultValueTest) {

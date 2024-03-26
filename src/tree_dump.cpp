@@ -80,12 +80,12 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
     case DataType::kRoot:
       dot_file_ << "\" {<data> ROOT";
       if (st_type != StmtType::kNone)
-        dot_file_ << " | <st_type>" << scc::common::UpperCase(st_type.ToString());
+        dot_file_ << " | <st_type>" << common::UpperCase(st_type.ToString());
       dot_file_ << "} \", style = filled, fillcolor = gray];\n";
       break;
     case DataType::kService:
       dot_file_ << "\" {<st_type> "
-                << scc::common::UpperCase(st_type.ToString())
+                << common::UpperCase(st_type.ToString())
                 << " } \", style = filled, fillcolor = purple, "
                    "fontcolor = white];\n";
       break;
@@ -93,7 +93,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       dot_file_ << "\" {<data> "
                 << std::dynamic_pointer_cast<IntNumNode>(node)->data;
       if (st_type != StmtType::kNone)
-        dot_file_ << " | <st_type>" << scc::common::UpperCase(st_type.ToString());
+        dot_file_ << " | <st_type>" << common::UpperCase(st_type.ToString());
       dot_file_ << "} \", style = filled, fillcolor = green, "
                    "fontcolor = black];\n";
       break;
@@ -101,7 +101,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       dot_file_ << "\" {<data> "
                 << std::dynamic_pointer_cast<FloatNumNode>(node)->data;
       if (st_type != StmtType::kNone)
-        dot_file_ << " | <st_type>" << scc::common::UpperCase(st_type.ToString());
+        dot_file_ << " | <st_type>" << common::UpperCase(st_type.ToString());
       dot_file_ << "} \", style = filled, fillcolor = green, "
                    "fontcolor = black];\n";
       break;
@@ -109,7 +109,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       dot_file_ << "\" {<data> "
                 << std::dynamic_pointer_cast<CharNode>(node)->data;
       if (st_type != StmtType::kNone)
-        dot_file_ << " | <st_type>" << scc::common::UpperCase(st_type.ToString());
+        dot_file_ << " | <st_type>" << common::UpperCase(st_type.ToString());
       dot_file_ << "} \", style = filled, fillcolor = lightblue, "
                    "fontcolor = black];\n";
       break;
@@ -117,7 +117,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       dot_file_ << "\" {<data> \'"
                 << std::dynamic_pointer_cast<CharNode>(node)->data;
       if (st_type != StmtType::kNone)
-        dot_file_ << " | <st_type>" << scc::common::UpperCase(st_type.ToString());
+        dot_file_ << " | <st_type>" << common::UpperCase(st_type.ToString());
       dot_file_ << "} \", style = filled, fillcolor = blue, "
                    "fontcolor = white];\n";
       break;
@@ -126,7 +126,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
                 << std::dynamic_pointer_cast<StringNode>(node)->data
                 << R"(\")";
       if (st_type != StmtType::kNone)
-        dot_file_ << " | <st_type>" << scc::common::UpperCase(st_type.ToString());
+        dot_file_ << " | <st_type>" << common::UpperCase(st_type.ToString());
       dot_file_ << "} \", style = filled, fillcolor = red, "
                    "fontcolor = white];\n";
       break;
@@ -134,7 +134,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
       dot_file_ << "\" {<data> "
                 << std::dynamic_pointer_cast<StringNode>(node)->data;
       if (st_type != StmtType::kNone)
-        dot_file_ << " | <st_type>" << scc::common::UpperCase(st_type.ToString());
+        dot_file_ << " | <st_type>" << common::UpperCase(st_type.ToString());
       dot_file_ << "} \", style = filled, fillcolor = orange, "
                    "fontcolor = white];\n";
       break;
@@ -143,7 +143,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
                 << std::dynamic_pointer_cast<StringNode>(node)->data
                 << R"(\")";
       if (st_type != StmtType::kNone)
-        dot_file_ << " | <st_type>" << scc::common::UpperCase(st_type.ToString());
+        dot_file_ << " | <st_type>" << common::UpperCase(st_type.ToString());
       dot_file_ << "} \", style = filled, fillcolor = yellow, "
                    "fontcolor = black];\n";
       break;
