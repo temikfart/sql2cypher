@@ -6,7 +6,7 @@
 
 #include "SCC/config/scc_mode.h"
 
-using namespace scc;
+using namespace scc::config;
 using namespace testing;
 
 TEST(SCCModeValueEnumTests, IsUnsignedCharTest) {

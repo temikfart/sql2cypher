@@ -32,7 +32,7 @@
 #define SCC_LOG_DIR "../log"
 #endif
 
-namespace scc {
+namespace scc::config {
 
 class no_argument_error : private std::runtime_error {
 public:
@@ -66,4 +66,4 @@ private:
   void PrintHelpAndExit(int exit_code) const;
 };
 
-} // scc
+} // scc::config

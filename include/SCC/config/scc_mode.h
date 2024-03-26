@@ -9,7 +9,7 @@
 #define INTERACTIVE "interactive"
 #define DAEMON "daemon"
 
-namespace scc {
+namespace scc::config {
 
 class SCCMode {
 public:
@@ -40,4 +40,4 @@ private:
 
 std::ostream& operator<<(std::ostream& os, const SCCMode& mode);
 
-} // scc
+} // scc::config

@@ -12,7 +12,7 @@ inline void ThrowFailedConfigCreation(const std::exception& e) {
 
 }
 
-namespace scc {
+namespace scc::config {
 
 namespace fs = std::filesystem;
 
@@ -64,4 +64,4 @@ void InitConfig(const SCCArgs& args) {
   static SCCConfig scc_config(args);
 }
 
-} // scc
+} // scc::config

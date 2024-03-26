@@ -7,7 +7,7 @@
 
 class SCCConfigBaseTests : public SCCArgsTests {
 protected:
-  scc::SCCConfig* config = nullptr;
+  scc::config::SCCConfig* config = nullptr;
 
   void SetUp() override;
   void TearDown() override;
@@ -23,7 +23,7 @@ protected:
 
 class CustomSCCConfigTests : public SCCArgsBaseTests {
 protected:
-  scc::SCCConfig* config;
+  scc::config::SCCConfig* config;
 
   void InitializeConfig();
 

@@ -2,11 +2,11 @@
 
 int main(int argc, char* argv[]) {
   try {
-    scc::SCCArgs scc_args;
+    scc::config::SCCArgs scc_args;
     scc_args.ParseArgs(argc, argv);
 
-    scc::InitConfig(scc_args);
-    scc::SCCConfig* config = scc::SCCConfig::Get();
+    scc::config::InitConfig(scc_args);
+    scc::config::SCCConfig* config = scc::config::SCCConfig::Get();
 
     logger::init(config->log_severity, config->log_directory);
 

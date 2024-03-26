@@ -8,7 +8,7 @@
 #include "SCC/fixtures/scc_config_fixtures.h"
 #include "SCC/log.h"
 
-using namespace scc;
+using namespace scc::config;
 using namespace testing;
 
 namespace fs = std::filesystem;

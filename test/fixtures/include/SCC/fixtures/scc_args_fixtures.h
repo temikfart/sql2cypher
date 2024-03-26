@@ -21,7 +21,7 @@ protected:
   };
 
   Args args;
-  scc::SCCArgs parser;
+  scc::config::SCCArgs parser;
   const std::string sql_path = scc::common::ResourcesPath() + "/sql_queries.sql";
 
   void ParseArgsWrapper();
