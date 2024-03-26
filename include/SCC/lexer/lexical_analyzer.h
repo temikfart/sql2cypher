@@ -12,7 +12,8 @@
 #include "SCC/ast/nodes/service_node.h"
 #include "SCC/ast/nodes/string_node.h"
 #include "SCC/config/scc_config.h"
-#include "SCC/lexer/token_classifier.h"
+#include "SCC/lexer/symbol_classifier.h"
+#include "SCC/lexer/symbol_types.h"
 #include "SCC/log.h"
 
 #include "logger/log.hpp"
@@ -25,14 +26,17 @@ public:
 
 private:
   std::ifstream input_;
-  int line_number_ = 1;
+  int line_ = 1;
   std::deque<std::shared_ptr<INode>> tokens_;
+
+  std::shared_ptr<INode> GetToken(char symbol, SymbolType sym_type);
 
   char GetSymbol();
   char PeekSymbol();
 
-  void GetNumber();
-  void GetWord();
-  void GetOperator();
-  void GetCharacter(DataType type);
+  int GetDigit();
+  std::shared_ptr<INode> GetNumber();
+  std::shared_ptr<INode> GetWord();
+  std::shared_ptr<INode> GetOperator();
+  std::shared_ptr<INode> GetCharacter(DataType type);
 };
