@@ -1,4 +1,4 @@
-#include "SCC/lexer/lexical_analyzer.h"
+#include "SCC/lexer/lexer.h"
 
 Lexer::Lexer(const std::filesystem::path& input_path)
     : input_(input_path) {}

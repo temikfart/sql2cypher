@@ -115,7 +115,7 @@ set(AST_SRC
         src/ast/stmt_types.cpp
 )
 set(LEXER_SRC
-        src/lexer/lexical_analyzer.cpp
+        src/lexer/lexer.cpp
         src/lexer/symbol_classifier.cpp
         src/lexer/symbol_types.cpp
 )
