@@ -38,5 +38,5 @@ private:
   std::shared_ptr<INode> GetNumber();
   std::shared_ptr<INode> GetWord();
   std::shared_ptr<INode> GetOperator();
-  std::shared_ptr<INode> GetCharacter(DataType type);
+  std::shared_ptr<INode> GetCharacter(DataType data_type);
 };
