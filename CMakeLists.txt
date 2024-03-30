@@ -1,92 +1,50 @@
 cmake_minimum_required(VERSION 3.16)
+set(CMAKE_CXX_STANDARD 20)
 
-########################### COMPILER'S CONFIGURATION ###########################
-
-# Set compilers' variables
-set(IS_COMPILERS_SET false)
 if (APPLE)
-    message("Set C/C++ compilers for MacOS")
-
-    # Set compilers for MacOS
-#    set(C_COMPILER "")
-#    set(CXX_COMPILER "")
-#    set(IS_COMPILERS_SET true)
-
-    # Set compilation flag (package)
     set(PACKAGE_TYPE ".app")
     set(PACKAGE_TYPE_FLAG "-DAPP_PACKAGE")
 elseif (WIN32)
-    message("Set C/C++ compilers for Windows")
-
-    # Set compilers for Windows
-#    set(C_COMPILER "C:/MinGW/bin/gcc")
-#    set(CXX_COMPILER "C:/MinGW/bin/g++")
-#    set(IS_COMPILERS_SET true)
-
-    # Set compilation flag (package)
     set(PACKAGE_TYPE ".exe")
     set(PACKAGE_TYPE_FLAG "-DEXE_PACKAGE")
 elseif (UNIX)
-    message("Set C/C++ compilers for Linux")
-
-    # Set compilers for Linux
-    set(C_COMPILER "/usr/bin/gcc")
-    set(CXX_COMPILER "/usr/bin/g++")
-    set(IS_COMPILERS_SET true)
-
-    # Set compilation flag (package)
     set(PACKAGE_TYPE ".deb")
     set(PACKAGE_TYPE_FLAG "-DDEBIAN_PACKAGE")
 else ()
     message(SEND_ERROR "Unsupported system")
 endif ()
+message(DEBUG "System name: ${CMAKE_SYSTEM_NAME}")
 
-# Set compilers
-if (IS_COMPILERS_SET)
-    set(CMAKE_C_COMPILER ${C_COMPILER})
-    set(CMAKE_CXX_COMPILER ${CXX_COMPILER})
-endif ()
+# Project Description
 
-# Set C++ standard
-set(CMAKE_CXX_STANDARD 20)
-
-
-############################# PROJECT INFORMATION ##############################
-
-# Set project name
 set(PRJ_NAME SCC)
 project(${PRJ_NAME})
 
-# Print current system
-message("Current system is ${CMAKE_SYSTEM_NAME}")
-
-# Set Version
 set(PRJ_VERSION_MAJOR 0)
 set(PRJ_VERSION_MINOR 9)
 set(PRJ_VERSION_PATCH 1)
-set(PRJ_VERSION "${PRJ_VERSION_MAJOR}\
-.${PRJ_VERSION_MINOR}\
-.${PRJ_VERSION_PATCH}")
+set(PRJ_VERSION "${PRJ_VERSION_MAJOR}.${PRJ_VERSION_MINOR}.${PRJ_VERSION_PATCH}")
 
-# Set developers
-set(PRJ_MAINTAINERS "Artyom Fartygin, Roman Korostinskiy")
+set(PRJ_SHORT_DESCRIPTION "SQL to Cypher Converter")
+set(PRJ_LONG_DESCRIPTION "The SCC is a tool, which allows you \
+to migrate schema from the relational (MS SQL Server) \
+to the graph (Neo4j) database.")
+set(PRJ_HOMEPAGE "https://github.com/temikfart/sql2cypher")
+set(PRJ_MAINTAINERS "Artyom Fartygin (fartygin.a@phystech.edu),\
+Roman Korostinskiy (korostinkii.r@phystech.edu)")
 
+# Cross-platform compilation
 
-########################## CROSS-PLATFORM COMPILATION ##########################
-
-# If package is created, then set macros
 if (PACKAGE)
     message("Invoked a creation of the \"${PACKAGE_TYPE}\" package")
     set(MACROS_PACKAGE_FLAGS "-DCREATE_PACKAGE ${PACKAGE_TYPE_FLAG}")
 endif ()
 
-# Set compilation flags
 set(MACROS_FLAGS "-DSCC_VERSION=\"\\\"${PRJ_VERSION}\\\"\" \
 -DSCC_MAINTAINERS=\"\\\"${PRJ_MAINTAINERS}\\\"\" ${MACROS_PACKAGE_FLAGS}")
 set(COMPILATION_FLAGS "-Wall -Wextra -g ${MACROS_FLAGS}")
 set(CMAKE_CXX_FLAGS ${COMPILATION_FLAGS})
 
-# Download dependencies
 include(FetchContent)
 FetchContent_Declare(
         logger
@@ -101,11 +59,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(argparse)
 
-# Create executable or package
-set(PRJ_TARGET scc)
-
-add_subdirectory(src)
-
 add_library(scc_include INTERFACE)
 target_include_directories(scc_include INTERFACE
         include
@@ -113,6 +66,9 @@ target_include_directories(scc_include INTERFACE
         ${argparse_SOURCE_DIR}/include
 )
 
+add_subdirectory(src)
+
+set(PRJ_TARGET scc)
 add_executable(${PRJ_TARGET} src/main.cpp)
 target_link_libraries(${PRJ_TARGET} PUBLIC
         scc_include
@@ -125,18 +81,10 @@ target_link_libraries(${PRJ_TARGET} PUBLIC
         scc_parser
         scc_query_assembler
 )
-
 target_link_libraries(${PRJ_TARGET} PUBLIC
         liblogger
         argparse
 )
-
-# Set information about an application
-set(PRJ_SHORT_DESCRIPTION "SQL to CypherQL Converter")
-set(PRJ_LONG_DESCRIPTION "The SCC is a tool, which allows you \
-to migrate data from the relational (MS SQL) \
-to the graph (neo4j) database.")
-set(PRJ_HOMEPAGE "https://github.com/temikfart/sql2cypher")
 
 #if (APPLE)
 #    # Create bundle or executable
@@ -239,7 +187,6 @@ set(PRJ_HOMEPAGE "https://github.com/temikfart/sql2cypher")
 #        include(CPack)
 #    endif()
 #endif ()
-
 
 ################################ ENABLE TESTING ################################
 
