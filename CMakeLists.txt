@@ -65,13 +65,10 @@ target_include_directories(scc_include INTERFACE
         ${logger_SOURCE_DIR}/include
         ${argparse_SOURCE_DIR}/include
 )
+set(SCC_INCLUDE_LIBS scc_include)
 
 add_subdirectory(src)
-
-set(PRJ_TARGET scc)
-add_executable(${PRJ_TARGET} src/main.cpp)
-target_link_libraries(${PRJ_TARGET} PUBLIC
-        scc_include
+set(SCC_SOURCE_LIBS
         scc_ast
         scc_common
         scc_config
@@ -81,10 +78,22 @@ target_link_libraries(${PRJ_TARGET} PUBLIC
         scc_parser
         scc_query_assembler
 )
+
+set(PRJ_TARGET scc)
+add_executable(${PRJ_TARGET} src/main.cpp)
+target_link_libraries(${PRJ_TARGET} PUBLIC
+        ${SCC_INCLUDE_LIBS}
+        ${SCC_SOURCE_LIBS}
+)
 target_link_libraries(${PRJ_TARGET} PUBLIC
         liblogger
         argparse
 )
+
+# Tests
+
+enable_testing()
+add_subdirectory(test)
 
 #if (APPLE)
 #    # Create bundle or executable
