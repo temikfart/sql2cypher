@@ -18,7 +18,10 @@ target_link_libraries(scc_test_libs INTERFACE
 
 function(scc_test TARGET_NAME)
     add_executable(${TARGET_NAME} ${ARGN})
-    target_link_libraries(${TARGET_NAME} PUBLIC scc_test_libs)
+    target_link_libraries(${TARGET_NAME} PUBLIC
+            scc_test_libs
+            scc_test_fixtures
+    )
     include(GoogleTest)
     gtest_discover_tests(${TARGET_NAME})
 endfunction(scc_test)
@@ -26,8 +29,8 @@ endfunction(scc_test)
 set(DIRS
         ast
         common
-#        config
-#        fixtures
+        config
+        fixtures
         lexer
 )
 foreach(DIR ${DIRS})
