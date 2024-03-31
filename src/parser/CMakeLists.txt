@@ -5,4 +5,7 @@ target_sources(scc_parser PRIVATE
         syntax_analyzer_general.cpp
         syntax_analyzer_other.cpp
 )
-target_link_libraries(scc_parser PRIVATE scc_include)
+target_link_libraries(scc_parser PRIVATE
+        scc_include
+        scc_ast
+)

@@ -4,4 +4,7 @@ target_sources(scc_lexer PRIVATE
         symbol_classifier.cpp
         symbol_types.cpp
 )
-target_link_libraries(scc_lexer PRIVATE scc_include)
+target_link_libraries(scc_lexer PRIVATE
+        scc_include
+        scc_ast
+)
