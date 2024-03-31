@@ -31,7 +31,7 @@ SCCConfig::SCCConfig(const SCCArgs& args) {
       mode = args.Get<SCCMode>("--mode");
 
     std::string sql_file_path = args.Get("--sql");
-    common::ValidateFileExists(sql_file_path);
+    scc::common::ValidateFileExists(sql_file_path);
     sql_file_ = fs::canonical(sql_file_path);
     cypher_file_ = fs::weakly_canonical(args.Get("--cypher"));
     if (args.IsUsed("--dump"))
