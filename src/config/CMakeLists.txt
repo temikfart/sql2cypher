@@ -4,4 +4,7 @@ target_sources(scc_config PRIVATE
         scc_config.cpp
         scc_mode.cpp
 )
-target_link_libraries(scc_config PRIVATE scc_include)
+target_link_libraries(scc_config PRIVATE
+        scc_include
+        scc_common
+)
