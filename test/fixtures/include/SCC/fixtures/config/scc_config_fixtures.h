@@ -3,7 +3,7 @@
 #include "gtest/gtest.h"
 
 #include "SCC/config/scc_config.h"
-#include "SCC/fixtures/scc_args_fixtures.h"
+#include "SCC/fixtures/config/scc_args_fixtures.h"
 
 class SCCConfigBaseTests : public SCCArgsTests {
 protected:
