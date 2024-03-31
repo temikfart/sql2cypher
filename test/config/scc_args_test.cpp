@@ -5,7 +5,7 @@
 
 #include "SCC/common/file_utils.h"
 #include "SCC/config/scc_args.h"
-#include "SCC/fixtures/scc_args_fixtures.h"
+#include "SCC/fixtures/config/scc_args_fixtures.h"
 #include "SCC/log.h"
 
 using namespace scc::config;

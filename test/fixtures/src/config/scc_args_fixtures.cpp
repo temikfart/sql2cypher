@@ -1,4 +1,4 @@
-#include "SCC/fixtures/scc_args_fixtures.h"
+#include "SCC/fixtures/config/scc_args_fixtures.h"
 
 using namespace scc::config;
 
