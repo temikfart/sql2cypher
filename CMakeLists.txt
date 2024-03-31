@@ -33,7 +33,7 @@ set(PRJ_HOMEPAGE "https://github.com/temikfart/sql2cypher")
 set(PRJ_MAINTAINERS "Artyom Fartygin (fartygin.a@phystech.edu),\
 Roman Korostinskiy (korostinkii.r@phystech.edu)")
 
-# Cross-platform compilation
+# Compilation
 
 if (PACKAGE)
     message("Invoked a creation of the \"${PACKAGE_TYPE}\" package")
@@ -44,6 +44,8 @@ set(MACROS_FLAGS "-DSCC_VERSION=\"\\\"${PRJ_VERSION}\\\"\" \
 -DSCC_MAINTAINERS=\"\\\"${PRJ_MAINTAINERS}\\\"\" ${MACROS_PACKAGE_FLAGS}")
 set(COMPILATION_FLAGS "-Wall -Wextra -g ${MACROS_FLAGS}")
 set(CMAKE_CXX_FLAGS ${COMPILATION_FLAGS})
+
+## Download dependencies
 
 include(FetchContent)
 FetchContent_Declare(
@@ -58,6 +60,8 @@ FetchContent_Declare(
         GIT_TAG 997da9255618311d1fcb0135ce86022729d1f1cb # release-2.9
 )
 FetchContent_MakeAvailable(argparse)
+
+## Build sources
 
 add_library(scc_include INTERFACE)
 target_include_directories(scc_include INTERFACE
@@ -78,6 +82,8 @@ set(SCC_SOURCE_LIBS
         scc_parser
         scc_query_assembler
 )
+
+## Create executable
 
 set(PRJ_TARGET scc)
 add_executable(${PRJ_TARGET} src/main.cpp)
