@@ -14,9 +14,7 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::deque<NodePtr<INode>>&& tokens)
 NodePtr<INode> SyntaxAnalyzer::Analyze() {
   LOGI << "starting syntax analysis...";
 
-  NodePtr<INode> root;
-  root = std::dynamic_pointer_cast<INode>(std::make_shared<RootNode>());
-  root->stmt_type = StmtType::kProgram;
+  NodePtr<INode> root = CreateRootNode(StmtType::kProgram);
 
   if (tokens_.empty()) {
     LOGI << "syntax analysis is ended: empty tokens' array";
@@ -47,19 +45,17 @@ NodePtr<INode> SyntaxAnalyzer::Analyze() {
 // Start
 
 NodePtr<INode> SyntaxAnalyzer::General() {
-  NodePtr<INode> separator, query, next_queries;
   pop_first_token();
-  separator = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  separator->stmt_type = StmtType::kSemicolonDelimiter;
+  NodePtr<INode> separator = CreateServiceNode(StmtType::kSemicolonDelimiter);
 
   if (!tokens_.empty()) {
-    query = GetDL();
+    NodePtr<INode> query = GetDL();
     INode::Link(separator, query);
   }
 
   if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsSemicolon(peek_first_token())) {
-      next_queries = General();
+      NodePtr<INode> next_queries = General();
       INode::Link(separator, next_queries);
     }
   }
@@ -69,9 +65,7 @@ NodePtr<INode> SyntaxAnalyzer::General() {
 StmtType SyntaxAnalyzer::GetDLStType() {
   StmtType DLStType = StmtType::kNone;   // invalid value
 
-  std::string key_word =
-      std::dynamic_pointer_cast<StringNode>(
-          peek_first_token())->data;
+  std::string key_word = CastToNodeType<StringNode>(peek_first_token())->data;
 
   std::vector<std::string> ddlSt_kws = {
       "CREATE", "ALTER", "DROP"
@@ -100,12 +94,11 @@ StmtType SyntaxAnalyzer::GetDLStType() {
   return DLStType;
 }
 NodePtr<INode> SyntaxAnalyzer::GetDL() {
-  NodePtr<INode> query, statement;
-  query = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  query->stmt_type = StmtType::kQuery;
+  NodePtr<INode> query = CreateServiceNode(StmtType::kQuery);
 
   ValidateIsWord(peek_first_token());
 
+  NodePtr<INode> statement;
   switch (GetDLStType()) {
     case StmtType::kDdlStmt:
       statement = GetDDLSt();
@@ -128,8 +121,7 @@ NodePtr<INode> SyntaxAnalyzer::GetDL() {
 NodePtr<INode> SyntaxAnalyzer::GetDataType() {
   NodePtr<INode> node = get_first_token();
 
-  std::string datatype =
-      std::dynamic_pointer_cast<StringNode>(node)->data;
+  std::string datatype = CastToNodeType<StringNode>(node)->data;
   StmtType SQL_datatype = StmtType::kNone;  // invalid value
   if (datatype == "int" || datatype == "integer") {
     SQL_datatype = StmtType::kIntType;
@@ -148,10 +140,7 @@ NodePtr<INode> SyntaxAnalyzer::GetDataType() {
   return node;
 }
 NodePtr<INode> SyntaxAnalyzer::GetPrimaryKey() {
-  NodePtr<INode> primary_key, column_name, separator;
-  primary_key =
-      std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  primary_key->stmt_type = StmtType::kPrimaryKey;
+  NodePtr<INode> primary_key = CreateServiceNode(StmtType::kPrimaryKey);
 
   int line = peek_first_token()->line;
   ValidateIsOpeningRoundBracket(peek_first_token());
@@ -162,13 +151,13 @@ NodePtr<INode> SyntaxAnalyzer::GetPrimaryKey() {
     LOGE << "column name is missed in line " << line;
     end(EXIT_FAILURE);
   }
-  column_name = GetIdentifier();
+  NodePtr<INode> column_name = GetIdentifier();
   INode::Link(primary_key, column_name);
 
   // Get listOf(column_names)
   if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsComma(peek_first_token())) {
-      separator = GetListOf(StmtType::kIdentifier);
+      NodePtr<INode> separator = GetListOf(StmtType::kIdentifier);
       INode::Link(primary_key, separator);
     }
   }
@@ -184,10 +173,7 @@ NodePtr<INode> SyntaxAnalyzer::GetPrimaryKey() {
 }
 
 NodePtr<INode> SyntaxAnalyzer::GetForeignKey() {
-  NodePtr<INode> foreign_key, column_name, separator, reference;
-  foreign_key =
-      std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  foreign_key->stmt_type = StmtType::kForeignKey;
+  NodePtr<INode> foreign_key = CreateServiceNode(StmtType::kForeignKey);
 
   int line = peek_first_token()->line;
   ValidateIsOpeningRoundBracket(peek_first_token());
@@ -198,13 +184,13 @@ NodePtr<INode> SyntaxAnalyzer::GetForeignKey() {
     LOGE << "columnName is missed in line " << line;
     end(EXIT_FAILURE);
   }
-  column_name = GetIdentifier();
+  NodePtr<INode> column_name = GetIdentifier();
   INode::Link(foreign_key, column_name);
 
   // Get listOf(column_names)
   if (!tokens_.empty()
       && SyntaxAnalyzer::IsComma(peek_first_token())) {
-    separator = GetListOf(StmtType::kIdentifier);
+    NodePtr<INode> separator = GetListOf(StmtType::kIdentifier);
     INode::Link(foreign_key, separator);
   }
 
@@ -221,34 +207,29 @@ NodePtr<INode> SyntaxAnalyzer::GetForeignKey() {
     end(EXIT_FAILURE);
   }
   ValidateIsWord(peek_first_token());
-  reference = GetReference();
+  NodePtr<INode> reference = GetReference();
   INode::Link(foreign_key, reference);
 
   return foreign_key;
 }
 NodePtr<INode> SyntaxAnalyzer::GetReference() {
-  NodePtr<INode> reference, ref_table_name;
-
   // Get REFERENCES
   int line = peek_first_token()->line;
-  std::string ref_kw =
-      std::dynamic_pointer_cast<StringNode>(
-          peek_first_token())->data;
+  std::string ref_kw = CastToNodeType<StringNode>(peek_first_token())->data;
   if (ref_kw != "REFERENCES") {
     LOGE << "incorrect reference key word in line "
         << line << ": " << ref_kw;
     end(EXIT_FAILURE);
   }
   pop_first_token();
-  reference = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  reference->stmt_type = StmtType::kReference;
+  NodePtr<INode> reference = CreateServiceNode(StmtType::kReference);
 
   // Get referenced table or columns
   if (tokens_.empty()) {
     LOGE << "table name is missed in line " << line;
     end(EXIT_FAILURE);
   }
-  ref_table_name = GetName();
+  NodePtr<INode> ref_table_name = GetName();
   INode::Link(reference, ref_table_name);
 
   // Get columns if present
@@ -316,21 +297,18 @@ NodePtr<INode> SyntaxAnalyzer::GetString() {
     }
     switch (tmp_type) {
       case DataType::kInt:
-        new_data += std::to_string(
-            std::dynamic_pointer_cast<IntNumNode>(tmp)->data);
+        new_data += std::to_string(CastToNodeType<IntNumNode>(tmp)->data);
         break;
       case DataType::kFloat:
-        new_data += std::to_string(
-            std::dynamic_pointer_cast<FloatNumNode>(tmp)->data);
+        new_data += std::to_string(CastToNodeType<FloatNumNode>(tmp)->data);
         break;
       case DataType::kWord:
       case DataType::kOperator:
-        new_data += std::dynamic_pointer_cast<StringNode>(tmp)->data;
+        new_data += CastToNodeType<StringNode>(tmp)->data;
         break;
       case DataType::kBracket:
       case DataType::kPunctuation:
-        new_data += std::to_string(
-            std::dynamic_pointer_cast<CharNode>(tmp)->data);
+        new_data += std::to_string(CastToNodeType<CharNode>(tmp)->data);
         break;
       default:
         LOGE << "invalid string in line "
@@ -352,22 +330,20 @@ NodePtr<INode> SyntaxAnalyzer::GetString() {
   }
   pop_first_token();
 
-  node = std::dynamic_pointer_cast<INode>(str);
+  node = CastToNodeType<INode>(str);
 
   return node;
 }
 
 NodePtr<INode> SyntaxAnalyzer::GetName() {
-  NodePtr<INode> name, identifier, next_identifiers;
-  name = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  name->stmt_type = StmtType::kName;
+  NodePtr<INode> name = CreateServiceNode(StmtType::kName);
 
-  identifier = GetIdentifier();
+  NodePtr<INode> identifier = GetIdentifier();
   INode::Link(name, identifier);
 
   if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsDot(peek_first_token())) {
-      next_identifiers = GetIdentifiers();
+      NodePtr<INode> next_identifiers = GetIdentifiers();
       INode::Link(name, next_identifiers);
     }
   }
@@ -375,22 +351,20 @@ NodePtr<INode> SyntaxAnalyzer::GetName() {
   return name;
 }
 NodePtr<INode> SyntaxAnalyzer::GetIdentifiers() {
-  NodePtr<INode> dot, identifier, next_identifiers;
   int line = peek_first_token()->line;
   pop_first_token();
-  dot = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  dot->stmt_type = StmtType::kDotDelimiter;
+  NodePtr<INode> dot = CreateServiceNode(StmtType::kDotDelimiter);
 
   if (tokens_.empty()) {
     LOGE << "bad name, which ends in a dot, in line " << line;
     end(EXIT_FAILURE);
   }
-  identifier = GetIdentifier();
+  NodePtr<INode> identifier = GetIdentifier();
   INode::Link(dot, identifier);
 
   if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsDot(peek_first_token())) {
-      next_identifiers = GetIdentifiers();
+      NodePtr<INode> next_identifiers = GetIdentifiers();
       INode::Link(dot, next_identifiers);
     }
   }
@@ -400,10 +374,7 @@ NodePtr<INode> SyntaxAnalyzer::GetIdentifiers() {
 
 NodePtr<INode> SyntaxAnalyzer::GetIdentifier() {
   ValidateIsWord(peek_first_token());
-  NodePtr<INode> identifier;
-  identifier =
-      std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  identifier->stmt_type = StmtType::kIdentifier;
+  NodePtr<INode> identifier = CreateServiceNode(StmtType::kIdentifier);
 
   NodePtr<INode> argument = get_first_token();
   INode::Link(identifier, argument);
@@ -411,21 +382,19 @@ NodePtr<INode> SyntaxAnalyzer::GetIdentifier() {
   return identifier;
 }
 
-NodePtr<INode> SyntaxAnalyzer::GetListOf(
-    StmtType get_function_type) {
-  NodePtr<INode> argument, separator, next_separator;
-
+NodePtr<INode> SyntaxAnalyzer::GetListOf(StmtType get_function_type) {
   // Get separator (comma)
   int line = peek_first_token()->line;
   pop_first_token();
-  separator = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  separator->stmt_type = StmtType::kCommaDelimiter;
+  NodePtr<INode> separator = CreateServiceNode(StmtType::kCommaDelimiter);
 
   if (tokens_.empty()) {
     LOGE << "invalid listOf in line "
         << line << ": argument is missed";
     end(EXIT_FAILURE);
   }
+
+  NodePtr<INode> argument;
   switch (get_function_type) {
     case StmtType::kIdentifier:
       argument = GetIdentifier();
@@ -455,7 +424,7 @@ NodePtr<INode> SyntaxAnalyzer::GetListOf(
 
   if (!tokens_.empty()
       && SyntaxAnalyzer::IsComma(peek_first_token())) {
-    next_separator = GetListOf(get_function_type);
+    NodePtr<INode> next_separator = GetListOf(get_function_type);
     INode::Link(separator, next_separator);
   }
 
