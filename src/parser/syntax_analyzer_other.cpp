@@ -145,12 +145,6 @@ bool SyntaxAnalyzer::IsSemicolon(NodePtr<INode>& node) {
   return INode::IsNodesEqual(semicolon, node);
 }
 
-void SyntaxAnalyzer::MakeKinship(NodePtr<INode>& parent,
-                                 NodePtr<INode>& child) {
-  parent->AddChild(child);
-  child->parent = parent;
-}
-
 // Work with deque of tokens
 
 NodePtr<INode>& SyntaxAnalyzer::peek_first_token() const {
