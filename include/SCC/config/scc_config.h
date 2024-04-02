@@ -10,7 +10,7 @@
 #include "SCC/common/singleton.h"
 #include "SCC/config/scc_args.h"
 #include "SCC/config/scc_mode.h"
-#include "SCC/log.h"
+#include "SCC/log/log.h"
 
 void end(int exit_code);
 

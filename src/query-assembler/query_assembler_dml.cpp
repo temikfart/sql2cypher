@@ -1,4 +1,4 @@
-#include "SCC/query_assembler.h"
+#include "SCC/query-assembler/query_assembler.h"
 
 namespace scc::query_assembler {
 

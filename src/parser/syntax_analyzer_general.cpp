@@ -1,4 +1,4 @@
-#include "SCC/syntax_analyzer.h"
+#include "SCC/parser/syntax_analyzer.h"
 
 namespace scc::parser {
 
