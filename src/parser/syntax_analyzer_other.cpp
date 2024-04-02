@@ -150,31 +150,31 @@ void SyntaxAnalyzer::MakeKinship(std::shared_ptr<INode>& parent,
 // Work with deque of tokens
 
 std::shared_ptr<INode>& SyntaxAnalyzer::peek_first_token() const {
-  this->ValidateNotEmpty();
+  ValidateNotEmpty();
   return const_cast<std::shared_ptr<INode>&>(tokens_.front());
 }
 std::shared_ptr<INode>& SyntaxAnalyzer::peek_last_token() const {
-  this->ValidateNotEmpty();
+  ValidateNotEmpty();
   return const_cast<std::shared_ptr<INode>&>(tokens_.back());
 }
 std::shared_ptr<INode> SyntaxAnalyzer::get_first_token() {
-  this->ValidateNotEmpty();
+  ValidateNotEmpty();
   std::shared_ptr<INode> node = tokens_.front();
   tokens_.pop_front();
   return node;
 }
 std::shared_ptr<INode> SyntaxAnalyzer::get_last_token() {
-  this->ValidateNotEmpty();
+  ValidateNotEmpty();
   std::shared_ptr<INode> node = tokens_.back();
   tokens_.pop_back();
   return node;
 }
 void SyntaxAnalyzer::pop_first_token() {
-  this->ValidateNotEmpty();
+  ValidateNotEmpty();
   tokens_.pop_front();
 }
 void SyntaxAnalyzer::pop_last_token() {
-  this->ValidateNotEmpty();
+  ValidateNotEmpty();
   tokens_.pop_back();
 }
 
