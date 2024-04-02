@@ -23,6 +23,7 @@ public:
   std::shared_ptr<INode> parent = {};
 
   explicit INode(DataType data_type);
+  explicit INode(DataType data_type, StmtType stmt_type);
   virtual ~INode();
 
   std::shared_ptr<INode> get_child(std::size_t node_num);

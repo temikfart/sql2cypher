@@ -142,6 +142,24 @@ private:
   std::shared_ptr<ast::INode>& peek_first_token() const;
   std::shared_ptr<ast::INode> get_first_token();
   void pop_first_token();
+
+  // Utils
+  
+  template<typename NodeType,
+      typename std::enable_if<std::is_base_of<ast::INode, NodeType>::value>::type* = nullptr>
+  std::shared_ptr<ast::INode> CastToINode(std::shared_ptr<NodeType> node) const {
+    return std::static_pointer_cast<ast::INode>(node);
+  }
+  template<typename NodeType,
+      typename std::enable_if<std::is_base_of<ast::INode, NodeType>::value>::type* = nullptr>
+  std::shared_ptr<NodeType> CastToNodeType(std::shared_ptr<ast::INode> node) const {
+    return std::static_pointer_cast<NodeType>(node);
+  }
+  std::shared_ptr<ast::INode> CreateRootNode(ast::StmtType stmt_type) const;
+  std::shared_ptr<ast::INode> CreateServiceNode(ast::StmtType stmt_type) const;
+  std::shared_ptr<ast::INode> CreateCharNode(char ch, ast::DataType data_type) const;
+  std::shared_ptr<ast::INode> CreateStringNode(const std::string& str,
+                                               ast::DataType data_type) const;
 };
 
 } // scc::parser

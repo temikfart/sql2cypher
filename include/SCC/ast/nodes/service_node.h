@@ -10,6 +10,7 @@ namespace scc::ast {
 class ServiceNode : public INode {
 public:
   explicit ServiceNode();
+  explicit ServiceNode(StmtType stmt_type);
 
   std::ostream& operator<<(std::ostream& os) override;
 };
