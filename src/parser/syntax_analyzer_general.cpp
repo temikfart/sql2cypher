@@ -4,13 +4,17 @@ namespace scc::parser {
 
 using namespace ast;
 
-SyntaxAnalyzer::SyntaxAnalyzer(std::deque<std::shared_ptr<INode>>&& tokens)
+template<typename NodeType,
+    typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
+using NodePtr = std::shared_ptr<NodeType>;
+
+SyntaxAnalyzer::SyntaxAnalyzer(std::deque<NodePtr<INode>>&& tokens)
     : tokens_(std::move(tokens)) {}
 
-std::shared_ptr<INode> SyntaxAnalyzer::Analyze() {
+NodePtr<INode> SyntaxAnalyzer::Analyze() {
   LOGI << "starting syntax analysis...";
 
-  std::shared_ptr<INode> root;
+  NodePtr<INode> root;
   root = std::dynamic_pointer_cast<INode>(std::make_shared<RootNode>());
   root->stmt_type = StmtType::kProgram;
 
@@ -19,7 +23,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::Analyze() {
     return nullptr;
   }
 
-  std::shared_ptr<INode> query, separator;
+  NodePtr<INode> query, separator;
 
   query = GetDL();
   SyntaxAnalyzer::MakeKinship(root, query);
@@ -42,8 +46,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::Analyze() {
 
 // Start
 
-std::shared_ptr<INode> SyntaxAnalyzer::General() {
-  std::shared_ptr<INode> separator, query, next_queries;
+NodePtr<INode> SyntaxAnalyzer::General() {
+  NodePtr<INode> separator, query, next_queries;
   pop_first_token();
   separator = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   separator->stmt_type = StmtType::kSemicolonDelimiter;
@@ -95,8 +99,8 @@ StmtType SyntaxAnalyzer::GetDLStType() {
 
   return DLStType;
 }
-std::shared_ptr<INode> SyntaxAnalyzer::GetDL() {
-  std::shared_ptr<INode> query, statement;
+NodePtr<INode> SyntaxAnalyzer::GetDL() {
+  NodePtr<INode> query, statement;
   query = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   query->stmt_type = StmtType::kQuery;
 
@@ -121,8 +125,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDL() {
 
 // Basic statements
 
-std::shared_ptr<INode> SyntaxAnalyzer::GetDataType() {
-  std::shared_ptr<INode> node = get_first_token();
+NodePtr<INode> SyntaxAnalyzer::GetDataType() {
+  NodePtr<INode> node = get_first_token();
 
   std::string datatype =
       std::dynamic_pointer_cast<StringNode>(node)->data;
@@ -143,8 +147,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDataType() {
 
   return node;
 }
-std::shared_ptr<INode> SyntaxAnalyzer::GetPrimaryKey() {
-  std::shared_ptr<INode> primary_key, column_name, separator;
+NodePtr<INode> SyntaxAnalyzer::GetPrimaryKey() {
+  NodePtr<INode> primary_key, column_name, separator;
   primary_key =
       std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   primary_key->stmt_type = StmtType::kPrimaryKey;
@@ -179,8 +183,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetPrimaryKey() {
   return primary_key;
 }
 
-std::shared_ptr<INode> SyntaxAnalyzer::GetForeignKey() {
-  std::shared_ptr<INode> foreign_key, column_name, separator, reference;
+NodePtr<INode> SyntaxAnalyzer::GetForeignKey() {
+  NodePtr<INode> foreign_key, column_name, separator, reference;
   foreign_key =
       std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   foreign_key->stmt_type = StmtType::kForeignKey;
@@ -222,8 +226,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetForeignKey() {
 
   return foreign_key;
 }
-std::shared_ptr<INode> SyntaxAnalyzer::GetReference() {
-  std::shared_ptr<INode> reference, ref_table_name;
+NodePtr<INode> SyntaxAnalyzer::GetReference() {
+  NodePtr<INode> reference, ref_table_name;
 
   // Get REFERENCES
   int line = peek_first_token()->line;
@@ -250,7 +254,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetReference() {
   // Get columns if present
   if (!tokens_.empty()
       && SyntaxAnalyzer::IsOpeningRoundBracket(peek_first_token())) {
-    std::shared_ptr<INode> ref_column_name, next_ref_column_names;
+    NodePtr<INode> ref_column_name, next_ref_column_names;
 
     ValidateIsOpeningRoundBracket(peek_first_token());
     pop_first_token();
@@ -286,8 +290,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetReference() {
   return reference;
 }
 
-std::shared_ptr<INode> SyntaxAnalyzer::GetString() {
-  std::shared_ptr<INode> node;
+NodePtr<INode> SyntaxAnalyzer::GetString() {
+  NodePtr<INode> node;
 
   int line = peek_first_token()->line;
   bool is_single_quote =
@@ -299,11 +303,11 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetString() {
         << line << ": invalid string";
     end(EXIT_FAILURE);
   }
-  std::shared_ptr<StringNode> str =
+  NodePtr<StringNode> str =
       std::make_shared<StringNode>("", DataType::kString);
   while (!SyntaxAnalyzer::IsSingleQuote(peek_first_token())
       || !SyntaxAnalyzer::IsDoubleQuote(peek_first_token())) {
-    std::shared_ptr<INode> tmp = get_first_token();
+    NodePtr<INode> tmp = get_first_token();
     line = tmp->line;
     DataType tmp_type = tmp->data_type;
     std::string new_data;
@@ -353,8 +357,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetString() {
   return node;
 }
 
-std::shared_ptr<INode> SyntaxAnalyzer::GetName() {
-  std::shared_ptr<INode> name, identifier, next_identifiers;
+NodePtr<INode> SyntaxAnalyzer::GetName() {
+  NodePtr<INode> name, identifier, next_identifiers;
   name = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   name->stmt_type = StmtType::kName;
 
@@ -370,8 +374,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetName() {
 
   return name;
 }
-std::shared_ptr<INode> SyntaxAnalyzer::GetIdentifiers() {
-  std::shared_ptr<INode> dot, identifier, next_identifiers;
+NodePtr<INode> SyntaxAnalyzer::GetIdentifiers() {
+  NodePtr<INode> dot, identifier, next_identifiers;
   int line = peek_first_token()->line;
   pop_first_token();
   dot = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
@@ -394,22 +398,22 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetIdentifiers() {
   return dot;
 }
 
-std::shared_ptr<INode> SyntaxAnalyzer::GetIdentifier() {
+NodePtr<INode> SyntaxAnalyzer::GetIdentifier() {
   ValidateIsWord(peek_first_token());
-  std::shared_ptr<INode> identifier;
+  NodePtr<INode> identifier;
   identifier =
       std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   identifier->stmt_type = StmtType::kIdentifier;
 
-  std::shared_ptr<INode> argument = get_first_token();
+  NodePtr<INode> argument = get_first_token();
   SyntaxAnalyzer::MakeKinship(identifier, argument);
 
   return identifier;
 }
 
-std::shared_ptr<INode> SyntaxAnalyzer::GetListOf(
+NodePtr<INode> SyntaxAnalyzer::GetListOf(
     StmtType get_function_type) {
-  std::shared_ptr<INode> argument, separator, next_separator;
+  NodePtr<INode> argument, separator, next_separator;
 
   // Get separator (comma)
   int line = peek_first_token()->line;
