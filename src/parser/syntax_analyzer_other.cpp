@@ -151,29 +151,15 @@ NodePtr<INode>& SyntaxAnalyzer::peek_first_token() const {
   ValidateNotEmpty();
   return const_cast<NodePtr<INode>&>(tokens_.front());
 }
-NodePtr<INode>& SyntaxAnalyzer::peek_last_token() const {
-  ValidateNotEmpty();
-  return const_cast<NodePtr<INode>&>(tokens_.back());
-}
 NodePtr<INode> SyntaxAnalyzer::get_first_token() {
   ValidateNotEmpty();
   NodePtr<INode> node = tokens_.front();
   tokens_.pop_front();
   return node;
 }
-NodePtr<INode> SyntaxAnalyzer::get_last_token() {
-  ValidateNotEmpty();
-  NodePtr<INode> node = tokens_.back();
-  tokens_.pop_back();
-  return node;
-}
 void SyntaxAnalyzer::pop_first_token() {
   ValidateNotEmpty();
   tokens_.pop_front();
-}
-void SyntaxAnalyzer::pop_last_token() {
-  ValidateNotEmpty();
-  tokens_.pop_back();
 }
 
 } // scc::parser

@@ -140,11 +140,8 @@ private:
   // Work with deque of tokens
 
   std::shared_ptr<ast::INode>& peek_first_token() const;
-  std::shared_ptr<ast::INode>& peek_last_token() const;
   std::shared_ptr<ast::INode> get_first_token();
-  std::shared_ptr<ast::INode> get_last_token();
   void pop_first_token();
-  void pop_last_token();
 };
 
 } // scc::parser
