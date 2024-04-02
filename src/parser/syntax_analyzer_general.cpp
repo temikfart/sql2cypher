@@ -8,10 +8,10 @@ template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
-SyntaxAnalyzer::SyntaxAnalyzer(std::deque<NodePtr<INode>>&& tokens)
+Parser::Parser(std::deque<NodePtr<INode>>&& tokens)
     : tokens_(std::move(tokens)) {}
 
-NodePtr<INode> SyntaxAnalyzer::Analyze() {
+NodePtr<INode> Parser::Parse() {
   LOGI << "starting syntax analysis...";
 
   NodePtr<INode> root = CreateRootNode(StmtType::kProgram);
@@ -27,7 +27,7 @@ NodePtr<INode> SyntaxAnalyzer::Analyze() {
   INode::Link(root, query);
 
   if (!tokens_.empty()) {
-    if (SyntaxAnalyzer::IsSemicolon(peek_first_token())) {
+    if (Parser::IsSemicolon(peek_first_token())) {
       separator = General();
       INode::Link(root, separator);
     }
@@ -44,7 +44,7 @@ NodePtr<INode> SyntaxAnalyzer::Analyze() {
 
 // Start
 
-NodePtr<INode> SyntaxAnalyzer::General() {
+NodePtr<INode> Parser::General() {
   pop_first_token();
   NodePtr<INode> separator = CreateServiceNode(StmtType::kSemicolonDelimiter);
 
@@ -54,7 +54,7 @@ NodePtr<INode> SyntaxAnalyzer::General() {
   }
 
   if (!tokens_.empty()) {
-    if (SyntaxAnalyzer::IsSemicolon(peek_first_token())) {
+    if (Parser::IsSemicolon(peek_first_token())) {
       NodePtr<INode> next_queries = General();
       INode::Link(separator, next_queries);
     }
@@ -62,7 +62,7 @@ NodePtr<INode> SyntaxAnalyzer::General() {
 
   return separator;
 }
-StmtType SyntaxAnalyzer::GetDLStType() {
+StmtType Parser::GetDLStType() {
   StmtType DLStType = StmtType::kNone;   // invalid value
 
   std::string key_word = CastToNodeType<StringNode>(peek_first_token())->data;
@@ -93,7 +93,7 @@ StmtType SyntaxAnalyzer::GetDLStType() {
 
   return DLStType;
 }
-NodePtr<INode> SyntaxAnalyzer::GetDL() {
+NodePtr<INode> Parser::GetDL() {
   NodePtr<INode> query = CreateServiceNode(StmtType::kQuery);
 
   ValidateIsWord(peek_first_token());
@@ -118,7 +118,7 @@ NodePtr<INode> SyntaxAnalyzer::GetDL() {
 
 // Basic statements
 
-NodePtr<INode> SyntaxAnalyzer::GetDataType() {
+NodePtr<INode> Parser::GetDataType() {
   NodePtr<INode> node = get_first_token();
 
   std::string datatype = CastToNodeType<StringNode>(node)->data;
@@ -139,7 +139,7 @@ NodePtr<INode> SyntaxAnalyzer::GetDataType() {
 
   return node;
 }
-NodePtr<INode> SyntaxAnalyzer::GetPrimaryKey() {
+NodePtr<INode> Parser::GetPrimaryKey() {
   NodePtr<INode> primary_key = CreateServiceNode(StmtType::kPrimaryKey);
 
   int line = peek_first_token()->line;
@@ -156,7 +156,7 @@ NodePtr<INode> SyntaxAnalyzer::GetPrimaryKey() {
 
   // Get listOf(column_names)
   if (!tokens_.empty()) {
-    if (SyntaxAnalyzer::IsComma(peek_first_token())) {
+    if (Parser::IsComma(peek_first_token())) {
       NodePtr<INode> separator = GetListOf(StmtType::kIdentifier);
       INode::Link(primary_key, separator);
     }
@@ -172,7 +172,7 @@ NodePtr<INode> SyntaxAnalyzer::GetPrimaryKey() {
   return primary_key;
 }
 
-NodePtr<INode> SyntaxAnalyzer::GetForeignKey() {
+NodePtr<INode> Parser::GetForeignKey() {
   NodePtr<INode> foreign_key = CreateServiceNode(StmtType::kForeignKey);
 
   int line = peek_first_token()->line;
@@ -189,7 +189,7 @@ NodePtr<INode> SyntaxAnalyzer::GetForeignKey() {
 
   // Get listOf(column_names)
   if (!tokens_.empty()
-      && SyntaxAnalyzer::IsComma(peek_first_token())) {
+      && Parser::IsComma(peek_first_token())) {
     NodePtr<INode> separator = GetListOf(StmtType::kIdentifier);
     INode::Link(foreign_key, separator);
   }
@@ -212,7 +212,7 @@ NodePtr<INode> SyntaxAnalyzer::GetForeignKey() {
 
   return foreign_key;
 }
-NodePtr<INode> SyntaxAnalyzer::GetReference() {
+NodePtr<INode> Parser::GetReference() {
   // Get REFERENCES
   int line = peek_first_token()->line;
   std::string ref_kw = CastToNodeType<StringNode>(peek_first_token())->data;
@@ -234,7 +234,7 @@ NodePtr<INode> SyntaxAnalyzer::GetReference() {
 
   // Get columns if present
   if (!tokens_.empty()
-      && SyntaxAnalyzer::IsOpeningRoundBracket(peek_first_token())) {
+      && Parser::IsOpeningRoundBracket(peek_first_token())) {
     NodePtr<INode> ref_column_name, next_ref_column_names;
 
     ValidateIsOpeningRoundBracket(peek_first_token());
@@ -253,7 +253,7 @@ NodePtr<INode> SyntaxAnalyzer::GetReference() {
           << line << ": closing round bracket is missed";
       end(EXIT_FAILURE);
     }
-    if (SyntaxAnalyzer::IsComma(peek_first_token())) {
+    if (Parser::IsComma(peek_first_token())) {
       next_ref_column_names =
           GetListOf(StmtType::kIdentifier);
       INode::Link(reference, next_ref_column_names);
@@ -271,12 +271,12 @@ NodePtr<INode> SyntaxAnalyzer::GetReference() {
   return reference;
 }
 
-NodePtr<INode> SyntaxAnalyzer::GetString() {
+NodePtr<INode> Parser::GetString() {
   NodePtr<INode> node;
 
   int line = peek_first_token()->line;
   bool is_single_quote =
-      SyntaxAnalyzer::IsSingleQuote(peek_first_token());
+      Parser::IsSingleQuote(peek_first_token());
   pop_first_token();
 
   if (tokens_.empty()) {
@@ -286,8 +286,8 @@ NodePtr<INode> SyntaxAnalyzer::GetString() {
   }
   NodePtr<StringNode> str =
       std::make_shared<StringNode>("", DataType::kString);
-  while (!SyntaxAnalyzer::IsSingleQuote(peek_first_token())
-      || !SyntaxAnalyzer::IsDoubleQuote(peek_first_token())) {
+  while (!Parser::IsSingleQuote(peek_first_token())
+      || !Parser::IsDoubleQuote(peek_first_token())) {
     NodePtr<INode> tmp = get_first_token();
     line = tmp->line;
     DataType tmp_type = tmp->data_type;
@@ -335,14 +335,14 @@ NodePtr<INode> SyntaxAnalyzer::GetString() {
   return node;
 }
 
-NodePtr<INode> SyntaxAnalyzer::GetName() {
+NodePtr<INode> Parser::GetName() {
   NodePtr<INode> name = CreateServiceNode(StmtType::kName);
 
   NodePtr<INode> identifier = GetIdentifier();
   INode::Link(name, identifier);
 
   if (!tokens_.empty()) {
-    if (SyntaxAnalyzer::IsDot(peek_first_token())) {
+    if (Parser::IsDot(peek_first_token())) {
       NodePtr<INode> next_identifiers = GetIdentifiers();
       INode::Link(name, next_identifiers);
     }
@@ -350,7 +350,7 @@ NodePtr<INode> SyntaxAnalyzer::GetName() {
 
   return name;
 }
-NodePtr<INode> SyntaxAnalyzer::GetIdentifiers() {
+NodePtr<INode> Parser::GetIdentifiers() {
   int line = peek_first_token()->line;
   pop_first_token();
   NodePtr<INode> dot = CreateServiceNode(StmtType::kDotDelimiter);
@@ -363,7 +363,7 @@ NodePtr<INode> SyntaxAnalyzer::GetIdentifiers() {
   INode::Link(dot, identifier);
 
   if (!tokens_.empty()) {
-    if (SyntaxAnalyzer::IsDot(peek_first_token())) {
+    if (Parser::IsDot(peek_first_token())) {
       NodePtr<INode> next_identifiers = GetIdentifiers();
       INode::Link(dot, next_identifiers);
     }
@@ -372,7 +372,7 @@ NodePtr<INode> SyntaxAnalyzer::GetIdentifiers() {
   return dot;
 }
 
-NodePtr<INode> SyntaxAnalyzer::GetIdentifier() {
+NodePtr<INode> Parser::GetIdentifier() {
   ValidateIsWord(peek_first_token());
   NodePtr<INode> identifier = CreateServiceNode(StmtType::kIdentifier);
 
@@ -382,7 +382,7 @@ NodePtr<INode> SyntaxAnalyzer::GetIdentifier() {
   return identifier;
 }
 
-NodePtr<INode> SyntaxAnalyzer::GetListOf(StmtType get_function_type) {
+NodePtr<INode> Parser::GetListOf(StmtType get_function_type) {
   // Get separator (comma)
   int line = peek_first_token()->line;
   pop_first_token();
@@ -423,7 +423,7 @@ NodePtr<INode> SyntaxAnalyzer::GetListOf(StmtType get_function_type) {
   INode::Link(separator, argument);
 
   if (!tokens_.empty()
-      && SyntaxAnalyzer::IsComma(peek_first_token())) {
+      && Parser::IsComma(peek_first_token())) {
     NodePtr<INode> next_separator = GetListOf(get_function_type);
     INode::Link(separator, next_separator);
   }

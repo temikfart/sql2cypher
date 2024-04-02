@@ -8,7 +8,7 @@ template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
-StmtType SyntaxAnalyzer::GetDDLStType() {
+StmtType Parser::GetDDLStType() {
   StmtType DDLStType = StmtType::kNone; // invalid value
 
   // Get first token
@@ -65,7 +65,7 @@ StmtType SyntaxAnalyzer::GetDDLStType() {
 
   return DDLStType;
 }
-NodePtr<INode> SyntaxAnalyzer::GetDDLSt() {
+NodePtr<INode> Parser::GetDDLSt() {
   LOGD << "getting DDL statement...";
   NodePtr<INode> node = CreateServiceNode(StmtType::kDdlStmt);
 
@@ -103,7 +103,7 @@ NodePtr<INode> SyntaxAnalyzer::GetDDLSt() {
 
 // DDL Statements
 
-NodePtr<INode> SyntaxAnalyzer::GetCreateDatabaseSt() {
+NodePtr<INode> Parser::GetCreateDatabaseSt() {
   NodePtr<INode> node = CreateServiceNode(StmtType::kCreateDatabaseStmt);
 
   if (tokens_.empty()) {
@@ -115,7 +115,7 @@ NodePtr<INode> SyntaxAnalyzer::GetCreateDatabaseSt() {
 
   return node;
 }
-NodePtr<INode> SyntaxAnalyzer::GetCreateTableSt() {
+NodePtr<INode> Parser::GetCreateTableSt() {
   NodePtr<INode> node = CreateServiceNode(StmtType::kCreateTableStmt);
 
   // Get tableName
@@ -153,7 +153,7 @@ NodePtr<INode> SyntaxAnalyzer::GetCreateTableSt() {
 
   return node;
 }
-NodePtr<INode> SyntaxAnalyzer::GetAlterTableSt() {
+NodePtr<INode> Parser::GetAlterTableSt() {
   NodePtr<INode> node = CreateServiceNode(StmtType::kAlterTableStmt);
 
   int line = peek_first_token()->line;
@@ -199,7 +199,7 @@ NodePtr<INode> SyntaxAnalyzer::GetAlterTableSt() {
 
   return node;
 }
-NodePtr<INode> SyntaxAnalyzer::GetDropDatabaseSt() {
+NodePtr<INode> Parser::GetDropDatabaseSt() {
   NodePtr<INode> node = CreateServiceNode(StmtType::kDropDatabaseStmt);
 
   // First database_name
@@ -211,14 +211,14 @@ NodePtr<INode> SyntaxAnalyzer::GetDropDatabaseSt() {
   INode::Link(node, database_name);
 
   if (!tokens_.empty()
-      && SyntaxAnalyzer::IsComma(peek_first_token())) {
+      && Parser::IsComma(peek_first_token())) {
     NodePtr<INode> separator = GetListOf(StmtType::kName);
     INode::Link(node, separator);
   }
 
   return node;
 }
-NodePtr<INode> SyntaxAnalyzer::GetDropTableSt() {
+NodePtr<INode> Parser::GetDropTableSt() {
   NodePtr<INode> node = CreateServiceNode(StmtType::kDropTableStmt);
 
   // First tableName
@@ -230,7 +230,7 @@ NodePtr<INode> SyntaxAnalyzer::GetDropTableSt() {
   INode::Link(node, table_name);
 
   if (!tokens_.empty()
-      && SyntaxAnalyzer::IsComma(peek_first_token())) {
+      && Parser::IsComma(peek_first_token())) {
     NodePtr<INode> separator = GetListOf(StmtType::kName);
     INode::Link(node, separator);
   }
@@ -240,21 +240,21 @@ NodePtr<INode> SyntaxAnalyzer::GetDropTableSt() {
 
 // DDL Basic Statements
 
-NodePtr<INode> SyntaxAnalyzer::GetTableDefinition() {
+NodePtr<INode> Parser::GetTableDefinition() {
   NodePtr<INode> node = CreateServiceNode(StmtType::kTableDef);
 
   NodePtr<INode> argument = GetTableDefinitionObject();
   INode::Link(node, argument);
 
   if (!tokens_.empty()
-      && SyntaxAnalyzer::IsComma(peek_first_token())) {
+      && Parser::IsComma(peek_first_token())) {
     NodePtr<INode> separator = GetListOf(StmtType::kTableDef);
     INode::Link(node, separator);
   }
 
   return node;
 }
-NodePtr<INode> SyntaxAnalyzer::GetTableDefinitionObject() {
+NodePtr<INode> Parser::GetTableDefinitionObject() {
   NodePtr<INode> argument;
 
   std::string key_word = CastToNodeType<StringNode>(peek_first_token())->data;
@@ -272,7 +272,7 @@ NodePtr<INode> SyntaxAnalyzer::GetTableDefinitionObject() {
   return argument;
 }
 
-NodePtr<INode> SyntaxAnalyzer::GetColumnDefinition() {
+NodePtr<INode> Parser::GetColumnDefinition() {
   NodePtr<INode> column_def = CreateServiceNode(StmtType::kColumnDef);
 
   // Get columnName
@@ -296,7 +296,7 @@ NodePtr<INode> SyntaxAnalyzer::GetColumnDefinition() {
 
   return column_def;
 }
-NodePtr<INode> SyntaxAnalyzer::GetTableConstraint() {
+NodePtr<INode> Parser::GetTableConstraint() {
   NodePtr<INode> table_constraint = CreateServiceNode(StmtType::kTableConstraint);
 
   // Get full form if present
@@ -363,14 +363,14 @@ NodePtr<INode> SyntaxAnalyzer::GetTableConstraint() {
   return table_constraint;
 }
 
-NodePtr<INode> SyntaxAnalyzer::GetDropListDefinition() {
+NodePtr<INode> Parser::GetDropListDefinition() {
   NodePtr<INode> node = CreateServiceNode(StmtType::kDropList);
 
   NodePtr<INode> objects = GetDropObject();
   INode::Link(node, objects);
 
   if (!tokens_.empty()) {
-    if (SyntaxAnalyzer::IsComma(peek_first_token())) {
+    if (Parser::IsComma(peek_first_token())) {
       NodePtr<INode> separator = GetDropList();
       INode::Link(node, separator);
     }
@@ -378,7 +378,7 @@ NodePtr<INode> SyntaxAnalyzer::GetDropListDefinition() {
 
   return node;
 }
-NodePtr<INode> SyntaxAnalyzer::GetDropList() {
+NodePtr<INode> Parser::GetDropList() {
   pop_first_token();
   NodePtr<INode> separator = CreateServiceNode(StmtType::kCommaDelimiter);
 
@@ -387,7 +387,7 @@ NodePtr<INode> SyntaxAnalyzer::GetDropList() {
   INode::Link(separator, objects);
 
   if (!tokens_.empty()) {
-    if (SyntaxAnalyzer::IsComma(peek_first_token())) {
+    if (Parser::IsComma(peek_first_token())) {
       NodePtr<INode> next_objects = GetDropList();
 
       INode::Link(separator, next_objects);
@@ -396,7 +396,7 @@ NodePtr<INode> SyntaxAnalyzer::GetDropList() {
 
   return separator;
 }
-NodePtr<INode> SyntaxAnalyzer::GetDropObject() {
+NodePtr<INode> Parser::GetDropObject() {
   int line = peek_first_token()->line;
   std::string key_word = CastToNodeType<StringNode>(peek_first_token())->data;
   bool is_tableConstraint = key_word == "CONSTRAINT";
@@ -431,10 +431,10 @@ NodePtr<INode> SyntaxAnalyzer::GetDropObject() {
   INode::Link(object, argument);
 
   if (!tokens_.empty()) {
-    if (SyntaxAnalyzer::IsComma(peek_first_token())) {
+    if (Parser::IsComma(peek_first_token())) {
       // Check key word after the comma
       bool is_list = true;
-      if (SyntaxAnalyzer::IsWord(tokens_[1])) {
+      if (Parser::IsWord(tokens_[1])) {
         std::string checking_word = CastToNodeType<StringNode>(tokens_[1])->data;
         if (checking_word == "CONSTRAINT" || checking_word == "COLUMN") {
           is_list = false;
