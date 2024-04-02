@@ -4,6 +4,10 @@ namespace scc::parser {
 
 using namespace ast;
 
+template<typename NodeType,
+    typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
+using NodePtr = std::shared_ptr<NodeType>;
+
 StmtType SyntaxAnalyzer::GetDMLStType() {
   StmtType DMLStType = StmtType::kNone; // invalid value
 
@@ -34,9 +38,9 @@ StmtType SyntaxAnalyzer::GetDMLStType() {
 
   return DMLStType;
 }
-std::shared_ptr<INode> SyntaxAnalyzer::GetDMLSt() {
+NodePtr<INode> SyntaxAnalyzer::GetDMLSt() {
   LOGD << "getting DML statement...";
-  std::shared_ptr<INode> node, statement;
+  NodePtr<INode> node, statement;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->stmt_type = StmtType::kDmlStmt;
 
@@ -65,22 +69,22 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetDMLSt() {
 
 // DML Statements
 
-std::shared_ptr<INode> SyntaxAnalyzer::GetInsertSt() {
-  std::shared_ptr<INode> node;
+NodePtr<INode> SyntaxAnalyzer::GetInsertSt() {
+  NodePtr<INode> node;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->stmt_type = StmtType::kInsertStmt;
 
   return node;
 }
-std::shared_ptr<INode> SyntaxAnalyzer::GetDeleteSt() {
-  std::shared_ptr<INode> node;
+NodePtr<INode> SyntaxAnalyzer::GetDeleteSt() {
+  NodePtr<INode> node;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->stmt_type = StmtType::kDeleteStmt;
 
   return node;
 }
-std::shared_ptr<INode> SyntaxAnalyzer::GetUpdateSt() {
-  std::shared_ptr<INode> node;
+NodePtr<INode> SyntaxAnalyzer::GetUpdateSt() {
+  NodePtr<INode> node;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->stmt_type = StmtType::kUpdateStmt;
 
@@ -89,8 +93,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetUpdateSt() {
 
 // DML Basic statements
 
-std::shared_ptr<INode> SyntaxAnalyzer::GetCondition() {
-  std::shared_ptr<INode> node, OR_condition;
+NodePtr<INode> SyntaxAnalyzer::GetCondition() {
+  NodePtr<INode> node, OR_condition;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->stmt_type = StmtType::kCondition;
 
@@ -100,8 +104,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetCondition() {
 
   return node;
 }
-std::shared_ptr<INode> SyntaxAnalyzer::GetORCondition() {
-  std::shared_ptr<INode> node, AND_condition, next_AND_conditions;
+NodePtr<INode> SyntaxAnalyzer::GetORCondition() {
+  NodePtr<INode> node, AND_condition, next_AND_conditions;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->stmt_type = StmtType::kORCondition;
 
@@ -112,7 +116,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetORCondition() {
   int line = peek_first_token()->line;
   if (!tokens_.empty()
       && SyntaxAnalyzer::IsWord(peek_first_token())) {
-    std::shared_ptr<StringNode> tmp =
+    NodePtr<StringNode> tmp =
         std::dynamic_pointer_cast<StringNode>(peek_first_token());
     if (tmp->data == "OR") {
       pop_first_token();
@@ -129,8 +133,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetORCondition() {
 
   return node;
 }
-std::shared_ptr<INode> SyntaxAnalyzer::GetANDCondition() {
-  std::shared_ptr<INode> node, NOT_condition, next_NOT_conditions;
+NodePtr<INode> SyntaxAnalyzer::GetANDCondition() {
+  NodePtr<INode> node, NOT_condition, next_NOT_conditions;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->stmt_type = StmtType::kANDCondition;
 
@@ -141,7 +145,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetANDCondition() {
   int line = peek_first_token()->line;
   if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsWord(peek_first_token())) {
-      std::shared_ptr<StringNode> tmp =
+      NodePtr<StringNode> tmp =
           std::dynamic_pointer_cast<StringNode>(peek_first_token());
       if (tmp->data == "AND") {
         pop_first_token();
@@ -159,15 +163,15 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetANDCondition() {
 
   return node;
 }
-std::shared_ptr<INode> SyntaxAnalyzer::GetNOTCondition() {
-  std::shared_ptr<INode> node, NOT_operator, predicate;
+NodePtr<INode> SyntaxAnalyzer::GetNOTCondition() {
+  NodePtr<INode> node, NOT_operator, predicate;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->stmt_type = StmtType::kNOTCondition;
 
   // Get NOT if present
   int line = peek_first_token()->line;
   if (SyntaxAnalyzer::IsWord(peek_first_token())) {
-    std::shared_ptr<StringNode> tmp =
+    NodePtr<StringNode> tmp =
         std::dynamic_pointer_cast<StringNode>(peek_first_token());
     if (tmp->data == "NOT") {
       NOT_operator = get_first_token();
@@ -187,8 +191,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetNOTCondition() {
 
   return node;
 }
-std::shared_ptr<INode> SyntaxAnalyzer::GetPredicate() {
-  std::shared_ptr<INode> node, lhs, rhs, bin_operator;
+NodePtr<INode> SyntaxAnalyzer::GetPredicate() {
+  NodePtr<INode> node, lhs, rhs, bin_operator;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->stmt_type = StmtType::kPredicate;
 
@@ -222,8 +226,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetPredicate() {
 
   return node;
 }
-std::shared_ptr<INode> SyntaxAnalyzer::GetExpression() {
-  std::shared_ptr<INode> node;
+NodePtr<INode> SyntaxAnalyzer::GetExpression() {
+  NodePtr<INode> node;
   node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
   node->stmt_type = StmtType::kExpression;
 
@@ -231,7 +235,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetExpression() {
 
   // Is it [table_name.] column ?
   if (SyntaxAnalyzer::IsWord(peek_first_token())) {
-    std::shared_ptr<INode> name, dot;
+    NodePtr<INode> name, dot;
 
     name = GetIdentifier();
 
@@ -250,7 +254,7 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetExpression() {
 
   // Is it unary operator ?
   if (SyntaxAnalyzer::IsUnaryOperator(peek_first_token())) {
-    std::shared_ptr<INode> u_operator, expression;
+    NodePtr<INode> u_operator, expression;
     u_operator = get_first_token();
 
     SyntaxAnalyzer::MakeKinship(node, u_operator);
@@ -297,19 +301,19 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetExpression() {
           << line << ": invalid string";
       end(EXIT_FAILURE);
     }
-    std::shared_ptr<INode> str = GetString();
+    NodePtr<INode> str = GetString();
     SyntaxAnalyzer::MakeKinship(node, str);
   }
 
   // So, it is Math expression
-  std::shared_ptr<INode> expression = GetMathExpression();
+  NodePtr<INode> expression = GetMathExpression();
   SyntaxAnalyzer::MakeKinship(node, expression);
 
   return node;
 }
 
-std::shared_ptr<INode> SyntaxAnalyzer::GetMathExpression() {
-  std::shared_ptr<INode> node;
+NodePtr<INode> SyntaxAnalyzer::GetMathExpression() {
+  NodePtr<INode> node;
 
   // TODO: implement this PEG
   /* MathExpr   <-- Sum
@@ -322,8 +326,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetMathExpression() {
 
   return node;
 }
-std::shared_ptr<INode> SyntaxAnalyzer::GetMathSum() {
-  std::shared_ptr<INode> product_1, op_node, product_2;
+NodePtr<INode> SyntaxAnalyzer::GetMathSum() {
+  NodePtr<INode> product_1, op_node, product_2;
 
   int line = peek_first_token()->line;
   product_1 = GetMathProduct();
@@ -360,8 +364,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetMathSum() {
 
   return product_1;
 }
-std::shared_ptr<INode> SyntaxAnalyzer::GetMathProduct() {
-  std::shared_ptr<INode> power_1, op_node, power_2;
+NodePtr<INode> SyntaxAnalyzer::GetMathProduct() {
+  NodePtr<INode> power_1, op_node, power_2;
 
   int line = peek_first_token()->line;
   power_1 = GetMathPower();
@@ -398,15 +402,15 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetMathProduct() {
 
   return power_1;
 }
-std::shared_ptr<INode> SyntaxAnalyzer::GetMathPower() {
-  std::shared_ptr<INode> power, degree_op, degree;
+NodePtr<INode> SyntaxAnalyzer::GetMathPower() {
+  NodePtr<INode> power, degree_op, degree;
 
   int line = peek_first_token()->line;
   power = GetMathValue();
 
   if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsOperator(peek_first_token())) {
-      std::shared_ptr<StringNode> op_node =
+      NodePtr<StringNode> op_node =
           std::dynamic_pointer_cast<StringNode>(peek_first_token());
       if (op_node->data == "^") {
         degree_op = get_first_token();
@@ -427,8 +431,8 @@ std::shared_ptr<INode> SyntaxAnalyzer::GetMathPower() {
 
   return power;
 }
-std::shared_ptr<INode> SyntaxAnalyzer::GetMathValue() {
-  std::shared_ptr<INode> value;
+NodePtr<INode> SyntaxAnalyzer::GetMathValue() {
+  NodePtr<INode> value;
 
   int line = peek_first_token()->line;
   if (SyntaxAnalyzer::IsNumber(peek_first_token())) {
