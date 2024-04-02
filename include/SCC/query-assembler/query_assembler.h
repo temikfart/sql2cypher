@@ -10,7 +10,7 @@
 #include "SCC/ast/nodes/inode.h"
 #include "SCC/config/scc_config.h"
 #include "SCC/log/log.h"
-#include "SCC/parser/syntax_analyzer.h"
+#include "SCC/parser/parser.h"
 
 #include "logger/log.hpp"
 
