@@ -19,11 +19,11 @@
 
 namespace scc::parser {
 
-class SyntaxAnalyzer {
+class Parser {
 public:
-  explicit SyntaxAnalyzer(std::deque<std::shared_ptr<ast::INode>>&& tokens);
+  explicit Parser(std::deque<std::shared_ptr<ast::INode>>&& tokens);
 
-  std::shared_ptr<ast::INode> Analyze();
+  std::shared_ptr<ast::INode> Parse();
 
 private:
   std::deque<std::shared_ptr<ast::INode>> tokens_;

@@ -8,7 +8,7 @@ template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
-StmtType SyntaxAnalyzer::GetDMLStType() {
+StmtType Parser::GetDMLStType() {
   StmtType DMLStType = StmtType::kNone; // invalid value
 
   // Get first token
@@ -36,7 +36,7 @@ StmtType SyntaxAnalyzer::GetDMLStType() {
 
   return DMLStType;
 }
-NodePtr<INode> SyntaxAnalyzer::GetDMLSt() {
+NodePtr<INode> Parser::GetDMLSt() {
   LOGD << "getting DML statement...";
   NodePtr<INode> node = CreateServiceNode(StmtType::kDmlStmt);
 
@@ -66,33 +66,33 @@ NodePtr<INode> SyntaxAnalyzer::GetDMLSt() {
 
 // DML Statements
 
-NodePtr<INode> SyntaxAnalyzer::GetInsertSt() {
+NodePtr<INode> Parser::GetInsertSt() {
   return CreateServiceNode(StmtType::kInsertStmt);
 }
-NodePtr<INode> SyntaxAnalyzer::GetDeleteSt() {
+NodePtr<INode> Parser::GetDeleteSt() {
   return CreateServiceNode(StmtType::kDeleteStmt);
 }
-NodePtr<INode> SyntaxAnalyzer::GetUpdateSt() {
+NodePtr<INode> Parser::GetUpdateSt() {
   return CreateServiceNode(StmtType::kUpdateStmt);
 }
 
 // DML Basic statements
 
-NodePtr<INode> SyntaxAnalyzer::GetCondition() {
+NodePtr<INode> Parser::GetCondition() {
   NodePtr<INode> node = CreateServiceNode(StmtType::kCondition);
   NodePtr<INode> OR_condition = GetORCondition();
   INode::Link(node, OR_condition);
   
   return node;
 }
-NodePtr<INode> SyntaxAnalyzer::GetORCondition() {
+NodePtr<INode> Parser::GetORCondition() {
   NodePtr<INode> node = CreateServiceNode(StmtType::kORCondition);
   NodePtr<INode> AND_condition = GetANDCondition();
   INode::Link(node, AND_condition);
 
   int line = peek_first_token()->line;
   if (!tokens_.empty()
-      && SyntaxAnalyzer::IsWord(peek_first_token())) {
+      && Parser::IsWord(peek_first_token())) {
     NodePtr<StringNode> tmp = CastToNodeType<StringNode>(peek_first_token());
     if (tmp->data == "OR") {
       pop_first_token();
@@ -109,14 +109,14 @@ NodePtr<INode> SyntaxAnalyzer::GetORCondition() {
 
   return node;
 }
-NodePtr<INode> SyntaxAnalyzer::GetANDCondition() {
+NodePtr<INode> Parser::GetANDCondition() {
   NodePtr<INode> node = CreateServiceNode(StmtType::kANDCondition);
   NodePtr<INode> NOT_condition = GetNOTCondition();
   INode::Link(node, NOT_condition);
 
   int line = peek_first_token()->line;
   if (!tokens_.empty()) {
-    if (SyntaxAnalyzer::IsWord(peek_first_token())) {
+    if (Parser::IsWord(peek_first_token())) {
       NodePtr<StringNode> tmp = CastToNodeType<StringNode>(peek_first_token());
       if (tmp->data == "AND") {
         pop_first_token();
@@ -134,12 +134,12 @@ NodePtr<INode> SyntaxAnalyzer::GetANDCondition() {
 
   return node;
 }
-NodePtr<INode> SyntaxAnalyzer::GetNOTCondition() {
+NodePtr<INode> Parser::GetNOTCondition() {
   NodePtr<INode> node = CreateServiceNode(StmtType::kNOTCondition);
 
   // Get NOT if present
   int line = peek_first_token()->line;
-  if (SyntaxAnalyzer::IsWord(peek_first_token())) {
+  if (Parser::IsWord(peek_first_token())) {
     NodePtr<StringNode> tmp = CastToNodeType<StringNode>(peek_first_token());
     if (tmp->data == "NOT") {
       NodePtr<INode> NOT_operator = get_first_token();
@@ -159,7 +159,7 @@ NodePtr<INode> SyntaxAnalyzer::GetNOTCondition() {
 
   return node;
 }
-NodePtr<INode> SyntaxAnalyzer::GetPredicate() {
+NodePtr<INode> Parser::GetPredicate() {
   NodePtr<INode> node = CreateServiceNode(StmtType::kPredicate);
   NodePtr<INode> lhs = GetExpression();
   INode::Link(node, lhs);
@@ -170,7 +170,7 @@ NodePtr<INode> SyntaxAnalyzer::GetPredicate() {
                "binary operator in line " << line;
     end(EXIT_FAILURE);
   }
-  if (SyntaxAnalyzer::IsBinaryOperator(peek_first_token())) {
+  if (Parser::IsBinaryOperator(peek_first_token())) {
     line = peek_first_token()->line;
     NodePtr<INode> bin_operator = get_first_token();
 
@@ -191,18 +191,18 @@ NodePtr<INode> SyntaxAnalyzer::GetPredicate() {
 
   return node;
 }
-NodePtr<INode> SyntaxAnalyzer::GetExpression() {
+NodePtr<INode> Parser::GetExpression() {
   NodePtr<INode> node = CreateServiceNode(StmtType::kExpression);
 
   int line = peek_first_token()->line;
 
   // Is it [table_name.] column ?
-  if (SyntaxAnalyzer::IsWord(peek_first_token())) {
+  if (Parser::IsWord(peek_first_token())) {
     NodePtr<INode> name = GetIdentifier();
     INode::Link(node, name);
 
     if (!tokens_.empty()) {
-      if (SyntaxAnalyzer::IsDot(peek_first_token())) {
+      if (Parser::IsDot(peek_first_token())) {
         NodePtr<INode> dot = GetIdentifiers();
 
         INode::Link(node, dot);
@@ -213,7 +213,7 @@ NodePtr<INode> SyntaxAnalyzer::GetExpression() {
   }
 
   // Is it unary operator ?
-  if (SyntaxAnalyzer::IsUnaryOperator(peek_first_token())) {
+  if (Parser::IsUnaryOperator(peek_first_token())) {
     NodePtr<INode> u_operator, expression;
     u_operator = get_first_token();
 
@@ -232,7 +232,7 @@ NodePtr<INode> SyntaxAnalyzer::GetExpression() {
   }
 
   // Is it (expression) ?
-  if (SyntaxAnalyzer::IsOpeningRoundBracket(peek_first_token())) {
+  if (Parser::IsOpeningRoundBracket(peek_first_token())) {
     pop_first_token();
     if (tokens_.empty()) {
       LOGE << "invalid expression in line "
@@ -253,8 +253,8 @@ NodePtr<INode> SyntaxAnalyzer::GetExpression() {
   }
 
   // Is it string ?
-  if (SyntaxAnalyzer::IsSingleQuote(peek_first_token())
-      || SyntaxAnalyzer::IsDoubleQuote(peek_first_token())) {
+  if (Parser::IsSingleQuote(peek_first_token())
+      || Parser::IsDoubleQuote(peek_first_token())) {
     pop_first_token();
     if (tokens_.empty()) {
       LOGE << "invalid expression in line "
@@ -272,7 +272,7 @@ NodePtr<INode> SyntaxAnalyzer::GetExpression() {
   return node;
 }
 
-NodePtr<INode> SyntaxAnalyzer::GetMathExpression() {
+NodePtr<INode> Parser::GetMathExpression() {
   NodePtr<INode> node;
 
   // TODO: implement this PEG
@@ -286,14 +286,14 @@ NodePtr<INode> SyntaxAnalyzer::GetMathExpression() {
 
   return node;
 }
-NodePtr<INode> SyntaxAnalyzer::GetMathSum() {
+NodePtr<INode> Parser::GetMathSum() {
   NodePtr<INode> product_1, op_node, product_2;
 
   int line = peek_first_token()->line;
   product_1 = GetMathProduct();
 
   if (!tokens_.empty()) {
-    while (SyntaxAnalyzer::IsOperator(peek_first_token())) {
+    while (Parser::IsOperator(peek_first_token())) {
       // Get ("+" | "-")
       op_node = get_first_token();
       std::string operator_str = CastToNodeType<StringNode>(op_node)->data;
@@ -323,14 +323,14 @@ NodePtr<INode> SyntaxAnalyzer::GetMathSum() {
 
   return product_1;
 }
-NodePtr<INode> SyntaxAnalyzer::GetMathProduct() {
+NodePtr<INode> Parser::GetMathProduct() {
   NodePtr<INode> power_1, op_node, power_2;
 
   int line = peek_first_token()->line;
   power_1 = GetMathPower();
 
   if (!tokens_.empty()) {
-    while (SyntaxAnalyzer::IsOperator(peek_first_token())) {
+    while (Parser::IsOperator(peek_first_token())) {
       // Get ("*" | "/")
       op_node = get_first_token();
       std::string operator_str = CastToNodeType<StringNode>(op_node)->data;
@@ -360,14 +360,14 @@ NodePtr<INode> SyntaxAnalyzer::GetMathProduct() {
 
   return power_1;
 }
-NodePtr<INode> SyntaxAnalyzer::GetMathPower() {
+NodePtr<INode> Parser::GetMathPower() {
   NodePtr<INode> power, degree_op, degree;
 
   int line = peek_first_token()->line;
   power = GetMathValue();
 
   if (!tokens_.empty()) {
-    if (SyntaxAnalyzer::IsOperator(peek_first_token())) {
+    if (Parser::IsOperator(peek_first_token())) {
       NodePtr<StringNode> op_node = CastToNodeType<StringNode>(peek_first_token());
       if (op_node->data == "^") {
         degree_op = get_first_token();
@@ -388,13 +388,13 @@ NodePtr<INode> SyntaxAnalyzer::GetMathPower() {
 
   return power;
 }
-NodePtr<INode> SyntaxAnalyzer::GetMathValue() {
+NodePtr<INode> Parser::GetMathValue() {
   NodePtr<INode> value;
 
   int line = peek_first_token()->line;
-  if (SyntaxAnalyzer::IsNumber(peek_first_token())) {
+  if (Parser::IsNumber(peek_first_token())) {
     value = get_first_token();
-  } else if (SyntaxAnalyzer::IsOpeningRoundBracket(peek_first_token())) {
+  } else if (Parser::IsOpeningRoundBracket(peek_first_token())) {
     pop_first_token();
 
     if (tokens_.empty()) {
@@ -405,7 +405,7 @@ NodePtr<INode> SyntaxAnalyzer::GetMathValue() {
     line = peek_first_token()->line;
     value = GetMathExpression();
 
-    if (SyntaxAnalyzer::IsClosingRoundBracket(peek_first_token())) {
+    if (Parser::IsClosingRoundBracket(peek_first_token())) {
       pop_first_token();
     } else {
       LOGE << "invalid Math expression: "

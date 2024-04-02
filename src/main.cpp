@@ -13,8 +13,8 @@ int main(int argc, char* argv[]) {
     scc::lexer::Lexer lexer(config->get_sql_file());
     std::deque<std::shared_ptr<scc::ast::INode>> tokens = lexer.Analyze();
 
-    scc::parser::SyntaxAnalyzer syntax_analyzer(std::move(tokens));
-    std::shared_ptr<scc::ast::INode> AST = syntax_analyzer.Analyze();
+    scc::parser::Parser syntax_analyzer(std::move(tokens));
+    std::shared_ptr<scc::ast::INode> AST = syntax_analyzer.Parse();
 
     if (scc_args.IsUsed("--dump")) {
       scc::dump::TreeDump dump(config->get_ast_dump_file());
