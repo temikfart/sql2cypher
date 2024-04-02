@@ -13,7 +13,7 @@
 #include "SCC/ast/nodes/service_node.h"
 #include "SCC/ast/nodes/string_node.h"
 #include "SCC/config/scc_config.h"
-#include "SCC/log.h"
+#include "SCC/log/log.h"
 
 #include "logger/log.hpp"
 

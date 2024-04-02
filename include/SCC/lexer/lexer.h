@@ -14,7 +14,7 @@
 #include "SCC/config/scc_config.h"
 #include "SCC/lexer/symbol_classifier.h"
 #include "SCC/lexer/symbol_types.h"
-#include "SCC/log.h"
+#include "SCC/log/log.h"
 
 #include "logger/log.hpp"
 

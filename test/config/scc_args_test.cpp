@@ -6,7 +6,7 @@
 #include "SCC/common/file_utils.h"
 #include "SCC/config/scc_args.h"
 #include "SCC/fixtures/config/scc_args_fixtures.h"
-#include "SCC/log.h"
+#include "SCC/log/log.h"
 
 using namespace scc::config;
 using namespace testing;

@@ -1,4 +1,4 @@
-#include "SCC/tree_dump.h"
+#include "SCC/dump/tree_dump.h"
 
 namespace scc::dump {
 
