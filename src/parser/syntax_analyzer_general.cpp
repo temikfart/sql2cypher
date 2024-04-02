@@ -26,12 +26,12 @@ NodePtr<INode> SyntaxAnalyzer::Analyze() {
   NodePtr<INode> query, separator;
 
   query = GetDL();
-  SyntaxAnalyzer::MakeKinship(root, query);
+  INode::Link(root, query);
 
   if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsSemicolon(peek_first_token())) {
       separator = General();
-      SyntaxAnalyzer::MakeKinship(root, separator);
+      INode::Link(root, separator);
     }
   }
 
@@ -54,13 +54,13 @@ NodePtr<INode> SyntaxAnalyzer::General() {
 
   if (!tokens_.empty()) {
     query = GetDL();
-    SyntaxAnalyzer::MakeKinship(separator, query);
+    INode::Link(separator, query);
   }
 
   if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsSemicolon(peek_first_token())) {
       next_queries = General();
-      SyntaxAnalyzer::MakeKinship(separator, next_queries);
+      INode::Link(separator, next_queries);
     }
   }
 
@@ -118,7 +118,7 @@ NodePtr<INode> SyntaxAnalyzer::GetDL() {
           << peek_first_token()->line;
       end(EXIT_FAILURE);
   }
-  SyntaxAnalyzer::MakeKinship(query, statement);
+  INode::Link(query, statement);
 
   return query;
 }
@@ -163,13 +163,13 @@ NodePtr<INode> SyntaxAnalyzer::GetPrimaryKey() {
     end(EXIT_FAILURE);
   }
   column_name = GetIdentifier();
-  SyntaxAnalyzer::MakeKinship(primary_key, column_name);
+  INode::Link(primary_key, column_name);
 
   // Get listOf(column_names)
   if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsComma(peek_first_token())) {
       separator = GetListOf(StmtType::kIdentifier);
-      SyntaxAnalyzer::MakeKinship(primary_key, separator);
+      INode::Link(primary_key, separator);
     }
   }
 
@@ -199,13 +199,13 @@ NodePtr<INode> SyntaxAnalyzer::GetForeignKey() {
     end(EXIT_FAILURE);
   }
   column_name = GetIdentifier();
-  SyntaxAnalyzer::MakeKinship(foreign_key, column_name);
+  INode::Link(foreign_key, column_name);
 
   // Get listOf(column_names)
   if (!tokens_.empty()
       && SyntaxAnalyzer::IsComma(peek_first_token())) {
     separator = GetListOf(StmtType::kIdentifier);
-    SyntaxAnalyzer::MakeKinship(foreign_key, separator);
+    INode::Link(foreign_key, separator);
   }
 
   if (tokens_.empty()) {
@@ -222,7 +222,7 @@ NodePtr<INode> SyntaxAnalyzer::GetForeignKey() {
   }
   ValidateIsWord(peek_first_token());
   reference = GetReference();
-  SyntaxAnalyzer::MakeKinship(foreign_key, reference);
+  INode::Link(foreign_key, reference);
 
   return foreign_key;
 }
@@ -249,7 +249,7 @@ NodePtr<INode> SyntaxAnalyzer::GetReference() {
     end(EXIT_FAILURE);
   }
   ref_table_name = GetName();
-  SyntaxAnalyzer::MakeKinship(reference, ref_table_name);
+  INode::Link(reference, ref_table_name);
 
   // Get columns if present
   if (!tokens_.empty()
@@ -265,7 +265,7 @@ NodePtr<INode> SyntaxAnalyzer::GetReference() {
       end(EXIT_FAILURE);
     }
     ref_column_name = GetIdentifier();
-    SyntaxAnalyzer::MakeKinship(reference, ref_column_name);
+    INode::Link(reference, ref_column_name);
 
     if (tokens_.empty()) {
       LOGE << "invalid reference in line "
@@ -275,7 +275,7 @@ NodePtr<INode> SyntaxAnalyzer::GetReference() {
     if (SyntaxAnalyzer::IsComma(peek_first_token())) {
       next_ref_column_names =
           GetListOf(StmtType::kIdentifier);
-      SyntaxAnalyzer::MakeKinship(reference, next_ref_column_names);
+      INode::Link(reference, next_ref_column_names);
     }
 
     if (tokens_.empty()) {
@@ -363,12 +363,12 @@ NodePtr<INode> SyntaxAnalyzer::GetName() {
   name->stmt_type = StmtType::kName;
 
   identifier = GetIdentifier();
-  SyntaxAnalyzer::MakeKinship(name, identifier);
+  INode::Link(name, identifier);
 
   if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsDot(peek_first_token())) {
       next_identifiers = GetIdentifiers();
-      SyntaxAnalyzer::MakeKinship(name, next_identifiers);
+      INode::Link(name, next_identifiers);
     }
   }
 
@@ -386,12 +386,12 @@ NodePtr<INode> SyntaxAnalyzer::GetIdentifiers() {
     end(EXIT_FAILURE);
   }
   identifier = GetIdentifier();
-  SyntaxAnalyzer::MakeKinship(dot, identifier);
+  INode::Link(dot, identifier);
 
   if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsDot(peek_first_token())) {
       next_identifiers = GetIdentifiers();
-      SyntaxAnalyzer::MakeKinship(dot, next_identifiers);
+      INode::Link(dot, next_identifiers);
     }
   }
 
@@ -406,7 +406,7 @@ NodePtr<INode> SyntaxAnalyzer::GetIdentifier() {
   identifier->stmt_type = StmtType::kIdentifier;
 
   NodePtr<INode> argument = get_first_token();
-  SyntaxAnalyzer::MakeKinship(identifier, argument);
+  INode::Link(identifier, argument);
 
   return identifier;
 }
@@ -451,12 +451,12 @@ NodePtr<INode> SyntaxAnalyzer::GetListOf(
           << peek_first_token()->line;
       end(EXIT_FAILURE);
   }
-  SyntaxAnalyzer::MakeKinship(separator, argument);
+  INode::Link(separator, argument);
 
   if (!tokens_.empty()
       && SyntaxAnalyzer::IsComma(peek_first_token())) {
     next_separator = GetListOf(get_function_type);
-    SyntaxAnalyzer::MakeKinship(separator, next_separator);
+    INode::Link(separator, next_separator);
   }
 
   return separator;

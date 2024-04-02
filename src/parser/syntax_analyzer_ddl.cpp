@@ -101,7 +101,7 @@ NodePtr<INode> SyntaxAnalyzer::GetDDLSt() {
       LOGE << "unknown DDL statement near line " << line;
       end(EXIT_FAILURE);
   }
-  SyntaxAnalyzer::MakeKinship(node, statement);
+  INode::Link(node, statement);
 
   return node;
 }
@@ -118,7 +118,7 @@ NodePtr<INode> SyntaxAnalyzer::GetCreateDatabaseSt() {
   }
   ValidateIsWord(peek_first_token());
   database_name = GetName();
-  SyntaxAnalyzer::MakeKinship(node, database_name);
+  INode::Link(node, database_name);
 
   return node;
 }
@@ -135,7 +135,7 @@ NodePtr<INode> SyntaxAnalyzer::GetCreateTableSt() {
   int line = peek_first_token()->line;
   ValidateIsWord(peek_first_token());
   table_name = GetName();
-  SyntaxAnalyzer::MakeKinship(node, table_name);
+  INode::Link(node, table_name);
 
   if (tokens_.empty()) {
     LOGE << "expected opening round bracket in line " << line;
@@ -152,7 +152,7 @@ NodePtr<INode> SyntaxAnalyzer::GetCreateTableSt() {
   line = peek_first_token()->line;
   ValidateIsWord(peek_first_token());
   table_definition = GetTableDefinition();
-  SyntaxAnalyzer::MakeKinship(node, table_definition);
+  INode::Link(node, table_definition);
 
   if (tokens_.empty()) {
     LOGE << "expected closing round bracket in line " << line;
@@ -170,7 +170,7 @@ NodePtr<INode> SyntaxAnalyzer::GetAlterTableSt() {
   int line = peek_first_token()->line;
   ValidateIsWord(peek_first_token());
   table_name = GetName();
-  SyntaxAnalyzer::MakeKinship(node, table_name);
+  INode::Link(node, table_name);
 
   // Get action (ADD | DROP)
   if (tokens_.empty()) {
@@ -205,8 +205,8 @@ NodePtr<INode> SyntaxAnalyzer::GetAlterTableSt() {
         << action_str << "\' in line " << line;
     end(EXIT_FAILURE);
   }
-  SyntaxAnalyzer::MakeKinship(node, action);
-  SyntaxAnalyzer::MakeKinship(action, argument);
+  INode::Link(node, action);
+  INode::Link(action, argument);
 
   return node;
 }
@@ -221,12 +221,12 @@ NodePtr<INode> SyntaxAnalyzer::GetDropDatabaseSt() {
   }
   ValidateIsWord(peek_first_token());
   database_name = GetName();
-  SyntaxAnalyzer::MakeKinship(node, database_name);
+  INode::Link(node, database_name);
 
   if (!tokens_.empty()
       && SyntaxAnalyzer::IsComma(peek_first_token())) {
     separator = GetListOf(StmtType::kName);
-    SyntaxAnalyzer::MakeKinship(node, separator);
+    INode::Link(node, separator);
   }
 
   return node;
@@ -242,12 +242,12 @@ NodePtr<INode> SyntaxAnalyzer::GetDropTableSt() {
   }
   ValidateIsWord(peek_first_token());
   table_name = GetName();
-  SyntaxAnalyzer::MakeKinship(node, table_name);
+  INode::Link(node, table_name);
 
   if (!tokens_.empty()
       && SyntaxAnalyzer::IsComma(peek_first_token())) {
     separator = GetListOf(StmtType::kName);
-    SyntaxAnalyzer::MakeKinship(node, separator);
+    INode::Link(node, separator);
   }
 
   return node;
@@ -261,12 +261,12 @@ NodePtr<INode> SyntaxAnalyzer::GetTableDefinition() {
   node->stmt_type = StmtType::kTableDef;
 
   argument = GetTableDefinitionObject();
-  SyntaxAnalyzer::MakeKinship(node, argument);
+  INode::Link(node, argument);
 
   if (!tokens_.empty()
       && SyntaxAnalyzer::IsComma(peek_first_token())) {
     separator = GetListOf(StmtType::kTableDef);
-    SyntaxAnalyzer::MakeKinship(node, separator);
+    INode::Link(node, separator);
   }
 
   return node;
@@ -300,7 +300,7 @@ NodePtr<INode> SyntaxAnalyzer::GetColumnDefinition() {
   // Get columnName
   int line = peek_first_token()->line;
   column_name = GetIdentifier();
-  SyntaxAnalyzer::MakeKinship(column_def, column_name);
+  INode::Link(column_def, column_name);
 
   // Get datatype
   if (tokens_.empty()) {
@@ -309,7 +309,7 @@ NodePtr<INode> SyntaxAnalyzer::GetColumnDefinition() {
   }
   ValidateIsWord(peek_first_token());
   datatype = GetDataType();
-  SyntaxAnalyzer::MakeKinship(column_def, datatype);
+  INode::Link(column_def, datatype);
 
   // Get other options
   if (!tokens_.empty()) {
@@ -335,14 +335,14 @@ NodePtr<INode> SyntaxAnalyzer::GetTableConstraint() {
         std::dynamic_pointer_cast<ServiceNode>(
             std::make_shared<ServiceNode>());
     constraint_kw->stmt_type = StmtType::kConstraintKW;
-    SyntaxAnalyzer::MakeKinship(table_constraint, constraint_kw);
+    INode::Link(table_constraint, constraint_kw);
 
     if (tokens_.empty()) {
       LOGE << "expected constraint name in line " << line;
       end(EXIT_FAILURE);
     }
     constraint_name = GetIdentifier();
-    SyntaxAnalyzer::MakeKinship(constraint_kw, constraint_name);
+    INode::Link(constraint_kw, constraint_name);
   }
 
   // Get PRIMARY | FOREIGN KEY
@@ -390,7 +390,7 @@ NodePtr<INode> SyntaxAnalyzer::GetTableConstraint() {
         << line << ": " << kind_of_key;
     end(EXIT_FAILURE);
   }
-  SyntaxAnalyzer::MakeKinship(table_constraint, key);
+  INode::Link(table_constraint, key);
 
   return table_constraint;
 }
@@ -401,12 +401,12 @@ NodePtr<INode> SyntaxAnalyzer::GetDropListDefinition() {
   node->stmt_type = StmtType::kDropList;
 
   objects = GetDropObject();
-  SyntaxAnalyzer::MakeKinship(node, objects);
+  INode::Link(node, objects);
 
   if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsComma(peek_first_token())) {
       separator = GetDropList();
-      SyntaxAnalyzer::MakeKinship(node, separator);
+      INode::Link(node, separator);
     }
   }
 
@@ -421,13 +421,13 @@ NodePtr<INode> SyntaxAnalyzer::GetDropList() {
 
   ValidateIsWord(peek_first_token());
   objects = GetDropObject();
-  SyntaxAnalyzer::MakeKinship(separator, objects);
+  INode::Link(separator, objects);
 
   if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsComma(peek_first_token())) {
       next_objects = GetDropList();
 
-      SyntaxAnalyzer::MakeKinship(separator, next_objects);
+      INode::Link(separator, next_objects);
     }
   }
 
@@ -470,7 +470,7 @@ NodePtr<INode> SyntaxAnalyzer::GetDropObject() {
     end(EXIT_FAILURE);
   }
   argument = GetIdentifier();
-  SyntaxAnalyzer::MakeKinship(object, argument);
+  INode::Link(object, argument);
 
   if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsComma(peek_first_token())) {
@@ -488,7 +488,7 @@ NodePtr<INode> SyntaxAnalyzer::GetDropObject() {
       // Get listOf identifiers if present
       if (is_list) {
         next_arguments = GetListOf(StmtType::kIdentifier);
-        SyntaxAnalyzer::MakeKinship(object, next_arguments);
+        INode::Link(object, next_arguments);
       }
     }
   }

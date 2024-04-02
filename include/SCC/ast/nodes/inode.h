@@ -29,6 +29,7 @@ public:
   std::size_t get_children_amount() const;
 
   void AddChild(std::shared_ptr<INode> const& node);
+  static void Link(std::shared_ptr<INode>& parent, std::shared_ptr<INode>& child);
   static bool IsNodesEqual(const std::shared_ptr<INode>& node1,
                            const std::shared_ptr<INode>& node2);
 

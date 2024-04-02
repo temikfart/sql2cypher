@@ -62,7 +62,7 @@ NodePtr<INode> SyntaxAnalyzer::GetDMLSt() {
       LOGE << "unknown DML statement near line " << line;
       end(EXIT_FAILURE);
   }
-  SyntaxAnalyzer::MakeKinship(node, statement);
+  INode::Link(node, statement);
 
   return node;
 }
@@ -100,7 +100,7 @@ NodePtr<INode> SyntaxAnalyzer::GetCondition() {
 
   OR_condition = GetORCondition();
 
-  SyntaxAnalyzer::MakeKinship(node, OR_condition);
+  INode::Link(node, OR_condition);
 
   return node;
 }
@@ -111,7 +111,7 @@ NodePtr<INode> SyntaxAnalyzer::GetORCondition() {
 
   AND_condition = GetANDCondition();
 
-  SyntaxAnalyzer::MakeKinship(node, AND_condition);
+  INode::Link(node, AND_condition);
 
   int line = peek_first_token()->line;
   if (!tokens_.empty()
@@ -127,7 +127,7 @@ NodePtr<INode> SyntaxAnalyzer::GetORCondition() {
         end(EXIT_FAILURE);
       }
       next_AND_conditions = GetANDCondition();
-      SyntaxAnalyzer::MakeKinship(node, next_AND_conditions);
+      INode::Link(node, next_AND_conditions);
     }
   }
 
@@ -140,7 +140,7 @@ NodePtr<INode> SyntaxAnalyzer::GetANDCondition() {
 
   NOT_condition = GetNOTCondition();
 
-  SyntaxAnalyzer::MakeKinship(node, NOT_condition);
+  INode::Link(node, NOT_condition);
 
   int line = peek_first_token()->line;
   if (!tokens_.empty()) {
@@ -156,7 +156,7 @@ NodePtr<INode> SyntaxAnalyzer::GetANDCondition() {
           end(EXIT_FAILURE);
         }
         next_NOT_conditions = GetNOTCondition();
-        SyntaxAnalyzer::MakeKinship(node, next_NOT_conditions);
+        INode::Link(node, next_NOT_conditions);
       }
     }
   }
@@ -176,7 +176,7 @@ NodePtr<INode> SyntaxAnalyzer::GetNOTCondition() {
     if (tmp->data == "NOT") {
       NOT_operator = get_first_token();
 
-      SyntaxAnalyzer::MakeKinship(node, NOT_operator);
+      INode::Link(node, NOT_operator);
     }
   }
 
@@ -187,7 +187,7 @@ NodePtr<INode> SyntaxAnalyzer::GetNOTCondition() {
     end(EXIT_FAILURE);
   }
   predicate = GetPredicate();
-  SyntaxAnalyzer::MakeKinship(node, predicate);
+  INode::Link(node, predicate);
 
   return node;
 }
@@ -198,7 +198,7 @@ NodePtr<INode> SyntaxAnalyzer::GetPredicate() {
 
   int line = peek_first_token()->line;
   lhs = GetExpression();
-  SyntaxAnalyzer::MakeKinship(node, lhs);
+  INode::Link(node, lhs);
 
   if (tokens_.empty()) {
     LOGE << "invalid predicate: expected "
@@ -209,7 +209,7 @@ NodePtr<INode> SyntaxAnalyzer::GetPredicate() {
     line = peek_first_token()->line;
     bin_operator = get_first_token();
 
-    SyntaxAnalyzer::MakeKinship(node, bin_operator);
+    INode::Link(node, bin_operator);
   } else {
     LOGE << "invalid predicate in line "
         << line << ": operator should be binary";
@@ -222,7 +222,7 @@ NodePtr<INode> SyntaxAnalyzer::GetPredicate() {
     end(EXIT_FAILURE);
   }
   rhs = GetExpression();
-  SyntaxAnalyzer::MakeKinship(node, rhs);
+  INode::Link(node, rhs);
 
   return node;
 }
@@ -239,13 +239,13 @@ NodePtr<INode> SyntaxAnalyzer::GetExpression() {
 
     name = GetIdentifier();
 
-    SyntaxAnalyzer::MakeKinship(node, name);
+    INode::Link(node, name);
 
     if (!tokens_.empty()) {
       if (SyntaxAnalyzer::IsDot(peek_first_token())) {
         dot = GetIdentifiers();
 
-        SyntaxAnalyzer::MakeKinship(node, dot);
+        INode::Link(node, dot);
       }
     }
 
@@ -257,7 +257,7 @@ NodePtr<INode> SyntaxAnalyzer::GetExpression() {
     NodePtr<INode> u_operator, expression;
     u_operator = get_first_token();
 
-    SyntaxAnalyzer::MakeKinship(node, u_operator);
+    INode::Link(node, u_operator);
 
     if (tokens_.empty()) {
       LOGE <<
@@ -266,7 +266,7 @@ NodePtr<INode> SyntaxAnalyzer::GetExpression() {
       end(EXIT_FAILURE);
     }
     expression = GetExpression();
-    SyntaxAnalyzer::MakeKinship(node, expression);
+    INode::Link(node, expression);
 
     return node;
   }
@@ -302,12 +302,12 @@ NodePtr<INode> SyntaxAnalyzer::GetExpression() {
       end(EXIT_FAILURE);
     }
     NodePtr<INode> str = GetString();
-    SyntaxAnalyzer::MakeKinship(node, str);
+    INode::Link(node, str);
   }
 
   // So, it is Math expression
   NodePtr<INode> expression = GetMathExpression();
-  SyntaxAnalyzer::MakeKinship(node, expression);
+  INode::Link(node, expression);
 
   return node;
 }
@@ -352,8 +352,8 @@ NodePtr<INode> SyntaxAnalyzer::GetMathSum() {
       }
       product_2 = GetMathProduct();
 
-      SyntaxAnalyzer::MakeKinship(op_node, product_1);
-      SyntaxAnalyzer::MakeKinship(op_node, product_2);
+      INode::Link(op_node, product_1);
+      INode::Link(op_node, product_2);
       product_1 = op_node;
 
       if (tokens_.empty()) {
@@ -390,8 +390,8 @@ NodePtr<INode> SyntaxAnalyzer::GetMathProduct() {
       }
       power_2 = GetMathPower();
 
-      SyntaxAnalyzer::MakeKinship(op_node, power_1);
-      SyntaxAnalyzer::MakeKinship(op_node, power_2);
+      INode::Link(op_node, power_1);
+      INode::Link(op_node, power_2);
       power_1 = op_node;
 
       if (tokens_.empty()) {
@@ -421,8 +421,8 @@ NodePtr<INode> SyntaxAnalyzer::GetMathPower() {
           end(EXIT_FAILURE);
         }
         degree = GetMathPower();
-        SyntaxAnalyzer::MakeKinship(degree_op, power);
-        SyntaxAnalyzer::MakeKinship(degree_op, degree);
+        INode::Link(degree_op, power);
+        INode::Link(degree_op, degree);
 
         return degree_op;
       }

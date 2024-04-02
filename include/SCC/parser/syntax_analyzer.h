@@ -137,10 +137,6 @@ private:
   static bool IsBinaryOperator(std::shared_ptr<ast::INode>& node);
   static bool IsSemicolon(std::shared_ptr<ast::INode>& node);
 
-  // Creates kinship between two nodes
-  static void MakeKinship(std::shared_ptr<ast::INode>& parent,
-                          std::shared_ptr<ast::INode>& child);
-
   // Work with deque of tokens
 
   std::shared_ptr<ast::INode>& peek_first_token() const;
