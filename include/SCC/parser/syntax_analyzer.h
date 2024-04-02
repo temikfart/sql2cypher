@@ -119,23 +119,23 @@ private:
 
   // Defining Node Datatype
 
-  static bool IsBracket(std::shared_ptr<ast::INode>& node);
-  static bool IsPunctuation(std::shared_ptr<ast::INode>& node);
-  static bool IsWord(std::shared_ptr<ast::INode>& node);
-  static bool IsNumber(std::shared_ptr<ast::INode>& node);
-  static bool IsOperator(std::shared_ptr<ast::INode>& node);
+  bool IsBracket(std::shared_ptr<ast::INode>& node) const;
+  bool IsPunctuation(std::shared_ptr<ast::INode>& node) const;
+  bool IsWord(std::shared_ptr<ast::INode>& node) const;
+  bool IsNumber(std::shared_ptr<ast::INode>& node) const;
+  bool IsOperator(std::shared_ptr<ast::INode>& node) const;
 
   // Defining Node data
 
-  static bool IsDot(std::shared_ptr<ast::INode>& node);
-  static bool IsComma(std::shared_ptr<ast::INode>& node);
-  static bool IsOpeningRoundBracket(std::shared_ptr<ast::INode>& node);
-  static bool IsClosingRoundBracket(std::shared_ptr<ast::INode>& node);
-  static bool IsSingleQuote(std::shared_ptr<ast::INode>& node);
-  static bool IsDoubleQuote(std::shared_ptr<ast::INode>& node);
-  static bool IsUnaryOperator(std::shared_ptr<ast::INode>& node);
-  static bool IsBinaryOperator(std::shared_ptr<ast::INode>& node);
-  static bool IsSemicolon(std::shared_ptr<ast::INode>& node);
+  bool IsDot(std::shared_ptr<ast::INode>& node) const;
+  bool IsComma(std::shared_ptr<ast::INode>& node) const;
+  bool IsOpeningRoundBracket(std::shared_ptr<ast::INode>& node) const;
+  bool IsClosingRoundBracket(std::shared_ptr<ast::INode>& node) const;
+  bool IsSingleQuote(std::shared_ptr<ast::INode>& node) const;
+  bool IsDoubleQuote(std::shared_ptr<ast::INode>& node) const;
+  bool IsUnaryOperator(std::shared_ptr<ast::INode>& node) const;
+  bool IsBinaryOperator(std::shared_ptr<ast::INode>& node) const;
+  bool IsSemicolon(std::shared_ptr<ast::INode>& node) const;
 
   // Work with deque of tokens
 
