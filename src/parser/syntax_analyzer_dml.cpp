@@ -13,9 +13,7 @@ StmtType SyntaxAnalyzer::GetDMLStType() {
 
   // Get first token
   int line = peek_first_token()->line;
-  std::string fst_kw =
-      std::dynamic_pointer_cast<StringNode>(
-          peek_first_token())->data;
+  std::string fst_kw = CastToNodeType<StringNode>(peek_first_token())->data;
   pop_first_token();
 
   if (tokens_.empty()) {
@@ -40,11 +38,10 @@ StmtType SyntaxAnalyzer::GetDMLStType() {
 }
 NodePtr<INode> SyntaxAnalyzer::GetDMLSt() {
   LOGD << "getting DML statement...";
-  NodePtr<INode> node, statement;
-  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::kDmlStmt;
+  NodePtr<INode> node = CreateServiceNode(StmtType::kDmlStmt);
 
   int line = peek_first_token()->line;
+  NodePtr<INode> statement;
   switch (GetDMLStType()) {
     case StmtType::kUpdateStmt:
       statement = GetUpdateSt();
@@ -70,54 +67,33 @@ NodePtr<INode> SyntaxAnalyzer::GetDMLSt() {
 // DML Statements
 
 NodePtr<INode> SyntaxAnalyzer::GetInsertSt() {
-  NodePtr<INode> node;
-  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::kInsertStmt;
-
-  return node;
+  return CreateServiceNode(StmtType::kInsertStmt);
 }
 NodePtr<INode> SyntaxAnalyzer::GetDeleteSt() {
-  NodePtr<INode> node;
-  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::kDeleteStmt;
-
-  return node;
+  return CreateServiceNode(StmtType::kDeleteStmt);
 }
 NodePtr<INode> SyntaxAnalyzer::GetUpdateSt() {
-  NodePtr<INode> node;
-  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::kUpdateStmt;
-
-  return node;
+  return CreateServiceNode(StmtType::kUpdateStmt);
 }
 
 // DML Basic statements
 
 NodePtr<INode> SyntaxAnalyzer::GetCondition() {
-  NodePtr<INode> node, OR_condition;
-  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::kCondition;
-
-  OR_condition = GetORCondition();
-
+  NodePtr<INode> node = CreateServiceNode(StmtType::kCondition);
+  NodePtr<INode> OR_condition = GetORCondition();
   INode::Link(node, OR_condition);
-
+  
   return node;
 }
 NodePtr<INode> SyntaxAnalyzer::GetORCondition() {
-  NodePtr<INode> node, AND_condition, next_AND_conditions;
-  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::kORCondition;
-
-  AND_condition = GetANDCondition();
-
+  NodePtr<INode> node = CreateServiceNode(StmtType::kORCondition);
+  NodePtr<INode> AND_condition = GetANDCondition();
   INode::Link(node, AND_condition);
 
   int line = peek_first_token()->line;
   if (!tokens_.empty()
       && SyntaxAnalyzer::IsWord(peek_first_token())) {
-    NodePtr<StringNode> tmp =
-        std::dynamic_pointer_cast<StringNode>(peek_first_token());
+    NodePtr<StringNode> tmp = CastToNodeType<StringNode>(peek_first_token());
     if (tmp->data == "OR") {
       pop_first_token();
 
@@ -126,7 +102,7 @@ NodePtr<INode> SyntaxAnalyzer::GetORCondition() {
                    "after the \'OR\' logical operator in line " << line;
         end(EXIT_FAILURE);
       }
-      next_AND_conditions = GetANDCondition();
+      NodePtr<INode> next_AND_conditions = GetANDCondition();
       INode::Link(node, next_AND_conditions);
     }
   }
@@ -134,19 +110,14 @@ NodePtr<INode> SyntaxAnalyzer::GetORCondition() {
   return node;
 }
 NodePtr<INode> SyntaxAnalyzer::GetANDCondition() {
-  NodePtr<INode> node, NOT_condition, next_NOT_conditions;
-  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::kANDCondition;
-
-  NOT_condition = GetNOTCondition();
-
+  NodePtr<INode> node = CreateServiceNode(StmtType::kANDCondition);
+  NodePtr<INode> NOT_condition = GetNOTCondition();
   INode::Link(node, NOT_condition);
 
   int line = peek_first_token()->line;
   if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsWord(peek_first_token())) {
-      NodePtr<StringNode> tmp =
-          std::dynamic_pointer_cast<StringNode>(peek_first_token());
+      NodePtr<StringNode> tmp = CastToNodeType<StringNode>(peek_first_token());
       if (tmp->data == "AND") {
         pop_first_token();
 
@@ -155,7 +126,7 @@ NodePtr<INode> SyntaxAnalyzer::GetANDCondition() {
                      "after the \\'AND\\' operator in line " << line;
           end(EXIT_FAILURE);
         }
-        next_NOT_conditions = GetNOTCondition();
+        NodePtr<INode> next_NOT_conditions = GetNOTCondition();
         INode::Link(node, next_NOT_conditions);
       }
     }
@@ -164,17 +135,14 @@ NodePtr<INode> SyntaxAnalyzer::GetANDCondition() {
   return node;
 }
 NodePtr<INode> SyntaxAnalyzer::GetNOTCondition() {
-  NodePtr<INode> node, NOT_operator, predicate;
-  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::kNOTCondition;
+  NodePtr<INode> node = CreateServiceNode(StmtType::kNOTCondition);
 
   // Get NOT if present
   int line = peek_first_token()->line;
   if (SyntaxAnalyzer::IsWord(peek_first_token())) {
-    NodePtr<StringNode> tmp =
-        std::dynamic_pointer_cast<StringNode>(peek_first_token());
+    NodePtr<StringNode> tmp = CastToNodeType<StringNode>(peek_first_token());
     if (tmp->data == "NOT") {
-      NOT_operator = get_first_token();
+      NodePtr<INode> NOT_operator = get_first_token();
 
       INode::Link(node, NOT_operator);
     }
@@ -186,20 +154,17 @@ NodePtr<INode> SyntaxAnalyzer::GetNOTCondition() {
         << line;
     end(EXIT_FAILURE);
   }
-  predicate = GetPredicate();
+  NodePtr<INode> predicate = GetPredicate();
   INode::Link(node, predicate);
 
   return node;
 }
 NodePtr<INode> SyntaxAnalyzer::GetPredicate() {
-  NodePtr<INode> node, lhs, rhs, bin_operator;
-  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::kPredicate;
-
-  int line = peek_first_token()->line;
-  lhs = GetExpression();
+  NodePtr<INode> node = CreateServiceNode(StmtType::kPredicate);
+  NodePtr<INode> lhs = GetExpression();
   INode::Link(node, lhs);
 
+  int line = peek_first_token()->line;
   if (tokens_.empty()) {
     LOGE << "invalid predicate: expected "
                "binary operator in line " << line;
@@ -207,7 +172,7 @@ NodePtr<INode> SyntaxAnalyzer::GetPredicate() {
   }
   if (SyntaxAnalyzer::IsBinaryOperator(peek_first_token())) {
     line = peek_first_token()->line;
-    bin_operator = get_first_token();
+    NodePtr<INode> bin_operator = get_first_token();
 
     INode::Link(node, bin_operator);
   } else {
@@ -221,29 +186,24 @@ NodePtr<INode> SyntaxAnalyzer::GetPredicate() {
                "right hand side expression in line " << line;
     end(EXIT_FAILURE);
   }
-  rhs = GetExpression();
+  NodePtr<INode> rhs = GetExpression();
   INode::Link(node, rhs);
 
   return node;
 }
 NodePtr<INode> SyntaxAnalyzer::GetExpression() {
-  NodePtr<INode> node;
-  node = std::dynamic_pointer_cast<INode>(std::make_shared<ServiceNode>());
-  node->stmt_type = StmtType::kExpression;
+  NodePtr<INode> node = CreateServiceNode(StmtType::kExpression);
 
   int line = peek_first_token()->line;
 
   // Is it [table_name.] column ?
   if (SyntaxAnalyzer::IsWord(peek_first_token())) {
-    NodePtr<INode> name, dot;
-
-    name = GetIdentifier();
-
+    NodePtr<INode> name = GetIdentifier();
     INode::Link(node, name);
 
     if (!tokens_.empty()) {
       if (SyntaxAnalyzer::IsDot(peek_first_token())) {
-        dot = GetIdentifiers();
+        NodePtr<INode> dot = GetIdentifiers();
 
         INode::Link(node, dot);
       }
@@ -336,8 +296,7 @@ NodePtr<INode> SyntaxAnalyzer::GetMathSum() {
     while (SyntaxAnalyzer::IsOperator(peek_first_token())) {
       // Get ("+" | "-")
       op_node = get_first_token();
-      std::string operator_str =
-          std::dynamic_pointer_cast<StringNode>(op_node)->data;
+      std::string operator_str = CastToNodeType<StringNode>(op_node)->data;
       if (operator_str != "+" || operator_str != "-") {
         LOGE << "invalid Math expression in line "
             << line << ": wrong operator \'" << operator_str << "\'";
@@ -374,8 +333,7 @@ NodePtr<INode> SyntaxAnalyzer::GetMathProduct() {
     while (SyntaxAnalyzer::IsOperator(peek_first_token())) {
       // Get ("*" | "/")
       op_node = get_first_token();
-      std::string operator_str =
-          std::dynamic_pointer_cast<StringNode>(op_node)->data;
+      std::string operator_str = CastToNodeType<StringNode>(op_node)->data;
       if (operator_str != "*" || operator_str != "/") {
         LOGE << "invalid Math expression in line "
             << line << ": wrong operator \'" << operator_str << "\'";
@@ -410,8 +368,7 @@ NodePtr<INode> SyntaxAnalyzer::GetMathPower() {
 
   if (!tokens_.empty()) {
     if (SyntaxAnalyzer::IsOperator(peek_first_token())) {
-      NodePtr<StringNode> op_node =
-          std::dynamic_pointer_cast<StringNode>(peek_first_token());
+      NodePtr<StringNode> op_node = CastToNodeType<StringNode>(peek_first_token());
       if (op_node->data == "^") {
         degree_op = get_first_token();
 

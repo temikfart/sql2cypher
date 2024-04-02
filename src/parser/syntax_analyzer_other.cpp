@@ -73,49 +73,35 @@ bool SyntaxAnalyzer::IsOperator(NodePtr<INode>& node) const {
 
 // Defining Node data
 
-  NodePtr<INode> dot =
-      std::dynamic_pointer_cast<INode>(
-          std::make_shared<CharNode>('.', DataType::kPunctuation));
 bool SyntaxAnalyzer::IsDot(NodePtr<INode>& node) const {
+  NodePtr<INode> dot = CreateCharNode('.', DataType::kPunctuation);
   return INode::IsNodesEqual(dot, node);
 }
-  NodePtr<INode> comma =
-      std::dynamic_pointer_cast<INode>(
-          std::make_shared<CharNode>(',', DataType::kPunctuation));
 bool SyntaxAnalyzer::IsComma(NodePtr<INode>& node) const {
+  NodePtr<INode> comma = CreateCharNode(',', DataType::kPunctuation);
   return INode::IsNodesEqual(comma, node);
 }
 bool SyntaxAnalyzer::IsOpeningRoundBracket(NodePtr<INode>& node) const {
   // Opening Round Bracket
-  NodePtr<INode> ORB =
-      std::dynamic_pointer_cast<INode>(
-          std::make_shared<CharNode>(
-              '(', DataType::kBracket));
+  NodePtr<INode> ORB = CreateCharNode('(', DataType::kBracket);
   return INode::IsNodesEqual(ORB, node);
 }
 bool SyntaxAnalyzer::IsClosingRoundBracket(NodePtr<INode>& node) const {
   // Closing Round Bracket
-  NodePtr<INode> CRB =
-      std::dynamic_pointer_cast<INode>(
-          std::make_shared<CharNode>(
-              ')', DataType::kBracket));
+  NodePtr<INode> CRB = CreateCharNode(')', DataType::kBracket);
   return INode::IsNodesEqual(CRB, node);
 }
-  NodePtr<INode> single_quote =
-      std::dynamic_pointer_cast<INode>(
-          std::make_shared<StringNode>("\'", DataType::kPunctuation));
 bool SyntaxAnalyzer::IsSingleQuote(NodePtr<INode>& node) const {
+  NodePtr<INode> single_quote = CreateStringNode("\'", DataType::kPunctuation);
   return INode::IsNodesEqual(single_quote, node);
 }
-  NodePtr<INode> double_quote =
-      std::dynamic_pointer_cast<INode>(
-          std::make_shared<StringNode>("\"", DataType::kPunctuation));
 bool SyntaxAnalyzer::IsDoubleQuote(NodePtr<INode>& node) const {
+  NodePtr<INode> double_quote = CreateStringNode("\"", DataType::kPunctuation);
   return INode::IsNodesEqual(double_quote, node);
 }
 bool SyntaxAnalyzer::IsUnaryOperator(NodePtr<INode>& node) const {
   if (node->data_type == DataType::kOperator) {
-    std::string data = std::dynamic_pointer_cast<StringNode>(node)->data;
+    std::string data = CastToNodeType<StringNode>(node)->data;
     if (data == "+" || data == "-") {
       return true;
     }
@@ -124,7 +110,7 @@ bool SyntaxAnalyzer::IsUnaryOperator(NodePtr<INode>& node) const {
 }
 bool SyntaxAnalyzer::IsBinaryOperator(NodePtr<INode>& node) const {
   if (node->data_type == DataType::kOperator) {
-    std::string data = std::dynamic_pointer_cast<StringNode>(node)->data;
+    std::string data = CastToNodeType<StringNode>(node)->data;
     std::vector<std::string> bin_operators = {
         "=", "<>", "!=",
         ">", ">=", "!>",
@@ -138,10 +124,8 @@ bool SyntaxAnalyzer::IsBinaryOperator(NodePtr<INode>& node) const {
   }
   return false;
 }
-  NodePtr<INode> semicolon =
-      std::dynamic_pointer_cast<INode>(
-          std::make_shared<CharNode>(';', DataType::kPunctuation));
 bool SyntaxAnalyzer::IsSemicolon(NodePtr<INode>& node) const {
+  NodePtr<INode> semicolon = CreateCharNode(';', DataType::kPunctuation);
   return INode::IsNodesEqual(semicolon, node);
 }
 
