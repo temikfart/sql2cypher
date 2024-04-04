@@ -50,6 +50,7 @@
 #define ST_CONSTRAINT_KW "constraint kw"
 
 #define ST_INT_TYPE "int"
+#define ST_INTEGER_TYPE "integer"
 #define ST_FLOAT_TYPE "float"
 #define ST_CHAR_TYPE "char"
 #define ST_VARCHAR_TYPE "varchar"

@@ -95,7 +95,7 @@ StmtType::StmtType(const std::string& str_stmt_type) {
     this->value_ = kConstraintKW;
 
   /* SQL Data Types */
-  else if (stmt_type == ST_INT_TYPE)
+  else if (stmt_type == ST_INT_TYPE || stmt_type == ST_INTEGER_TYPE)
     this->value_ = kIntType;
   else if (stmt_type == ST_FLOAT_TYPE)
     this->value_ = kFloatType;
