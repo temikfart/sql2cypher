@@ -11,21 +11,15 @@ using NodePtr = std::shared_ptr<NodeType>;
 NodePtr<INode> Parser::GetDataType() {
   NodePtr<INode> node = get_first_token();
 
-  std::string datatype = CastToNodeType<StringNode>(node)->data;
-  StmtType SQL_datatype = StmtType::kNone;  // invalid value
-  if (datatype == "int" || datatype == "integer") {
-    SQL_datatype = StmtType::kIntType;
-  } else if (datatype == "float") {
-    SQL_datatype = StmtType::kFloatType;
-  } else if (datatype == "char") {
-    SQL_datatype = StmtType::kCharType;
-  } else if (datatype == "varchar") {
-    SQL_datatype = StmtType::kVarcharType;
-  } else {
+  try {
+    std::string datatype = CastToNodeType<StringNode>(node)->data;
+    StmtType SQL_datatype(datatype);
+    node->stmt_type = SQL_datatype;
+  } catch (const std::invalid_argument& ia) {
+    LOGE << ia.what();
     LOGE << "invalid column datatype in line " << node->line;
     end(EXIT_FAILURE);
   }
-  node->stmt_type = SQL_datatype;
 
   return node;
 }
