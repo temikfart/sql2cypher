@@ -14,6 +14,7 @@
 #include "SCC/ast/nodes/string_node.h"
 #include "SCC/config/scc_config.h"
 #include "SCC/log/log.h"
+#include "SCC/parser/common/node_data_classifier.h"
 #include "SCC/parser/common/node_datatype_classifier.h"
 #include "SCC/parser/common/utils.h"
 
@@ -118,18 +119,6 @@ private:
   void ValidateIsClosingRoundBracket(std::shared_ptr<ast::INode>& node) const;
   void ValidateIsSingleQuote(std::shared_ptr<ast::INode>& node) const;
   void ValidateIsDoubleQuote(std::shared_ptr<ast::INode>& node) const;
-
-  // Defining Node data
-
-  bool IsDot(std::shared_ptr<ast::INode>& node) const;
-  bool IsComma(std::shared_ptr<ast::INode>& node) const;
-  bool IsOpeningRoundBracket(std::shared_ptr<ast::INode>& node) const;
-  bool IsClosingRoundBracket(std::shared_ptr<ast::INode>& node) const;
-  bool IsSingleQuote(std::shared_ptr<ast::INode>& node) const;
-  bool IsDoubleQuote(std::shared_ptr<ast::INode>& node) const;
-  bool IsUnaryOperator(std::shared_ptr<ast::INode>& node) const;
-  bool IsBinaryOperator(std::shared_ptr<ast::INode>& node) const;
-  bool IsSemicolon(std::shared_ptr<ast::INode>& node) const;
 
   // Work with deque of tokens
 

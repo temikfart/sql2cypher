@@ -100,7 +100,7 @@ NodePtr<INode> Parser::GetPredicate() {
             "binary operator in line " << line;
     end(EXIT_FAILURE);
   }
-  if (Parser::IsBinaryOperator(peek_first_token())) {
+  if (NodeDataClassifier::IsBinaryOperator(peek_first_token())) {
     line = peek_first_token()->line;
     NodePtr<INode> bin_operator = get_first_token();
 
@@ -131,19 +131,16 @@ NodePtr<INode> Parser::GetExpression() {
     NodePtr<INode> name = GetIdentifier();
     INode::Link(node, name);
 
-    if (!tokens_.empty()) {
-      if (Parser::IsDot(peek_first_token())) {
-        NodePtr<INode> dot = GetIdentifiers();
-
-        INode::Link(node, dot);
-      }
+    if (!tokens_.empty() && NodeDataClassifier::IsDot(peek_first_token())) {
+      NodePtr<INode> dot = GetIdentifiers();
+      INode::Link(node, dot);
     }
 
     return node;
   }
 
   // Is it unary operator ?
-  if (Parser::IsUnaryOperator(peek_first_token())) {
+  if (NodeDataClassifier::IsUnaryOperator(peek_first_token())) {
     NodePtr<INode> u_operator, expression;
     u_operator = get_first_token();
 
@@ -162,7 +159,7 @@ NodePtr<INode> Parser::GetExpression() {
   }
 
   // Is it (expression) ?
-  if (Parser::IsOpeningRoundBracket(peek_first_token())) {
+  if (NodeDataClassifier::IsOpeningRoundBracket(peek_first_token())) {
     pop_first_token();
     if (tokens_.empty()) {
       LOGE << "invalid expression in line "
@@ -183,8 +180,7 @@ NodePtr<INode> Parser::GetExpression() {
   }
 
   // Is it string ?
-  if (Parser::IsSingleQuote(peek_first_token())
-      || Parser::IsDoubleQuote(peek_first_token())) {
+  if (NodeDataClassifier::IsQuote(peek_first_token())) {
     pop_first_token();
     if (tokens_.empty()) {
       LOGE << "invalid expression in line "

@@ -3,6 +3,7 @@
 namespace scc::parser {
 
 using namespace ast;
+using namespace common;
 
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
@@ -21,27 +22,27 @@ void Parser::ValidateIsWord(NodePtr<INode>& node) const {
   }
 }
 void Parser::ValidateIsOpeningRoundBracket(NodePtr<INode>& node) const {
-  if (!IsOpeningRoundBracket(node)) {
+  if (!NodeDataClassifier::IsOpeningRoundBracket(node)) {
     LOGE << "expected an opening round bracket in line "
          << node->line;
     end(EXIT_FAILURE);
   }
 }
 void Parser::ValidateIsClosingRoundBracket(NodePtr<INode>& node) const {
-  if (!IsClosingRoundBracket(node)) {
+  if (!NodeDataClassifier::IsClosingRoundBracket(node)) {
     LOGE << "expected a closing round bracket in line "
          << node->line;
     end(EXIT_FAILURE);
   }
 }
 void Parser::ValidateIsSingleQuote(NodePtr<INode>& node) const {
-  if (!IsSingleQuote(node)) {
+  if (!NodeDataClassifier::IsSingleQuote(node)) {
     LOGE << "expected a single quote in line " << node->line;
     end(EXIT_FAILURE);
   }
 }
 void Parser::ValidateIsDoubleQuote(NodePtr<INode>& node) const {
-  if (!IsSingleQuote(node)) {
+  if (!NodeDataClassifier::IsSingleQuote(node)) {
     LOGE << "expected a double quote in line " << node->line;
     end(EXIT_FAILURE);
   }
