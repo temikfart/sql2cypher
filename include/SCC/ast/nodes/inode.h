@@ -30,8 +30,6 @@ public:
 
   std::size_t ChildrenCount() const;
   void AddChild(std::shared_ptr<INode> const& node);
-  static bool IsNodesEqual(const std::shared_ptr<INode>& node1,
-                           const std::shared_ptr<INode>& node2);
 
   virtual std::ostream& operator<<(std::ostream& os) = 0;
 
