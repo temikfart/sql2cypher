@@ -8,61 +8,57 @@ template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
-bool NodeDataClassifier::IsDot(NodePtr<INode>& node) {
-  NodePtr<INode> dot = ParserUtils::CreateCharNode('.', DataType::kPunctuation);
-  return INode::IsNodesEqual(dot, node);
+bool NodeDataClassifier::IsDot(const NodePtr<INode>& node) {
+  return SameDataType(node, DataType::kPunctuation)
+      && ParserUtils::CastToNodeType<CharNode>(node)->data == '.';
 }
-bool NodeDataClassifier::IsComma(NodePtr<INode>& node) {
-  NodePtr<INode> comma = ParserUtils::CreateCharNode(',', DataType::kPunctuation);
-  return INode::IsNodesEqual(comma, node);
+bool NodeDataClassifier::IsComma(const NodePtr<INode>& node) {
+  return SameDataType(node, DataType::kPunctuation)
+      && ParserUtils::CastToNodeType<CharNode>(node)->data == ',';
 }
-bool NodeDataClassifier::IsOpeningRoundBracket(NodePtr<INode>& node) {
-  NodePtr<INode> ORB = ParserUtils::CreateCharNode('(', DataType::kBracket);
-  return INode::IsNodesEqual(ORB, node);
+bool NodeDataClassifier::IsOpeningRoundBracket(const NodePtr<INode>& node) {
+  return SameDataType(node, DataType::kBracket)
+      && ParserUtils::CastToNodeType<CharNode>(node)->data == '(';
 }
-bool NodeDataClassifier::IsClosingRoundBracket(NodePtr<INode>& node) {
-  NodePtr<INode> CRB = ParserUtils::CreateCharNode(')', DataType::kBracket);
-  return INode::IsNodesEqual(CRB, node);
+bool NodeDataClassifier::IsClosingRoundBracket(const NodePtr<INode>& node) {
+  return SameDataType(node, DataType::kBracket)
+      && ParserUtils::CastToNodeType<CharNode>(node)->data == ')';
 }
-bool NodeDataClassifier::IsSingleQuote(NodePtr<INode>& node) {
-  NodePtr<INode> single_quote = ParserUtils::CreateStringNode("\'", DataType::kPunctuation);
-  return INode::IsNodesEqual(single_quote, node);
+bool NodeDataClassifier::IsSingleQuote(const NodePtr<INode>& node) {
+  return SameDataType(node, DataType::kPunctuation)
+      && ParserUtils::CastToNodeType<CharNode>(node)->data == '\'';
 }
-bool NodeDataClassifier::IsDoubleQuote(NodePtr<INode>& node) {
-  NodePtr<INode> double_quote = ParserUtils::CreateStringNode("\"", DataType::kPunctuation);
-  return INode::IsNodesEqual(double_quote, node);
+bool NodeDataClassifier::IsDoubleQuote(const NodePtr<INode>& node) {
+  return SameDataType(node, DataType::kPunctuation)
+      && ParserUtils::CastToNodeType<CharNode>(node)->data == '\"';
 }
-bool NodeDataClassifier::IsQuote(NodePtr<INode>& node) {
+bool NodeDataClassifier::IsQuote(const NodePtr<INode>& node) {
   return IsSingleQuote(node) || IsDoubleQuote(node);
 }
-bool NodeDataClassifier::IsUnaryOperator(NodePtr<INode>& node) {
-  if (node->data_type == DataType::kOperator) {
+bool NodeDataClassifier::IsUnaryOperator(const NodePtr<INode>& node) {
+  if (SameDataType(node, DataType::kOperator)) {
     std::string data = ParserUtils::CastToNodeType<StringNode>(node)->data;
-    if (data == "+" || data == "-") {
-      return true;
-    }
+    return data == "+" || data == "-";
   }
   return false;
 }
-bool NodeDataClassifier::IsBinaryOperator(NodePtr<INode>& node) {
-  if (node->data_type == DataType::kOperator) {
+bool NodeDataClassifier::IsBinaryOperator(const NodePtr<INode>& node) {
+  if (SameDataType(node, DataType::kOperator)) {
     std::string data = ParserUtils::CastToNodeType<StringNode>(node)->data;
-    std::vector<std::string> bin_operators = {
-        "=", "<>", "!=",
-        ">", ">=", "!>",
-        "<", "<=", "!<"
+    static const std::vector<std::string> bin_operators = {
+        "!=", "=", "!>", ">", ">=", "!<", "<", "<=", "<>"
     };
-    if (std::find(bin_operators.begin(),
-                  bin_operators.end(),
-                  data) != bin_operators.end()) {
-      return true;
-    }
+    return std::find(bin_operators.begin(), bin_operators.end(), data) != bin_operators.end();
   }
   return false;
 }
-bool NodeDataClassifier::IsSemicolon(NodePtr<INode>& node) {
-  NodePtr<INode> semicolon = ParserUtils::CreateCharNode(';', DataType::kPunctuation);
-  return INode::IsNodesEqual(semicolon, node);
+bool NodeDataClassifier::IsSemicolon(const NodePtr<INode>& node) {
+  return SameDataType(node, DataType::kPunctuation)
+      && ParserUtils::CastToNodeType<CharNode>(node)->data == ';';
+}
+
+bool NodeDataClassifier::SameDataType(const NodePtr<INode>& node, DataType data_type) {
+  return node->data_type == data_type;
 }
 
 } // scc::parser::common
