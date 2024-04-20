@@ -11,9 +11,14 @@ using NodePtr = std::shared_ptr<NodeType>;
 
 parsing_error::parsing_error(const std::string& message) : std::logic_error(message) {}
 
-void Parser::ValidateNotEmpty() const {
+void Parser::ValidateHasTokens() const {
   if (tokens_.empty()) {
     throw parsing_error("Unexpected empty tokens array");
+  }
+}
+void Parser::ValidateHasNotTokens() const {
+  if (!tokens_.empty()) {
+    throw parsing_error("Unexpected non empty tokens array");
   }
 }
 void Parser::ValidateIsWord(const NodePtr<INode>& node) const {

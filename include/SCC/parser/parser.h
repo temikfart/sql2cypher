@@ -125,7 +125,8 @@ private:
 
   // Validation
 
-  void ValidateNotEmpty() const;
+  void ValidateHasTokens() const;
+  void ValidateHasNotTokens() const;
   void ValidateIsWord(const std::shared_ptr<ast::INode>& node) const;
   void ValidateIsOpeningRoundBracket(const std::shared_ptr<ast::INode>& node) const;
   void ValidateIsClosingRoundBracket(const std::shared_ptr<ast::INode>& node) const;
