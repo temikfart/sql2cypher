@@ -2,7 +2,7 @@
 
 #include "SCC/ast/data_types.h"
 #include "SCC/ast/nodes/inode.h"
-#include "SCC/parser/common/utils.h"
+#include "SCC/ast/common/utils.h"
 
 namespace scc::parser::common {
 

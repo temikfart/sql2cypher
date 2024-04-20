@@ -5,6 +5,7 @@
 #include <memory>
 #include <utility>
 
+#include "SCC/ast/common/utils.h"
 #include "SCC/ast/nodes/inode.h"
 #include "SCC/ast/nodes/char_node.h"
 #include "SCC/ast/nodes/float_node.h"
@@ -16,7 +17,6 @@
 #include "SCC/log/log.h"
 #include "SCC/parser/common/node_data_classifier.h"
 #include "SCC/parser/common/node_datatype_classifier.h"
-#include "SCC/parser/common/utils.h"
 
 #include "logger/log.hpp"
 
