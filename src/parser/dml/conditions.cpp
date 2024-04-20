@@ -10,20 +10,20 @@ template<typename NodeType,
 using NodePtr = std::shared_ptr<NodeType>;
 
 NodePtr<INode> Parser::GetCondition() {
-  NodePtr<INode> node = CreateServiceNode(StmtType::kCondition);
+  NodePtr<INode> node = ParserUtils::CreateServiceNode(StmtType::kCondition);
   NodePtr<INode> OR_condition = GetORCondition();
   INode::Link(node, OR_condition);
 
   return node;
 }
 NodePtr<INode> Parser::GetORCondition() {
-  NodePtr<INode> node = CreateServiceNode(StmtType::kORCondition);
+  NodePtr<INode> node = ParserUtils::CreateServiceNode(StmtType::kORCondition);
   NodePtr<INode> AND_condition = GetANDCondition();
   INode::Link(node, AND_condition);
 
   int line = peek_first_token()->line;
   if (!tokens_.empty() && NodeDataTypeClassifier::IsWord(peek_first_token())) {
-    NodePtr<StringNode> tmp = CastToNodeType<StringNode>(peek_first_token());
+    NodePtr<StringNode> tmp = ParserUtils::CastToNodeType<StringNode>(peek_first_token());
     if (tmp->data == "OR") {
       pop_first_token();
 
@@ -40,14 +40,14 @@ NodePtr<INode> Parser::GetORCondition() {
   return node;
 }
 NodePtr<INode> Parser::GetANDCondition() {
-  NodePtr<INode> node = CreateServiceNode(StmtType::kANDCondition);
+  NodePtr<INode> node = ParserUtils::CreateServiceNode(StmtType::kANDCondition);
   NodePtr<INode> NOT_condition = GetNOTCondition();
   INode::Link(node, NOT_condition);
 
   int line = peek_first_token()->line;
   if (!tokens_.empty()) {
     if (NodeDataTypeClassifier::IsWord(peek_first_token())) {
-      NodePtr<StringNode> tmp = CastToNodeType<StringNode>(peek_first_token());
+      NodePtr<StringNode> tmp = ParserUtils::CastToNodeType<StringNode>(peek_first_token());
       if (tmp->data == "AND") {
         pop_first_token();
 
@@ -65,12 +65,12 @@ NodePtr<INode> Parser::GetANDCondition() {
   return node;
 }
 NodePtr<INode> Parser::GetNOTCondition() {
-  NodePtr<INode> node = CreateServiceNode(StmtType::kNOTCondition);
+  NodePtr<INode> node = ParserUtils::CreateServiceNode(StmtType::kNOTCondition);
 
   // Get NOT if present
   int line = peek_first_token()->line;
   if (NodeDataTypeClassifier::IsWord(peek_first_token())) {
-    NodePtr<StringNode> tmp = CastToNodeType<StringNode>(peek_first_token());
+    NodePtr<StringNode> tmp = ParserUtils::CastToNodeType<StringNode>(peek_first_token());
     if (tmp->data == "NOT") {
       NodePtr<INode> NOT_operator = get_first_token();
 
@@ -90,7 +90,7 @@ NodePtr<INode> Parser::GetNOTCondition() {
   return node;
 }
 NodePtr<INode> Parser::GetPredicate() {
-  NodePtr<INode> node = CreateServiceNode(StmtType::kPredicate);
+  NodePtr<INode> node = ParserUtils::CreateServiceNode(StmtType::kPredicate);
   NodePtr<INode> lhs = GetExpression();
   INode::Link(node, lhs);
 
@@ -122,7 +122,7 @@ NodePtr<INode> Parser::GetPredicate() {
   return node;
 }
 NodePtr<INode> Parser::GetExpression() {
-  NodePtr<INode> node = CreateServiceNode(StmtType::kExpression);
+  NodePtr<INode> node = ParserUtils::CreateServiceNode(StmtType::kExpression);
 
   int line = peek_first_token()->line;
 

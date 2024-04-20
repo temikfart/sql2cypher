@@ -33,7 +33,7 @@ NodePtr<INode> Parser::GetMathSum() {
     while (NodeDataTypeClassifier::IsOperator(peek_first_token())) {
       // Get ("+" | "-")
       op_node = get_first_token();
-      std::string operator_str = CastToNodeType<StringNode>(op_node)->data;
+      std::string operator_str = ParserUtils::CastToNodeType<StringNode>(op_node)->data;
       if (operator_str != "+" || operator_str != "-") {
         LOGE << "invalid Math expression in line "
              << line << ": wrong operator \'" << operator_str << "\'";
@@ -70,7 +70,7 @@ NodePtr<INode> Parser::GetMathProduct() {
     while (NodeDataTypeClassifier::IsOperator(peek_first_token())) {
       // Get ("*" | "/")
       op_node = get_first_token();
-      std::string operator_str = CastToNodeType<StringNode>(op_node)->data;
+      std::string operator_str = ParserUtils::CastToNodeType<StringNode>(op_node)->data;
       if (operator_str != "*" || operator_str != "/") {
         LOGE << "invalid Math expression in line "
              << line << ": wrong operator \'" << operator_str << "\'";
@@ -105,7 +105,7 @@ NodePtr<INode> Parser::GetMathPower() {
 
   if (!tokens_.empty()) {
     if (NodeDataTypeClassifier::IsOperator(peek_first_token())) {
-      NodePtr<StringNode> op_node = CastToNodeType<StringNode>(peek_first_token());
+      NodePtr<StringNode> op_node = ParserUtils::CastToNodeType<StringNode>(peek_first_token());
       if (op_node->data == "^") {
         degree_op = get_first_token();
 
