@@ -15,33 +15,33 @@ void Parser::ValidateNotEmpty() const {
     end(EXIT_FAILURE);
   }
 }
-void Parser::ValidateIsWord(NodePtr<INode>& node) const {
+void Parser::ValidateIsWord(const NodePtr<INode>& node) const {
   if (node->data_type != DataType::kWord) {
     LOGE << "expected word in line " << node->line;
     end(EXIT_FAILURE);
   }
 }
-void Parser::ValidateIsOpeningRoundBracket(NodePtr<INode>& node) const {
+void Parser::ValidateIsOpeningRoundBracket(const NodePtr<INode>& node) const {
   if (!NodeDataClassifier::IsOpeningRoundBracket(node)) {
     LOGE << "expected an opening round bracket in line "
          << node->line;
     end(EXIT_FAILURE);
   }
 }
-void Parser::ValidateIsClosingRoundBracket(NodePtr<INode>& node) const {
+void Parser::ValidateIsClosingRoundBracket(const NodePtr<INode>& node) const {
   if (!NodeDataClassifier::IsClosingRoundBracket(node)) {
     LOGE << "expected a closing round bracket in line "
          << node->line;
     end(EXIT_FAILURE);
   }
 }
-void Parser::ValidateIsSingleQuote(NodePtr<INode>& node) const {
+void Parser::ValidateIsSingleQuote(const NodePtr<INode>& node) const {
   if (!NodeDataClassifier::IsSingleQuote(node)) {
     LOGE << "expected a single quote in line " << node->line;
     end(EXIT_FAILURE);
   }
 }
-void Parser::ValidateIsDoubleQuote(NodePtr<INode>& node) const {
+void Parser::ValidateIsDoubleQuote(const NodePtr<INode>& node) const {
   if (!NodeDataClassifier::IsSingleQuote(node)) {
     LOGE << "expected a double quote in line " << node->line;
     end(EXIT_FAILURE);

@@ -114,17 +114,17 @@ private:
   // Validation
 
   void ValidateNotEmpty() const;
-  void ValidateIsWord(std::shared_ptr<ast::INode>& node) const;
-  void ValidateIsOpeningRoundBracket(std::shared_ptr<ast::INode>& node) const;
-  void ValidateIsClosingRoundBracket(std::shared_ptr<ast::INode>& node) const;
-  void ValidateIsSingleQuote(std::shared_ptr<ast::INode>& node) const;
-  void ValidateIsDoubleQuote(std::shared_ptr<ast::INode>& node) const;
 
   // Work with deque of tokens
 
   std::shared_ptr<ast::INode>& peek_first_token() const;
   std::shared_ptr<ast::INode> get_first_token();
   void pop_first_token();
+  void ValidateIsWord(const std::shared_ptr<ast::INode>& node) const;
+  void ValidateIsOpeningRoundBracket(const std::shared_ptr<ast::INode>& node) const;
+  void ValidateIsClosingRoundBracket(const std::shared_ptr<ast::INode>& node) const;
+  void ValidateIsSingleQuote(const std::shared_ptr<ast::INode>& node) const;
+  void ValidateIsDoubleQuote(const std::shared_ptr<ast::INode>& node) const;
 };
 
 } // scc::parser
