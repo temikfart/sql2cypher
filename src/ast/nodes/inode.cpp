@@ -17,7 +17,7 @@ std::shared_ptr<INode> INode::get_child(std::size_t node_num) {
     return {};
   return children_[node_num];
 }
-std::size_t INode::get_children_amount() const {
+std::size_t INode::ChildrenCount() const {
   return children_.size();
 }
 

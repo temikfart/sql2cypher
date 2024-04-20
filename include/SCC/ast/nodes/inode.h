@@ -27,8 +27,8 @@ public:
   virtual ~INode();
 
   std::shared_ptr<INode> get_child(std::size_t node_num);
-  std::size_t get_children_amount() const;
 
+  std::size_t ChildrenCount() const;
   void AddChild(std::shared_ptr<INode> const& node);
   static void Link(std::shared_ptr<INode>& parent, std::shared_ptr<INode>& child);
   static bool IsNodesEqual(const std::shared_ptr<INode>& node1,

@@ -69,7 +69,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
   num_of_nodes++;
   int current_node_num = num_of_nodes;
 
-  size_t num_of_children = node->get_children_amount();
+  size_t num_of_children = node->ChildrenCount();
   DataType type = node->data_type;
   StmtType st_type = node->stmt_type;
 

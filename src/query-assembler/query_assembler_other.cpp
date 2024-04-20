@@ -14,14 +14,14 @@ void QueryAssembler::TranslatePrimaryKey(
     LOGE << "incorrect type for primaryKey node";
     end(EXIT_FAILURE);
   }
-  if (key->get_children_amount() == 0) {
+  if (key->ChildrenCount() == 0) {
     LOGE << "PRIMARY KEY definition is missed";
     end(EXIT_FAILURE);
   }
 
   std::vector<std::string> properties;
   properties.push_back(this->TranslateIdentifier(key->get_child(0)));
-  if (key->get_children_amount() > 1) {
+  if (key->ChildrenCount() > 1) {
     std::vector<std::string> other_properties =
         this->GetListOf(key->get_child(1), StmtType::kIdentifier);
     properties.insert(properties.end(),
@@ -49,7 +49,7 @@ void QueryAssembler::TranslateForeignKey(
     LOGE << "incorrect type for foreignKey node";
     end(EXIT_FAILURE);
   }
-  if (key->get_children_amount() == 0) {
+  if (key->ChildrenCount() == 0) {
     LOGE << "PRIMARY KEY definition is missed";
     end(EXIT_FAILURE);
   }
@@ -57,7 +57,7 @@ void QueryAssembler::TranslateForeignKey(
 
   std::vector<std::string> properties;
   properties.push_back(this->TranslateIdentifier(key->get_child(0)));
-  if (key->get_children_amount() > 2) {
+  if (key->ChildrenCount() > 2) {
     if (key->get_child(1)->stmt_type != StmtType::kCommaDelimiter) {
       LOGE << "invalid delimiter between properties in foreign key";
       end(EXIT_FAILURE);
@@ -76,7 +76,7 @@ void QueryAssembler::TranslateForeignKey(
     LOGE << "invalid foreign key: incorrect referene statement type";
     end(EXIT_FAILURE);
   }
-  if (reference->get_children_amount() == 0) {
+  if (reference->ChildrenCount() == 0) {
     LOGE << "empty reference";
     end(EXIT_FAILURE);
   }
@@ -85,9 +85,9 @@ void QueryAssembler::TranslateForeignKey(
 
   // Get ref columns if present
   std::vector<std::string> ref_columns;
-  if (reference->get_children_amount() > 1) {
+  if (reference->ChildrenCount() > 1) {
     ref_columns.push_back(this->TranslateIdentifier(reference->get_child(1)));
-    if (reference->get_children_amount() > 2) {
+    if (reference->ChildrenCount() > 2) {
       std::vector<std::string> other_props =
           this->GetListOf(reference->get_child(2),
                           StmtType::kIdentifier);
@@ -159,7 +159,7 @@ std::vector<std::string> QueryAssembler::GetListOf(
     LOGE << "invalid ListOf: delimiter is not a comma";
     end(EXIT_FAILURE);
   }
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGE << "invalid ListOf: comma without children";
     end(EXIT_FAILURE);
   }
@@ -177,7 +177,7 @@ std::vector<std::string> QueryAssembler::GetListOf(
       end(EXIT_FAILURE);
   }
 
-  if (node->get_children_amount() > 1) {
+  if (node->ChildrenCount() > 1) {
     std::vector<std::string> other_arguments =
         this->GetListOf(node->get_child(1), type);
     arguments.insert(arguments.end(),
@@ -189,7 +189,7 @@ std::vector<std::string> QueryAssembler::GetListOf(
 }
 
 std::string QueryAssembler::TranslateName(std::shared_ptr<INode> node) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGE << "empty name node";
     end(EXIT_FAILURE);
   }
@@ -197,7 +197,7 @@ std::string QueryAssembler::TranslateName(std::shared_ptr<INode> node) {
   std::ostringstream name;
 
   name << this->TranslateIdentifier(node->get_child(0));
-  if (node->get_children_amount() > 1) {
+  if (node->ChildrenCount() > 1) {
     if (node->get_child(1)->stmt_type == StmtType::kDotDelimiter) {
       name << this->TranslateIdentifiers(node->get_child(1));
     } else {
@@ -210,7 +210,7 @@ std::string QueryAssembler::TranslateName(std::shared_ptr<INode> node) {
 }
 std::string QueryAssembler::TranslateIdentifiers(
     std::shared_ptr<INode> node) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGE << "invalid list of identifiers";
     end(EXIT_FAILURE);
   }
@@ -218,14 +218,14 @@ std::string QueryAssembler::TranslateIdentifiers(
   std::ostringstream identifiers;
   identifiers << "." << this->TranslateIdentifier(node->get_child(0));
 
-  if (node->get_children_amount() > 1) {
+  if (node->ChildrenCount() > 1) {
     identifiers << this->TranslateIdentifiers(node->get_child(1));
   }
 
   return identifiers.str();
 }
 std::string QueryAssembler::TranslateIdentifier(std::shared_ptr<INode> node) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGE << "empty identifier";
     end(EXIT_FAILURE);
   }
