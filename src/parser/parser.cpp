@@ -3,6 +3,7 @@
 namespace scc::parser {
 
 using namespace ast;
+using namespace common;
 
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
@@ -14,7 +15,7 @@ Parser::Parser(std::deque<NodePtr<INode>>&& tokens)
 NodePtr<INode> Parser::Parse() {
   LOGI << "starting syntax analysis...";
 
-  NodePtr<INode> root = CreateRootNode(StmtType::kProgram);
+  NodePtr<INode> root = ParserUtils::CreateRootNode(StmtType::kProgram);
 
   if (tokens_.empty()) {
     LOGI << "syntax analysis is ended: empty tokens' array";
@@ -61,7 +62,7 @@ void Parser::pop_first_token() {
 
 NodePtr<INode> Parser::General() {
   pop_first_token();
-  NodePtr<INode> separator = CreateServiceNode(StmtType::kSemicolonDelimiter);
+  NodePtr<INode> separator = ParserUtils::CreateServiceNode(StmtType::kSemicolonDelimiter);
 
   if (!tokens_.empty()) {
     NodePtr<INode> query = GetDL();
@@ -80,7 +81,7 @@ NodePtr<INode> Parser::General() {
 StmtType Parser::GetDLStType() {
   StmtType DLStType = StmtType::kNone;   // invalid value
 
-  std::string key_word = CastToNodeType<StringNode>(peek_first_token())->data;
+  std::string key_word = ParserUtils::CastToNodeType<StringNode>(peek_first_token())->data;
 
   std::vector<std::string> ddlSt_kws = {
       "CREATE", "ALTER", "DROP"
@@ -109,7 +110,7 @@ StmtType Parser::GetDLStType() {
   return DLStType;
 }
 NodePtr<INode> Parser::GetDL() {
-  NodePtr<INode> query = CreateServiceNode(StmtType::kQuery);
+  NodePtr<INode> query = ParserUtils::CreateServiceNode(StmtType::kQuery);
 
   ValidateIsWord(peek_first_token());
 

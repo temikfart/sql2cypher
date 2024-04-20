@@ -3,6 +3,7 @@
 namespace scc::parser {
 
 using namespace ast;
+using namespace common;
 
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
@@ -13,7 +14,7 @@ StmtType Parser::GetDMLStType() {
 
   // Get first token
   int line = peek_first_token()->line;
-  std::string fst_kw = CastToNodeType<StringNode>(peek_first_token())->data;
+  std::string fst_kw = ParserUtils::CastToNodeType<StringNode>(peek_first_token())->data;
   pop_first_token();
 
   if (tokens_.empty()) {
@@ -38,7 +39,7 @@ StmtType Parser::GetDMLStType() {
 }
 NodePtr<INode> Parser::GetDMLSt() {
   LOGD << "getting DML statement...";
-  NodePtr<INode> node = CreateServiceNode(StmtType::kDmlStmt);
+  NodePtr<INode> node = ParserUtils::CreateServiceNode(StmtType::kDmlStmt);
 
   int line = peek_first_token()->line;
   NodePtr<INode> statement;
@@ -67,13 +68,13 @@ NodePtr<INode> Parser::GetDMLSt() {
 // DML Statements
 
 NodePtr<INode> Parser::GetInsertSt() {
-  return CreateServiceNode(StmtType::kInsertStmt);
+  return ParserUtils::CreateServiceNode(StmtType::kInsertStmt);
 }
 NodePtr<INode> Parser::GetDeleteSt() {
-  return CreateServiceNode(StmtType::kDeleteStmt);
+  return ParserUtils::CreateServiceNode(StmtType::kDeleteStmt);
 }
 NodePtr<INode> Parser::GetUpdateSt() {
-  return CreateServiceNode(StmtType::kUpdateStmt);
+  return ParserUtils::CreateServiceNode(StmtType::kUpdateStmt);
 }
 
 } // scc::parser

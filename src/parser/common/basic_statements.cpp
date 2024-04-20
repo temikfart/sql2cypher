@@ -3,6 +3,7 @@
 namespace scc::parser {
 
 using namespace ast;
+using namespace common;
 
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
@@ -12,7 +13,7 @@ NodePtr<INode> Parser::GetDataType() {
   NodePtr<INode> node = get_first_token();
 
   try {
-    std::string datatype = CastToNodeType<StringNode>(node)->data;
+    std::string datatype = ParserUtils::CastToNodeType<StringNode>(node)->data;
     StmtType SQL_datatype(datatype);
     node->stmt_type = SQL_datatype;
   } catch (const std::invalid_argument& ia) {
@@ -24,7 +25,7 @@ NodePtr<INode> Parser::GetDataType() {
   return node;
 }
 NodePtr<INode> Parser::GetPrimaryKey() {
-  NodePtr<INode> primary_key = CreateServiceNode(StmtType::kPrimaryKey);
+  NodePtr<INode> primary_key = ParserUtils::CreateServiceNode(StmtType::kPrimaryKey);
 
   int line = peek_first_token()->line;
   ValidateIsOpeningRoundBracket(peek_first_token());
@@ -57,7 +58,7 @@ NodePtr<INode> Parser::GetPrimaryKey() {
 }
 
 NodePtr<INode> Parser::GetForeignKey() {
-  NodePtr<INode> foreign_key = CreateServiceNode(StmtType::kForeignKey);
+  NodePtr<INode> foreign_key = ParserUtils::CreateServiceNode(StmtType::kForeignKey);
 
   int line = peek_first_token()->line;
   ValidateIsOpeningRoundBracket(peek_first_token());
@@ -99,14 +100,14 @@ NodePtr<INode> Parser::GetForeignKey() {
 NodePtr<INode> Parser::GetReference() {
   // Get REFERENCES
   int line = peek_first_token()->line;
-  std::string ref_kw = CastToNodeType<StringNode>(peek_first_token())->data;
+  std::string ref_kw = ParserUtils::CastToNodeType<StringNode>(peek_first_token())->data;
   if (ref_kw != "REFERENCES") {
     LOGE << "incorrect reference key word in line "
          << line << ": " << ref_kw;
     end(EXIT_FAILURE);
   }
   pop_first_token();
-  NodePtr<INode> reference = CreateServiceNode(StmtType::kReference);
+  NodePtr<INode> reference = ParserUtils::CreateServiceNode(StmtType::kReference);
 
   // Get referenced table or columns
   if (tokens_.empty()) {
@@ -181,18 +182,18 @@ NodePtr<INode> Parser::GetString() {
     }
     switch (tmp_type) {
       case DataType::kInt:
-        new_data += std::to_string(CastToNodeType<IntNumNode>(tmp)->data);
+        new_data += std::to_string(ParserUtils::CastToNodeType<IntNumNode>(tmp)->data);
         break;
       case DataType::kFloat:
-        new_data += std::to_string(CastToNodeType<FloatNumNode>(tmp)->data);
+        new_data += std::to_string(ParserUtils::CastToNodeType<FloatNumNode>(tmp)->data);
         break;
       case DataType::kWord:
       case DataType::kOperator:
-        new_data += CastToNodeType<StringNode>(tmp)->data;
+        new_data += ParserUtils::CastToNodeType<StringNode>(tmp)->data;
         break;
       case DataType::kBracket:
       case DataType::kPunctuation:
-        new_data += std::to_string(CastToNodeType<CharNode>(tmp)->data);
+        new_data += std::to_string(ParserUtils::CastToNodeType<CharNode>(tmp)->data);
         break;
       default:
         LOGE << "invalid string in line "
@@ -214,13 +215,13 @@ NodePtr<INode> Parser::GetString() {
   }
   pop_first_token();
 
-  node = CastToNodeType<INode>(str);
+  node = ParserUtils::CastToNodeType<INode>(str);
 
   return node;
 }
 
 NodePtr<INode> Parser::GetName() {
-  NodePtr<INode> name = CreateServiceNode(StmtType::kName);
+  NodePtr<INode> name = ParserUtils::CreateServiceNode(StmtType::kName);
 
   NodePtr<INode> identifier = GetIdentifier();
   INode::Link(name, identifier);
@@ -237,7 +238,7 @@ NodePtr<INode> Parser::GetName() {
 NodePtr<INode> Parser::GetIdentifiers() {
   int line = peek_first_token()->line;
   pop_first_token();
-  NodePtr<INode> dot = CreateServiceNode(StmtType::kDotDelimiter);
+  NodePtr<INode> dot = ParserUtils::CreateServiceNode(StmtType::kDotDelimiter);
 
   if (tokens_.empty()) {
     LOGE << "bad name, which ends in a dot, in line " << line;
@@ -258,7 +259,7 @@ NodePtr<INode> Parser::GetIdentifiers() {
 
 NodePtr<INode> Parser::GetIdentifier() {
   ValidateIsWord(peek_first_token());
-  NodePtr<INode> identifier = CreateServiceNode(StmtType::kIdentifier);
+  NodePtr<INode> identifier = ParserUtils::CreateServiceNode(StmtType::kIdentifier);
 
   NodePtr<INode> argument = get_first_token();
   INode::Link(identifier, argument);
@@ -270,7 +271,7 @@ NodePtr<INode> Parser::GetListOf(StmtType get_function_type) {
   // Get separator (comma)
   int line = peek_first_token()->line;
   pop_first_token();
-  NodePtr<INode> separator = CreateServiceNode(StmtType::kCommaDelimiter);
+  NodePtr<INode> separator = ParserUtils::CreateServiceNode(StmtType::kCommaDelimiter);
 
   if (tokens_.empty()) {
     LOGE << "invalid listOf in line "
