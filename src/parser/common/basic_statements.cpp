@@ -38,13 +38,13 @@ NodePtr<INode> Parser::GetPrimaryKey() {
     end(EXIT_FAILURE);
   }
   NodePtr<INode> column_name = GetIdentifier();
-  INode::Link(primary_key, column_name);
+  ASTUtils::Link(primary_key, column_name);
 
   // Get listOf(column_names)
   if (!tokens_.empty()) {
     if (NodeDataClassifier::IsComma(peek_first_token())) {
       NodePtr<INode> separator = GetListOf(StmtType::kIdentifier);
-      INode::Link(primary_key, separator);
+      ASTUtils::Link(primary_key, separator);
     }
   }
 
@@ -71,12 +71,12 @@ NodePtr<INode> Parser::GetForeignKey() {
     end(EXIT_FAILURE);
   }
   NodePtr<INode> column_name = GetIdentifier();
-  INode::Link(foreign_key, column_name);
+  ASTUtils::Link(foreign_key, column_name);
 
   // Get listOf(column_names)
   if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
     NodePtr<INode> separator = GetListOf(StmtType::kIdentifier);
-    INode::Link(foreign_key, separator);
+    ASTUtils::Link(foreign_key, separator);
   }
 
   if (tokens_.empty()) {
@@ -93,7 +93,7 @@ NodePtr<INode> Parser::GetForeignKey() {
   }
   ValidateIsWord(peek_first_token());
   NodePtr<INode> reference = GetReference();
-  INode::Link(foreign_key, reference);
+  ASTUtils::Link(foreign_key, reference);
 
   return foreign_key;
 }
@@ -115,7 +115,7 @@ NodePtr<INode> Parser::GetReference() {
     end(EXIT_FAILURE);
   }
   NodePtr<INode> ref_table_name = GetName();
-  INode::Link(reference, ref_table_name);
+  ASTUtils::Link(reference, ref_table_name);
 
   // Get columns if present
   if (!tokens_.empty() && NodeDataClassifier::IsOpeningRoundBracket(peek_first_token())) {
@@ -130,7 +130,7 @@ NodePtr<INode> Parser::GetReference() {
       end(EXIT_FAILURE);
     }
     ref_column_name = GetIdentifier();
-    INode::Link(reference, ref_column_name);
+    ASTUtils::Link(reference, ref_column_name);
 
     if (tokens_.empty()) {
       LOGE << "invalid reference in line "
@@ -140,7 +140,7 @@ NodePtr<INode> Parser::GetReference() {
     if (NodeDataClassifier::IsComma(peek_first_token())) {
       next_ref_column_names =
           GetListOf(StmtType::kIdentifier);
-      INode::Link(reference, next_ref_column_names);
+      ASTUtils::Link(reference, next_ref_column_names);
     }
 
     if (tokens_.empty()) {
@@ -219,12 +219,12 @@ NodePtr<INode> Parser::GetName() {
   NodePtr<INode> name = ASTUtils::CreateServiceNode(StmtType::kName);
 
   NodePtr<INode> identifier = GetIdentifier();
-  INode::Link(name, identifier);
+  ASTUtils::Link(name, identifier);
 
   if (!tokens_.empty()) {
     if (NodeDataClassifier::IsDot(peek_first_token())) {
       NodePtr<INode> next_identifiers = GetIdentifiers();
-      INode::Link(name, next_identifiers);
+      ASTUtils::Link(name, next_identifiers);
     }
   }
 
@@ -240,12 +240,12 @@ NodePtr<INode> Parser::GetIdentifiers() {
     end(EXIT_FAILURE);
   }
   NodePtr<INode> identifier = GetIdentifier();
-  INode::Link(dot, identifier);
+  ASTUtils::Link(dot, identifier);
 
   if (!tokens_.empty()) {
     if (NodeDataClassifier::IsDot(peek_first_token())) {
       NodePtr<INode> next_identifiers = GetIdentifiers();
-      INode::Link(dot, next_identifiers);
+      ASTUtils::Link(dot, next_identifiers);
     }
   }
 
@@ -257,7 +257,7 @@ NodePtr<INode> Parser::GetIdentifier() {
   NodePtr<INode> identifier = ASTUtils::CreateServiceNode(StmtType::kIdentifier);
 
   NodePtr<INode> argument = get_first_token();
-  INode::Link(identifier, argument);
+  ASTUtils::Link(identifier, argument);
 
   return identifier;
 }
@@ -300,12 +300,12 @@ NodePtr<INode> Parser::GetListOf(StmtType get_function_type) {
            << peek_first_token()->line;
       end(EXIT_FAILURE);
   }
-  INode::Link(separator, argument);
+  ASTUtils::Link(separator, argument);
 
   if (!tokens_.empty()
       && NodeDataClassifier::IsComma(peek_first_token())) {
     NodePtr<INode> next_separator = GetListOf(get_function_type);
-    INode::Link(separator, next_separator);
+    ASTUtils::Link(separator, next_separator);
   }
 
   return separator;

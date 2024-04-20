@@ -13,14 +13,14 @@ using NodePtr = std::shared_ptr<NodeType>;
 NodePtr<INode> Parser::GetCondition() {
   NodePtr<INode> node = ASTUtils::CreateServiceNode(StmtType::kCondition);
   NodePtr<INode> OR_condition = GetORCondition();
-  INode::Link(node, OR_condition);
+  ASTUtils::Link(node, OR_condition);
 
   return node;
 }
 NodePtr<INode> Parser::GetORCondition() {
   NodePtr<INode> node = ASTUtils::CreateServiceNode(StmtType::kORCondition);
   NodePtr<INode> AND_condition = GetANDCondition();
-  INode::Link(node, AND_condition);
+  ASTUtils::Link(node, AND_condition);
 
   int line = peek_first_token()->line;
   if (!tokens_.empty() && NodeDataTypeClassifier::IsWord(peek_first_token())) {
@@ -34,7 +34,7 @@ NodePtr<INode> Parser::GetORCondition() {
         end(EXIT_FAILURE);
       }
       NodePtr<INode> next_AND_conditions = GetANDCondition();
-      INode::Link(node, next_AND_conditions);
+      ASTUtils::Link(node, next_AND_conditions);
     }
   }
 
@@ -43,7 +43,7 @@ NodePtr<INode> Parser::GetORCondition() {
 NodePtr<INode> Parser::GetANDCondition() {
   NodePtr<INode> node = ASTUtils::CreateServiceNode(StmtType::kANDCondition);
   NodePtr<INode> NOT_condition = GetNOTCondition();
-  INode::Link(node, NOT_condition);
+  ASTUtils::Link(node, NOT_condition);
 
   int line = peek_first_token()->line;
   if (!tokens_.empty()) {
@@ -58,7 +58,7 @@ NodePtr<INode> Parser::GetANDCondition() {
           end(EXIT_FAILURE);
         }
         NodePtr<INode> next_NOT_conditions = GetNOTCondition();
-        INode::Link(node, next_NOT_conditions);
+        ASTUtils::Link(node, next_NOT_conditions);
       }
     }
   }
@@ -75,7 +75,7 @@ NodePtr<INode> Parser::GetNOTCondition() {
     if (tmp->data == "NOT") {
       NodePtr<INode> NOT_operator = get_first_token();
 
-      INode::Link(node, NOT_operator);
+      ASTUtils::Link(node, NOT_operator);
     }
   }
 
@@ -86,14 +86,14 @@ NodePtr<INode> Parser::GetNOTCondition() {
     end(EXIT_FAILURE);
   }
   NodePtr<INode> predicate = GetPredicate();
-  INode::Link(node, predicate);
+  ASTUtils::Link(node, predicate);
 
   return node;
 }
 NodePtr<INode> Parser::GetPredicate() {
   NodePtr<INode> node = ASTUtils::CreateServiceNode(StmtType::kPredicate);
   NodePtr<INode> lhs = GetExpression();
-  INode::Link(node, lhs);
+  ASTUtils::Link(node, lhs);
 
   int line = peek_first_token()->line;
   if (tokens_.empty()) {
@@ -105,7 +105,7 @@ NodePtr<INode> Parser::GetPredicate() {
     line = peek_first_token()->line;
     NodePtr<INode> bin_operator = get_first_token();
 
-    INode::Link(node, bin_operator);
+    ASTUtils::Link(node, bin_operator);
   } else {
     LOGE << "invalid predicate in line "
          << line << ": operator should be binary";
@@ -118,7 +118,7 @@ NodePtr<INode> Parser::GetPredicate() {
     end(EXIT_FAILURE);
   }
   NodePtr<INode> rhs = GetExpression();
-  INode::Link(node, rhs);
+  ASTUtils::Link(node, rhs);
 
   return node;
 }
@@ -130,11 +130,11 @@ NodePtr<INode> Parser::GetExpression() {
   // Is it [table_name.] column ?
   if (NodeDataTypeClassifier::IsWord(peek_first_token())) {
     NodePtr<INode> name = GetIdentifier();
-    INode::Link(node, name);
+    ASTUtils::Link(node, name);
 
     if (!tokens_.empty() && NodeDataClassifier::IsDot(peek_first_token())) {
       NodePtr<INode> dot = GetIdentifiers();
-      INode::Link(node, dot);
+      ASTUtils::Link(node, dot);
     }
 
     return node;
@@ -145,7 +145,7 @@ NodePtr<INode> Parser::GetExpression() {
     NodePtr<INode> u_operator, expression;
     u_operator = get_first_token();
 
-    INode::Link(node, u_operator);
+    ASTUtils::Link(node, u_operator);
 
     if (tokens_.empty()) {
       LOGE <<
@@ -154,7 +154,7 @@ NodePtr<INode> Parser::GetExpression() {
       end(EXIT_FAILURE);
     }
     expression = GetExpression();
-    INode::Link(node, expression);
+    ASTUtils::Link(node, expression);
 
     return node;
   }
@@ -189,12 +189,12 @@ NodePtr<INode> Parser::GetExpression() {
       end(EXIT_FAILURE);
     }
     NodePtr<INode> str = GetString();
-    INode::Link(node, str);
+    ASTUtils::Link(node, str);
   }
 
   // So, it is Math expression
   NodePtr<INode> expression = GetMathExpression();
-  INode::Link(node, expression);
+  ASTUtils::Link(node, expression);
 
   return node;
 }

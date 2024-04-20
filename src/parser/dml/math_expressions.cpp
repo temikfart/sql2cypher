@@ -49,8 +49,8 @@ NodePtr<INode> Parser::GetMathSum() {
       }
       product_2 = GetMathProduct();
 
-      INode::Link(op_node, product_1);
-      INode::Link(op_node, product_2);
+      ASTUtils::Link(op_node, product_1);
+      ASTUtils::Link(op_node, product_2);
       product_1 = op_node;
 
       if (tokens_.empty()) {
@@ -86,8 +86,8 @@ NodePtr<INode> Parser::GetMathProduct() {
       }
       power_2 = GetMathPower();
 
-      INode::Link(op_node, power_1);
-      INode::Link(op_node, power_2);
+      ASTUtils::Link(op_node, power_1);
+      ASTUtils::Link(op_node, power_2);
       power_1 = op_node;
 
       if (tokens_.empty()) {
@@ -116,8 +116,8 @@ NodePtr<INode> Parser::GetMathPower() {
           end(EXIT_FAILURE);
         }
         degree = GetMathPower();
-        INode::Link(degree_op, power);
-        INode::Link(degree_op, degree);
+        ASTUtils::Link(degree_op, power);
+        ASTUtils::Link(degree_op, degree);
 
         return degree_op;
       }

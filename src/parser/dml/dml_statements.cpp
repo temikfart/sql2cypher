@@ -61,7 +61,7 @@ NodePtr<INode> Parser::GetDMLSt() {
       LOGE << "unknown DML statement near line " << line;
       end(EXIT_FAILURE);
   }
-  INode::Link(node, statement);
+  ASTUtils::Link(node, statement);
 
   return node;
 }

@@ -19,4 +19,9 @@ NodePtr<INode> ASTUtils::CreateStringNode(const std::string& str, DataType data_
   return CastToINode(std::make_shared<StringNode>(str, data_type));
 }
 
+void ASTUtils::Link(std::shared_ptr<INode>& parent, std::shared_ptr<INode>& child) {
+  parent->AddChild(child);
+  child->parent = parent;
+}
+
 } // scc::ast::common

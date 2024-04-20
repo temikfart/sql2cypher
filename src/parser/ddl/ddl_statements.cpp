@@ -98,7 +98,7 @@ NodePtr<INode> Parser::GetDDLSt() {
       LOGE << "unknown DDL statement near line " << line;
       end(EXIT_FAILURE);
   }
-  INode::Link(node, statement);
+  ASTUtils::Link(node, statement);
 
   return node;
 }
@@ -113,7 +113,7 @@ NodePtr<INode> Parser::GetCreateDatabaseSt() {
   }
   ValidateIsWord(peek_first_token());
   NodePtr<INode> database_name = GetName();
-  INode::Link(node, database_name);
+  ASTUtils::Link(node, database_name);
 
   return node;
 }
@@ -128,7 +128,7 @@ NodePtr<INode> Parser::GetCreateTableSt() {
   int line = peek_first_token()->line;
   ValidateIsWord(peek_first_token());
   NodePtr<INode> table_name = GetName();
-  INode::Link(node, table_name);
+  ASTUtils::Link(node, table_name);
 
   if (tokens_.empty()) {
     LOGE << "expected opening round bracket in line " << line;
@@ -145,7 +145,7 @@ NodePtr<INode> Parser::GetCreateTableSt() {
   line = peek_first_token()->line;
   ValidateIsWord(peek_first_token());
   NodePtr<INode> table_definition = GetTableDefinition();
-  INode::Link(node, table_definition);
+  ASTUtils::Link(node, table_definition);
 
   if (tokens_.empty()) {
     LOGE << "expected closing round bracket in line " << line;
@@ -161,7 +161,7 @@ NodePtr<INode> Parser::GetAlterTableSt() {
   int line = peek_first_token()->line;
   ValidateIsWord(peek_first_token());
   NodePtr<INode> table_name = GetName();
-  INode::Link(node, table_name);
+  ASTUtils::Link(node, table_name);
 
   // Get action (ADD | DROP)
   if (tokens_.empty()) {
@@ -196,8 +196,8 @@ NodePtr<INode> Parser::GetAlterTableSt() {
     end(EXIT_FAILURE);
   }
   NodePtr<INode> action = ASTUtils::CreateServiceNode(actionStmtType);
-  INode::Link(node, action);
-  INode::Link(action, argument);
+  ASTUtils::Link(node, action);
+  ASTUtils::Link(action, argument);
 
   return node;
 }
@@ -210,11 +210,11 @@ NodePtr<INode> Parser::GetDropDatabaseSt() {
   }
   ValidateIsWord(peek_first_token());
   NodePtr<INode> database_name = GetName();
-  INode::Link(node, database_name);
+  ASTUtils::Link(node, database_name);
 
   if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
     NodePtr<INode> separator = GetListOf(StmtType::kName);
-    INode::Link(node, separator);
+    ASTUtils::Link(node, separator);
   }
 
   return node;
@@ -228,11 +228,11 @@ NodePtr<INode> Parser::GetDropTableSt() {
   }
   ValidateIsWord(peek_first_token());
   NodePtr<INode> table_name = GetName();
-  INode::Link(node, table_name);
+  ASTUtils::Link(node, table_name);
 
   if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
     NodePtr<INode> separator = GetListOf(StmtType::kName);
-    INode::Link(node, separator);
+    ASTUtils::Link(node, separator);
   }
 
   return node;
@@ -244,11 +244,11 @@ NodePtr<INode> Parser::GetTableDefinition() {
   NodePtr<INode> node = ASTUtils::CreateServiceNode(StmtType::kTableDef);
 
   NodePtr<INode> argument = GetTableDefinitionObject();
-  INode::Link(node, argument);
+  ASTUtils::Link(node, argument);
 
   if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
     NodePtr<INode> separator = GetListOf(StmtType::kTableDef);
-    INode::Link(node, separator);
+    ASTUtils::Link(node, separator);
   }
 
   return node;
@@ -277,7 +277,7 @@ NodePtr<INode> Parser::GetColumnDefinition() {
   // Get columnName
   int line = peek_first_token()->line;
   NodePtr<INode> column_name = GetIdentifier();
-  INode::Link(column_def, column_name);
+  ASTUtils::Link(column_def, column_name);
 
   // Get datatype
   if (tokens_.empty()) {
@@ -286,7 +286,7 @@ NodePtr<INode> Parser::GetColumnDefinition() {
   }
   ValidateIsWord(peek_first_token());
   NodePtr<INode> datatype = GetDataType();
-  INode::Link(column_def, datatype);
+  ASTUtils::Link(column_def, datatype);
 
   // Get other options
   if (!tokens_.empty()) {
@@ -306,14 +306,14 @@ NodePtr<INode> Parser::GetTableConstraint() {
     NodePtr<INode> constraint_kw =
         ASTUtils::CastToNodeType<ServiceNode>(std::make_shared<ServiceNode>());
     constraint_kw->stmt_type = StmtType::kConstraintKW;
-    INode::Link(table_constraint, constraint_kw);
+    ASTUtils::Link(table_constraint, constraint_kw);
 
     if (tokens_.empty()) {
       LOGE << "expected constraint name in line " << line;
       end(EXIT_FAILURE);
     }
     NodePtr<INode> constraint_name = GetIdentifier();
-    INode::Link(constraint_kw, constraint_name);
+    ASTUtils::Link(constraint_kw, constraint_name);
   }
 
   // Get PRIMARY | FOREIGN KEY
@@ -358,7 +358,7 @@ NodePtr<INode> Parser::GetTableConstraint() {
         << line << ": " << kind_of_key;
     end(EXIT_FAILURE);
   }
-  INode::Link(table_constraint, key);
+  ASTUtils::Link(table_constraint, key);
 
   return table_constraint;
 }
@@ -367,11 +367,11 @@ NodePtr<INode> Parser::GetDropListDefinition() {
   NodePtr<INode> node = ASTUtils::CreateServiceNode(StmtType::kDropList);
 
   NodePtr<INode> objects = GetDropObject();
-  INode::Link(node, objects);
+  ASTUtils::Link(node, objects);
 
   if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
     NodePtr<INode> separator = GetDropList();
-    INode::Link(node, separator);
+    ASTUtils::Link(node, separator);
   }
 
   return node;
@@ -382,11 +382,11 @@ NodePtr<INode> Parser::GetDropList() {
 
   ValidateIsWord(peek_first_token());
   NodePtr<INode> objects = GetDropObject();
-  INode::Link(separator, objects);
+  ASTUtils::Link(separator, objects);
 
   if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
       NodePtr<INode> next_objects = GetDropList();
-      INode::Link(separator, next_objects);
+      ASTUtils::Link(separator, next_objects);
   }
 
   return separator;
@@ -423,7 +423,7 @@ NodePtr<INode> Parser::GetDropObject() {
     end(EXIT_FAILURE);
   }
   NodePtr<INode> argument = GetIdentifier();
-  INode::Link(object, argument);
+  ASTUtils::Link(object, argument);
 
   if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
     // Check key word after the comma
@@ -438,7 +438,7 @@ NodePtr<INode> Parser::GetDropObject() {
     // Get listOf identifiers if present
     if (is_list) {
       NodePtr<INode> next_arguments = GetListOf(StmtType::kIdentifier);
-      INode::Link(object, next_arguments);
+      ASTUtils::Link(object, next_arguments);
     }
   }
 
