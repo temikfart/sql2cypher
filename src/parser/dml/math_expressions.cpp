@@ -3,6 +3,7 @@
 namespace scc::parser {
 
 using namespace ast;
+using namespace common;
 
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
@@ -29,7 +30,7 @@ NodePtr<INode> Parser::GetMathSum() {
   product_1 = GetMathProduct();
 
   if (!tokens_.empty()) {
-    while (Parser::IsOperator(peek_first_token())) {
+    while (NodeDataTypeClassifier::IsOperator(peek_first_token())) {
       // Get ("+" | "-")
       op_node = get_first_token();
       std::string operator_str = CastToNodeType<StringNode>(op_node)->data;
@@ -66,7 +67,7 @@ NodePtr<INode> Parser::GetMathProduct() {
   power_1 = GetMathPower();
 
   if (!tokens_.empty()) {
-    while (Parser::IsOperator(peek_first_token())) {
+    while (NodeDataTypeClassifier::IsOperator(peek_first_token())) {
       // Get ("*" | "/")
       op_node = get_first_token();
       std::string operator_str = CastToNodeType<StringNode>(op_node)->data;
@@ -103,7 +104,7 @@ NodePtr<INode> Parser::GetMathPower() {
   power = GetMathValue();
 
   if (!tokens_.empty()) {
-    if (Parser::IsOperator(peek_first_token())) {
+    if (NodeDataTypeClassifier::IsOperator(peek_first_token())) {
       NodePtr<StringNode> op_node = CastToNodeType<StringNode>(peek_first_token());
       if (op_node->data == "^") {
         degree_op = get_first_token();
@@ -128,7 +129,7 @@ NodePtr<INode> Parser::GetMathValue() {
   NodePtr<INode> value;
 
   int line = peek_first_token()->line;
-  if (Parser::IsNumber(peek_first_token())) {
+  if (NodeDataTypeClassifier::IsNumber(peek_first_token())) {
     value = get_first_token();
   } else if (Parser::IsOpeningRoundBracket(peek_first_token())) {
     pop_first_token();

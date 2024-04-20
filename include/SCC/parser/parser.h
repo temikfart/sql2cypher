@@ -14,6 +14,7 @@
 #include "SCC/ast/nodes/string_node.h"
 #include "SCC/config/scc_config.h"
 #include "SCC/log/log.h"
+#include "SCC/parser/common/node_datatype_classifier.h"
 
 #include "logger/log.hpp"
 
@@ -116,14 +117,6 @@ private:
   void ValidateIsClosingRoundBracket(std::shared_ptr<ast::INode>& node) const;
   void ValidateIsSingleQuote(std::shared_ptr<ast::INode>& node) const;
   void ValidateIsDoubleQuote(std::shared_ptr<ast::INode>& node) const;
-
-  // Defining Node Datatype
-
-  bool IsBracket(std::shared_ptr<ast::INode>& node) const;
-  bool IsPunctuation(std::shared_ptr<ast::INode>& node) const;
-  bool IsWord(std::shared_ptr<ast::INode>& node) const;
-  bool IsNumber(std::shared_ptr<ast::INode>& node) const;
-  bool IsOperator(std::shared_ptr<ast::INode>& node) const;
 
   // Defining Node data
 

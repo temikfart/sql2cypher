@@ -3,6 +3,7 @@
 namespace scc::parser {
 
 using namespace ast;
+using namespace common;
 
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
@@ -21,8 +22,7 @@ NodePtr<INode> Parser::GetORCondition() {
   INode::Link(node, AND_condition);
 
   int line = peek_first_token()->line;
-  if (!tokens_.empty()
-      && Parser::IsWord(peek_first_token())) {
+  if (!tokens_.empty() && NodeDataTypeClassifier::IsWord(peek_first_token())) {
     NodePtr<StringNode> tmp = CastToNodeType<StringNode>(peek_first_token());
     if (tmp->data == "OR") {
       pop_first_token();
@@ -46,7 +46,7 @@ NodePtr<INode> Parser::GetANDCondition() {
 
   int line = peek_first_token()->line;
   if (!tokens_.empty()) {
-    if (Parser::IsWord(peek_first_token())) {
+    if (NodeDataTypeClassifier::IsWord(peek_first_token())) {
       NodePtr<StringNode> tmp = CastToNodeType<StringNode>(peek_first_token());
       if (tmp->data == "AND") {
         pop_first_token();
@@ -69,7 +69,7 @@ NodePtr<INode> Parser::GetNOTCondition() {
 
   // Get NOT if present
   int line = peek_first_token()->line;
-  if (Parser::IsWord(peek_first_token())) {
+  if (NodeDataTypeClassifier::IsWord(peek_first_token())) {
     NodePtr<StringNode> tmp = CastToNodeType<StringNode>(peek_first_token());
     if (tmp->data == "NOT") {
       NodePtr<INode> NOT_operator = get_first_token();
@@ -127,7 +127,7 @@ NodePtr<INode> Parser::GetExpression() {
   int line = peek_first_token()->line;
 
   // Is it [table_name.] column ?
-  if (Parser::IsWord(peek_first_token())) {
+  if (NodeDataTypeClassifier::IsWord(peek_first_token())) {
     NodePtr<INode> name = GetIdentifier();
     INode::Link(node, name);
 
