@@ -3,6 +3,7 @@
 namespace scc::parser {
 
 using namespace ast;
+using namespace common;
 
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
@@ -434,7 +435,7 @@ NodePtr<INode> Parser::GetDropObject() {
     if (Parser::IsComma(peek_first_token())) {
       // Check key word after the comma
       bool is_list = true;
-      if (Parser::IsWord(tokens_[1])) {
+      if (NodeDataTypeClassifier::IsWord(tokens_[1])) {
         std::string checking_word = CastToNodeType<StringNode>(tokens_[1])->data;
         if (checking_word == "CONSTRAINT" || checking_word == "COLUMN") {
           is_list = false;
