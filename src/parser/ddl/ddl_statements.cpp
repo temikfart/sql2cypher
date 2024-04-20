@@ -14,9 +14,9 @@ StmtType Parser::GetDDLStType() {
   StmtType DDLStType = StmtType::kNone; // invalid value
 
   // Get first token
-  int line = peek_first_token()->line;
-  std::string fst_kw = ASTUtils::CastToNodeType<StringNode>(peek_first_token())->data;
-  pop_first_token();
+  int line = PeekToken()->line;
+  std::string fst_kw = ASTUtils::CastToNodeType<StringNode>(PeekToken())->data;
+  NextToken();
 
   // Get second token
   if (tokens_.empty()) {
@@ -24,10 +24,10 @@ StmtType Parser::GetDDLStType() {
         << line << ": second key word is missed";
     end(EXIT_FAILURE);
   }
-  line = peek_first_token()->line;
-  ValidateIsWord(peek_first_token());
-  std::string snd_kw = ASTUtils::CastToNodeType<StringNode>(peek_first_token())->data;
-  pop_first_token();
+  line = PeekToken()->line;
+  ValidateIsWord(PeekToken());
+  std::string snd_kw = ASTUtils::CastToNodeType<StringNode>(PeekToken())->data;
+  NextToken();
 
   if (tokens_.empty()) {
     LOGE << "body of the DDL statement is missed in line " << line;
@@ -71,7 +71,7 @@ NodePtr<INode> Parser::GetDDLSt() {
   LOGD << "getting DDL statement...";
   NodePtr<INode> node = ASTUtils::CreateServiceNode(StmtType::kDdlStmt);
 
-  int line = peek_first_token()->line;
+  int line = PeekToken()->line;
   NodePtr<INode> statement;
   switch (GetDDLStType()) {
     case StmtType::kCreateDatabaseStmt:
@@ -111,7 +111,7 @@ NodePtr<INode> Parser::GetCreateDatabaseSt() {
   if (tokens_.empty()) {
     LOGE << "database name is missed";
   }
-  ValidateIsWord(peek_first_token());
+  ValidateIsWord(PeekToken());
   NodePtr<INode> database_name = GetName();
   ASTUtils::Link(node, database_name);
 
@@ -125,8 +125,8 @@ NodePtr<INode> Parser::GetCreateTableSt() {
     LOGE << "tableName is missed";
     return node;
   }
-  int line = peek_first_token()->line;
-  ValidateIsWord(peek_first_token());
+  int line = PeekToken()->line;
+  ValidateIsWord(PeekToken());
   NodePtr<INode> table_name = GetName();
   ASTUtils::Link(node, table_name);
 
@@ -134,32 +134,32 @@ NodePtr<INode> Parser::GetCreateTableSt() {
     LOGE << "expected opening round bracket in line " << line;
     end(EXIT_FAILURE);
   }
-  line = peek_first_token()->line;
-  ValidateIsOpeningRoundBracket(peek_first_token());
-  pop_first_token();
+  line = PeekToken()->line;
+  ValidateIsOpeningRoundBracket(PeekToken());
+  NextToken();
 
   if (tokens_.empty()) {
     LOGE << "expected table definition in line " << line;
     end(EXIT_FAILURE);
   }
-  line = peek_first_token()->line;
-  ValidateIsWord(peek_first_token());
+  line = PeekToken()->line;
+  ValidateIsWord(PeekToken());
   NodePtr<INode> table_definition = GetTableDefinition();
   ASTUtils::Link(node, table_definition);
 
   if (tokens_.empty()) {
     LOGE << "expected closing round bracket in line " << line;
   }
-  ValidateIsClosingRoundBracket(peek_first_token());
-  pop_first_token();
+  ValidateIsClosingRoundBracket(PeekToken());
+  NextToken();
 
   return node;
 }
 NodePtr<INode> Parser::GetAlterTableSt() {
   NodePtr<INode> node = ASTUtils::CreateServiceNode(StmtType::kAlterTableStmt);
 
-  int line = peek_first_token()->line;
-  ValidateIsWord(peek_first_token());
+  int line = PeekToken()->line;
+  ValidateIsWord(PeekToken());
   NodePtr<INode> table_name = GetName();
   ASTUtils::Link(node, table_name);
 
@@ -169,17 +169,17 @@ NodePtr<INode> Parser::GetAlterTableSt() {
         << line << ": expected action";
     end(EXIT_FAILURE);
   }
-  line = peek_first_token()->line;
-  ValidateIsWord(peek_first_token());
-  NodePtr<INode> action_str_node = get_first_token();
+  line = PeekToken()->line;
+  ValidateIsWord(PeekToken());
+  NodePtr<INode> action_str_node = NextToken();
 
   if (tokens_.empty()) {
     LOGE << "invalid alter table query: "
                "expected action's body in line " << line;
     end(EXIT_FAILURE);
   }
-  line = peek_first_token()->line;
-  ValidateIsWord(peek_first_token());
+  line = PeekToken()->line;
+  ValidateIsWord(PeekToken());
   std::string action_str = ASTUtils::CastToNodeType<StringNode>(action_str_node)->data;
 
   NodePtr<INode> argument;
@@ -208,11 +208,11 @@ NodePtr<INode> Parser::GetDropDatabaseSt() {
   if (tokens_.empty()) {
     LOGE << "databaseName is missed";
   }
-  ValidateIsWord(peek_first_token());
+  ValidateIsWord(PeekToken());
   NodePtr<INode> database_name = GetName();
   ASTUtils::Link(node, database_name);
 
-  if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
+  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
     NodePtr<INode> separator = GetListOf(StmtType::kName);
     ASTUtils::Link(node, separator);
   }
@@ -226,11 +226,11 @@ NodePtr<INode> Parser::GetDropTableSt() {
   if (tokens_.empty()) {
     LOGE << "table name is missed";
   }
-  ValidateIsWord(peek_first_token());
+  ValidateIsWord(PeekToken());
   NodePtr<INode> table_name = GetName();
   ASTUtils::Link(node, table_name);
 
-  if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
+  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
     NodePtr<INode> separator = GetListOf(StmtType::kName);
     ASTUtils::Link(node, separator);
   }
@@ -246,7 +246,7 @@ NodePtr<INode> Parser::GetTableDefinition() {
   NodePtr<INode> argument = GetTableDefinitionObject();
   ASTUtils::Link(node, argument);
 
-  if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
+  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
     NodePtr<INode> separator = GetListOf(StmtType::kTableDef);
     ASTUtils::Link(node, separator);
   }
@@ -256,7 +256,7 @@ NodePtr<INode> Parser::GetTableDefinition() {
 NodePtr<INode> Parser::GetTableDefinitionObject() {
   NodePtr<INode> argument;
 
-  std::string key_word = ASTUtils::CastToNodeType<StringNode>(peek_first_token())->data;
+  std::string key_word = ASTUtils::CastToNodeType<StringNode>(PeekToken())->data;
   bool is_tableConstraint =
       key_word == "CONSTRAINT"
           || key_word == "PRIMARY"
@@ -275,7 +275,7 @@ NodePtr<INode> Parser::GetColumnDefinition() {
   NodePtr<INode> column_def = ASTUtils::CreateServiceNode(StmtType::kColumnDef);
 
   // Get columnName
-  int line = peek_first_token()->line;
+  int line = PeekToken()->line;
   NodePtr<INode> column_name = GetIdentifier();
   ASTUtils::Link(column_def, column_name);
 
@@ -284,7 +284,7 @@ NodePtr<INode> Parser::GetColumnDefinition() {
     LOGE << "expected column datatype in line " << line;
     end(EXIT_FAILURE);
   }
-  ValidateIsWord(peek_first_token());
+  ValidateIsWord(PeekToken());
   NodePtr<INode> datatype = GetDataType();
   ASTUtils::Link(column_def, datatype);
 
@@ -299,10 +299,10 @@ NodePtr<INode> Parser::GetTableConstraint() {
   NodePtr<INode> table_constraint = ASTUtils::CreateServiceNode(StmtType::kTableConstraint);
 
   // Get full form if present
-  int line = peek_first_token()->line;
-  std::string key_word = ASTUtils::CastToNodeType<StringNode>(peek_first_token())->data;
+  int line = PeekToken()->line;
+  std::string key_word = ASTUtils::CastToNodeType<StringNode>(PeekToken())->data;
   if (key_word == "CONSTRAINT") {
-    pop_first_token();
+    NextToken();
     NodePtr<INode> constraint_kw =
         ASTUtils::CastToNodeType<ServiceNode>(std::make_shared<ServiceNode>());
     constraint_kw->stmt_type = StmtType::kConstraintKW;
@@ -323,9 +323,9 @@ NodePtr<INode> Parser::GetTableConstraint() {
   }
 
   // Get 'PRIMARY' | 'FOREIGN' key word
-  line = peek_first_token()->line;
-  ValidateIsWord(peek_first_token());
-  std::string kind_of_key = ASTUtils::CastToNodeType<StringNode>(get_first_token())->data;
+  line = PeekToken()->line;
+  ValidateIsWord(PeekToken());
+  std::string kind_of_key = ASTUtils::CastToNodeType<StringNode>(NextToken())->data;
 
   // Get 'KEY' key word
   if (tokens_.empty()) {
@@ -333,9 +333,9 @@ NodePtr<INode> Parser::GetTableConstraint() {
                "expected \'KEY\' in line " << line;
     end(EXIT_FAILURE);
   }
-  line = peek_first_token()->line;
-  ValidateIsWord(peek_first_token());
-  std::string KEY_kw = ASTUtils::CastToNodeType<StringNode>(get_first_token())->data;
+  line = PeekToken()->line;
+  ValidateIsWord(PeekToken());
+  std::string KEY_kw = ASTUtils::CastToNodeType<StringNode>(NextToken())->data;
   if (KEY_kw != "KEY") {
     LOGE << "expected \'KEY\', got \'"
         << KEY_kw << "\' in line " << line;
@@ -347,7 +347,7 @@ NodePtr<INode> Parser::GetTableConstraint() {
     LOGE << "expected constraint definition in line " << line;
     end(EXIT_FAILURE);
   }
-  line = peek_first_token()->line;
+  line = PeekToken()->line;
   NodePtr<INode> key;
   if (kind_of_key == "PRIMARY") {
     key = GetPrimaryKey();
@@ -369,7 +369,7 @@ NodePtr<INode> Parser::GetDropListDefinition() {
   NodePtr<INode> objects = GetDropObject();
   ASTUtils::Link(node, objects);
 
-  if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
+  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
     NodePtr<INode> separator = GetDropList();
     ASTUtils::Link(node, separator);
   }
@@ -377,14 +377,14 @@ NodePtr<INode> Parser::GetDropListDefinition() {
   return node;
 }
 NodePtr<INode> Parser::GetDropList() {
-  pop_first_token();
+  NextToken();
   NodePtr<INode> separator = ASTUtils::CreateServiceNode(StmtType::kCommaDelimiter);
 
-  ValidateIsWord(peek_first_token());
+  ValidateIsWord(PeekToken());
   NodePtr<INode> objects = GetDropObject();
   ASTUtils::Link(separator, objects);
 
-  if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
+  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
       NodePtr<INode> next_objects = GetDropList();
       ASTUtils::Link(separator, next_objects);
   }
@@ -392,8 +392,8 @@ NodePtr<INode> Parser::GetDropList() {
   return separator;
 }
 NodePtr<INode> Parser::GetDropObject() {
-  int line = peek_first_token()->line;
-  std::string key_word = ASTUtils::CastToNodeType<StringNode>(peek_first_token())->data;
+  int line = PeekToken()->line;
+  std::string key_word = ASTUtils::CastToNodeType<StringNode>(PeekToken())->data;
   bool is_tableConstraint = key_word == "CONSTRAINT";
   bool is_column = key_word == "COLUMN";
 
@@ -403,7 +403,7 @@ NodePtr<INode> Parser::GetDropObject() {
     end(EXIT_FAILURE);
   }
 
-  line = peek_first_token()->line;
+  line = PeekToken()->line;
   StmtType objectStmtType;
   if (is_tableConstraint) {
     objectStmtType = StmtType::kDropConstraint;
@@ -411,7 +411,7 @@ NodePtr<INode> Parser::GetDropObject() {
     objectStmtType = StmtType::kDropColumn;
   }
   NodePtr<INode> object = ASTUtils::CreateServiceNode(objectStmtType);
-  pop_first_token();
+  NextToken();
   if (tokens_.empty()) {
     LOGE << "invalid drop list: expected "
         << (is_column ? "constraint" : "column_name") << " in line " << line;
@@ -425,7 +425,7 @@ NodePtr<INode> Parser::GetDropObject() {
   NodePtr<INode> argument = GetIdentifier();
   ASTUtils::Link(object, argument);
 
-  if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
+  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
     // Check key word after the comma
     bool is_list = true;
     if (NodeDataTypeClassifier::IsWord(tokens_[1])) {

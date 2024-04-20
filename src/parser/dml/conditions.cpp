@@ -22,11 +22,11 @@ NodePtr<INode> Parser::GetORCondition() {
   NodePtr<INode> AND_condition = GetANDCondition();
   ASTUtils::Link(node, AND_condition);
 
-  int line = peek_first_token()->line;
-  if (!tokens_.empty() && NodeDataTypeClassifier::IsWord(peek_first_token())) {
-    NodePtr<StringNode> tmp = ASTUtils::CastToNodeType<StringNode>(peek_first_token());
+  int line = PeekToken()->line;
+  if (!tokens_.empty() && NodeDataTypeClassifier::IsWord(PeekToken())) {
+    NodePtr<StringNode> tmp = ASTUtils::CastToNodeType<StringNode>(PeekToken());
     if (tmp->data == "OR") {
-      pop_first_token();
+      NextToken();
 
       if (tokens_.empty()) {
         LOGE << "invalid OR-condition: expected AND-condition "
@@ -45,12 +45,12 @@ NodePtr<INode> Parser::GetANDCondition() {
   NodePtr<INode> NOT_condition = GetNOTCondition();
   ASTUtils::Link(node, NOT_condition);
 
-  int line = peek_first_token()->line;
+  int line = PeekToken()->line;
   if (!tokens_.empty()) {
-    if (NodeDataTypeClassifier::IsWord(peek_first_token())) {
-      NodePtr<StringNode> tmp = ASTUtils::CastToNodeType<StringNode>(peek_first_token());
+    if (NodeDataTypeClassifier::IsWord(PeekToken())) {
+      NodePtr<StringNode> tmp = ASTUtils::CastToNodeType<StringNode>(PeekToken());
       if (tmp->data == "AND") {
-        pop_first_token();
+        NextToken();
 
         if (tokens_.empty()) {
           LOGE << "invalid AND-condition: expected NOT-condition "
@@ -69,11 +69,11 @@ NodePtr<INode> Parser::GetNOTCondition() {
   NodePtr<INode> node = ASTUtils::CreateServiceNode(StmtType::kNOTCondition);
 
   // Get NOT if present
-  int line = peek_first_token()->line;
-  if (NodeDataTypeClassifier::IsWord(peek_first_token())) {
-    NodePtr<StringNode> tmp = ASTUtils::CastToNodeType<StringNode>(peek_first_token());
+  int line = PeekToken()->line;
+  if (NodeDataTypeClassifier::IsWord(PeekToken())) {
+    NodePtr<StringNode> tmp = ASTUtils::CastToNodeType<StringNode>(PeekToken());
     if (tmp->data == "NOT") {
-      NodePtr<INode> NOT_operator = get_first_token();
+      NodePtr<INode> NOT_operator = NextToken();
 
       ASTUtils::Link(node, NOT_operator);
     }
@@ -95,15 +95,15 @@ NodePtr<INode> Parser::GetPredicate() {
   NodePtr<INode> lhs = GetExpression();
   ASTUtils::Link(node, lhs);
 
-  int line = peek_first_token()->line;
+  int line = PeekToken()->line;
   if (tokens_.empty()) {
     LOGE << "invalid predicate: expected "
             "binary operator in line " << line;
     end(EXIT_FAILURE);
   }
-  if (NodeDataClassifier::IsBinaryOperator(peek_first_token())) {
-    line = peek_first_token()->line;
-    NodePtr<INode> bin_operator = get_first_token();
+  if (NodeDataClassifier::IsBinaryOperator(PeekToken())) {
+    line = PeekToken()->line;
+    NodePtr<INode> bin_operator = NextToken();
 
     ASTUtils::Link(node, bin_operator);
   } else {
@@ -125,14 +125,14 @@ NodePtr<INode> Parser::GetPredicate() {
 NodePtr<INode> Parser::GetExpression() {
   NodePtr<INode> node = ASTUtils::CreateServiceNode(StmtType::kExpression);
 
-  int line = peek_first_token()->line;
+  int line = PeekToken()->line;
 
   // Is it [table_name.] column ?
-  if (NodeDataTypeClassifier::IsWord(peek_first_token())) {
+  if (NodeDataTypeClassifier::IsWord(PeekToken())) {
     NodePtr<INode> name = GetIdentifier();
     ASTUtils::Link(node, name);
 
-    if (!tokens_.empty() && NodeDataClassifier::IsDot(peek_first_token())) {
+    if (!tokens_.empty() && NodeDataClassifier::IsDot(PeekToken())) {
       NodePtr<INode> dot = GetIdentifiers();
       ASTUtils::Link(node, dot);
     }
@@ -141,9 +141,9 @@ NodePtr<INode> Parser::GetExpression() {
   }
 
   // Is it unary operator ?
-  if (NodeDataClassifier::IsUnaryOperator(peek_first_token())) {
+  if (NodeDataClassifier::IsUnaryOperator(PeekToken())) {
     NodePtr<INode> u_operator, expression;
-    u_operator = get_first_token();
+    u_operator = NextToken();
 
     ASTUtils::Link(node, u_operator);
 
@@ -160,14 +160,14 @@ NodePtr<INode> Parser::GetExpression() {
   }
 
   // Is it (expression) ?
-  if (NodeDataClassifier::IsOpeningRoundBracket(peek_first_token())) {
-    pop_first_token();
+  if (NodeDataClassifier::IsOpeningRoundBracket(PeekToken())) {
+    NextToken();
     if (tokens_.empty()) {
       LOGE << "invalid expression in line "
            << line << ": bad bracket sequence \'(.\'";
       end(EXIT_FAILURE);
     }
-    line = peek_first_token()->line;
+    line = PeekToken()->line;
     node = GetExpression();
 
     if (tokens_.empty()) {
@@ -175,14 +175,14 @@ NodePtr<INode> Parser::GetExpression() {
            << line << ": bad bracket sequence \'(.\'";
       end(EXIT_FAILURE);
     }
-    pop_first_token();
+    NextToken();
 
     return node;
   }
 
   // Is it string ?
-  if (NodeDataClassifier::IsQuote(peek_first_token())) {
-    pop_first_token();
+  if (NodeDataClassifier::IsQuote(PeekToken())) {
+    NextToken();
     if (tokens_.empty()) {
       LOGE << "invalid expression in line "
            << line << ": invalid string";
