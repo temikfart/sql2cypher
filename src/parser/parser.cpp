@@ -14,14 +14,9 @@ Parser::Parser(std::deque<NodePtr<INode>>&& tokens) : tokens_(std::move(tokens))
 
 NodePtr<INode> Parser::Parse() {
   LOGI << "starting syntax analysis...";
+  ValidateHasTokens();
 
   NodePtr<INode> root = ASTUtils::CreateRootNode(StmtType::kProgram);
-
-  if (tokens_.empty()) {
-    LOGI << "syntax analysis is ended: empty tokens' array";
-    return nullptr;
-  }
-
   NodePtr<INode> query = GetDL();
   ASTUtils::Link(root, query);
 
@@ -30,21 +25,16 @@ NodePtr<INode> Parser::Parse() {
     ASTUtils::Link(root, separator);
   }
 
-  if (!tokens_.empty()) {
-    LOGE << "syntax analysis is ended with not empty tokens' array";
-    end(EXIT_FAILURE);
-  }
-
-  LOGI << "syntax analysis is ended";
+  ValidateHasNotTokens();
   return root;
 }
 
 const NodePtr<INode>& Parser::PeekToken() const {
-  ValidateNotEmpty();
+  ValidateHasTokens();
   return tokens_.front();
 }
 NodePtr<INode> Parser::NextToken() {
-  ValidateNotEmpty();
+  ValidateHasTokens();
   NodePtr<INode> node = tokens_.front();
   tokens_.pop_front();
   return node;
@@ -57,7 +47,7 @@ NodePtr<INode> Parser::General() {
   NodePtr<INode> separator = ASTUtils::CreateServiceNode(StmtType::kSemicolonDelimiter);
 
   if (!tokens_.empty()) {
-    NodePtr<INode> query = GetDL();
+    NodePtr<INode> query = ParseQuery();
     ASTUtils::Link(separator, query);
   }
 
@@ -101,7 +91,7 @@ StmtType Parser::GetDLStType() {
 
   return DLStType;
 }
-NodePtr<INode> Parser::GetDL() {
+NodePtr<INode> Parser::ParseQuery() {
   NodePtr<INode> query = ASTUtils::CreateServiceNode(StmtType::kQuery);
 
   ValidateIsWord(PeekToken());
