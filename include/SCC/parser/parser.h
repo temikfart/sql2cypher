@@ -1,8 +1,10 @@
 #pragma once
 
 #include <deque>
+#include <exception>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <utility>
 
 #include "SCC/ast/common/utils.h"
@@ -21,6 +23,11 @@
 #include "logger/log.hpp"
 
 namespace scc::parser {
+
+class parsing_error : private std::logic_error {
+public:
+  explicit parsing_error(const std::string& message);
+};
 
 class Parser {
 public:

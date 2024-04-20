@@ -9,42 +9,36 @@ template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
+parsing_error::parsing_error(const std::string& message) : std::logic_error(message) {}
+
 void Parser::ValidateNotEmpty() const {
   if (tokens_.empty()) {
-    LOGE << "expected that tokens' array is not empty";
-    end(EXIT_FAILURE);
+    throw parsing_error("Unexpected empty tokens array");
   }
 }
 void Parser::ValidateIsWord(const NodePtr<INode>& node) const {
-  if (node->data_type != DataType::kWord) {
-    LOGE << "expected word in line " << node->line;
-    end(EXIT_FAILURE);
+  if (!NodeDataTypeClassifier::IsWord(node)) {
+    throw parsing_error("Expected Word at line " + std::to_string(node->line));
   }
 }
 void Parser::ValidateIsOpeningRoundBracket(const NodePtr<INode>& node) const {
   if (!NodeDataClassifier::IsOpeningRoundBracket(node)) {
-    LOGE << "expected an opening round bracket in line "
-         << node->line;
-    end(EXIT_FAILURE);
+    throw parsing_error("Expected Opening Round Bracket at line " + std::to_string(node->line));
   }
 }
 void Parser::ValidateIsClosingRoundBracket(const NodePtr<INode>& node) const {
   if (!NodeDataClassifier::IsClosingRoundBracket(node)) {
-    LOGE << "expected a closing round bracket in line "
-         << node->line;
-    end(EXIT_FAILURE);
+    throw parsing_error("Expected Closing Round Bracket at line " + std::to_string(node->line));
   }
 }
 void Parser::ValidateIsSingleQuote(const NodePtr<INode>& node) const {
   if (!NodeDataClassifier::IsSingleQuote(node)) {
-    LOGE << "expected a single quote in line " << node->line;
-    end(EXIT_FAILURE);
+    throw parsing_error("Expected Single Quote at line " + std::to_string(node->line));
   }
 }
 void Parser::ValidateIsDoubleQuote(const NodePtr<INode>& node) const {
   if (!NodeDataClassifier::IsSingleQuote(node)) {
-    LOGE << "expected a double quote in line " << node->line;
-    end(EXIT_FAILURE);
+    throw parsing_error("Expected Double Quote at line " + std::to_string(node->line));
   }
 }
 

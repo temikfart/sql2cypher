@@ -10,8 +10,7 @@ template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
-Parser::Parser(std::deque<NodePtr<INode>>&& tokens)
-    : tokens_(std::move(tokens)) {}
+Parser::Parser(std::deque<NodePtr<INode>>&& tokens) : tokens_(std::move(tokens)) {}
 
 NodePtr<INode> Parser::Parse() {
   LOGI << "starting syntax analysis...";
