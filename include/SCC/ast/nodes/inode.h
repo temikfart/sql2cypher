@@ -24,6 +24,7 @@ public:
 
   explicit INode(DataType data_type);
   explicit INode(DataType data_type, StmtType stmt_type);
+  explicit INode(DataType data_type, StmtType stmt_type, int line);
   virtual ~INode();
 
   std::shared_ptr<INode> get_child(std::size_t node_num);

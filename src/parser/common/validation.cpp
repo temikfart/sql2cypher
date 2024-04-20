@@ -11,9 +11,11 @@ using NodePtr = std::shared_ptr<NodeType>;
 
 parsing_error::parsing_error(const std::string& message) : std::logic_error(message) {}
 
-void Parser::ValidateHasTokens() const {
+void Parser::ValidateHasTokens(const std::string& details) const {
   if (tokens_.empty()) {
-    throw parsing_error("Unexpected empty tokens array");
+    std::string msg = "Unexpected empty tokens array";
+    std::string cause = (details.empty() ? "" : (": " + details));
+    throw parsing_error(msg + cause);
   }
 }
 void Parser::ValidateHasNotTokens() const {

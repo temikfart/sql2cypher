@@ -12,6 +12,9 @@ NodePtr<INode> ASTUtils::CreateRootNode(StmtType stmt_type) {
 NodePtr<INode> ASTUtils::CreateServiceNode(StmtType stmt_type) {
   return CastToINode(std::make_shared<ServiceNode>(stmt_type));
 }
+NodePtr<INode> ASTUtils::CreateServiceNode(StmtType stmt_type, const NodePtr<INode>& base) {
+  return CastToINode(std::make_shared<ServiceNode>(stmt_type, base->line));
+}
 NodePtr<INode> ASTUtils::CreateCharNode(char ch, DataType data_type) {
   return CastToINode(std::make_shared<CharNode>(ch, data_type));
 }

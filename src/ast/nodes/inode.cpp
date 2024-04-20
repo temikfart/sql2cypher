@@ -5,6 +5,8 @@ namespace scc::ast {
 INode::INode(DataType data_type) : data_type(data_type) {}
 INode::INode(DataType data_type, StmtType stmt_type)
     : data_type(data_type), stmt_type(stmt_type) {}
+INode::INode(DataType data_type, StmtType stmt_type, int line)
+    : line(line), data_type(data_type), stmt_type(stmt_type) {}
 INode::~INode() = default;
 
 std::shared_ptr<INode> INode::get_child(std::size_t node_num) {
