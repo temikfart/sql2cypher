@@ -31,7 +31,7 @@ void QueryAssembler::Translate(std::shared_ptr<INode> AST) {
   }
 
   if (ast_->stmt_type == StmtType::kProgram) {
-    if (ast_->get_children_amount() > 0) {
+    if (ast_->ChildrenCount() > 0) {
       this->TranslateProgram(ast_);
     } else {
       LOGI << "translation is ended: only one node in AST";
@@ -55,10 +55,10 @@ void QueryAssembler::TranslateProgram(std::shared_ptr<INode> node) {
     end(EXIT_FAILURE);
   }
 
-  if (node->get_children_amount() > 1) {
+  if (node->ChildrenCount() > 1) {
     auto other_queries = node->get_child(1);
     if (other_queries->stmt_type == StmtType::kSemicolonDelimiter) {
-      if (other_queries->get_children_amount() > 0) {
+      if (other_queries->ChildrenCount() > 0) {
         this->TranslateProgram(other_queries);
       }
     } else {
@@ -68,7 +68,7 @@ void QueryAssembler::TranslateProgram(std::shared_ptr<INode> node) {
   }
 }
 void QueryAssembler::TranslateQuery(std::shared_ptr<INode> node) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGD << "empty query";
     return;
   }

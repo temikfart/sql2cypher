@@ -5,7 +5,7 @@ namespace scc::query_assembler {
 using namespace ast;
 
 void QueryAssembler::TranslateDDLStatement(std::shared_ptr<INode> node) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGD << "empty DDL query";
     return;
   }
@@ -34,7 +34,7 @@ void QueryAssembler::TranslateDDLStatement(std::shared_ptr<INode> node) {
 }
 
 void QueryAssembler::TranslateCreateDatabase(std::shared_ptr<INode> node) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGE << "database name is missed";
     end(EXIT_FAILURE);
   }
@@ -44,7 +44,7 @@ void QueryAssembler::TranslateCreateDatabase(std::shared_ptr<INode> node) {
        << ";\n" << std::endl;
 }
 void QueryAssembler::TranslateCreateTable(std::shared_ptr<INode> node) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGE << "table name is missed";
     end(EXIT_FAILURE);
   }
@@ -52,12 +52,12 @@ void QueryAssembler::TranslateCreateTable(std::shared_ptr<INode> node) {
   std::string table_name = this->TranslateName(node->get_child(0));
   out_ << "CREATE (:" << table_name;
 
-  if (node->get_children_amount() < 2) {
+  if (node->ChildrenCount() < 2) {
     LOGE << "table definition is missed";
     end(EXIT_FAILURE);
   }
   auto table_definition = node->get_child(1);
-  if (table_definition->get_children_amount() == 0) {
+  if (table_definition->ChildrenCount() == 0) {
     LOGE << "invalid table: empty table definition";
     end(EXIT_FAILURE);
   }
@@ -76,14 +76,14 @@ void QueryAssembler::TranslateCreateTable(std::shared_ptr<INode> node) {
   out_ << std::get<0>(first_property) << ": "
        << std::get<1>(first_property);
 
-  if (table_definition->get_children_amount() > 1) {
+  if (table_definition->ChildrenCount() > 1) {
     auto comma = table_definition->get_child(1);
     if (comma->stmt_type != StmtType::kCommaDelimiter) {
       LOGE << "invalid table definition: delimiter is not a comma";
       end(EXIT_FAILURE);
     }
 
-    if (comma->get_children_amount() == 0) {
+    if (comma->ChildrenCount() == 0) {
       LOGE << "invalid table definition: comma without children";
       end(EXIT_FAILURE);
     }
@@ -100,7 +100,7 @@ void QueryAssembler::TranslateCreateTable(std::shared_ptr<INode> node) {
   out_ << "});\n" << std::endl;
 
   // Get constraints
-  if (table_definition->get_children_amount() > 1) {
+  if (table_definition->ChildrenCount() > 1) {
     auto constraints = this->FindConstraint(table_definition->get_child(1));
     if (constraints != nullptr) {
       this->TranslateListOfTableConstraints(constraints, table_name);
@@ -108,14 +108,14 @@ void QueryAssembler::TranslateCreateTable(std::shared_ptr<INode> node) {
   }
 }
 void QueryAssembler::TranslateAlterTable(std::shared_ptr<INode> node) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGE << "table name is missed";
     end(EXIT_FAILURE);
   }
 
   std::string table_name = this->TranslateName(node->get_child(0));
 
-  if (node->get_children_amount() < 2) {
+  if (node->ChildrenCount() < 2) {
     LOGE << "alter table action is missed";
     end(EXIT_FAILURE);
   }
@@ -128,7 +128,7 @@ void QueryAssembler::TranslateAlterTable(std::shared_ptr<INode> node) {
   }
 }
 void QueryAssembler::TranslateDropDatabase(std::shared_ptr<INode> node) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGE << "database name is missed";
     end(EXIT_FAILURE);
   }
@@ -137,7 +137,7 @@ void QueryAssembler::TranslateDropDatabase(std::shared_ptr<INode> node) {
        << this->TranslateName(node->get_child(0))
        << ";\n" << std::endl;
 
-  if (node->get_children_amount() > 1) {
+  if (node->ChildrenCount() > 1) {
     std::vector<std::string> other_db_names =
         this->GetListOf(node->get_child(1), StmtType::kName);
     for (auto& i: other_db_names) {
@@ -146,7 +146,7 @@ void QueryAssembler::TranslateDropDatabase(std::shared_ptr<INode> node) {
   }
 }
 void QueryAssembler::TranslateDropTable(std::shared_ptr<INode> node) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGE << "table name is missed";
     end(EXIT_FAILURE);
   }
@@ -156,7 +156,7 @@ void QueryAssembler::TranslateDropTable(std::shared_ptr<INode> node) {
        << this->TranslateName(node->get_child(0))
        << ") DELETE x;\n" << std::endl;
 
-  if (node->get_children_amount() > 1) {
+  if (node->ChildrenCount() > 1) {
     std::vector<std::string> other_table_names =
         this->GetListOf(node->get_child(1), StmtType::kName);
     for (auto& i: other_table_names) {
@@ -168,13 +168,13 @@ void QueryAssembler::TranslateDropTable(std::shared_ptr<INode> node) {
 void QueryAssembler::TranslateAlterTableActionAdd(
     std::shared_ptr<INode> action_node,
     std::string& table_name) {
-  if (action_node->get_children_amount() == 0) {
+  if (action_node->ChildrenCount() == 0) {
     LOGE << "alter table ADD without content";
     end(EXIT_FAILURE);
   }
   auto table_definition = action_node->get_child(0);
 
-  if (table_definition->get_children_amount() == 0) {
+  if (table_definition->ChildrenCount() == 0) {
     LOGE << "alter table ADD action without arguments";
     end(EXIT_FAILURE);
   }
@@ -194,7 +194,7 @@ void QueryAssembler::TranslateAlterTableActionAdd(
     out_ << "n." << std::get<0>(first_prop)
          << " = " << std::get<1>(first_prop);
 
-    if (table_definition->get_children_amount() > 1) {
+    if (table_definition->ChildrenCount() > 1) {
       auto comma = table_definition->get_child(1);
       if (comma->stmt_type != StmtType::kCommaDelimiter) {
         LOGE << "delimiter between column definitions is not a comma";
@@ -230,20 +230,20 @@ void QueryAssembler::TranslateAlterTableActionAdd(
 void QueryAssembler::TranslateAlterTableActionDrop(
     std::shared_ptr<INode> action_node,
     std::string& table_name) {
-  if (action_node->get_children_amount() == 0) {
+  if (action_node->ChildrenCount() == 0) {
     LOGE << "alter table DROP without content";
     end(EXIT_FAILURE);
   }
   auto drop_list_def = action_node->get_child(0);
 
-  if (drop_list_def->get_children_amount() == 0) {
+  if (drop_list_def->ChildrenCount() == 0) {
     LOGE << "alter table DROP without arguments";
   }
   auto object = drop_list_def->get_child(0);
 
   this->TranslateDropObject(object, table_name);
 
-  if (drop_list_def->get_children_amount() > 1) {
+  if (drop_list_def->ChildrenCount() > 1) {
     auto other_objects = drop_list_def->get_child(1);
     this->TranslateListOfDropObjects(other_objects, table_name);
   }
@@ -251,7 +251,7 @@ void QueryAssembler::TranslateAlterTableActionDrop(
 
 std::vector<StdProperty> QueryAssembler::TranslateListOfColumnDefinitions(
     std::shared_ptr<INode> node) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGE << "invalid list of column definitions: comma without children";
     end(EXIT_FAILURE);
   }
@@ -262,7 +262,7 @@ std::vector<StdProperty> QueryAssembler::TranslateListOfColumnDefinitions(
 
   std::vector<StdProperty> column_definitions;
   column_definitions.push_back(this->TranslateColumnDefinition(argument));
-  if (node->get_children_amount() > 1) {
+  if (node->ChildrenCount() > 1) {
     auto comma = node->get_child(1);
     if ((comma->get_child(0))->stmt_type
         == StmtType::kColumnDef) {
@@ -278,13 +278,13 @@ std::vector<StdProperty> QueryAssembler::TranslateListOfColumnDefinitions(
 }
 StdProperty QueryAssembler::TranslateColumnDefinition(
     std::shared_ptr<INode> node) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGE << "empty column definition";
     end(EXIT_FAILURE);
   }
   std::string column_name = this->TranslateIdentifier(node->get_child(0));
 
-  if (node->get_children_amount() == 1) {
+  if (node->ChildrenCount() == 1) {
     LOGE << "invalid column definition: datatype is missed";
     end(EXIT_FAILURE);
   }
@@ -312,14 +312,14 @@ StdProperty QueryAssembler::TranslateColumnDefinition(
 
 void QueryAssembler::TranslateListOfTableConstraints(std::shared_ptr<INode> node,
                                                      std::string& table_name) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGE <<
         "invalid list of table constraints: comma without children";
     end(EXIT_FAILURE);
   }
 
   auto constraint = node->get_child(0);
-  if (constraint->get_children_amount() == 0) {
+  if (constraint->ChildrenCount() == 0) {
     LOGE << "empty table constraint";
     end(EXIT_FAILURE);
   }
@@ -327,12 +327,12 @@ void QueryAssembler::TranslateListOfTableConstraints(std::shared_ptr<INode> node
   // Create new constraint name if necessary
   size_t key_node_number = 0;
   std::string constraint_name;
-  if (constraint->get_children_amount() > 1) {
+  if (constraint->ChildrenCount() > 1) {
     key_node_number++;
 
     auto constraint_kw = constraint->get_child(0);
     if (constraint_kw->stmt_type != StmtType::kConstraintKW
-        || constraint_kw->get_children_amount() == 0) {
+        || constraint_kw->ChildrenCount() == 0) {
       LOGE << "invalid CONSTRAINT key word node";
       end(EXIT_FAILURE);
     }
@@ -344,7 +344,7 @@ void QueryAssembler::TranslateListOfTableConstraints(std::shared_ptr<INode> node
   }
 
   // Translate constraint definition
-  if (constraint->get_children_amount() < key_node_number) {
+  if (constraint->ChildrenCount() < key_node_number) {
     LOGE << "table constraint definition is missed";
     end(EXIT_FAILURE);
   }
@@ -355,7 +355,7 @@ void QueryAssembler::TranslateListOfTableConstraints(std::shared_ptr<INode> node
     this->TranslateForeignKey(key, table_name);
   }
 
-  if (node->get_children_amount() > 1) {
+  if (node->ChildrenCount() > 1) {
     this->TranslateListOfTableConstraints(
         node->get_child(1),
         table_name);
@@ -364,7 +364,7 @@ void QueryAssembler::TranslateListOfTableConstraints(std::shared_ptr<INode> node
 std::shared_ptr<INode> QueryAssembler::FindConstraint(
     std::shared_ptr<INode> node) {
   std::shared_ptr<INode> constraints = nullptr;
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     return constraints;
   }
 
@@ -372,7 +372,7 @@ std::shared_ptr<INode> QueryAssembler::FindConstraint(
   if (left->stmt_type == StmtType::kTableConstraint) {
     constraints = node;
   } else {
-    if (node->get_children_amount() > 1) {
+    if (node->ChildrenCount() > 1) {
       constraints = this->FindConstraint(node->get_child(1));
     }
   }
@@ -387,14 +387,14 @@ void QueryAssembler::TranslateListOfDropObjects(
     LOGE << "invalid statement type for the dropList";
     end(EXIT_FAILURE);
   }
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGE << "invalid dropList without children";
     end(EXIT_FAILURE);
   }
 
   this->TranslateDropObject(node->get_child(0), table_name);
 
-  if (node->get_children_amount() > 1) {
+  if (node->ChildrenCount() > 1) {
     auto other_objects = node->get_child(1);
     this->TranslateListOfDropObjects(other_objects, table_name);
   }
@@ -402,13 +402,13 @@ void QueryAssembler::TranslateListOfDropObjects(
 void QueryAssembler::TranslateDropObject(
     std::shared_ptr<INode> node,
     std::string& table_name) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGE << "invalid drop object without children";
     end(EXIT_FAILURE);
   }
   std::string argument = this->TranslateIdentifier(node->get_child(0));
   std::vector<std::string> other_arguments;
-  if (node->get_children_amount() > 1) {
+  if (node->ChildrenCount() > 1) {
     other_arguments =
         this->GetListOf(node->get_child(1), StmtType::kIdentifier);
   }

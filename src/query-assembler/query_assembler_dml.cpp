@@ -5,7 +5,7 @@ namespace scc::query_assembler {
 using namespace ast;
 
 void QueryAssembler::TranslateDMLStatement(std::shared_ptr<INode> node) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGD << "empty DML query";
   }
 
@@ -27,19 +27,19 @@ void QueryAssembler::TranslateDMLStatement(std::shared_ptr<INode> node) {
 }
 
 void QueryAssembler::TranslateInsert(std::shared_ptr<INode> node) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGE << "insert statement without body";
     end(EXIT_FAILURE);
   }
 }
 void QueryAssembler::TranslateDelete(std::shared_ptr<INode> node) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGE << "delete statement without body";
     end(EXIT_FAILURE);
   }
 }
 void QueryAssembler::TranslateUpdate(std::shared_ptr<INode> node) {
-  if (node->get_children_amount() == 0) {
+  if (node->ChildrenCount() == 0) {
     LOGE << "update statement without body";
     end(EXIT_FAILURE);
   }
