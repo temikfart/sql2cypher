@@ -26,6 +26,8 @@ public:
   static std::shared_ptr<INode> CreateServiceNode(StmtType stmt_type);
   static std::shared_ptr<INode> CreateCharNode(char ch, DataType data_type);
   static std::shared_ptr<INode> CreateStringNode(const std::string& str, DataType data_type);
+
+  static void Link(std::shared_ptr<INode>& parent, std::shared_ptr<INode>& child);
 };
 
 } // scc::ast::common

@@ -23,16 +23,12 @@ NodePtr<INode> Parser::Parse() {
     return nullptr;
   }
 
-  NodePtr<INode> query, separator;
+  NodePtr<INode> query = GetDL();
+  ASTUtils::Link(root, query);
 
-  query = GetDL();
-  INode::Link(root, query);
-
-  if (!tokens_.empty()) {
-    if (NodeDataClassifier::IsSemicolon(peek_first_token())) {
-      separator = General();
-      INode::Link(root, separator);
-    }
+  if (!tokens_.empty() && NodeDataClassifier::IsSemicolon(peek_first_token())) {
+    NodePtr<INode> separator = General();
+    ASTUtils::Link(root, separator);
   }
 
   if (!tokens_.empty()) {
@@ -67,13 +63,13 @@ NodePtr<INode> Parser::General() {
 
   if (!tokens_.empty()) {
     NodePtr<INode> query = GetDL();
-    INode::Link(separator, query);
+    ASTUtils::Link(separator, query);
   }
 
   if (!tokens_.empty()) {
     if (NodeDataClassifier::IsSemicolon(peek_first_token())) {
       NodePtr<INode> next_queries = General();
-      INode::Link(separator, next_queries);
+      ASTUtils::Link(separator, next_queries);
     }
   }
 
@@ -128,7 +124,7 @@ NodePtr<INode> Parser::GetDL() {
           << peek_first_token()->line;
       end(EXIT_FAILURE);
   }
-  INode::Link(query, statement);
+  ASTUtils::Link(query, statement);
 
   return query;
 }

@@ -24,10 +24,6 @@ std::size_t INode::ChildrenCount() const {
 void INode::AddChild(std::shared_ptr<INode> const& node) {
   children_.push_back(node);
 }
-void INode::Link(std::shared_ptr<INode>& parent, std::shared_ptr<INode>& child) {
-  parent->AddChild(child);
-  child->parent = parent;
-}
 bool INode::IsNodesEqual(const std::shared_ptr<INode>& node1,
                          const std::shared_ptr<INode>& node2) {
   if (node1->data_type != node2->data_type ||
