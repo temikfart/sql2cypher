@@ -13,19 +13,23 @@ using NodePtr = std::shared_ptr<NodeType>;
 Parser::Parser(std::deque<NodePtr<INode>>&& tokens) : tokens_(std::move(tokens)) {}
 
 NodePtr<INode> Parser::Parse() {
-  LOGI << "starting syntax analysis...";
-  ValidateHasTokens();
+  LOGI << "Parsing is started";
+  if (tokens_.empty()) {
+    LOGI << "Parsing is finished. Nothing to parse";
+    return {};
+  }
 
   NodePtr<INode> root = ASTUtils::CreateRootNode(StmtType::kProgram);
-  NodePtr<INode> query = GetDL();
+  NodePtr<INode> query = ParseQuery();
   ASTUtils::Link(root, query);
 
   if (!tokens_.empty() && NodeDataClassifier::IsSemicolon(PeekToken())) {
-    NodePtr<INode> separator = General();
-    ASTUtils::Link(root, separator);
+    NodePtr<INode> next_queries = ParseNextQueries();
+    ASTUtils::Link(root, next_queries);
   }
 
   ValidateHasNotTokens();
+  LOGI << "Parsing is finished";
   return root;
 }
 
@@ -40,78 +44,42 @@ NodePtr<INode> Parser::NextToken() {
   return node;
 }
 
-// Start
+NodePtr<INode> Parser::ParseQuery() {
+  const auto& peeked_token = PeekToken();
+  ValidateIsWord(peeked_token);
+  NodePtr<INode> query = ASTUtils::CreateServiceNode(StmtType::kQuery, peeked_token);
 
-NodePtr<INode> Parser::General() {
-  NextToken();
-  NodePtr<INode> separator = ASTUtils::CreateServiceNode(StmtType::kSemicolonDelimiter);
+  NodePtr<INode> statement = ParseBaseStatement();
+  ASTUtils::Link(query, statement);
+
+  return query;
+}
+NodePtr<INode> Parser::ParseBaseStatement() {
+  const auto& peeked_token = PeekToken();
+  std::string keyword = ASTUtils::CastToNodeType<StringNode>(peeked_token)->data;
+  if (BaseStmtTypeClassifier::IsDDLKeyword(keyword)) {
+    return GetDDLSt();
+  } else if (BaseStmtTypeClassifier::IsDMLKeyword(keyword)) {
+    return GetDMLSt();
+  } else {
+    throw parsing_error("Unknown Base Statement at line " + std::to_string(peeked_token->line));
+  }
+}
+NodePtr<INode> Parser::ParseNextQueries() {
+  NodePtr<INode> separator = ASTUtils::CreateServiceNode(StmtType::kSemicolonDelimiter,
+                                                         NextToken());
 
   if (!tokens_.empty()) {
     NodePtr<INode> query = ParseQuery();
     ASTUtils::Link(separator, query);
   }
 
-  if (!tokens_.empty()) {
-    if (NodeDataClassifier::IsSemicolon(PeekToken())) {
-      NodePtr<INode> next_queries = General();
-      ASTUtils::Link(separator, next_queries);
-    }
+  if (!tokens_.empty() && NodeDataClassifier::IsSemicolon(PeekToken())) {
+    NodePtr<INode> next_queries = ParseNextQueries();
+    ASTUtils::Link(separator, next_queries);
   }
 
   return separator;
-}
-StmtType Parser::GetDLStType() {
-  StmtType DLStType = StmtType::kNone;   // invalid value
-
-  std::string key_word = ASTUtils::CastToNodeType<StringNode>(PeekToken())->data;
-
-  std::vector<std::string> ddlSt_kws = {
-      "CREATE", "ALTER", "DROP"
-  };
-  std::vector<std::string> dmlSt_kws = {
-      "UPDATE", "DELETE", "INSERT"
-  };
-
-  bool is_ddlSt = std::any_of(ddlSt_kws.begin(),
-                              ddlSt_kws.end(),
-                              [key_word](std::string& st) {
-                                return (key_word == st);
-                              });
-  bool is_dmlSt = std::any_of(dmlSt_kws.begin(),
-                              dmlSt_kws.end(),
-                              [key_word](std::string& st) {
-                                return (key_word == st);
-                              });
-
-  if (is_ddlSt) {
-    DLStType = StmtType::kDdlStmt;
-  } else if (is_dmlSt) {
-    DLStType = StmtType::kDmlStmt;
-  }
-
-  return DLStType;
-}
-NodePtr<INode> Parser::ParseQuery() {
-  NodePtr<INode> query = ASTUtils::CreateServiceNode(StmtType::kQuery);
-
-  ValidateIsWord(PeekToken());
-
-  NodePtr<INode> statement;
-  switch (GetDLStType()) {
-    case StmtType::kDdlStmt:
-      statement = GetDDLSt();
-      break;
-    case StmtType::kDmlStmt:
-      statement = GetDMLSt();
-      break;
-    default:
-      LOGE << "unknown DL on line "
-          << PeekToken()->line;
-      end(EXIT_FAILURE);
-  }
-  ASTUtils::Link(query, statement);
-
-  return query;
 }
 
 } // scc::parser

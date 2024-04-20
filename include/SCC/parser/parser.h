@@ -17,6 +17,7 @@
 #include "SCC/ast/nodes/string_node.h"
 #include "SCC/config/scc_config.h"
 #include "SCC/log/log.h"
+#include "SCC/parser/common/base_stmttype_classifier.h"
 #include "SCC/parser/common/node_data_classifier.h"
 #include "SCC/parser/common/node_datatype_classifier.h"
 
@@ -45,9 +46,9 @@ private:
 
   // Start
 
-  std::shared_ptr<ast::INode> General();
-  ast::StmtType GetDLStType();
-  std::shared_ptr<ast::INode> GetDL();
+  std::shared_ptr<ast::INode> ParseQuery();
+  std::shared_ptr<ast::INode> ParseBaseStatement();
+  std::shared_ptr<ast::INode> ParseNextQueries();
 
   // Define language (DDL | DML)
 
@@ -125,7 +126,7 @@ private:
 
   // Validation
 
-  void ValidateHasTokens() const;
+  void ValidateHasTokens(const std::string& details = "") const;
   void ValidateHasNotTokens() const;
   void ValidateIsWord(const std::shared_ptr<ast::INode>& node) const;
   void ValidateIsOpeningRoundBracket(const std::shared_ptr<ast::INode>& node) const;
