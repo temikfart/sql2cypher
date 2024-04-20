@@ -41,7 +41,7 @@ NodePtr<INode> Parser::GetPrimaryKey() {
 
   // Get listOf(column_names)
   if (!tokens_.empty()) {
-    if (Parser::IsComma(peek_first_token())) {
+    if (NodeDataClassifier::IsComma(peek_first_token())) {
       NodePtr<INode> separator = GetListOf(StmtType::kIdentifier);
       INode::Link(primary_key, separator);
     }
@@ -73,8 +73,7 @@ NodePtr<INode> Parser::GetForeignKey() {
   INode::Link(foreign_key, column_name);
 
   // Get listOf(column_names)
-  if (!tokens_.empty()
-      && Parser::IsComma(peek_first_token())) {
+  if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
     NodePtr<INode> separator = GetListOf(StmtType::kIdentifier);
     INode::Link(foreign_key, separator);
   }
@@ -118,8 +117,7 @@ NodePtr<INode> Parser::GetReference() {
   INode::Link(reference, ref_table_name);
 
   // Get columns if present
-  if (!tokens_.empty()
-      && Parser::IsOpeningRoundBracket(peek_first_token())) {
+  if (!tokens_.empty() && NodeDataClassifier::IsOpeningRoundBracket(peek_first_token())) {
     NodePtr<INode> ref_column_name, next_ref_column_names;
 
     ValidateIsOpeningRoundBracket(peek_first_token());
@@ -138,7 +136,7 @@ NodePtr<INode> Parser::GetReference() {
            << line << ": closing round bracket is missed";
       end(EXIT_FAILURE);
     }
-    if (Parser::IsComma(peek_first_token())) {
+    if (NodeDataClassifier::IsComma(peek_first_token())) {
       next_ref_column_names =
           GetListOf(StmtType::kIdentifier);
       INode::Link(reference, next_ref_column_names);
@@ -160,8 +158,7 @@ NodePtr<INode> Parser::GetString() {
   NodePtr<INode> node;
 
   int line = peek_first_token()->line;
-  bool is_single_quote =
-      Parser::IsSingleQuote(peek_first_token());
+  bool is_single_quote = NodeDataClassifier::IsSingleQuote(peek_first_token());
   pop_first_token();
 
   if (tokens_.empty()) {
@@ -171,16 +168,13 @@ NodePtr<INode> Parser::GetString() {
   }
   NodePtr<StringNode> str =
       std::make_shared<StringNode>("", DataType::kString);
-  while (!Parser::IsSingleQuote(peek_first_token())
-      || !Parser::IsDoubleQuote(peek_first_token())) {
+  while (!NodeDataClassifier::IsQuote(peek_first_token())) {
     NodePtr<INode> tmp = get_first_token();
-    line = tmp->line;
-    DataType tmp_type = tmp->data_type;
     std::string new_data;
     if (!str->data.empty()) {
       new_data = str->data + " ";
     }
-    switch (tmp_type) {
+    switch (tmp->data_type) {
       case DataType::kInt:
         new_data += std::to_string(ParserUtils::CastToNodeType<IntNumNode>(tmp)->data);
         break;
@@ -197,7 +191,7 @@ NodePtr<INode> Parser::GetString() {
         break;
       default:
         LOGE << "invalid string in line "
-             << line << ": incorrect type of token inside the string";
+             << tmp->line << ": incorrect type of token inside the string";
         end(EXIT_FAILURE);
     }
     str->data = new_data;
@@ -227,7 +221,7 @@ NodePtr<INode> Parser::GetName() {
   INode::Link(name, identifier);
 
   if (!tokens_.empty()) {
-    if (Parser::IsDot(peek_first_token())) {
+    if (NodeDataClassifier::IsDot(peek_first_token())) {
       NodePtr<INode> next_identifiers = GetIdentifiers();
       INode::Link(name, next_identifiers);
     }
@@ -248,7 +242,7 @@ NodePtr<INode> Parser::GetIdentifiers() {
   INode::Link(dot, identifier);
 
   if (!tokens_.empty()) {
-    if (Parser::IsDot(peek_first_token())) {
+    if (NodeDataClassifier::IsDot(peek_first_token())) {
       NodePtr<INode> next_identifiers = GetIdentifiers();
       INode::Link(dot, next_identifiers);
     }
@@ -308,7 +302,7 @@ NodePtr<INode> Parser::GetListOf(StmtType get_function_type) {
   INode::Link(separator, argument);
 
   if (!tokens_.empty()
-      && Parser::IsComma(peek_first_token())) {
+      && NodeDataClassifier::IsComma(peek_first_token())) {
     NodePtr<INode> next_separator = GetListOf(get_function_type);
     INode::Link(separator, next_separator);
   }

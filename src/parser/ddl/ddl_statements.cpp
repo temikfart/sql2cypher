@@ -211,8 +211,7 @@ NodePtr<INode> Parser::GetDropDatabaseSt() {
   NodePtr<INode> database_name = GetName();
   INode::Link(node, database_name);
 
-  if (!tokens_.empty()
-      && Parser::IsComma(peek_first_token())) {
+  if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
     NodePtr<INode> separator = GetListOf(StmtType::kName);
     INode::Link(node, separator);
   }
@@ -230,8 +229,7 @@ NodePtr<INode> Parser::GetDropTableSt() {
   NodePtr<INode> table_name = GetName();
   INode::Link(node, table_name);
 
-  if (!tokens_.empty()
-      && Parser::IsComma(peek_first_token())) {
+  if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
     NodePtr<INode> separator = GetListOf(StmtType::kName);
     INode::Link(node, separator);
   }
@@ -247,8 +245,7 @@ NodePtr<INode> Parser::GetTableDefinition() {
   NodePtr<INode> argument = GetTableDefinitionObject();
   INode::Link(node, argument);
 
-  if (!tokens_.empty()
-      && Parser::IsComma(peek_first_token())) {
+  if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
     NodePtr<INode> separator = GetListOf(StmtType::kTableDef);
     INode::Link(node, separator);
   }
@@ -305,7 +302,8 @@ NodePtr<INode> Parser::GetTableConstraint() {
   std::string key_word = ParserUtils::CastToNodeType<StringNode>(peek_first_token())->data;
   if (key_word == "CONSTRAINT") {
     pop_first_token();
-    NodePtr<INode> constraint_kw = ParserUtils::CastToNodeType<ServiceNode>(std::make_shared<ServiceNode>());
+    NodePtr<INode> constraint_kw =
+        ParserUtils::CastToNodeType<ServiceNode>(std::make_shared<ServiceNode>());
     constraint_kw->stmt_type = StmtType::kConstraintKW;
     INode::Link(table_constraint, constraint_kw);
 
@@ -370,11 +368,9 @@ NodePtr<INode> Parser::GetDropListDefinition() {
   NodePtr<INode> objects = GetDropObject();
   INode::Link(node, objects);
 
-  if (!tokens_.empty()) {
-    if (Parser::IsComma(peek_first_token())) {
-      NodePtr<INode> separator = GetDropList();
-      INode::Link(node, separator);
-    }
+  if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
+    NodePtr<INode> separator = GetDropList();
+    INode::Link(node, separator);
   }
 
   return node;
@@ -387,12 +383,9 @@ NodePtr<INode> Parser::GetDropList() {
   NodePtr<INode> objects = GetDropObject();
   INode::Link(separator, objects);
 
-  if (!tokens_.empty()) {
-    if (Parser::IsComma(peek_first_token())) {
+  if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
       NodePtr<INode> next_objects = GetDropList();
-
       INode::Link(separator, next_objects);
-    }
   }
 
   return separator;
@@ -431,22 +424,20 @@ NodePtr<INode> Parser::GetDropObject() {
   NodePtr<INode> argument = GetIdentifier();
   INode::Link(object, argument);
 
-  if (!tokens_.empty()) {
-    if (Parser::IsComma(peek_first_token())) {
-      // Check key word after the comma
-      bool is_list = true;
-      if (NodeDataTypeClassifier::IsWord(tokens_[1])) {
-        std::string checking_word = ParserUtils::CastToNodeType<StringNode>(tokens_[1])->data;
-        if (checking_word == "CONSTRAINT" || checking_word == "COLUMN") {
-          is_list = false;
-        }
+  if (!tokens_.empty() && NodeDataClassifier::IsComma(peek_first_token())) {
+    // Check key word after the comma
+    bool is_list = true;
+    if (NodeDataTypeClassifier::IsWord(tokens_[1])) {
+      std::string checking_word = ParserUtils::CastToNodeType<StringNode>(tokens_[1])->data;
+      if (checking_word == "CONSTRAINT" || checking_word == "COLUMN") {
+        is_list = false;
       }
+    }
 
-      // Get listOf identifiers if present
-      if (is_list) {
-        NodePtr<INode> next_arguments = GetListOf(StmtType::kIdentifier);
-        INode::Link(object, next_arguments);
-      }
+    // Get listOf identifiers if present
+    if (is_list) {
+      NodePtr<INode> next_arguments = GetListOf(StmtType::kIdentifier);
+      INode::Link(object, next_arguments);
     }
   }
 

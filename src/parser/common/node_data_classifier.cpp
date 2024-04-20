@@ -1,41 +1,41 @@
-#include "SCC/parser/parser.h"
+#include "SCC/parser/common/node_data_classifier.h"
 
-namespace scc::parser {
+namespace scc::parser::common {
 
 using namespace ast;
-using namespace common;
 
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
-bool Parser::IsDot(NodePtr<INode>& node) const {
+bool NodeDataClassifier::IsDot(NodePtr<INode>& node) {
   NodePtr<INode> dot = ParserUtils::CreateCharNode('.', DataType::kPunctuation);
   return INode::IsNodesEqual(dot, node);
 }
-bool Parser::IsComma(NodePtr<INode>& node) const {
+bool NodeDataClassifier::IsComma(NodePtr<INode>& node) {
   NodePtr<INode> comma = ParserUtils::CreateCharNode(',', DataType::kPunctuation);
   return INode::IsNodesEqual(comma, node);
 }
-bool Parser::IsOpeningRoundBracket(NodePtr<INode>& node) const {
-  // Opening Round Bracket
+bool NodeDataClassifier::IsOpeningRoundBracket(NodePtr<INode>& node) {
   NodePtr<INode> ORB = ParserUtils::CreateCharNode('(', DataType::kBracket);
   return INode::IsNodesEqual(ORB, node);
 }
-bool Parser::IsClosingRoundBracket(NodePtr<INode>& node) const {
-  // Closing Round Bracket
+bool NodeDataClassifier::IsClosingRoundBracket(NodePtr<INode>& node) {
   NodePtr<INode> CRB = ParserUtils::CreateCharNode(')', DataType::kBracket);
   return INode::IsNodesEqual(CRB, node);
 }
-bool Parser::IsSingleQuote(NodePtr<INode>& node) const {
+bool NodeDataClassifier::IsSingleQuote(NodePtr<INode>& node) {
   NodePtr<INode> single_quote = ParserUtils::CreateStringNode("\'", DataType::kPunctuation);
   return INode::IsNodesEqual(single_quote, node);
 }
-bool Parser::IsDoubleQuote(NodePtr<INode>& node) const {
+bool NodeDataClassifier::IsDoubleQuote(NodePtr<INode>& node) {
   NodePtr<INode> double_quote = ParserUtils::CreateStringNode("\"", DataType::kPunctuation);
   return INode::IsNodesEqual(double_quote, node);
 }
-bool Parser::IsUnaryOperator(NodePtr<INode>& node) const {
+bool NodeDataClassifier::IsQuote(NodePtr<INode>& node) {
+  return IsSingleQuote(node) || IsDoubleQuote(node);
+}
+bool NodeDataClassifier::IsUnaryOperator(NodePtr<INode>& node) {
   if (node->data_type == DataType::kOperator) {
     std::string data = ParserUtils::CastToNodeType<StringNode>(node)->data;
     if (data == "+" || data == "-") {
@@ -44,7 +44,7 @@ bool Parser::IsUnaryOperator(NodePtr<INode>& node) const {
   }
   return false;
 }
-bool Parser::IsBinaryOperator(NodePtr<INode>& node) const {
+bool NodeDataClassifier::IsBinaryOperator(NodePtr<INode>& node) {
   if (node->data_type == DataType::kOperator) {
     std::string data = ParserUtils::CastToNodeType<StringNode>(node)->data;
     std::vector<std::string> bin_operators = {
@@ -60,9 +60,9 @@ bool Parser::IsBinaryOperator(NodePtr<INode>& node) const {
   }
   return false;
 }
-bool Parser::IsSemicolon(NodePtr<INode>& node) const {
+bool NodeDataClassifier::IsSemicolon(NodePtr<INode>& node) {
   NodePtr<INode> semicolon = ParserUtils::CreateCharNode(';', DataType::kPunctuation);
   return INode::IsNodesEqual(semicolon, node);
 }
 
-} // scc::parser
+} // scc::parser::common

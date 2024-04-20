@@ -131,7 +131,7 @@ NodePtr<INode> Parser::GetMathValue() {
   int line = peek_first_token()->line;
   if (NodeDataTypeClassifier::IsNumber(peek_first_token())) {
     value = get_first_token();
-  } else if (Parser::IsOpeningRoundBracket(peek_first_token())) {
+  } else if (NodeDataClassifier::IsOpeningRoundBracket(peek_first_token())) {
     pop_first_token();
 
     if (tokens_.empty()) {
@@ -142,7 +142,7 @@ NodePtr<INode> Parser::GetMathValue() {
     line = peek_first_token()->line;
     value = GetMathExpression();
 
-    if (Parser::IsClosingRoundBracket(peek_first_token())) {
+    if (NodeDataClassifier::IsClosingRoundBracket(peek_first_token())) {
       pop_first_token();
     } else {
       LOGE << "invalid Math expression: "

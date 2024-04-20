@@ -28,7 +28,7 @@ NodePtr<INode> Parser::Parse() {
   INode::Link(root, query);
 
   if (!tokens_.empty()) {
-    if (Parser::IsSemicolon(peek_first_token())) {
+    if (NodeDataClassifier::IsSemicolon(peek_first_token())) {
       separator = General();
       INode::Link(root, separator);
     }
@@ -70,7 +70,7 @@ NodePtr<INode> Parser::General() {
   }
 
   if (!tokens_.empty()) {
-    if (Parser::IsSemicolon(peek_first_token())) {
+    if (NodeDataClassifier::IsSemicolon(peek_first_token())) {
       NodePtr<INode> next_queries = General();
       INode::Link(separator, next_queries);
     }
