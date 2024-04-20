@@ -26,7 +26,7 @@ NodePtr<INode> Parser::Parse() {
   NodePtr<INode> query = GetDL();
   ASTUtils::Link(root, query);
 
-  if (!tokens_.empty() && NodeDataClassifier::IsSemicolon(peek_first_token())) {
+  if (!tokens_.empty() && NodeDataClassifier::IsSemicolon(PeekToken())) {
     NodePtr<INode> separator = General();
     ASTUtils::Link(root, separator);
   }
@@ -40,25 +40,21 @@ NodePtr<INode> Parser::Parse() {
   return root;
 }
 
-NodePtr<INode>& Parser::peek_first_token() const {
+const NodePtr<INode>& Parser::PeekToken() const {
   ValidateNotEmpty();
-  return const_cast<NodePtr<INode>&>(tokens_.front());
+  return tokens_.front();
 }
-NodePtr<INode> Parser::get_first_token() {
+NodePtr<INode> Parser::NextToken() {
   ValidateNotEmpty();
   NodePtr<INode> node = tokens_.front();
   tokens_.pop_front();
   return node;
 }
-void Parser::pop_first_token() {
-  ValidateNotEmpty();
-  tokens_.pop_front();
-}
 
 // Start
 
 NodePtr<INode> Parser::General() {
-  pop_first_token();
+  NextToken();
   NodePtr<INode> separator = ASTUtils::CreateServiceNode(StmtType::kSemicolonDelimiter);
 
   if (!tokens_.empty()) {
@@ -67,7 +63,7 @@ NodePtr<INode> Parser::General() {
   }
 
   if (!tokens_.empty()) {
-    if (NodeDataClassifier::IsSemicolon(peek_first_token())) {
+    if (NodeDataClassifier::IsSemicolon(PeekToken())) {
       NodePtr<INode> next_queries = General();
       ASTUtils::Link(separator, next_queries);
     }
@@ -78,7 +74,7 @@ NodePtr<INode> Parser::General() {
 StmtType Parser::GetDLStType() {
   StmtType DLStType = StmtType::kNone;   // invalid value
 
-  std::string key_word = ASTUtils::CastToNodeType<StringNode>(peek_first_token())->data;
+  std::string key_word = ASTUtils::CastToNodeType<StringNode>(PeekToken())->data;
 
   std::vector<std::string> ddlSt_kws = {
       "CREATE", "ALTER", "DROP"
@@ -109,7 +105,7 @@ StmtType Parser::GetDLStType() {
 NodePtr<INode> Parser::GetDL() {
   NodePtr<INode> query = ASTUtils::CreateServiceNode(StmtType::kQuery);
 
-  ValidateIsWord(peek_first_token());
+  ValidateIsWord(PeekToken());
 
   NodePtr<INode> statement;
   switch (GetDLStType()) {
@@ -121,7 +117,7 @@ NodePtr<INode> Parser::GetDL() {
       break;
     default:
       LOGE << "unknown DL on line "
-          << peek_first_token()->line;
+          << PeekToken()->line;
       end(EXIT_FAILURE);
   }
   ASTUtils::Link(query, statement);

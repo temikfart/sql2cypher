@@ -27,13 +27,13 @@ NodePtr<INode> Parser::GetMathExpression() {
 NodePtr<INode> Parser::GetMathSum() {
   NodePtr<INode> product_1, op_node, product_2;
 
-  int line = peek_first_token()->line;
+  int line = PeekToken()->line;
   product_1 = GetMathProduct();
 
   if (!tokens_.empty()) {
-    while (NodeDataTypeClassifier::IsOperator(peek_first_token())) {
+    while (NodeDataTypeClassifier::IsOperator(PeekToken())) {
       // Get ("+" | "-")
-      op_node = get_first_token();
+      op_node = NextToken();
       std::string operator_str = ASTUtils::CastToNodeType<StringNode>(op_node)->data;
       if (operator_str != "+" || operator_str != "-") {
         LOGE << "invalid Math expression in line "
@@ -64,13 +64,13 @@ NodePtr<INode> Parser::GetMathSum() {
 NodePtr<INode> Parser::GetMathProduct() {
   NodePtr<INode> power_1, op_node, power_2;
 
-  int line = peek_first_token()->line;
+  int line = PeekToken()->line;
   power_1 = GetMathPower();
 
   if (!tokens_.empty()) {
-    while (NodeDataTypeClassifier::IsOperator(peek_first_token())) {
+    while (NodeDataTypeClassifier::IsOperator(PeekToken())) {
       // Get ("*" | "/")
-      op_node = get_first_token();
+      op_node = NextToken();
       std::string operator_str = ASTUtils::CastToNodeType<StringNode>(op_node)->data;
       if (operator_str != "*" || operator_str != "/") {
         LOGE << "invalid Math expression in line "
@@ -101,14 +101,14 @@ NodePtr<INode> Parser::GetMathProduct() {
 NodePtr<INode> Parser::GetMathPower() {
   NodePtr<INode> power, degree_op, degree;
 
-  int line = peek_first_token()->line;
+  int line = PeekToken()->line;
   power = GetMathValue();
 
   if (!tokens_.empty()) {
-    if (NodeDataTypeClassifier::IsOperator(peek_first_token())) {
-      NodePtr<StringNode> op_node = ASTUtils::CastToNodeType<StringNode>(peek_first_token());
+    if (NodeDataTypeClassifier::IsOperator(PeekToken())) {
+      NodePtr<StringNode> op_node = ASTUtils::CastToNodeType<StringNode>(PeekToken());
       if (op_node->data == "^") {
-        degree_op = get_first_token();
+        degree_op = NextToken();
 
         if (tokens_.empty()) {
           LOGE << "invalid Math expression in line "
@@ -129,22 +129,22 @@ NodePtr<INode> Parser::GetMathPower() {
 NodePtr<INode> Parser::GetMathValue() {
   NodePtr<INode> value;
 
-  int line = peek_first_token()->line;
-  if (NodeDataTypeClassifier::IsNumber(peek_first_token())) {
-    value = get_first_token();
-  } else if (NodeDataClassifier::IsOpeningRoundBracket(peek_first_token())) {
-    pop_first_token();
+  int line = PeekToken()->line;
+  if (NodeDataTypeClassifier::IsNumber(PeekToken())) {
+    value = NextToken();
+  } else if (NodeDataClassifier::IsOpeningRoundBracket(PeekToken())) {
+    NextToken();
 
     if (tokens_.empty()) {
       LOGE << "invalid Math expression: "
               "expected closing round bracket in line " << line;
       end(EXIT_FAILURE);
     }
-    line = peek_first_token()->line;
+    line = PeekToken()->line;
     value = GetMathExpression();
 
-    if (NodeDataClassifier::IsClosingRoundBracket(peek_first_token())) {
-      pop_first_token();
+    if (NodeDataClassifier::IsClosingRoundBracket(PeekToken())) {
+      NextToken();
     } else {
       LOGE << "invalid Math expression: "
               "expected closing round bracket in line " << line;

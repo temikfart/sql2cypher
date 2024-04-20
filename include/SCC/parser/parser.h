@@ -31,6 +31,11 @@ public:
 private:
   std::deque<std::shared_ptr<ast::INode>> tokens_;
 
+  // Work with deque of tokens
+
+  const std::shared_ptr<ast::INode>& PeekToken() const;
+  std::shared_ptr<ast::INode> NextToken();
+
   // Start
 
   std::shared_ptr<ast::INode> General();
@@ -114,12 +119,6 @@ private:
   // Validation
 
   void ValidateNotEmpty() const;
-
-  // Work with deque of tokens
-
-  std::shared_ptr<ast::INode>& peek_first_token() const;
-  std::shared_ptr<ast::INode> get_first_token();
-  void pop_first_token();
   void ValidateIsWord(const std::shared_ptr<ast::INode>& node) const;
   void ValidateIsOpeningRoundBracket(const std::shared_ptr<ast::INode>& node) const;
   void ValidateIsClosingRoundBracket(const std::shared_ptr<ast::INode>& node) const;

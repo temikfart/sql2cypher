@@ -14,9 +14,9 @@ StmtType Parser::GetDMLStType() {
   StmtType DMLStType = StmtType::kNone; // invalid value
 
   // Get first token
-  int line = peek_first_token()->line;
-  std::string fst_kw = ASTUtils::CastToNodeType<StringNode>(peek_first_token())->data;
-  pop_first_token();
+  int line = PeekToken()->line;
+  std::string fst_kw = ASTUtils::CastToNodeType<StringNode>(PeekToken())->data;
+  NextToken();
 
   if (tokens_.empty()) {
     LOGE << "body of the DDL statement is missed in line " << line;
@@ -42,7 +42,7 @@ NodePtr<INode> Parser::GetDMLSt() {
   LOGD << "getting DML statement...";
   NodePtr<INode> node = ASTUtils::CreateServiceNode(StmtType::kDmlStmt);
 
-  int line = peek_first_token()->line;
+  int line = PeekToken()->line;
   NodePtr<INode> statement;
   switch (GetDMLStType()) {
     case StmtType::kUpdateStmt:
