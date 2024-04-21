@@ -1,0 +1,42 @@
+program ::= "" | (query ";")+
+query ::= ddl_statement | dml_statement
+
+// DDL Statements
+ddl_statement ::= create_statement | alter_statement | drop_statement
+
+create_statement ::= "CREATE" create_database_statement | create_table_statement
+
+create_database_statement ::= "DATABASE" database_name
+database_name ::= name
+
+create_table_statement ::= "TABLE" table_name table_definition
+table_name ::= name
+table_definition ::= "(" column_definition ("," column_definition)+ ("," table_constraint)* ")"
+column_definition ::= column_name data_type
+column_name ::= identifier
+data_type ::= "float" | ("int" | "integer") | "varchar" | "char"
+table_constraint ::= ("CONSTRAINT" constraint_name)? (primary_key_constraint | foreign_key_constraint)
+constraint_name ::= identifier
+primary_key_constraint ::= "PRIMARY KEY" "(" column_name ("," column_name)* ")"
+foreign_key_constraint ::= "FOREIGN KEY" "(" column_name ("," column_name)* ")" "REFERENCES" referenced_table_name ("(" ref_column ("," ref_column)*")")
+referenced_table_name ::= table_name
+ref_column ::= column_name
+
+alter_statement ::= "ALTER" alter_table_statement
+alter_table_statement ::= "TABLE" table_name alter_table_add_action | alter_table_drop_action
+alter_table_add_action ::= "ADD" column_definition | table_constraint ("," column_definition | table_constraint)*
+alter_table_drop_action ::= "DROP" ("CONSTRAINT" constraint_name ("," constraint_name)* | "COLUMN" column_name ("," column_name)*)
+
+drop_statement ::= "DROP" drop_database_statement | drop_table_statement
+drop_database_statement ::= "DATABASE" database_name
+drop_table_statement ::= "TABLE" table_name
+
+// DML Statements
+dml_statement ::= insert_statement | update_statement | delete_statement
+insert_statement ::= "INSERT" // stub
+update_statement ::= "UPDATE" // stub
+delete_statement ::= "DELETE" // stub
+
+// Base statements
+name ::= identifier ("." identifier)
+identifier ::= "regexp:[a-zA-z][_a-zA-z0-9]+"
