@@ -44,10 +44,10 @@ TEST(StmtTypeCtorTests, InvalidValueTest) {
 }
 
 TEST(StmtTypeCtorTests, StringValueTest) {
-  StmtType column_def(ST_COLUMN_DEF);
+  StmtType column_def(kST_COLUMN_DEF);
   EXPECT_EQ(StmtType::kColumnDef, (StmtType::Value) column_def);
 
-  StmtType reference(ST_REFERENCE);
+  StmtType reference(kST_REFERENCE);
   EXPECT_EQ(StmtType::kReference, (StmtType::Value) reference);
 
   StmtType mixed_case_expression("expREssION");
@@ -63,11 +63,11 @@ TEST(StmtTypeCtorTests, InvalidStringValueTest) {
 }
 
 TEST(StmtTypeoStringTests, ToStringTest) {
-  EXPECT_EQ(ST_NONE, StmtType(StmtType::kNone).ToString());
-  EXPECT_EQ(ST_TABLE_DEF, StmtType(StmtType::kTableDef).ToString());
-  EXPECT_EQ(ST_UPDATE, StmtType(StmtType::kUpdateStmt).ToString());
-  EXPECT_EQ(ST_DOT_DELIMITER, StmtType(StmtType::kDotDelimiter).ToString());
-  EXPECT_EQ(ST_VARCHAR_TYPE, StmtType(StmtType::kVarcharType).ToString());
+  EXPECT_EQ(kST_NONE, StmtType(StmtType::kNone).ToString());
+  EXPECT_EQ(kST_TABLE_DEF, StmtType(StmtType::kTableDef).ToString());
+  EXPECT_EQ(kST_UPDATE, StmtType(StmtType::kUpdateStmt).ToString());
+  EXPECT_EQ(kST_DOT_DELIMITER, StmtType(StmtType::kDotDelimiter).ToString());
+  EXPECT_EQ(kST_VARCHAR_TYPE, StmtType(StmtType::kVarcharType).ToString());
 }
 
 TEST(StmtTypeCastTests, CastToValueTest) {
@@ -83,19 +83,19 @@ TEST(StmtTypeCastTests, CastToValueTest) {
 TEST(StmtTypeOperatorsTests, OutputTest) {
   std::ostringstream oss_create_database_stmt;
   oss_create_database_stmt << StmtType(StmtType::kCreateDatabaseStmt);
-  EXPECT_EQ(ST_CREATE_DATABASE, oss_create_database_stmt.str());
+  EXPECT_EQ(kST_CREATE_DATABASE, oss_create_database_stmt.str());
 
   std::ostringstream oss_drop_list;
   oss_drop_list << StmtType(StmtType::kDropList);
-  EXPECT_EQ(ST_DROP_LIST, oss_drop_list.str());
+  EXPECT_EQ(kST_DROP_LIST, oss_drop_list.str());
 
   std::ostringstream oss_condition;
   oss_condition << StmtType(StmtType::kCondition);
-  EXPECT_EQ(ST_CONDITION, oss_condition.str());
+  EXPECT_EQ(kST_CONDITION, oss_condition.str());
 
   std::ostringstream oss_foreign_key;
   oss_foreign_key << StmtType(StmtType::kForeignKey);
-  EXPECT_EQ(ST_FOREIGN_KEY, oss_foreign_key.str());
+  EXPECT_EQ(kST_FOREIGN_KEY, oss_foreign_key.str());
 }
 
 TEST(StmtTypeOperatorsTests, CompareTwoEqualTypesTest) {
