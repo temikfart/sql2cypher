@@ -6,54 +6,54 @@
 
 #include "SCC/common/string_utils.h"
 
-#define ST_NONE "none"
-#define ST_PROGRAM "program"
-#define ST_QUERY "query"
-#define ST_DDL_STMT "ddl"
-#define ST_DML_STMT "dml"
+constexpr std::string_view kST_NONE = "none";
+constexpr std::string_view kST_PROGRAM = "program";
+constexpr std::string_view kST_QUERY = "query";
+constexpr std::string_view kST_DDL_STMT = "ddl";
+constexpr std::string_view kST_DML_STMT = "dml";
 
-#define ST_ALTER_TABLE "alter table"
-#define ST_CREATE_DATABASE "create database"
-#define ST_CREATE_TABLE "create table"
-#define ST_DROP_DATABASE "drop database"
-#define ST_DROP_TABLE "drop table"
+constexpr std::string_view kST_ALTER_TABLE = "alter table";
+constexpr std::string_view kST_CREATE_DATABASE = "create database";
+constexpr std::string_view kST_CREATE_TABLE = "create table";
+constexpr std::string_view kST_DROP_DATABASE = "drop database";
+constexpr std::string_view kST_DROP_TABLE = "drop table";
 
-#define ST_TABLE_DEF "table definition"
-#define ST_COLUMN_DEF "column definition"
-#define ST_TABLE_CONSTRAINT "table constraint"
-#define ST_ALTER_ACTION_ADD "alter action add"
-#define ST_ALTER_ACTION_DROP "alter action drop"
-#define ST_DROP_LIST "drop list"
-#define ST_DROP_CONSTRAINT "drop constraint"
-#define ST_DROP_COLUMN "drop column"
+constexpr std::string_view kST_TABLE_DEF = "table definition";
+constexpr std::string_view kST_COLUMN_DEF = "column definition";
+constexpr std::string_view kST_TABLE_CONSTRAINT = "table constraint";
+constexpr std::string_view kST_ALTER_ACTION_ADD = "alter action add";
+constexpr std::string_view kST_ALTER_ACTION_DROP = "alter action drop";
+constexpr std::string_view kST_DROP_LIST = "drop list";
+constexpr std::string_view kST_DROP_CONSTRAINT = "drop constraint";
+constexpr std::string_view kST_DROP_COLUMN = "drop column";
 
-#define ST_DELETE "delete"
-#define ST_INSERT "insert"
-#define ST_UPDATE "update"
+constexpr std::string_view kST_DELETE = "delete";
+constexpr std::string_view kST_INSERT = "insert";
+constexpr std::string_view kST_UPDATE = "update";
 
-#define ST_CONDITION "condition"
-#define ST_OR_CONDITION "or condition"
-#define ST_AND_CONDITION "and condition"
-#define ST_NOT_CONDITION "not condition"
-#define ST_PREDICATE "predicate"
-#define ST_EXPRESSION "expression"
+constexpr std::string_view kST_CONDITION = "condition";
+constexpr std::string_view kST_OR_CONDITION = "or condition";
+constexpr std::string_view kST_AND_CONDITION = "and condition";
+constexpr std::string_view kST_NOT_CONDITION = "not condition";
+constexpr std::string_view kST_PREDICATE = "predicate";
+constexpr std::string_view kST_EXPRESSION = "expression";
 
-#define ST_PRIMARY_KEY "primary Key"
-#define ST_FOREIGN_KEY "foreign Key"
-#define ST_REFERENCE "reference"
-#define ST_NAME "name"
-#define ST_IDENTIFIER "identifier"
-#define ST_DOT_DELIMITER "dot delimiter"
-#define ST_COMMA_DELIMITER "comma delimiter"
-#define ST_SEMICOLON_DELIMITER "semicolon delimiter"
+constexpr std::string_view kST_PRIMARY_KEY = "primary key";
+constexpr std::string_view kST_FOREIGN_KEY = "foreign key";
+constexpr std::string_view kST_REFERENCE = "reference";
+constexpr std::string_view kST_NAME = "name";
+constexpr std::string_view kST_IDENTIFIER = "identifier";
+constexpr std::string_view kST_DOT_DELIMITER = "dot delimiter";
+constexpr std::string_view kST_COMMA_DELIMITER = "comma delimiter";
+constexpr std::string_view kST_SEMICOLON_DELIMITER = "semicolon delimiter";
 
-#define ST_CONSTRAINT_KW "constraint kw"
+constexpr std::string_view kST_CONSTRAINT_KW = "constraint";
 
-#define ST_INT_TYPE "int"
-#define ST_INTEGER_TYPE "integer"
-#define ST_FLOAT_TYPE "float"
-#define ST_CHAR_TYPE "char"
-#define ST_VARCHAR_TYPE "varchar"
+constexpr std::string_view kST_INT_TYPE = "int";
+constexpr std::string_view kST_INTEGER_TYPE = "integer";
+constexpr std::string_view kST_FLOAT_TYPE = "float";
+constexpr std::string_view kST_CHAR_TYPE = "char";
+constexpr std::string_view kST_VARCHAR_TYPE = "varchar";
 
 namespace scc::ast {
 
@@ -118,7 +118,7 @@ public:
 
   StmtType() = default;
   StmtType(Value value);
-  explicit StmtType(const std::string& str_stmt_type);
+  explicit StmtType(const std::string_view& str_stmt_type);
 
   std::string ToString() const;
 
