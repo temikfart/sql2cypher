@@ -147,13 +147,6 @@ NodePtr<INode> Parser::ParseDropTableStatement() {
   return service_node;
 }
 
-NodePtr<INode> Parser::ParseDatabaseName() {
-  return ParseName();
-}
-NodePtr<INode> Parser::ParseTableName() {
-  return ParseName();
-}
-
 NodePtr<INode> Parser::ParseTableDefinition() {
   ValidateIsOpeningRoundBracket(NextToken());
 

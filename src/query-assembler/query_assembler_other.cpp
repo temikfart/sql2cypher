@@ -56,7 +56,7 @@ void QueryAssembler::TranslateForeignKey(
   int reference_child_num = 1;
 
   std::vector<std::string> properties;
-  properties.push_back(this->TranslateIdentifier(key->get_child(0)));
+  properties.push_back(this->TranslateName(key->get_child(0)));
   if (key->ChildrenCount() > 2) {
     if (key->get_child(1)->stmt_type != StmtType::kCommaDelimiter) {
       LOGE << "invalid delimiter between properties in foreign key";
@@ -64,7 +64,7 @@ void QueryAssembler::TranslateForeignKey(
     }
     reference_child_num++;
     std::vector<std::string> other_properties =
-        this->GetListOf(key->get_child(1), StmtType::kIdentifier);
+        this->GetListOf(key->get_child(1), StmtType::kName);
     properties.insert(properties.end(),
                       other_properties.begin(),
                       other_properties.end());
@@ -86,11 +86,11 @@ void QueryAssembler::TranslateForeignKey(
   // Get ref columns if present
   std::vector<std::string> ref_columns;
   if (reference->ChildrenCount() > 1) {
-    ref_columns.push_back(this->TranslateIdentifier(reference->get_child(1)));
+    ref_columns.push_back(this->TranslateName(reference->get_child(1)));
     if (reference->ChildrenCount() > 2) {
       std::vector<std::string> other_props =
           this->GetListOf(reference->get_child(2),
-                          StmtType::kIdentifier);
+                          StmtType::kName);
       ref_columns.insert(ref_columns.end(),
                          other_props.begin(),
                          other_props.end());

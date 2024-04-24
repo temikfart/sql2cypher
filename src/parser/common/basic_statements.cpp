@@ -46,68 +46,63 @@ StmtType Parser::DetermineLogicalOperatorType(const std::string& keyword) const 
 }
 
 bool Parser::DetermineIsFullConstraintDefinition(const std::string& keyword) const {
-  return kST_CONSTRAINT_KW.find(scc::common::LowerCase(keyword)) == 0;
+  return DetermineIsPrefix(kST_CONSTRAINT_KW, keyword);
 }
 bool Parser::DetermineIsPrimaryKey(const std::string& keyword) const {
-  return kST_PRIMARY_KEY.find(scc::common::LowerCase(keyword)) == 0;
+  return DetermineIsPrefix(kST_PRIMARY_KEY, keyword);
 }
 bool Parser::DetermineIsForeignKey(const std::string& keyword) const {
-  return kST_FOREIGN_KEY.find(scc::common::LowerCase(keyword)) == 0;
+  return DetermineIsPrefix(kST_FOREIGN_KEY, keyword);
+}
+bool Parser::DetermineIsReferences(const std::string& keyword) const {
+  return DetermineIsPrefix(kST_REFERENCES_KW, keyword);
 }
 bool Parser::DetermineIsOROperator(const std::string& keyword) const {
-  return kST_OR_OPERATOR.find(scc::common::LowerCase(keyword)) == 0;
+  return DetermineIsPrefix(kST_OR_OPERATOR, keyword);
 }
 bool Parser::DetermineIsANDOperator(const std::string& keyword) const {
-  return kST_AND_OPERATOR.find(scc::common::LowerCase(keyword)) == 0;
+  return DetermineIsPrefix(kST_AND_OPERATOR, keyword);
 }
 bool Parser::DetermineIsNOTOperator(const std::string& keyword) const {
-  return kST_NOT_OPERATOR.find(scc::common::LowerCase(keyword)) == 0;
+  return DetermineIsPrefix(kST_NOT_OPERATOR, keyword);
+}
+bool Parser::DetermineIsPrefix(const std::string_view& string, const std::string& prefix) const {
+  return string.find(scc::common::LowerCase(prefix)) == 0;
 }
 
-NodePtr<INode> Parser::ParseListOf(StmtType get_function_type) {
-  // Get separator (comma)
-  int line = PeekToken()->line;
-  NextToken();
-  NodePtr<INode> separator = ASTUtils::CreateServiceNode(StmtType::kCommaDelimiter);
+NodePtr<INode> Parser::ParseListOf(StmtType element_type) {
+  auto next_token = NextToken();
+  NodePtr<INode> separator = ASTUtils::CreateServiceNode(StmtType::kCommaDelimiter, next_token);
 
-  if (tokens_.empty()) {
-    LOGE << "invalid listOf in line "
-         << line << ": argument is missed";
-    end(EXIT_FAILURE);
-  }
-
-  NodePtr<INode> argument;
-  switch (get_function_type) {
+  ValidateHasTokens("Invalid statement at line " + std::to_string(next_token->line)
+                        + ": expected something after the comma");
+  NodePtr<INode> next_element;
+  switch (element_type) {
     case StmtType::kIdentifier:
-      argument = ParseIdentifier();
+      next_element = ParseIdentifier();
       break;
     case StmtType::kTableDef:
-      ValidateIsWord(PeekToken());
-      argument = ParseTableDefinitionElement();
+      next_element = ParseTableDefinitionElement();
       break;
     case StmtType::kColumnDef:
-      ValidateIsWord(PeekToken());
-      argument = ParseColumnDefinition();
+      next_element = ParseColumnDefinition();
       break;
     case StmtType::kTableConstraint:
-      ValidateIsWord(PeekToken());
-      argument = ParseTableConstraint();
+      next_element = ParseTableConstraint();
       break;
     case StmtType::kName:
-      ValidateIsWord(PeekToken());
-      argument = ParseName();
+      next_element = ParseName();
       break;
     default:
-      LOGE << "unknown statement type for the listOf in line "
-           << PeekToken()->line;
-      end(EXIT_FAILURE);
+      throw parsing_error("Invalid statatement at line " + std::to_string(PeekToken()->line)
+                              + ": unsupported elements in the list \'" + element_type.ToString()
+                              + "\'");
   }
-  ASTUtils::Link(separator, argument);
+  ASTUtils::Link(separator, next_element);
 
-  if (!tokens_.empty()
-      && NodeDataClassifier::IsComma(PeekToken())) {
-    NodePtr<INode> next_separator = ParseListOf(get_function_type);
-    ASTUtils::Link(separator, next_separator);
+  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+    NodePtr<INode> next_elements = ParseListOf(element_type);
+    ASTUtils::Link(separator, next_elements);
   }
 
   return separator;
@@ -182,214 +177,167 @@ NodePtr<INode> Parser::ParseForeignKey() {
 
   ValidateHasTokens("Missing \'FOREIGN KEY\' definition at line "
                         + std::to_string(next_token->line));
-  int line = PeekToken()->line;
-  ValidateIsOpeningRoundBracket(PeekToken());
-  NextToken();
+  next_token = NextToken();
+  ValidateIsOpeningRoundBracket(next_token);
 
-  // Get FOREIGN KEY definition
-  if (tokens_.empty()) {
-    LOGE << "columnName is missed in line " << line;
-    end(EXIT_FAILURE);
-  }
-  NodePtr<INode> column_name = ParseIdentifier();
-  ASTUtils::Link(foreign_key, column_name);
+  ValidateHasTokens("Missing referencing column name in \'FOREIGN KEY\' definition at line "
+                        + std::to_string(next_token->line));
+  NodePtr<INode> referencing_column_name = ParseColumnName();
+  ASTUtils::Link(foreign_key, referencing_column_name);
 
-  // Get listOf(column_names)
   if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
-    NodePtr<INode> separator = ParseListOf(StmtType::kIdentifier);
-    ASTUtils::Link(foreign_key, separator);
+    NodePtr<INode> next_referencing_column_names = ParseListOf(StmtType::kName);
+    ASTUtils::Link(foreign_key, next_referencing_column_names);
   }
 
-  if (tokens_.empty()) {
-    LOGE << "closing round bracket is missed in line " << line;
-    end(EXIT_FAILURE);
-  }
-  ValidateIsClosingRoundBracket(PeekToken());
-  NextToken();
+  ValidateHasTokens("Missing closing parenthesis in \'FOREIGN KEY\' definition at line "
+                        + std::to_string(referencing_column_name->line));
+  next_token = NextToken();
+  ValidateIsClosingRoundBracket(next_token);
 
-  // Get Reference
-  if (tokens_.empty()) {
-    LOGE << "reference is missed in line " << line;
-    end(EXIT_FAILURE);
-  }
-  ValidateIsWord(PeekToken());
-  NodePtr<INode> reference = GetReference();
+  ValidateHasTokens("Missing \'REFERENCES\' keyword in \'FOREIGN KEY\' definition at line "
+                        + std::to_string(next_token->line));
+  NodePtr<INode> reference = ParseReference();
   ASTUtils::Link(foreign_key, reference);
 
   return foreign_key;
 }
-NodePtr<INode> Parser::GetReference() {
-  // Get REFERENCES
-  int line = PeekToken()->line;
-  std::string ref_kw = ASTUtils::CastToNodeType<StringNode>(PeekToken())->data;
-  if (ref_kw != "REFERENCES") {
-    LOGE << "incorrect reference key word in line "
-         << line << ": " << ref_kw;
-    end(EXIT_FAILURE);
+NodePtr<INode> Parser::ParseReference() {
+  auto next_token = NextToken();
+  ValidateIsWord(next_token);
+  std::string references_keyword = ASTUtils::CastToNodeType<StringNode>(next_token)->data;
+  if (!DetermineIsReferences(references_keyword)) {
+    throw parsing_error("Incorrect \'REFERENCES\' definition at line "
+                            + std::to_string(next_token->line));
   }
-  NodePtr<INode> reference = ASTUtils::CreateServiceNode(StmtType::kReferencesKW, NextToken());
+  NodePtr<INode> reference = ASTUtils::CreateServiceNode(StmtType::kReferencesKW, next_token);
 
-  // Get referenced table or columns
-  if (tokens_.empty()) {
-    LOGE << "table name is missed in line " << line;
-    end(EXIT_FAILURE);
-  }
-  NodePtr<INode> ref_table_name = ParseName();
-  ASTUtils::Link(reference, ref_table_name);
+  ValidateHasTokens("Missing references table name at line " + std::to_string(next_token->line));
+  NodePtr<INode> referenced_table_name = ParseTableName();
+  ASTUtils::Link(reference, referenced_table_name);
 
-  // Get columns if present
   if (!tokens_.empty() && NodeDataClassifier::IsOpeningRoundBracket(PeekToken())) {
-    NodePtr<INode> ref_column_name, next_ref_column_names;
+    next_token = NextToken();
 
-    ValidateIsOpeningRoundBracket(PeekToken());
-    NextToken();
+    ValidateHasTokens("Missing referenced column name at line " + std::to_string(next_token->line));
+    NodePtr<INode> referenced_column_name = ParseColumnName();
+    ASTUtils::Link(reference, referenced_column_name);
 
-    if (tokens_.empty()) {
-      LOGE << "invalid reference in line "
-           << line << ": incorrect list of column names";
-      end(EXIT_FAILURE);
-    }
-    ref_column_name = ParseIdentifier();
-    ASTUtils::Link(reference, ref_column_name);
-
-    if (tokens_.empty()) {
-      LOGE << "invalid reference in line "
-           << line << ": closing round bracket is missed";
-      end(EXIT_FAILURE);
-    }
-    if (NodeDataClassifier::IsComma(PeekToken())) {
-      next_ref_column_names =
-          ParseListOf(StmtType::kIdentifier);
-      ASTUtils::Link(reference, next_ref_column_names);
+    ValidateHasTokens("Missing closing parenthesis or comma at line "
+                          + std::to_string(referenced_column_name->line));
+    auto peeked_token = PeekToken();
+    if (NodeDataClassifier::IsComma(peeked_token)) {
+      NodePtr<INode> next_referenced_column_names = ParseListOf(StmtType::kName);
+      ASTUtils::Link(reference, next_referenced_column_names);
     }
 
-    if (tokens_.empty()) {
-      LOGE << "invalid reference in line "
-           << line << ": closing round bracket is missed";
-      end(EXIT_FAILURE);
-    }
-    ValidateIsClosingRoundBracket(PeekToken());
-    NextToken();
+    ValidateHasTokens("Missing closing parenthesis at line " + std::to_string(peeked_token->line));
+    ValidateIsClosingRoundBracket(NextToken());
   }
 
   return reference;
 }
 
+NodePtr<INode> Parser::ParseDatabaseName() {
+  return ParseName();
+}
+NodePtr<INode> Parser::ParseTableName() {
+  return ParseName();
+}
+NodePtr<INode> Parser::ParseColumnName() {
+  return ParseName();
+}
+
 NodePtr<INode> Parser::ParseDataType() {
-  NodePtr<INode> node = NextToken();
-  std::string datatype = ASTUtils::CastToNodeType<StringNode>(node)->data;
+  auto next_token = NextToken();
+  ValidateIsWord(next_token);
+  std::string datatype = ASTUtils::CastToNodeType<StringNode>(next_token)->data;
   try {
     StmtType sql_datatype(datatype);
-    node->stmt_type = sql_datatype;
+    next_token->stmt_type = sql_datatype;
   } catch (const std::invalid_argument& ia) {
     throw parsing_error("Unknown Data Type \'" + datatype
-                            + "\' at line " + std::to_string(node->line));
+                            + "\' at line " + std::to_string(next_token->line));
   }
-  return node;
+  return next_token;
 }
 NodePtr<INode> Parser::ParseString() {
-  NodePtr<INode> node;
+  auto next_token = NextToken();
+  ValidateIsSingleQuote(next_token);
 
-  int line = PeekToken()->line;
-  bool is_single_quote = NodeDataClassifier::IsSingleQuote(PeekToken());
-  NextToken();
-
-  if (tokens_.empty()) {
-    LOGE << "invalid expression in line "
-         << line << ": invalid string";
-    end(EXIT_FAILURE);
-  }
-  NodePtr<StringNode> str =
-      std::make_shared<StringNode>("", DataType::kString);
-  while (!NodeDataClassifier::IsQuote(PeekToken())) {
-    NodePtr<INode> tmp = NextToken();
-    std::string new_data;
-    if (!str->data.empty()) {
-      new_data = str->data + " ";
+  ValidateHasTokens("Missing string literal content or closing single quote at line "
+                        + std::to_string(next_token->line));
+  NodePtr<StringNode> string = ASTUtils::CastToNodeType<StringNode>(
+      ASTUtils::CreateStringNode("", DataType::kString)
+  );
+  auto peeked_token = PeekToken();
+  while (!NodeDataClassifier::IsSingleQuote(peeked_token)) {
+    NodePtr<INode> next_word = NextToken();
+    if (!string->data.empty()) {
+      string->data + " "; // TODO: Lexer should save whitespace characters.
     }
-    switch (tmp->data_type) {
+    switch (next_word->data_type) {
       case DataType::kInt:
-        new_data += std::to_string(ASTUtils::CastToNodeType<IntNumNode>(tmp)->data);
+        string->data += std::to_string(ASTUtils::CastToNodeType<IntNumNode>(next_word)->data);
         break;
       case DataType::kFloat:
-        new_data += std::to_string(ASTUtils::CastToNodeType<FloatNumNode>(tmp)->data);
-        break;
-      case DataType::kWord:
-      case DataType::kOperator:
-        new_data += ASTUtils::CastToNodeType<StringNode>(tmp)->data;
+        string->data += std::to_string(ASTUtils::CastToNodeType<FloatNumNode>(next_word)->data);
         break;
       case DataType::kBracket:
       case DataType::kPunctuation:
-        new_data += std::to_string(ASTUtils::CastToNodeType<CharNode>(tmp)->data);
+        string->data += std::to_string(ASTUtils::CastToNodeType<CharNode>(next_word)->data);
+        break;
+      case DataType::kOperator:
+      case DataType::kWord:
+        string->data += ASTUtils::CastToNodeType<StringNode>(next_word)->data;
         break;
       default:
-        LOGE << "invalid string in line "
-             << tmp->line << ": incorrect type of token inside the string";
-        end(EXIT_FAILURE);
+        throw parsing_error("Invalid string at line " + std::to_string(next_word->line)
+                                + ": unsupported data type for string literal part");
     }
-    str->data = new_data;
+    ValidateHasTokens("Missing closing single quote or string literal part at line "
+                          + std::to_string(next_word->line));
   }
+  NextToken(); // Pop closing single quote
 
-  if (tokens_.empty()) {
-    LOGE << "invalid string in line "
-         << line << ": closing quote is missed";
-    end(EXIT_FAILURE);
-  }
-  if (is_single_quote) {
-    ValidateIsSingleQuote(PeekToken());
-  } else {
-    ValidateIsDoubleQuote(PeekToken());
-  }
-  NextToken();
-
-  node = ASTUtils::CastToNodeType<INode>(str);
-
-  return node;
+  return string;
 }
 NodePtr<INode> Parser::ParseName() {
-  NodePtr<INode> name = ASTUtils::CreateServiceNode(StmtType::kName);
-
+  NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kName, PeekToken());
   NodePtr<INode> identifier = ParseIdentifier();
-  ASTUtils::Link(name, identifier);
+  ASTUtils::Link(service_node, identifier);
 
-  if (!tokens_.empty()) {
-    if (NodeDataClassifier::IsDot(PeekToken())) {
-      NodePtr<INode> next_identifiers = ParseIdentifiers();
-      ASTUtils::Link(name, next_identifiers);
-    }
+  if (!tokens_.empty() && NodeDataClassifier::IsDot(PeekToken())) {
+    NodePtr<INode> next_identifiers = ParseIdentifiers();
+    ASTUtils::Link(service_node, next_identifiers);
   }
 
-  return name;
+  return service_node;
 }
 NodePtr<INode> Parser::ParseIdentifiers() {
-  int line = PeekToken()->line;
-  NextToken();
-  NodePtr<INode> dot = ASTUtils::CreateServiceNode(StmtType::kDotDelimiter);
+  auto next_token = NextToken();
+  NodePtr<INode> delimiter = ASTUtils::CreateServiceNode(StmtType::kDotDelimiter, next_token);
 
-  if (tokens_.empty()) {
-    LOGE << "bad name, which ends in a dot, in line " << line;
-    end(EXIT_FAILURE);
-  }
+  ValidateHasTokens("Missing identifier after the dot delimiter at line "
+                        + std::to_string(next_token->line));
   NodePtr<INode> identifier = ParseIdentifier();
-  ASTUtils::Link(dot, identifier);
+  ASTUtils::Link(delimiter, identifier);
 
-  if (!tokens_.empty()) {
-    if (NodeDataClassifier::IsDot(PeekToken())) {
-      NodePtr<INode> next_identifiers = ParseIdentifiers();
-      ASTUtils::Link(dot, next_identifiers);
-    }
+  if (!tokens_.empty() && NodeDataClassifier::IsDot(PeekToken())) {
+    NodePtr<INode> next_identifiers = ParseIdentifiers();
+    ASTUtils::Link(delimiter, next_identifiers);
   }
 
-  return dot;
+  return delimiter;
 }
 NodePtr<INode> Parser::ParseIdentifier() {
-  ValidateIsWord(PeekToken());
-  NodePtr<INode> identifier = ASTUtils::CreateServiceNode(StmtType::kIdentifier);
+  auto next_token = NextToken();
+  ValidateIsWord(next_token);
+  NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kIdentifier, next_token);
+  NodePtr<INode> identifier = next_token;
+  ASTUtils::Link(service_node, identifier);
 
-  NodePtr<INode> argument = NextToken();
-  ASTUtils::Link(identifier, argument);
-
-  return identifier;
+  return service_node;
 }
 
 } // scc::parser
