@@ -38,6 +38,10 @@ constexpr std::string_view kST_NOT_CONDITION = "not condition";
 constexpr std::string_view kST_PREDICATE = "predicate";
 constexpr std::string_view kST_EXPRESSION = "expression";
 
+constexpr std::string_view kST_OR_OPERATOR = "or";
+constexpr std::string_view kST_AND_OPERATOR = "and";
+constexpr std::string_view kST_NOT_OPERATOR = "not";
+
 constexpr std::string_view kST_PRIMARY_KEY = "primary key";
 constexpr std::string_view kST_FOREIGN_KEY = "foreign key";
 constexpr std::string_view kST_REFERENCE = "reference";
@@ -98,6 +102,11 @@ public:
     kNOTCondition,
     kPredicate,
     kExpression,
+
+    // Logical Operators
+    kOROperator,
+    kANDOperator,
+    kNOTOperator,
 
     // Basic Statements
     kPrimaryKey,

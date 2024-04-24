@@ -72,6 +72,14 @@ StmtType::StmtType(const std::string_view& str_stmt_type) {
   else if (stmt_type == kST_EXPRESSION)
     this->value_ = kExpression;
 
+  /* Logical Operators */
+  else if (stmt_type == kST_OR_OPERATOR)
+    this->value_ = kOROperator;
+  else if (stmt_type == kST_AND_OPERATOR)
+    this->value_ = kANDOperator;
+  else if (stmt_type == kST_NOT_OPERATOR)
+    this->value_ = kNOTOperator;
+
   /* Basic Statements */
   else if (stmt_type == kST_PRIMARY_KEY)
     this->value_ = kPrimaryKey;
@@ -177,6 +185,14 @@ std::string StmtType::ToString() const {
       return std::string(kST_PREDICATE);
     case kExpression:
       return std::string(kST_EXPRESSION);
+
+    /* Logical Operators */
+    case kOROperator:
+      return std::string(kST_OR_OPERATOR);
+    case kANDOperator:
+      return std::string(kST_AND_OPERATOR);
+    case kNOTOperator:
+      return std::string(kST_NOT_OPERATOR);
 
     /* Basic Statements */
     case kPrimaryKey:
