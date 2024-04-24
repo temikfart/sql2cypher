@@ -69,9 +69,6 @@ private:
 
   // DDL Basic Statements
 
-  std::shared_ptr<ast::INode> ParseDatabaseName();
-  std::shared_ptr<ast::INode> ParseTableName();
-
   // Gets tableDefinition, which consist
   // of tableConstraints and columnDefinitions
   std::shared_ptr<ast::INode> ParseTableDefinition();
@@ -120,14 +117,20 @@ private:
   bool DetermineIsFullConstraintDefinition(const std::string& keyword) const;
   bool DetermineIsPrimaryKey(const std::string& keyword) const;
   bool DetermineIsForeignKey(const std::string& keyword) const;
+  bool DetermineIsReferences(const std::string& keyword) const;
   bool DetermineIsOROperator(const std::string& keyword) const;
   bool DetermineIsANDOperator(const std::string& keyword) const;
   bool DetermineIsNOTOperator(const std::string& keyword) const;
+  bool DetermineIsPrefix(const std::string_view& string, const std::string& prefix) const;
 
-  std::shared_ptr<ast::INode> ParseListOf(ast::StmtType get_function_type);
+  std::shared_ptr<ast::INode> ParseListOf(ast::StmtType element_type);
   std::shared_ptr<ast::INode> ParsePrimaryKey();
   std::shared_ptr<ast::INode> ParseForeignKey();
-  std::shared_ptr<ast::INode> GetReference();
+  std::shared_ptr<ast::INode> ParseReference();
+
+  std::shared_ptr<ast::INode> ParseDatabaseName();
+  std::shared_ptr<ast::INode> ParseTableName();
+  std::shared_ptr<ast::INode> ParseColumnName();
 
   std::shared_ptr<ast::INode> ParseDataType();
   std::shared_ptr<ast::INode> ParseString();
