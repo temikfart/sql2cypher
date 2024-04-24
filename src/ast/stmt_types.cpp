@@ -93,6 +93,12 @@ StmtType::StmtType(const std::string_view& str_stmt_type) {
   /* Other keywords */
   else if (stmt_type == kST_CONSTRAINT_KW)
     this->value_ = kConstraintKW;
+  else if (stmt_type == kST_COLUMN_KW)
+    this->value_ = kColumnKW;
+  else if (stmt_type == kST_ADD_KW)
+    this->value_ = kAddKW;
+  else if (stmt_type == kST_DROP_KW)
+    this->value_ = kDropKW;
 
   /* SQL Data Types */
   else if (stmt_type == kST_INT_TYPE || stmt_type == kST_INTEGER_TYPE)
@@ -193,6 +199,12 @@ std::string StmtType::ToString() const {
     /* Other Keywords */
     case kConstraintKW:
       return std::string(kST_CONSTRAINT_KW);
+    case kColumnKW:
+      return std::string(kST_COLUMN_KW);
+    case kAddKW:
+      return std::string(kST_ADD_KW);
+    case kDropKW:
+      return std::string(kST_DROP_KW);
 
     /* SQL Data Types */
     case kIntType:
