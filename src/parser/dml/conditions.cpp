@@ -129,11 +129,11 @@ NodePtr<INode> Parser::GetExpression() {
 
   // Is it [table_name.] column ?
   if (NodeDataTypeClassifier::IsWord(PeekToken())) {
-    NodePtr<INode> name = GetIdentifier();
+    NodePtr<INode> name = ParseIdentifier();
     ASTUtils::Link(node, name);
 
     if (!tokens_.empty() && NodeDataClassifier::IsDot(PeekToken())) {
-      NodePtr<INode> dot = GetIdentifiers();
+      NodePtr<INode> dot = ParseIdentifiers();
       ASTUtils::Link(node, dot);
     }
 

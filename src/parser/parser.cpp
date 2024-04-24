@@ -56,9 +56,10 @@ NodePtr<INode> Parser::ParseQuery() {
 }
 NodePtr<INode> Parser::ParseBaseStatement() {
   const auto& peeked_token = PeekToken();
+  ValidateIsWord(peeked_token);
   std::string keyword = ASTUtils::CastToNodeType<StringNode>(peeked_token)->data;
   if (BaseStmtTypeClassifier::IsDDLKeyword(keyword)) {
-    return GetDDLSt();
+    return ParseDDLStatement();
   } else if (BaseStmtTypeClassifier::IsDMLKeyword(keyword)) {
     return GetDMLSt();
   } else {

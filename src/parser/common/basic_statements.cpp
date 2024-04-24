@@ -10,57 +10,123 @@ template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
-NodePtr<INode> Parser::GetDataType() {
-  NodePtr<INode> node = NextToken();
-
-  try {
-    std::string datatype = ASTUtils::CastToNodeType<StringNode>(node)->data;
-    StmtType SQL_datatype(datatype);
-    node->stmt_type = SQL_datatype;
-  } catch (const std::invalid_argument& ia) {
-    LOGE << ia.what();
-    LOGE << "invalid column datatype in line " << node->line;
-    end(EXIT_FAILURE);
+StmtType Parser::DetermineDropElementType(const std::string& keyword) {
+  if (kST_CONSTRAINT_KW.find(keyword) == 0) {
+    return StmtType::kConstraintKW;
+  } else if (kST_COLUMN_KW.find(keyword) == 0) {
+    return StmtType::kColumnKW;
   }
+  return StmtType::kNone;
+}
+StmtType Parser::DetermineAlterTableActionType(const std::string& keyword) {
+  if (kST_ADD_KW.find(scc::common::LowerCase(keyword)) == 0) {
+    return StmtType::kAddKW;
+  } else if (kST_DROP_KW.find(scc::common::LowerCase(keyword)) == 0) {
+    return StmtType::kDropKW;
+  }
+  return StmtType::kNone;
+}
 
+StmtType Parser::DetermineConstraintType(const std::string& keyword) {
+  if (DetermineIsPrimaryKey(keyword)) {
+    return StmtType::kPrimaryKey;
+  } else if (DetermineIsForeignKey(keyword)) {
+    return StmtType::kForeignKey;
+  }
+  return StmtType::kNone;
+}
+bool Parser::DetermineIsFullConstraintDefinition(const std::string& keyword) {
+  return kST_CONSTRAINT_KW.find(scc::common::LowerCase(keyword)) == 0;
+}
+NodePtr<INode> Parser::ParseDataType() {
+  NodePtr<INode> node = NextToken();
+  std::string datatype = ASTUtils::CastToNodeType<StringNode>(node)->data;
+  try {
+    StmtType sql_datatype(datatype);
+    node->stmt_type = sql_datatype;
+  } catch (const std::invalid_argument& ia) {
+    throw parsing_error("Unknown Data Type \'" + datatype
+                            + "\' at line " + std::to_string(node->line));
+  }
   return node;
 }
-NodePtr<INode> Parser::GetPrimaryKey() {
+bool Parser::DetermineIsPrimaryKey(const std::string& keyword) {
+  return kST_PRIMARY_KEY.find(scc::common::LowerCase(keyword)) == 0;
+}
+NodePtr<INode> Parser::ParsePrimaryKey() {
   NodePtr<INode> primary_key = ASTUtils::CreateServiceNode(StmtType::kPrimaryKey);
 
+  std::string incorrect_msg_prefix = "Incorrect \'PRIMARY KEY\' definition at line ";
+
+  auto next_token = NextToken();
+  ValidateIsWord(next_token);
+  std::string primary_keyword = ASTUtils::CastToNodeType<StringNode>(next_token)->data;
+  if (!DetermineIsPrimaryKey(primary_keyword)) {
+    throw parsing_error(incorrect_msg_prefix + std::to_string(next_token->line)
+                            + ": expected \'PRIMARY\' keyword");
+  }
+
+  ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
+                        + ": missing \'KEY\' keyword");
+  next_token = NextToken();
+  ValidateIsWord(next_token);
+  std::string key_keyword = ASTUtils::CastToNodeType<StringNode>(next_token)->data;
+  if (scc::common::LowerCase(key_keyword) != "key") {
+    throw parsing_error(incorrect_msg_prefix + std::to_string(next_token->line)
+                            + ": expected \'KEY\' keyword");
+  }
+
+  ValidateHasTokens("Missing \'PRIMARY KEY\' definition at line "
+                        + std::to_string(next_token->line));
   int line = PeekToken()->line;
   ValidateIsOpeningRoundBracket(PeekToken());
   NextToken();
 
-  // Get PRIMARY KEY definition
-  if (tokens_.empty()) {
-    LOGE << "column name is missed in line " << line;
-    end(EXIT_FAILURE);
-  }
-  NodePtr<INode> column_name = GetIdentifier();
+  ValidateHasTokens("Missed column name at line " + std::to_string(line));
+  NodePtr<INode> column_name = ParseIdentifier();
   ASTUtils::Link(primary_key, column_name);
 
   // Get listOf(column_names)
-  if (!tokens_.empty()) {
-    if (NodeDataClassifier::IsComma(PeekToken())) {
-      NodePtr<INode> separator = GetListOf(StmtType::kIdentifier);
-      ASTUtils::Link(primary_key, separator);
-    }
+  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+    NodePtr<INode> separator = ParseListOf(StmtType::kIdentifier);
+    ASTUtils::Link(primary_key, separator);
   }
 
-  if (tokens_.empty()) {
-    LOGE << "closing round bracket is missed in line " << line;
-    end(EXIT_FAILURE);
-  }
+  ValidateHasTokens("Missed closing round bracket at line " + std::to_string(line));
   ValidateIsClosingRoundBracket(PeekToken());
   NextToken();
 
   return primary_key;
 }
 
-NodePtr<INode> Parser::GetForeignKey() {
+bool Parser::DetermineIsForeignKey(const std::string& keyword) {
+  return kST_FOREIGN_KEY.find(scc::common::LowerCase(keyword)) == 0;
+}
+NodePtr<INode> Parser::ParseForeignKey() {
   NodePtr<INode> foreign_key = ASTUtils::CreateServiceNode(StmtType::kForeignKey);
 
+  std::string incorrect_msg_prefix = "Incorrect \'FOREIGN KEY\' definition at line ";
+
+  auto next_token = NextToken();
+  ValidateIsWord(next_token);
+  std::string foreign_keyword = ASTUtils::CastToNodeType<StringNode>(next_token)->data;
+  if (!DetermineIsForeignKey(foreign_keyword)) {
+    throw parsing_error(incorrect_msg_prefix + std::to_string(next_token->line)
+                            + ": expected \'FOREIGN\' keyword");
+  }
+
+  ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
+                        + ": missing \'KEY\' keyword");
+  next_token = NextToken();
+  ValidateIsWord(next_token);
+  std::string key_keyword = ASTUtils::CastToNodeType<StringNode>(next_token)->data;
+  if (scc::common::LowerCase(key_keyword) != "key") {
+    throw parsing_error(incorrect_msg_prefix + std::to_string(next_token->line)
+                            + ": expected \'KEY\' keyword");
+  }
+
+  ValidateHasTokens("Missing \'FOREIGN KEY\' definition at line "
+                        + std::to_string(next_token->line));
   int line = PeekToken()->line;
   ValidateIsOpeningRoundBracket(PeekToken());
   NextToken();
@@ -70,12 +136,12 @@ NodePtr<INode> Parser::GetForeignKey() {
     LOGE << "columnName is missed in line " << line;
     end(EXIT_FAILURE);
   }
-  NodePtr<INode> column_name = GetIdentifier();
+  NodePtr<INode> column_name = ParseIdentifier();
   ASTUtils::Link(foreign_key, column_name);
 
   // Get listOf(column_names)
   if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
-    NodePtr<INode> separator = GetListOf(StmtType::kIdentifier);
+    NodePtr<INode> separator = ParseListOf(StmtType::kIdentifier);
     ASTUtils::Link(foreign_key, separator);
   }
 
@@ -114,7 +180,7 @@ NodePtr<INode> Parser::GetReference() {
     LOGE << "table name is missed in line " << line;
     end(EXIT_FAILURE);
   }
-  NodePtr<INode> ref_table_name = GetName();
+  NodePtr<INode> ref_table_name = ParseName();
   ASTUtils::Link(reference, ref_table_name);
 
   // Get columns if present
@@ -129,7 +195,7 @@ NodePtr<INode> Parser::GetReference() {
            << line << ": incorrect list of column names";
       end(EXIT_FAILURE);
     }
-    ref_column_name = GetIdentifier();
+    ref_column_name = ParseIdentifier();
     ASTUtils::Link(reference, ref_column_name);
 
     if (tokens_.empty()) {
@@ -139,7 +205,7 @@ NodePtr<INode> Parser::GetReference() {
     }
     if (NodeDataClassifier::IsComma(PeekToken())) {
       next_ref_column_names =
-          GetListOf(StmtType::kIdentifier);
+          ParseListOf(StmtType::kIdentifier);
       ASTUtils::Link(reference, next_ref_column_names);
     }
 
@@ -215,22 +281,22 @@ NodePtr<INode> Parser::GetString() {
   return node;
 }
 
-NodePtr<INode> Parser::GetName() {
+NodePtr<INode> Parser::ParseName() {
   NodePtr<INode> name = ASTUtils::CreateServiceNode(StmtType::kName);
 
-  NodePtr<INode> identifier = GetIdentifier();
+  NodePtr<INode> identifier = ParseIdentifier();
   ASTUtils::Link(name, identifier);
 
   if (!tokens_.empty()) {
     if (NodeDataClassifier::IsDot(PeekToken())) {
-      NodePtr<INode> next_identifiers = GetIdentifiers();
+      NodePtr<INode> next_identifiers = ParseIdentifiers();
       ASTUtils::Link(name, next_identifiers);
     }
   }
 
   return name;
 }
-NodePtr<INode> Parser::GetIdentifiers() {
+NodePtr<INode> Parser::ParseIdentifiers() {
   int line = PeekToken()->line;
   NextToken();
   NodePtr<INode> dot = ASTUtils::CreateServiceNode(StmtType::kDotDelimiter);
@@ -239,12 +305,12 @@ NodePtr<INode> Parser::GetIdentifiers() {
     LOGE << "bad name, which ends in a dot, in line " << line;
     end(EXIT_FAILURE);
   }
-  NodePtr<INode> identifier = GetIdentifier();
+  NodePtr<INode> identifier = ParseIdentifier();
   ASTUtils::Link(dot, identifier);
 
   if (!tokens_.empty()) {
     if (NodeDataClassifier::IsDot(PeekToken())) {
-      NodePtr<INode> next_identifiers = GetIdentifiers();
+      NodePtr<INode> next_identifiers = ParseIdentifiers();
       ASTUtils::Link(dot, next_identifiers);
     }
   }
@@ -252,7 +318,7 @@ NodePtr<INode> Parser::GetIdentifiers() {
   return dot;
 }
 
-NodePtr<INode> Parser::GetIdentifier() {
+NodePtr<INode> Parser::ParseIdentifier() {
   ValidateIsWord(PeekToken());
   NodePtr<INode> identifier = ASTUtils::CreateServiceNode(StmtType::kIdentifier);
 
@@ -262,7 +328,7 @@ NodePtr<INode> Parser::GetIdentifier() {
   return identifier;
 }
 
-NodePtr<INode> Parser::GetListOf(StmtType get_function_type) {
+NodePtr<INode> Parser::ParseListOf(StmtType get_function_type) {
   // Get separator (comma)
   int line = PeekToken()->line;
   NextToken();
@@ -277,23 +343,23 @@ NodePtr<INode> Parser::GetListOf(StmtType get_function_type) {
   NodePtr<INode> argument;
   switch (get_function_type) {
     case StmtType::kIdentifier:
-      argument = GetIdentifier();
+      argument = ParseIdentifier();
       break;
     case StmtType::kTableDef:
       ValidateIsWord(PeekToken());
-      argument = GetTableDefinitionObject();
+      argument = ParseTableDefinitionElement();
       break;
     case StmtType::kColumnDef:
       ValidateIsWord(PeekToken());
-      argument = GetColumnDefinition();
+      argument = ParseColumnDefinition();
       break;
     case StmtType::kTableConstraint:
       ValidateIsWord(PeekToken());
-      argument = GetTableConstraint();
+      argument = ParseTableConstraint();
       break;
     case StmtType::kName:
       ValidateIsWord(PeekToken());
-      argument = GetName();
+      argument = ParseName();
       break;
     default:
       LOGE << "unknown statement type for the listOf in line "
@@ -304,7 +370,7 @@ NodePtr<INode> Parser::GetListOf(StmtType get_function_type) {
 
   if (!tokens_.empty()
       && NodeDataClassifier::IsComma(PeekToken())) {
-    NodePtr<INode> next_separator = GetListOf(get_function_type);
+    NodePtr<INode> next_separator = ParseListOf(get_function_type);
     ASTUtils::Link(separator, next_separator);
   }
 
