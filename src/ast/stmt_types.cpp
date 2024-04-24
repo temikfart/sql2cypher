@@ -85,10 +85,6 @@ StmtType::StmtType(const std::string_view& str_stmt_type) {
     this->value_ = kPrimaryKey;
   else if (stmt_type == kST_FOREIGN_KEY)
     this->value_ = kForeignKey;
-  else if (stmt_type == kST_REFERENCE)
-    this->value_ = kReference;
-  else if (stmt_type == kST_NAME)
-    this->value_ = kName;
   else if (stmt_type == kST_IDENTIFIER)
     this->value_ = kIdentifier;
   else if (stmt_type == kST_DOT_DELIMITER)
@@ -103,6 +99,8 @@ StmtType::StmtType(const std::string_view& str_stmt_type) {
     this->value_ = kConstraintKW;
   else if (stmt_type == kST_COLUMN_KW)
     this->value_ = kColumnKW;
+  else if (stmt_type == kST_REFERENCES_KW)
+    this->value_ = kReferencesKW;
   else if (stmt_type == kST_ADD_KW)
     this->value_ = kAddKW;
   else if (stmt_type == kST_DROP_KW)
@@ -199,8 +197,6 @@ std::string StmtType::ToString() const {
       return std::string(kST_PRIMARY_KEY);
     case kForeignKey:
       return std::string(kST_FOREIGN_KEY);
-    case kReference:
-      return std::string(kST_REFERENCE);
     case kName:
       return std::string(kST_NAME);
     case kIdentifier:
@@ -217,6 +213,8 @@ std::string StmtType::ToString() const {
       return std::string(kST_CONSTRAINT_KW);
     case kColumnKW:
       return std::string(kST_COLUMN_KW);
+    case kReferencesKW:
+      return std::string(kST_REFERENCES_KW);
     case kAddKW:
       return std::string(kST_ADD_KW);
     case kDropKW:

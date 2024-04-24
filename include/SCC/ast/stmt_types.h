@@ -44,7 +44,6 @@ constexpr std::string_view kST_NOT_OPERATOR = "not";
 
 constexpr std::string_view kST_PRIMARY_KEY = "primary key";
 constexpr std::string_view kST_FOREIGN_KEY = "foreign key";
-constexpr std::string_view kST_REFERENCE = "reference";
 constexpr std::string_view kST_NAME = "name";
 constexpr std::string_view kST_IDENTIFIER = "identifier";
 constexpr std::string_view kST_DOT_DELIMITER = "dot delimiter";
@@ -53,6 +52,7 @@ constexpr std::string_view kST_SEMICOLON_DELIMITER = "semicolon delimiter";
 
 constexpr std::string_view kST_CONSTRAINT_KW = "constraint";
 constexpr std::string_view kST_COLUMN_KW = "column";
+constexpr std::string_view kST_REFERENCES_KW = "references";
 constexpr std::string_view kST_ADD_KW = "add";
 constexpr std::string_view kST_DROP_KW = "drop";
 
@@ -111,7 +111,6 @@ public:
     // Basic Statements
     kPrimaryKey,
     kForeignKey,
-    kReference,
     kName,
     kIdentifier,
     kDotDelimiter,
@@ -121,6 +120,7 @@ public:
     // Other Keywords
     kConstraintKW,
     kColumnKW,
+    kReferencesKW,
     kAddKW,
     kDropKW,
 

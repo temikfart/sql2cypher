@@ -72,8 +72,8 @@ void QueryAssembler::TranslateForeignKey(
 
   // Get reference
   auto reference = key->get_child(reference_child_num);
-  if (reference->stmt_type != StmtType::kReference) {
-    LOGE << "invalid foreign key: incorrect referene statement type";
+  if (reference->stmt_type != StmtType::kReferencesKW) {
+    LOGE << "invalid foreign key: incorrect reference statement type";
     end(EXIT_FAILURE);
   }
   if (reference->ChildrenCount() == 0) {
