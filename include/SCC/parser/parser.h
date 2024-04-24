@@ -96,15 +96,15 @@ private:
   // DML Basic Statements
 
   // Gets logical condition
-  std::shared_ptr<ast::INode> GetCondition();
-  std::shared_ptr<ast::INode> GetORCondition();
-  std::shared_ptr<ast::INode> GetANDCondition();
-  std::shared_ptr<ast::INode> GetNOTCondition();
-  std::shared_ptr<ast::INode> GetPredicate();
-  std::shared_ptr<ast::INode> GetExpression();
+  std::shared_ptr<ast::INode> ParseCondition();
+  std::shared_ptr<ast::INode> ParseORCondition();
+  std::shared_ptr<ast::INode> ParseANDCondition();
+  std::shared_ptr<ast::INode> ParseNOTCondition();
+  std::shared_ptr<ast::INode> ParsePredicate();
+  std::shared_ptr<ast::INode> ParseExpression();
 
   // Gets Math expression like ((5 + 7) * (9 / 3) - (7^2 - 5 * 11))
-  std::shared_ptr<ast::INode> GetMathExpression();
+  std::shared_ptr<ast::INode> ParseMathExpression();
   std::shared_ptr<ast::INode> GetMathSum();
   std::shared_ptr<ast::INode> GetMathProduct();
   std::shared_ptr<ast::INode> GetMathPower();
@@ -112,20 +112,25 @@ private:
 
   // Basic statements
 
-  ast::StmtType DetermineAlterTableActionType(const std::string& keyword);
-  ast::StmtType DetermineDropElementType(const std::string& keyword);
+  ast::StmtType DetermineAlterTableActionType(const std::string& keyword) const;
+  ast::StmtType DetermineDropElementType(const std::string& keyword) const;
 
-  ast::StmtType DetermineConstraintType(const std::string& keyword);
-  bool DetermineIsFullConstraintDefinition(const std::string& keyword);
+  ast::StmtType DetermineConstraintType(const std::string& keyword) const;
+  bool DetermineIsFullConstraintDefinition(const std::string& keyword) const;
   std::shared_ptr<ast::INode> ParseDataType();
-  bool DetermineIsPrimaryKey(const std::string& keyword);
+  bool DetermineIsPrimaryKey(const std::string& keyword) const;
   std::shared_ptr<ast::INode> ParsePrimaryKey();
 
-  bool DetermineIsForeignKey(const std::string& keyword);
+  bool DetermineIsForeignKey(const std::string& keyword) const;
   std::shared_ptr<ast::INode> ParseForeignKey();
   std::shared_ptr<ast::INode> GetReference();
 
-  std::shared_ptr<ast::INode> GetString();
+  ast::StmtType DetermineLogicalOperator(const std::string& keyword) const;
+  bool DetermineIsOROperator(const std::string& keyword) const;
+  bool DetermineIsANDOperator(const std::string& keyword) const;
+  bool DetermineIsNOTOperator(const std::string& keyword) const;
+
+  std::shared_ptr<ast::INode> ParseString();
 
   // Gets name like [ [ schema. ] db. ] table
   std::shared_ptr<ast::INode> ParseName();
@@ -145,6 +150,7 @@ private:
   void ValidateIsClosingRoundBracket(const std::shared_ptr<ast::INode>& node) const;
   void ValidateIsSingleQuote(const std::shared_ptr<ast::INode>& node) const;
   void ValidateIsDoubleQuote(const std::shared_ptr<ast::INode>& node) const;
+  void ValidateIsBinaryOperator(const std::shared_ptr<ast::INode>& node) const;
 };
 
 } // scc::parser

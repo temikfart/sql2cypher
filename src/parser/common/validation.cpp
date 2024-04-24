@@ -48,5 +48,10 @@ void Parser::ValidateIsDoubleQuote(const NodePtr<INode>& node) const {
     throw parsing_error("Expected Double Quote at line " + std::to_string(node->line));
   }
 }
+void Parser::ValidateIsBinaryOperator(const NodePtr<INode>& node) const {
+  if (!NodeDataClassifier::IsBinaryOperator(node)) {
+    throw parsing_error("Expected Binary Operator at line " + std::to_string(node->line));
+  }
+}
 
 } // scc::parser
