@@ -112,34 +112,28 @@ private:
 
   // Basic statements
 
+  ast::StmtType DetermineConstraintType(const std::string& keyword) const;
   ast::StmtType DetermineAlterTableActionType(const std::string& keyword) const;
   ast::StmtType DetermineDropElementType(const std::string& keyword) const;
+  ast::StmtType DetermineLogicalOperatorType(const std::string& keyword) const;
 
-  ast::StmtType DetermineConstraintType(const std::string& keyword) const;
   bool DetermineIsFullConstraintDefinition(const std::string& keyword) const;
-  std::shared_ptr<ast::INode> ParseDataType();
   bool DetermineIsPrimaryKey(const std::string& keyword) const;
-  std::shared_ptr<ast::INode> ParsePrimaryKey();
-
   bool DetermineIsForeignKey(const std::string& keyword) const;
-  std::shared_ptr<ast::INode> ParseForeignKey();
-  std::shared_ptr<ast::INode> GetReference();
-
-  ast::StmtType DetermineLogicalOperator(const std::string& keyword) const;
   bool DetermineIsOROperator(const std::string& keyword) const;
   bool DetermineIsANDOperator(const std::string& keyword) const;
   bool DetermineIsNOTOperator(const std::string& keyword) const;
 
-  std::shared_ptr<ast::INode> ParseString();
+  std::shared_ptr<ast::INode> ParseListOf(ast::StmtType get_function_type);
+  std::shared_ptr<ast::INode> ParsePrimaryKey();
+  std::shared_ptr<ast::INode> ParseForeignKey();
+  std::shared_ptr<ast::INode> GetReference();
 
-  // Gets name like [ [ schema. ] db. ] table
+  std::shared_ptr<ast::INode> ParseDataType();
+  std::shared_ptr<ast::INode> ParseString();
   std::shared_ptr<ast::INode> ParseName();
   std::shared_ptr<ast::INode> ParseIdentifiers();
-
   std::shared_ptr<ast::INode> ParseIdentifier();
-
-  // Gets listOf arguments with certain type
-  std::shared_ptr<ast::INode> ParseListOf(ast::StmtType get_function_type);
 
   // Validation
 

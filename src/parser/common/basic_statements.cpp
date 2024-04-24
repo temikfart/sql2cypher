@@ -10,11 +10,11 @@ template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
-StmtType Parser::DetermineDropElementType(const std::string& keyword) const {
-  if (kST_CONSTRAINT_KW.find(keyword) == 0) {
-    return StmtType::kConstraintKW;
-  } else if (kST_COLUMN_KW.find(keyword) == 0) {
-    return StmtType::kColumnKW;
+StmtType Parser::DetermineConstraintType(const std::string& keyword) const {
+  if (DetermineIsPrimaryKey(keyword)) {
+    return StmtType::kPrimaryKey;
+  } else if (DetermineIsForeignKey(keyword)) {
+    return StmtType::kForeignKey;
   }
   return StmtType::kNone;
 }
@@ -26,32 +26,91 @@ StmtType Parser::DetermineAlterTableActionType(const std::string& keyword) const
   }
   return StmtType::kNone;
 }
-
-StmtType Parser::DetermineConstraintType(const std::string& keyword) const {
-  if (DetermineIsPrimaryKey(keyword)) {
-    return StmtType::kPrimaryKey;
-  } else if (DetermineIsForeignKey(keyword)) {
-    return StmtType::kForeignKey;
+StmtType Parser::DetermineDropElementType(const std::string& keyword) const {
+  if (kST_CONSTRAINT_KW.find(keyword) == 0) {
+    return StmtType::kConstraintKW;
+  } else if (kST_COLUMN_KW.find(keyword) == 0) {
+    return StmtType::kColumnKW;
   }
   return StmtType::kNone;
 }
+StmtType Parser::DetermineLogicalOperatorType(const std::string& keyword) const {
+  if (DetermineIsOROperator(keyword)) {
+    return StmtType::kOROperator;
+  } else if (DetermineIsANDOperator(keyword)) {
+    return StmtType::kANDOperator;
+  } else if (DetermineIsNOTOperator(keyword)) {
+    return StmtType::kNOTOperator;
+  }
+  return StmtType::kNone;
+}
+
 bool Parser::DetermineIsFullConstraintDefinition(const std::string& keyword) const {
   return kST_CONSTRAINT_KW.find(scc::common::LowerCase(keyword)) == 0;
 }
-NodePtr<INode> Parser::ParseDataType() {
-  NodePtr<INode> node = NextToken();
-  std::string datatype = ASTUtils::CastToNodeType<StringNode>(node)->data;
-  try {
-    StmtType sql_datatype(datatype);
-    node->stmt_type = sql_datatype;
-  } catch (const std::invalid_argument& ia) {
-    throw parsing_error("Unknown Data Type \'" + datatype
-                            + "\' at line " + std::to_string(node->line));
-  }
-  return node;
-}
 bool Parser::DetermineIsPrimaryKey(const std::string& keyword) const {
   return kST_PRIMARY_KEY.find(scc::common::LowerCase(keyword)) == 0;
+}
+bool Parser::DetermineIsForeignKey(const std::string& keyword) const {
+  return kST_FOREIGN_KEY.find(scc::common::LowerCase(keyword)) == 0;
+}
+bool Parser::DetermineIsOROperator(const std::string& keyword) const {
+  return kST_OR_OPERATOR.find(scc::common::LowerCase(keyword)) == 0;
+}
+bool Parser::DetermineIsANDOperator(const std::string& keyword) const {
+  return kST_AND_OPERATOR.find(scc::common::LowerCase(keyword)) == 0;
+}
+bool Parser::DetermineIsNOTOperator(const std::string& keyword) const {
+  return kST_NOT_OPERATOR.find(scc::common::LowerCase(keyword)) == 0;
+}
+
+NodePtr<INode> Parser::ParseListOf(StmtType get_function_type) {
+  // Get separator (comma)
+  int line = PeekToken()->line;
+  NextToken();
+  NodePtr<INode> separator = ASTUtils::CreateServiceNode(StmtType::kCommaDelimiter);
+
+  if (tokens_.empty()) {
+    LOGE << "invalid listOf in line "
+         << line << ": argument is missed";
+    end(EXIT_FAILURE);
+  }
+
+  NodePtr<INode> argument;
+  switch (get_function_type) {
+    case StmtType::kIdentifier:
+      argument = ParseIdentifier();
+      break;
+    case StmtType::kTableDef:
+      ValidateIsWord(PeekToken());
+      argument = ParseTableDefinitionElement();
+      break;
+    case StmtType::kColumnDef:
+      ValidateIsWord(PeekToken());
+      argument = ParseColumnDefinition();
+      break;
+    case StmtType::kTableConstraint:
+      ValidateIsWord(PeekToken());
+      argument = ParseTableConstraint();
+      break;
+    case StmtType::kName:
+      ValidateIsWord(PeekToken());
+      argument = ParseName();
+      break;
+    default:
+      LOGE << "unknown statement type for the listOf in line "
+           << PeekToken()->line;
+      end(EXIT_FAILURE);
+  }
+  ASTUtils::Link(separator, argument);
+
+  if (!tokens_.empty()
+      && NodeDataClassifier::IsComma(PeekToken())) {
+    NodePtr<INode> next_separator = ParseListOf(get_function_type);
+    ASTUtils::Link(separator, next_separator);
+  }
+
+  return separator;
 }
 NodePtr<INode> Parser::ParsePrimaryKey() {
   NodePtr<INode> primary_key = ASTUtils::CreateServiceNode(StmtType::kPrimaryKey);
@@ -97,10 +156,6 @@ NodePtr<INode> Parser::ParsePrimaryKey() {
   NextToken();
 
   return primary_key;
-}
-
-bool Parser::DetermineIsForeignKey(const std::string& keyword) const {
-  return kST_FOREIGN_KEY.find(scc::common::LowerCase(keyword)) == 0;
 }
 NodePtr<INode> Parser::ParseForeignKey() {
   NodePtr<INode> foreign_key = ASTUtils::CreateServiceNode(StmtType::kForeignKey);
@@ -221,26 +276,18 @@ NodePtr<INode> Parser::GetReference() {
   return reference;
 }
 
-StmtType Parser::DetermineLogicalOperator(const std::string& keyword) const {
-  if (DetermineIsOROperator(keyword)) {
-    return StmtType::kOROperator;
-  } else if (DetermineIsANDOperator(keyword)) {
-    return StmtType::kANDOperator;
-  } else if (DetermineIsNOTOperator(keyword)) {
-    return StmtType::kNOTOperator;
+NodePtr<INode> Parser::ParseDataType() {
+  NodePtr<INode> node = NextToken();
+  std::string datatype = ASTUtils::CastToNodeType<StringNode>(node)->data;
+  try {
+    StmtType sql_datatype(datatype);
+    node->stmt_type = sql_datatype;
+  } catch (const std::invalid_argument& ia) {
+    throw parsing_error("Unknown Data Type \'" + datatype
+                            + "\' at line " + std::to_string(node->line));
   }
-  return StmtType::kNone;
+  return node;
 }
-bool Parser::DetermineIsOROperator(const std::string& keyword) const {
-  return kST_OR_OPERATOR.find(scc::common::LowerCase(keyword)) == 0;
-}
-bool Parser::DetermineIsANDOperator(const std::string& keyword) const {
-  return kST_AND_OPERATOR.find(scc::common::LowerCase(keyword)) == 0;
-}
-bool Parser::DetermineIsNOTOperator(const std::string& keyword) const {
-  return kST_NOT_OPERATOR.find(scc::common::LowerCase(keyword)) == 0;
-}
-
 NodePtr<INode> Parser::ParseString() {
   NodePtr<INode> node;
 
@@ -300,7 +347,6 @@ NodePtr<INode> Parser::ParseString() {
 
   return node;
 }
-
 NodePtr<INode> Parser::ParseName() {
   NodePtr<INode> name = ASTUtils::CreateServiceNode(StmtType::kName);
 
@@ -337,7 +383,6 @@ NodePtr<INode> Parser::ParseIdentifiers() {
 
   return dot;
 }
-
 NodePtr<INode> Parser::ParseIdentifier() {
   ValidateIsWord(PeekToken());
   NodePtr<INode> identifier = ASTUtils::CreateServiceNode(StmtType::kIdentifier);
@@ -346,55 +391,6 @@ NodePtr<INode> Parser::ParseIdentifier() {
   ASTUtils::Link(identifier, argument);
 
   return identifier;
-}
-
-NodePtr<INode> Parser::ParseListOf(StmtType get_function_type) {
-  // Get separator (comma)
-  int line = PeekToken()->line;
-  NextToken();
-  NodePtr<INode> separator = ASTUtils::CreateServiceNode(StmtType::kCommaDelimiter);
-
-  if (tokens_.empty()) {
-    LOGE << "invalid listOf in line "
-         << line << ": argument is missed";
-    end(EXIT_FAILURE);
-  }
-
-  NodePtr<INode> argument;
-  switch (get_function_type) {
-    case StmtType::kIdentifier:
-      argument = ParseIdentifier();
-      break;
-    case StmtType::kTableDef:
-      ValidateIsWord(PeekToken());
-      argument = ParseTableDefinitionElement();
-      break;
-    case StmtType::kColumnDef:
-      ValidateIsWord(PeekToken());
-      argument = ParseColumnDefinition();
-      break;
-    case StmtType::kTableConstraint:
-      ValidateIsWord(PeekToken());
-      argument = ParseTableConstraint();
-      break;
-    case StmtType::kName:
-      ValidateIsWord(PeekToken());
-      argument = ParseName();
-      break;
-    default:
-      LOGE << "unknown statement type for the listOf in line "
-           << PeekToken()->line;
-      end(EXIT_FAILURE);
-  }
-  ASTUtils::Link(separator, argument);
-
-  if (!tokens_.empty()
-      && NodeDataClassifier::IsComma(PeekToken())) {
-    NodePtr<INode> next_separator = ParseListOf(get_function_type);
-    ASTUtils::Link(separator, next_separator);
-  }
-
-  return separator;
 }
 
 } // scc::parser
