@@ -10,41 +10,41 @@ template<typename NodeType,
 using NodePtr = std::shared_ptr<NodeType>;
 
 bool NodeDataClassifier::IsDot(const NodePtr<INode>& node) {
-  return SameDataType(node, DataType::kPunctuation)
+  return IsCorrectDataType(node, DataType::kPunctuation)
       && ASTUtils::CastToNodeType<CharNode>(node)->data == '.';
 }
 bool NodeDataClassifier::IsComma(const NodePtr<INode>& node) {
-  return SameDataType(node, DataType::kPunctuation)
+  return IsCorrectDataType(node, DataType::kPunctuation)
       && ASTUtils::CastToNodeType<CharNode>(node)->data == ',';
 }
 bool NodeDataClassifier::IsOpeningRoundBracket(const NodePtr<INode>& node) {
-  return SameDataType(node, DataType::kBracket)
+  return IsCorrectDataType(node, DataType::kBracket)
       && ASTUtils::CastToNodeType<CharNode>(node)->data == '(';
 }
 bool NodeDataClassifier::IsClosingRoundBracket(const NodePtr<INode>& node) {
-  return SameDataType(node, DataType::kBracket)
+  return IsCorrectDataType(node, DataType::kBracket)
       && ASTUtils::CastToNodeType<CharNode>(node)->data == ')';
 }
 bool NodeDataClassifier::IsSingleQuote(const NodePtr<INode>& node) {
-  return SameDataType(node, DataType::kPunctuation)
+  return IsCorrectDataType(node, DataType::kPunctuation)
       && ASTUtils::CastToNodeType<CharNode>(node)->data == '\'';
 }
 bool NodeDataClassifier::IsDoubleQuote(const NodePtr<INode>& node) {
-  return SameDataType(node, DataType::kPunctuation)
+  return IsCorrectDataType(node, DataType::kPunctuation)
       && ASTUtils::CastToNodeType<CharNode>(node)->data == '\"';
 }
 bool NodeDataClassifier::IsQuote(const NodePtr<INode>& node) {
   return IsSingleQuote(node) || IsDoubleQuote(node);
 }
 bool NodeDataClassifier::IsUnaryOperator(const NodePtr<INode>& node) {
-  if (SameDataType(node, DataType::kOperator)) {
+  if (IsCorrectDataType(node, DataType::kOperator)) {
     std::string data = ASTUtils::CastToNodeType<StringNode>(node)->data;
     return data == "+" || data == "-";
   }
   return false;
 }
 bool NodeDataClassifier::IsBinaryOperator(const NodePtr<INode>& node) {
-  if (SameDataType(node, DataType::kOperator)) {
+  if (IsCorrectDataType(node, DataType::kOperator)) {
     std::string data = ASTUtils::CastToNodeType<StringNode>(node)->data;
     static const std::vector<std::string> bin_operators = {
         "!=", "=", "!>", ">", ">=", "!<", "<", "<=", "<>"
@@ -54,12 +54,13 @@ bool NodeDataClassifier::IsBinaryOperator(const NodePtr<INode>& node) {
   return false;
 }
 bool NodeDataClassifier::IsSemicolon(const NodePtr<INode>& node) {
-  return SameDataType(node, DataType::kPunctuation)
+  return IsCorrectDataType(node, DataType::kPunctuation)
       && ASTUtils::CastToNodeType<CharNode>(node)->data == ';';
 }
 
-bool NodeDataClassifier::SameDataType(const NodePtr<INode>& node, DataType data_type) {
-  return node->data_type == data_type;
+bool NodeDataClassifier::IsCorrectDataType(const NodePtr<INode>& node_to_check,
+                                           DataType correct_data_type) {
+  return node_to_check->data_type == correct_data_type;
 }
 
 } // scc::parser::common

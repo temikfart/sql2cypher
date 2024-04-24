@@ -10,7 +10,7 @@ template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
-NodePtr<INode> Parser::GetMathExpression() {
+NodePtr<INode> Parser::ParseMathExpression() {
   NodePtr<INode> node;
 
   // TODO: implement this PEG
@@ -141,7 +141,7 @@ NodePtr<INode> Parser::GetMathValue() {
       end(EXIT_FAILURE);
     }
     line = PeekToken()->line;
-    value = GetMathExpression();
+    value = ParseMathExpression();
 
     if (NodeDataClassifier::IsClosingRoundBracket(PeekToken())) {
       NextToken();

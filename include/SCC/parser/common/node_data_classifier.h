@@ -20,7 +20,8 @@ public:
   static bool IsSemicolon(const std::shared_ptr<ast::INode>& node);
 
 private:
-  static bool SameDataType(const std::shared_ptr<ast::INode>& node, ast::DataType data_type);
+  static bool IsCorrectDataType(const std::shared_ptr<ast::INode>& node_to_check,
+                                ast::DataType correct_data_type);
 };
 
 } // scc::parser::common
