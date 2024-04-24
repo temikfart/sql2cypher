@@ -48,6 +48,9 @@ constexpr std::string_view kST_COMMA_DELIMITER = "comma delimiter";
 constexpr std::string_view kST_SEMICOLON_DELIMITER = "semicolon delimiter";
 
 constexpr std::string_view kST_CONSTRAINT_KW = "constraint";
+constexpr std::string_view kST_COLUMN_KW = "column";
+constexpr std::string_view kST_ADD_KW = "add";
+constexpr std::string_view kST_DROP_KW = "drop";
 
 constexpr std::string_view kST_INT_TYPE = "int";
 constexpr std::string_view kST_INTEGER_TYPE = "integer";
@@ -108,6 +111,9 @@ public:
 
     // Other Keywords
     kConstraintKW,
+    kColumnKW,
+    kAddKW,
+    kDropKW,
 
     // SQL Data Types
     kIntType,
