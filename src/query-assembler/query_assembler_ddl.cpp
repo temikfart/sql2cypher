@@ -121,9 +121,9 @@ void QueryAssembler::TranslateAlterTable(std::shared_ptr<INode> node) {
   }
 
   auto action_node = node->get_child(1);
-  if (action_node->stmt_type == StmtType::kAlterActionAdd) {
+  if (action_node->stmt_type == StmtType::kAddKW) {
     this->TranslateAlterTableActionAdd(action_node, table_name);
-  } else if (action_node->stmt_type == StmtType::kAlterActionDrop) {
+  } else if (action_node->stmt_type == StmtType::kDropKW) {
     this->TranslateAlterTableActionDrop(action_node, table_name);
   }
 }

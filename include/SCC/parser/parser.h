@@ -15,6 +15,7 @@
 #include "SCC/ast/nodes/root_node.h"
 #include "SCC/ast/nodes/service_node.h"
 #include "SCC/ast/nodes/string_node.h"
+#include "SCC/common/string_utils.h"
 #include "SCC/config/scc_config.h"
 #include "SCC/log/log.h"
 #include "SCC/parser/common/base_stmttype_classifier.h"
@@ -25,7 +26,7 @@
 
 namespace scc::parser {
 
-class parsing_error : private std::logic_error {
+class parsing_error : public std::logic_error {
 public:
   explicit parsing_error(const std::string& message);
 };
@@ -52,34 +53,39 @@ private:
 
   // Define language (DDL | DML)
 
-  ast::StmtType GetDDLStType();
-  std::shared_ptr<ast::INode> GetDDLSt();
+  ast::StmtType ParseDDLStatementType();
+  std::shared_ptr<ast::INode> ParseDDLStatement();
 
   ast::StmtType GetDMLStType();
   std::shared_ptr<ast::INode> GetDMLSt();
 
   // DDL Statements
 
-  std::shared_ptr<ast::INode> GetCreateDatabaseSt();
-  std::shared_ptr<ast::INode> GetCreateTableSt();
-  std::shared_ptr<ast::INode> GetAlterTableSt();
-  std::shared_ptr<ast::INode> GetDropDatabaseSt();
-  std::shared_ptr<ast::INode> GetDropTableSt();
+  std::shared_ptr<ast::INode> ParseCreateDatabaseStatement();
+  std::shared_ptr<ast::INode> ParseCreateTableStatement();
+  std::shared_ptr<ast::INode> ParseAlterTableStatement();
+  std::shared_ptr<ast::INode> ParseDropDatabaseStatement();
+  std::shared_ptr<ast::INode> ParseDropTableStatement();
 
   // DDL Basic Statements
 
+  std::shared_ptr<ast::INode> ParseDatabaseName();
+  std::shared_ptr<ast::INode> ParseTableName();
+
   // Gets tableDefinition, which consist
   // of tableConstraints and columnDefinitions
-  std::shared_ptr<ast::INode> GetTableDefinition();
-  std::shared_ptr<ast::INode> GetTableDefinitionObject();
+  std::shared_ptr<ast::INode> ParseTableDefinition();
+  std::shared_ptr<ast::INode> ParseTableDefinitionElements();
+  std::shared_ptr<ast::INode> ParseTableDefinitionElement();
+  ast::StmtType ParseTableDefinitionElementType();
 
-  std::shared_ptr<ast::INode> GetColumnDefinition();
-  std::shared_ptr<ast::INode> GetTableConstraint();
+  std::shared_ptr<ast::INode> ParseColumnDefinition();
+  std::shared_ptr<ast::INode> ParseTableConstraint(ast::StmtType stmt_type = ast::StmtType::kNone);
 
   // Gets listOf dropColumns and dropConstraints
-  std::shared_ptr<ast::INode> GetDropListDefinition();
-  std::shared_ptr<ast::INode> GetDropList();
-  std::shared_ptr<ast::INode> GetDropObject();
+  std::shared_ptr<ast::INode> ParseDropListDefinition();
+  std::shared_ptr<ast::INode> ParseDropElements();
+  std::shared_ptr<ast::INode> ParseDropElement();
 
   // DML Statements
 
@@ -106,23 +112,29 @@ private:
 
   // Basic statements
 
-  std::shared_ptr<ast::INode> GetDataType();
-  std::shared_ptr<ast::INode> GetPrimaryKey();
+  ast::StmtType DetermineAlterTableActionType(const std::string& keyword);
+  ast::StmtType DetermineDropElementType(const std::string& keyword);
 
-  std::shared_ptr<ast::INode> GetForeignKey();
+  ast::StmtType DetermineConstraintType(const std::string& keyword);
+  bool DetermineIsFullConstraintDefinition(const std::string& keyword);
+  std::shared_ptr<ast::INode> ParseDataType();
+  bool DetermineIsPrimaryKey(const std::string& keyword);
+  std::shared_ptr<ast::INode> ParsePrimaryKey();
+
+  bool DetermineIsForeignKey(const std::string& keyword);
+  std::shared_ptr<ast::INode> ParseForeignKey();
   std::shared_ptr<ast::INode> GetReference();
 
   std::shared_ptr<ast::INode> GetString();
 
   // Gets name like [ [ schema. ] db. ] table
-  std::shared_ptr<ast::INode> GetName();
-  std::shared_ptr<ast::INode> GetIdentifiers();
+  std::shared_ptr<ast::INode> ParseName();
+  std::shared_ptr<ast::INode> ParseIdentifiers();
 
-  std::shared_ptr<ast::INode> GetIdentifier();
+  std::shared_ptr<ast::INode> ParseIdentifier();
 
   // Gets listOf arguments with certain type
-  std::shared_ptr<ast::INode> GetListOf(
-      ast::StmtType get_function_type);
+  std::shared_ptr<ast::INode> ParseListOf(ast::StmtType get_function_type);
 
   // Validation
 
