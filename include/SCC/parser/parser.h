@@ -105,10 +105,10 @@ private:
 
   // Gets Math expression like ((5 + 7) * (9 / 3) - (7^2 - 5 * 11))
   std::shared_ptr<ast::INode> ParseMathExpression();
-  std::shared_ptr<ast::INode> GetMathSum();
-  std::shared_ptr<ast::INode> GetMathProduct();
-  std::shared_ptr<ast::INode> GetMathPower();
-  std::shared_ptr<ast::INode> GetMathValue();
+  std::shared_ptr<ast::INode> ParseMathSum();
+  std::shared_ptr<ast::INode> ParseMathProduct();
+  std::shared_ptr<ast::INode> ParseMathPower();
+  std::shared_ptr<ast::INode> ParseMathValue();
 
   // Basic statements
 

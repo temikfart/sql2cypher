@@ -10,149 +10,108 @@ template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
+/**
+ * @code
+ * Parsing expression grammar (PEG):
+ *   MathExpr ::= Sum
+ *   Sum      ::= Product (('+' / '-') Product)
+ *   Product  ::= Power (('*' / '/') Power)
+ *   Power    ::= Value ('^' Power)?
+ *   Value    ::= [0-9]+ / '(' MathExpr ')'
+ * @endcode
+ */
 NodePtr<INode> Parser::ParseMathExpression() {
-  NodePtr<INode> node;
-
-  // TODO: implement this PEG
-  /* MathExpr   <-- Sum
-   * Sum        <-- Product (('+' / '-') Product)*
-   * Product    <-- Power (('*' / '/') Power)*
-   * Power      <-- Value ('^' Power)?
-   * Value      <-- [0-9]+ / '(' MathExpr ')'                   */
-
-  node = GetMathSum();
-
-  return node;
+  NodePtr<INode> math_expression = ParseMathSum();
+  return math_expression;
 }
-NodePtr<INode> Parser::GetMathSum() {
-  NodePtr<INode> product_1, op_node, product_2;
+NodePtr<INode> Parser::ParseMathSum() {
+  NodePtr<INode> lhs_product = ParseMathProduct();
 
-  int line = PeekToken()->line;
-  product_1 = GetMathProduct();
-
-  if (!tokens_.empty()) {
-    while (NodeDataTypeClassifier::IsOperator(PeekToken())) {
-      // Get ("+" | "-")
-      op_node = NextToken();
-      std::string operator_str = ASTUtils::CastToNodeType<StringNode>(op_node)->data;
-      if (operator_str != "+" || operator_str != "-") {
-        LOGE << "invalid Math expression in line "
-             << line << ": wrong operator \'" << operator_str << "\'";
-        end(EXIT_FAILURE);
-      }
-
-      // Get next powers
-      if (tokens_.empty()) {
-        LOGE << "invalid Math expression: expected second operand for "
-                "the \'" << operator_str << "\' in line " << line;
-        end(EXIT_FAILURE);
-      }
-      product_2 = GetMathProduct();
-
-      ASTUtils::Link(op_node, product_1);
-      ASTUtils::Link(op_node, product_2);
-      product_1 = op_node;
-
-      if (tokens_.empty()) {
-        break;
-      }
-    }
-  }
-
-  return product_1;
-}
-NodePtr<INode> Parser::GetMathProduct() {
-  NodePtr<INode> power_1, op_node, power_2;
-
-  int line = PeekToken()->line;
-  power_1 = GetMathPower();
-
-  if (!tokens_.empty()) {
-    while (NodeDataTypeClassifier::IsOperator(PeekToken())) {
-      // Get ("*" | "/")
-      op_node = NextToken();
-      std::string operator_str = ASTUtils::CastToNodeType<StringNode>(op_node)->data;
-      if (operator_str != "*" || operator_str != "/") {
-        LOGE << "invalid Math expression in line "
-             << line << ": wrong operator \'" << operator_str << "\'";
-        end(EXIT_FAILURE);
-      }
-
-      // Get next powers
-      if (tokens_.empty()) {
-        LOGE << "invalid Math expression: expected second operand for "
-                "the \'" << operator_str << "\' in line " << line;
-        end(EXIT_FAILURE);
-      }
-      power_2 = GetMathPower();
-
-      ASTUtils::Link(op_node, power_1);
-      ASTUtils::Link(op_node, power_2);
-      power_1 = op_node;
-
-      if (tokens_.empty()) {
-        break;
-      }
-    }
-  }
-
-  return power_1;
-}
-NodePtr<INode> Parser::GetMathPower() {
-  NodePtr<INode> power, degree_op, degree;
-
-  int line = PeekToken()->line;
-  power = GetMathValue();
-
-  if (!tokens_.empty()) {
-    if (NodeDataTypeClassifier::IsOperator(PeekToken())) {
-      NodePtr<StringNode> op_node = ASTUtils::CastToNodeType<StringNode>(PeekToken());
-      if (op_node->data == "^") {
-        degree_op = NextToken();
-
-        if (tokens_.empty()) {
-          LOGE << "invalid Math expression in line "
-               << line << ": power missing";
-          end(EXIT_FAILURE);
-        }
-        degree = GetMathPower();
-        ASTUtils::Link(degree_op, power);
-        ASTUtils::Link(degree_op, degree);
-
-        return degree_op;
-      }
-    }
-  }
-
-  return power;
-}
-NodePtr<INode> Parser::GetMathValue() {
-  NodePtr<INode> value;
-
-  int line = PeekToken()->line;
-  if (NodeDataTypeClassifier::IsNumber(PeekToken())) {
-    value = NextToken();
-  } else if (NodeDataClassifier::IsOpeningRoundBracket(PeekToken())) {
-    NextToken();
-
-    if (tokens_.empty()) {
-      LOGE << "invalid Math expression: "
-              "expected closing round bracket in line " << line;
-      end(EXIT_FAILURE);
-    }
-    line = PeekToken()->line;
-    value = ParseMathExpression();
-
-    if (NodeDataClassifier::IsClosingRoundBracket(PeekToken())) {
+  if (!tokens_.empty() && NodeDataTypeClassifier::IsOperator(PeekToken())) {
+    NodePtr<INode> operator_node = PeekToken();
+    std::string operator_str = ASTUtils::CastToNodeType<StringNode>(operator_node)->data;
+    if (operator_str == "+" || operator_str == "-") {
       NextToken();
-    } else {
-      LOGE << "invalid Math expression: "
-              "expected closing round bracket in line " << line;
-      end(EXIT_FAILURE);
+      ASTUtils::Link(operator_node, lhs_product);
+
+      ValidateHasTokens("Incorrect math expression at line " + std::to_string(operator_node->line)
+                            + ": missing second operand for \'" + operator_str
+                            + "\' binary operator");
+      NodePtr<INode> rhs_product = ParseMathProduct();
+      ASTUtils::Link(operator_node, rhs_product);
+      return operator_node;
+    }
+  }
+
+  return lhs_product;
+}
+NodePtr<INode> Parser::ParseMathProduct() {
+  NodePtr<INode> lhs_power = ParseMathPower();
+
+  if (!tokens_.empty() && NodeDataTypeClassifier::IsOperator(PeekToken())) {
+    NodePtr<INode> operator_node = PeekToken();
+    std::string operator_str = ASTUtils::CastToNodeType<StringNode>(operator_node)->data;
+    if (operator_str == "*" || operator_str == "/") {
+      NextToken();
+      ASTUtils::Link(operator_node, lhs_power);
+
+      ValidateHasTokens("Incorrect math expression at line " + std::to_string(operator_node->line)
+                            + ": missing second operand for \'" + operator_str
+                            + "\' binary operator");
+      NodePtr<INode> rhs_power = ParseMathPower();
+      ASTUtils::Link(operator_node, rhs_power);
+      return operator_node;
+    }
+  }
+
+  return lhs_power;
+}
+NodePtr<INode> Parser::ParseMathPower() {
+  NodePtr<INode> value = ParseMathValue();
+
+  if (!tokens_.empty() && NodeDataTypeClassifier::IsOperator(PeekToken())) {
+    NodePtr<INode> operator_node = PeekToken();
+    std::string operator_str = ASTUtils::CastToNodeType<StringNode>(operator_node)->data;
+    if (operator_str == "^") {
+      NextToken();
+      ASTUtils::Link(operator_node, value);
+
+      ValidateHasTokens("Incorrect math expression at line " + std::to_string(operator_node->line)
+                            + ": missing second operand for \'" + operator_str
+                            + "\' binary operator");
+      NodePtr<INode> power = ParseMathPower();
+      ASTUtils::Link(operator_node, power);
+      return operator_node;
     }
   }
 
   return value;
+}
+NodePtr<INode> Parser::ParseMathValue() {
+  auto peeked_token = PeekToken();
+
+  if (NodeDataTypeClassifier::IsNumber(peeked_token)) {
+    NodePtr<INode> number = NextToken();
+    return number;
+  }
+
+  if (NodeDataClassifier::IsOpeningRoundBracket(peeked_token)) {
+    auto next_token = NextToken();
+
+    ValidateHasTokens("Incorrect math expression at line " + std::to_string(next_token->line)
+                          + ": incorrect parenthesis sequence \'(\'");
+    NodePtr<INode> math_expression = ParseMathExpression();
+
+    ValidateHasTokens("Incorrect math expression at line " + std::to_string(math_expression->line)
+                          + ": missing closing parenthesis");
+    next_token = NextToken();
+    ValidateIsClosingRoundBracket(next_token);
+
+    return math_expression;
+  }
+
+  throw parsing_error("Incorrect math expression at line " + std::to_string(peeked_token->line)
+                          + ": expected number or math expression in parentheses");
 }
 
 } // scc::parser
