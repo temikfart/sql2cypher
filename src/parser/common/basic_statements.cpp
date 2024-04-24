@@ -227,8 +227,7 @@ NodePtr<INode> Parser::GetReference() {
          << line << ": " << ref_kw;
     end(EXIT_FAILURE);
   }
-  NextToken();
-  NodePtr<INode> reference = ASTUtils::CreateServiceNode(StmtType::kReference);
+  NodePtr<INode> reference = ASTUtils::CreateServiceNode(StmtType::kReferencesKW, NextToken());
 
   // Get referenced table or columns
   if (tokens_.empty()) {

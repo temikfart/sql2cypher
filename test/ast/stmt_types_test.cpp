@@ -34,7 +34,7 @@ TEST(StmtTypeCtorTests, ValueTest) {
   EXPECT_EQ(StmtType::kNone, (StmtType::Value) StmtType(StmtType::kNone));
   EXPECT_EQ(StmtType::kProgram, (StmtType::Value) StmtType(StmtType::kProgram));
   EXPECT_EQ(StmtType::kAlterTableStmt, (StmtType::Value) StmtType(StmtType::kAlterTableStmt));
-  EXPECT_EQ(StmtType::kReference, (StmtType::Value) StmtType(StmtType::kReference));
+  EXPECT_EQ(StmtType::kReferencesKW, (StmtType::Value) StmtType(StmtType::kReferencesKW));
   EXPECT_EQ(StmtType::kVarcharType, (StmtType::Value) StmtType(StmtType::kVarcharType));
 }
 
@@ -47,8 +47,8 @@ TEST(StmtTypeCtorTests, StringValueTest) {
   StmtType column_def(kST_COLUMN_DEF);
   EXPECT_EQ(StmtType::kColumnDef, (StmtType::Value) column_def);
 
-  StmtType reference(kST_REFERENCE);
-  EXPECT_EQ(StmtType::kReference, (StmtType::Value) reference);
+  StmtType reference(kST_REFERENCES_KW);
+  EXPECT_EQ(StmtType::kReferencesKW, (StmtType::Value) reference);
 
   StmtType mixed_case_expression("expREssION");
   EXPECT_EQ(StmtType::kExpression, (StmtType::Value) mixed_case_expression);
