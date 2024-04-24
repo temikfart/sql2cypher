@@ -28,6 +28,8 @@ int main(int argc, char* argv[]) {
   } catch (const std::exception& e) {
     std::cerr << "Translation failed with error" << std::endl;
     std::cerr << e.what() << std::endl;
+  } catch (...) {
+    std::cerr << "Translation failed with unknown error" << std::endl;
   }
 
   return 0;
