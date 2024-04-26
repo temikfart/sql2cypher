@@ -140,7 +140,6 @@ NodePtr<INode> Parser::ParsePrimaryKey() {
   NodePtr<INode> column_name = ParseIdentifier();
   ASTUtils::Link(primary_key, column_name);
 
-  // Get listOf(column_names)
   if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
     NodePtr<INode> separator = ParseListOf(StmtType::kIdentifier);
     ASTUtils::Link(primary_key, separator);
