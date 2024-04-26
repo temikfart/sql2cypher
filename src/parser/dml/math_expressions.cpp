@@ -95,14 +95,16 @@ NodePtr<INode> Parser::ParseMathValue() {
     return number;
   }
 
+  std::string incorrect_msg_prefix = "Incorrect math expression at line ";
+
   if (NodeDataClassifier::IsOpeningRoundBracket(peeked_token)) {
     auto next_token = NextToken();
 
-    ValidateHasTokens("Incorrect math expression at line " + std::to_string(next_token->line)
+    ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
                           + ": incorrect parenthesis sequence \'(\'");
     NodePtr<INode> math_expression = ParseMathExpression();
 
-    ValidateHasTokens("Incorrect math expression at line " + std::to_string(math_expression->line)
+    ValidateHasTokens(incorrect_msg_prefix + std::to_string(math_expression->line)
                           + ": missing closing parenthesis");
     next_token = NextToken();
     ValidateIsClosingRoundBracket(next_token);
@@ -110,7 +112,7 @@ NodePtr<INode> Parser::ParseMathValue() {
     return math_expression;
   }
 
-  throw parsing_error("Incorrect math expression at line " + std::to_string(peeked_token->line)
+  throw parsing_error(incorrect_msg_prefix + std::to_string(peeked_token->line)
                           + ": expected number or math expression in parentheses");
 }
 

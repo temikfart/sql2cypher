@@ -14,8 +14,7 @@ public:
   static bool IsDMLKeyword(const std::string& keyword);
 
 private:
-  static bool AnyOfKeywords(const std::vector<std::string>& keywords,
-                            const std::string& keyword);
+  static bool AnyOfKeywords(const std::vector<std::string>& keywords, const std::string& keyword);
 };
 
 } // scc::parser::common

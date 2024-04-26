@@ -40,26 +40,17 @@ public:
 private:
   std::deque<std::shared_ptr<ast::INode>> tokens_;
 
-  // Work with deque of tokens
-
   const std::shared_ptr<ast::INode>& PeekToken() const;
   std::shared_ptr<ast::INode> NextToken();
-
-  // Start
 
   std::shared_ptr<ast::INode> ParseQuery();
   std::shared_ptr<ast::INode> ParseBaseStatement();
   std::shared_ptr<ast::INode> ParseNextQueries();
 
-  // Define language (DDL | DML)
-
   ast::StmtType ParseDDLStatementType();
-  std::shared_ptr<ast::INode> ParseDDLStatement();
-
   ast::StmtType ParseDMLStatementType();
+  std::shared_ptr<ast::INode> ParseDDLStatement();
   std::shared_ptr<ast::INode> ParseDMLStatement();
-
-  // DDL Statements
 
   std::shared_ptr<ast::INode> ParseCreateDatabaseStatement();
   std::shared_ptr<ast::INode> ParseCreateTableStatement();
@@ -67,32 +58,21 @@ private:
   std::shared_ptr<ast::INode> ParseDropDatabaseStatement();
   std::shared_ptr<ast::INode> ParseDropTableStatement();
 
-  // DDL Basic Statements
-
-  // Gets tableDefinition, which consist
-  // of tableConstraints and columnDefinitions
   std::shared_ptr<ast::INode> ParseTableDefinition();
   std::shared_ptr<ast::INode> ParseTableDefinitionElements();
   std::shared_ptr<ast::INode> ParseTableDefinitionElement();
   ast::StmtType ParseTableDefinitionElementType();
-
   std::shared_ptr<ast::INode> ParseColumnDefinition();
   std::shared_ptr<ast::INode> ParseTableConstraint(ast::StmtType stmt_type = ast::StmtType::kNone);
 
-  // Gets listOf dropColumns and dropConstraints
   std::shared_ptr<ast::INode> ParseDropListDefinition();
   std::shared_ptr<ast::INode> ParseDropElements();
   std::shared_ptr<ast::INode> ParseDropElement();
-
-  // DML Statements
 
   std::shared_ptr<ast::INode> ParseInsertStatement();
   std::shared_ptr<ast::INode> ParseDeleteStatement();
   std::shared_ptr<ast::INode> ParseUpdateStatement();
 
-  // DML Basic Statements
-
-  // Gets logical condition
   std::shared_ptr<ast::INode> ParseCondition();
   std::shared_ptr<ast::INode> ParseORCondition();
   std::shared_ptr<ast::INode> ParseANDCondition();
@@ -100,14 +80,11 @@ private:
   std::shared_ptr<ast::INode> ParsePredicate();
   std::shared_ptr<ast::INode> ParseExpression();
 
-  // Gets Math expression like ((5 + 7) * (9 / 3) - (7^2 - 5 * 11))
   std::shared_ptr<ast::INode> ParseMathExpression();
   std::shared_ptr<ast::INode> ParseMathSum();
   std::shared_ptr<ast::INode> ParseMathProduct();
   std::shared_ptr<ast::INode> ParseMathPower();
   std::shared_ptr<ast::INode> ParseMathValue();
-
-  // Basic statements
 
   ast::StmtType DetermineConstraintType(const std::string& keyword) const;
   ast::StmtType DetermineAlterTableActionType(const std::string& keyword) const;
@@ -137,8 +114,6 @@ private:
   std::shared_ptr<ast::INode> ParseName();
   std::shared_ptr<ast::INode> ParseIdentifiers();
   std::shared_ptr<ast::INode> ParseIdentifier();
-
-  // Validation
 
   void ValidateHasTokens(const std::string& details = "") const;
   void ValidateHasNotTokens() const;
