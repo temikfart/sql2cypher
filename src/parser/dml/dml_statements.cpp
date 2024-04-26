@@ -10,71 +10,53 @@ template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
-StmtType Parser::GetDMLStType() {
-  StmtType DMLStType = StmtType::kNone; // invalid value
+StmtType Parser::ParseDMLStatementType() {
+  auto next_token = NextToken();
+  ValidateIsWord(next_token);
+  auto keyword_token = ASTUtils::CastToNodeType<StringNode>(next_token);
+  std::string keyword = keyword_token->data;
 
-  // Get first token
-  int line = PeekToken()->line;
-  std::string fst_kw = ASTUtils::CastToNodeType<StringNode>(PeekToken())->data;
-  NextToken();
-
-  if (tokens_.empty()) {
-    LOGE << "body of the DDL statement is missed in line " << line;
-    end(EXIT_FAILURE);
+  try {
+    StmtType ddl_stmt_type(keyword);
+    return ddl_stmt_type;
+  } catch (const std::invalid_argument& ia) {
+    throw parsing_error("Unsupported DML Statement \'" + keyword + "\' at line "
+                            + std::to_string(keyword_token->line));
   }
-
-  // Define next rule
-  bool is_UPDATE = fst_kw == "UPDATE";
-  bool is_DELETE = fst_kw == "DELETE";
-  bool is_INSERT = fst_kw == "INSERT";
-
-  if (is_UPDATE) { DMLStType = StmtType::kUpdateStmt; }
-  else if (is_DELETE) { DMLStType = StmtType::kDeleteStmt; }
-  else if (is_INSERT) { DMLStType = StmtType::kInsertStmt; }
-  else {
-    LOGE << "unknown DML statement type in line " << line;
-    end(EXIT_FAILURE);
-  }
-
-  return DMLStType;
 }
-NodePtr<INode> Parser::GetDMLSt() {
-  LOGD << "getting DML statement...";
-  NodePtr<INode> node = ASTUtils::CreateServiceNode(StmtType::kDmlStmt);
+NodePtr<INode> Parser::ParseDMLStatement() {
+  auto peeked_token = PeekToken();
+  NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kDmlStmt, peeked_token);
 
-  int line = PeekToken()->line;
+  StmtType dml_stmt_type = ParseDMLStatementType();
+  ValidateHasTokens("Missed body for \'" + scc::common::UpperCase(dml_stmt_type.ToString())
+                        + "\' statement at line" + std::to_string(peeked_token->line));
   NodePtr<INode> statement;
-  switch (GetDMLStType()) {
+  switch (dml_stmt_type) {
     case StmtType::kUpdateStmt:
-      statement = GetUpdateSt();
-      LOGD << "got UPDATE statement";
+      statement = ParseUpdateStatement();
       break;
     case StmtType::kDeleteStmt:
-      statement = GetDeleteSt();
-      LOGD << "got DELETE statement";
+      statement = ParseDeleteStatement();
       break;
     case StmtType::kInsertStmt:
-      statement = GetInsertSt();
-      LOGD << "got INSERT statement";
+      statement = ParseInsertStatement();
       break;
     default:
-      LOGE << "unknown DML statement near line " << line;
-      end(EXIT_FAILURE);
+      throw parsing_error("Unknown DML Statement at line " + std::to_string(peeked_token->line));
   }
-  ASTUtils::Link(node, statement);
+  ASTUtils::Link(service_node, statement);
 
-  return node;
+  return service_node;
 }
 
-// DML Statements
-
-NodePtr<INode> Parser::GetInsertSt() {
+NodePtr<INode> Parser::ParseInsertStatement() {
   return ASTUtils::CreateServiceNode(StmtType::kInsertStmt);
 }
-NodePtr<INode> Parser::GetDeleteSt() {
+NodePtr<INode> Parser::ParseDeleteStatement() {
   return ASTUtils::CreateServiceNode(StmtType::kDeleteStmt);
 }
-NodePtr<INode> Parser::GetUpdateSt() {
+NodePtr<INode> Parser::ParseUpdateStatement() {
   return ASTUtils::CreateServiceNode(StmtType::kUpdateStmt);
 }
 

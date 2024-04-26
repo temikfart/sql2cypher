@@ -56,8 +56,8 @@ private:
   ast::StmtType ParseDDLStatementType();
   std::shared_ptr<ast::INode> ParseDDLStatement();
 
-  ast::StmtType GetDMLStType();
-  std::shared_ptr<ast::INode> GetDMLSt();
+  ast::StmtType ParseDMLStatementType();
+  std::shared_ptr<ast::INode> ParseDMLStatement();
 
   // DDL Statements
 
@@ -86,9 +86,9 @@ private:
 
   // DML Statements
 
-  std::shared_ptr<ast::INode> GetInsertSt();
-  std::shared_ptr<ast::INode> GetDeleteSt();
-  std::shared_ptr<ast::INode> GetUpdateSt();
+  std::shared_ptr<ast::INode> ParseInsertStatement();
+  std::shared_ptr<ast::INode> ParseDeleteStatement();
+  std::shared_ptr<ast::INode> ParseUpdateStatement();
 
   // DML Basic Statements
 

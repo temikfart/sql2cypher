@@ -61,7 +61,7 @@ NodePtr<INode> Parser::ParseBaseStatement() {
   if (BaseStmtTypeClassifier::IsDDLKeyword(keyword)) {
     return ParseDDLStatement();
   } else if (BaseStmtTypeClassifier::IsDMLKeyword(keyword)) {
-    return GetDMLSt();
+    return ParseDMLStatement();
   } else {
     throw parsing_error("Unknown Base Statement at line " + std::to_string(peeked_token->line));
   }
