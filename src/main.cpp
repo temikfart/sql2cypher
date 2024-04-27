@@ -21,8 +21,8 @@ int main(int argc, char* argv[]) {
       dump.DumpTree(AST);
     }
 
-    scc::query_assembler::QueryAssembler query_assembler(config->get_cypher_file());
-    query_assembler.Translate(AST);
+    scc::query_assembler::QueryAssembler query_assembler(AST, config->get_cypher_file());
+    query_assembler.Translate();
 
     end(EXIT_SUCCESS);
   } catch (const std::exception& e) {

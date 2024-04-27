@@ -4,27 +4,11 @@ namespace scc::query_assembler {
 
 using namespace ast;
 
-QueryAssembler::QueryAssembler(const std::filesystem::path& out_path)
-: out_(out_path) {}
+QueryAssembler::QueryAssembler(std::shared_ptr<INode> ast, const std::filesystem::path& out_path)
+    : ast_(std::move(ast)), out_(out_path) {}
 
-bool QueryAssembler::CloseOutputFile() {
-  if (out_.is_open()) {
-    out_.close();
-    if (out_.good()) {
-      ;
-    } else {
-      std::cerr << "output file close error" << std::endl;
-      return false;
-    }
-  }
-  return true;
-}
-
-void QueryAssembler::Translate(std::shared_ptr<INode> AST) {
+void QueryAssembler::Translate() {
   LOGI << "starting translation...";
-
-  ast_ = std::move(AST);
-
   if (ast_ == nullptr) {
     LOGI << "translation is ended: nothing to translate";
     return;

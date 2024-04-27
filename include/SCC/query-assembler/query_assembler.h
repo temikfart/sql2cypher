@@ -6,6 +6,7 @@
 #include <memory>
 #include <tuple>
 #include <sstream>
+#include <utility>
 
 #include "SCC/ast/nodes/inode.h"
 #include "SCC/config/scc_config.h"
@@ -21,11 +22,9 @@ using StdProperty = std::tuple<std::string, std::string>;
 
 class QueryAssembler {
 public:
-  explicit QueryAssembler(const std::filesystem::path& out_path);
+  explicit QueryAssembler(std::shared_ptr<ast::INode> ast, const std::filesystem::path& out_path);
 
-  bool CloseOutputFile();
-
-  void Translate(std::shared_ptr<ast::INode> AST);
+  void Translate();
 
 private:
   std::shared_ptr<ast::INode> ast_;
