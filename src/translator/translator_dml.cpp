@@ -12,13 +12,13 @@ void Translator::TranslateDMLStatement(std::shared_ptr<INode> node) {
   auto statement = node->get_child(0);
   switch (statement->stmt_type) {
     case StmtType::kInsertStmt:
-      this->TranslateInsert(statement);
+      TranslateInsert(statement);
       break;
     case StmtType::kDeleteStmt:
-      this->TranslateDelete(statement);
+      TranslateDelete(statement);
       break;
     case StmtType::kUpdateStmt:
-      this->TranslateUpdate(statement);
+      TranslateUpdate(statement);
       break;
     default:
       LOGE << "unknown DML statement";

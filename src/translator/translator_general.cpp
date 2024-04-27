@@ -16,7 +16,7 @@ void Translator::Translate() {
 
   if (ast_->stmt_type == StmtType::kProgram) {
     if (ast_->ChildrenCount() > 0) {
-      this->TranslateProgram(ast_);
+      TranslateProgram(ast_);
     } else {
       LOGI << "translation is ended: only one node in AST";
       return;
@@ -33,7 +33,7 @@ void Translator::Translate() {
 void Translator::TranslateProgram(std::shared_ptr<INode> node) {
   auto query = node->get_child(0);
   if (query->stmt_type == StmtType::kQuery) {
-    this->TranslateQuery(query);
+    TranslateQuery(query);
   } else {
     LOGE << "first child is not a query";
     end(EXIT_FAILURE);
@@ -43,7 +43,7 @@ void Translator::TranslateProgram(std::shared_ptr<INode> node) {
     auto other_queries = node->get_child(1);
     if (other_queries->stmt_type == StmtType::kSemicolonDelimiter) {
       if (other_queries->ChildrenCount() > 0) {
-        this->TranslateProgram(other_queries);
+        TranslateProgram(other_queries);
       }
     } else {
       LOGE << "invalid delimiter between queries";
@@ -60,10 +60,10 @@ void Translator::TranslateQuery(std::shared_ptr<INode> node) {
   auto data_language = node->get_child(0);
   switch (data_language->stmt_type) {
     case StmtType::kDdlStmt:
-      this->TranslateDDLStatement(data_language);
+      TranslateDDLStatement(data_language);
       break;
     case StmtType::kDmlStmt:
-      this->TranslateDMLStatement(data_language);
+      TranslateDMLStatement(data_language);
       break;
     default:
       LOGE << "unknown query data language";
