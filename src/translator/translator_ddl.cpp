@@ -71,10 +71,8 @@ void Translator::TranslateCreateTable(std::shared_ptr<INode> node) {
 
   out_ << " {";
 
-  StdProperty first_property =
-      TranslateColumnDefinition(column_definition);
-  out_ << std::get<0>(first_property) << ": "
-       << std::get<1>(first_property);
+  StdProperty first_property = TranslateColumnDefinition(column_definition);
+  out_ << std::get<0>(first_property) << ": " << std::get<1>(first_property);
 
   if (table_definition->ChildrenCount() > 1) {
     auto comma = table_definition->get_child(1);
@@ -87,10 +85,8 @@ void Translator::TranslateCreateTable(std::shared_ptr<INode> node) {
       LOGE << "invalid table definition: comma without children";
       end(EXIT_FAILURE);
     }
-    if (comma->get_child(0)->stmt_type
-        == StmtType::kColumnDef) {
-      std::vector<StdProperty> other_props =
-          TranslateListOfColumnDefinitions(comma);
+    if (comma->get_child(0)->stmt_type == StmtType::kColumnDef) {
+      std::vector<StdProperty> other_props = TranslateListOfColumnDefinitions(comma);
       for (auto& i: other_props) {
         out_ << ", " << std::get<0>(i) << ": " << std::get<1>(i);
       }
@@ -133,13 +129,10 @@ void Translator::TranslateDropDatabase(std::shared_ptr<INode> node) {
     end(EXIT_FAILURE);
   }
 
-  out_ << "DROP DATABASE "
-       << TranslateName(node->get_child(0))
-       << ";\n" << std::endl;
+  out_ << "DROP DATABASE " << TranslateName(node->get_child(0)) << ";\n" << std::endl;
 
   if (node->ChildrenCount() > 1) {
-    std::vector<std::string> other_db_names =
-        GetListOf(node->get_child(1), StmtType::kName);
+    std::vector<std::string> other_db_names = GetListOf(node->get_child(1), StmtType::kName);
     for (auto& i: other_db_names) {
       out_ << "DROP DATABASE " << i << ";\n" << std::endl;
     }
@@ -152,22 +145,18 @@ void Translator::TranslateDropTable(std::shared_ptr<INode> node) {
   }
 
   std::vector<std::string> table_names;
-  out_ << "MATCH (x:"
-       << TranslateName(node->get_child(0))
-       << ") DELETE x;\n" << std::endl;
+  out_ << "MATCH (x:" << TranslateName(node->get_child(0)) << ") DELETE x;\n" << std::endl;
 
   if (node->ChildrenCount() > 1) {
-    std::vector<std::string> other_table_names =
-        GetListOf(node->get_child(1), StmtType::kName);
+    std::vector<std::string> other_table_names = GetListOf(node->get_child(1), StmtType::kName);
     for (auto& i: other_table_names) {
       out_ << "MATCH (x:" << i << ") DELETE x;\n" << std::endl;
     }
   }
 }
 
-void Translator::TranslateAlterTableActionAdd(
-    std::shared_ptr<INode> action_node,
-    std::string& table_name) {
+void Translator::TranslateAlterTableActionAdd(std::shared_ptr<INode> action_node,
+                                              std::string& table_name) {
   if (action_node->ChildrenCount() == 0) {
     LOGE << "alter table ADD without content";
     end(EXIT_FAILURE);
@@ -189,10 +178,8 @@ void Translator::TranslateAlterTableActionAdd(
     out_ << "MATCH (n:" << table_name << ")\n";
     out_ << "SET ";
 
-    StdProperty first_prop =
-        TranslateColumnDefinition(first_argument);
-    out_ << "n." << std::get<0>(first_prop)
-         << " = " << std::get<1>(first_prop);
+    StdProperty first_prop = TranslateColumnDefinition(first_argument);
+    out_ << "n." << std::get<0>(first_prop) << " = " << std::get<1>(first_prop);
 
     if (table_definition->ChildrenCount() > 1) {
       auto comma = table_definition->get_child(1);
@@ -201,14 +188,10 @@ void Translator::TranslateAlterTableActionAdd(
         end(EXIT_FAILURE);
       }
 
-      if (comma->get_child(0)->stmt_type
-          == StmtType::kColumnDef) {
-        std::vector<StdProperty> other_props =
-            TranslateListOfColumnDefinitions(comma);
-
+      if (comma->get_child(0)->stmt_type == StmtType::kColumnDef) {
+        std::vector<StdProperty> other_props = TranslateListOfColumnDefinitions(comma);
         for (auto& i: other_props) {
-          out_ << ", n." << std::get<0>(i)
-               << " = " << std::get<1>(i);
+          out_ << ", n." << std::get<0>(i) << " = " << std::get<1>(i);
         }
       }
     }
@@ -220,16 +203,14 @@ void Translator::TranslateAlterTableActionAdd(
   if (is_constraint_first) {
     TranslateListOfTableConstraints(table_definition, table_name);
   } else {
-    auto constraints =
-        FindConstraint(table_definition->get_child(1));
+    auto constraints = FindConstraint(table_definition->get_child(1));
     if (constraints != nullptr) {
       TranslateListOfTableConstraints(constraints, table_name);
     }
   }
 }
-void Translator::TranslateAlterTableActionDrop(
-    std::shared_ptr<INode> action_node,
-    std::string& table_name) {
+void Translator::TranslateAlterTableActionDrop(std::shared_ptr<INode> action_node,
+                                               std::string& table_name) {
   if (action_node->ChildrenCount() == 0) {
     LOGE << "alter table DROP without content";
     end(EXIT_FAILURE);
@@ -249,8 +230,7 @@ void Translator::TranslateAlterTableActionDrop(
   }
 }
 
-std::vector<StdProperty> Translator::TranslateListOfColumnDefinitions(
-    std::shared_ptr<INode> node) {
+std::vector<StdProperty> Translator::TranslateListOfColumnDefinitions(std::shared_ptr<INode> node) {
   if (node->ChildrenCount() == 0) {
     LOGE << "invalid list of column definitions: comma without children";
     end(EXIT_FAILURE);
@@ -264,20 +244,15 @@ std::vector<StdProperty> Translator::TranslateListOfColumnDefinitions(
   column_definitions.push_back(TranslateColumnDefinition(argument));
   if (node->ChildrenCount() > 1) {
     auto comma = node->get_child(1);
-    if ((comma->get_child(0))->stmt_type
-        == StmtType::kColumnDef) {
-      std::vector<StdProperty> other_cols =
-          TranslateListOfColumnDefinitions(node->get_child(1));
-      column_definitions.insert(column_definitions.end(),
-                                other_cols.begin(),
-                                other_cols.end());
+    if ((comma->get_child(0))->stmt_type == StmtType::kColumnDef) {
+      std::vector<StdProperty> other_cols = TranslateListOfColumnDefinitions(node->get_child(1));
+      column_definitions.insert(column_definitions.end(), other_cols.begin(), other_cols.end());
     }
   }
 
   return column_definitions;
 }
-StdProperty Translator::TranslateColumnDefinition(
-    std::shared_ptr<INode> node) {
+StdProperty Translator::TranslateColumnDefinition(std::shared_ptr<INode> node) {
   if (node->ChildrenCount() == 0) {
     LOGE << "empty column definition";
     end(EXIT_FAILURE);
@@ -313,8 +288,7 @@ StdProperty Translator::TranslateColumnDefinition(
 void Translator::TranslateListOfTableConstraints(std::shared_ptr<INode> node,
                                                  std::string& table_name) {
   if (node->ChildrenCount() == 0) {
-    LOGE <<
-        "invalid list of table constraints: comma without children";
+    LOGE << "invalid list of table constraints: comma without children";
     end(EXIT_FAILURE);
   }
 
@@ -337,8 +311,7 @@ void Translator::TranslateListOfTableConstraints(std::shared_ptr<INode> node,
       end(EXIT_FAILURE);
     }
 
-    constraint_name +=
-        TranslateIdentifier(constraint_kw->get_child(0));
+    constraint_name += TranslateIdentifier(constraint_kw->get_child(0));
   } else {
     constraint_name = table_name + "_constraint";
   }
@@ -356,13 +329,10 @@ void Translator::TranslateListOfTableConstraints(std::shared_ptr<INode> node,
   }
 
   if (node->ChildrenCount() > 1) {
-    TranslateListOfTableConstraints(
-        node->get_child(1),
-        table_name);
+    TranslateListOfTableConstraints(node->get_child(1), table_name);
   }
 }
-std::shared_ptr<INode> Translator::FindConstraint(
-    std::shared_ptr<INode> node) {
+std::shared_ptr<INode> Translator::FindConstraint(std::shared_ptr<INode> node) {
   std::shared_ptr<INode> constraints = nullptr;
   if (node->ChildrenCount() == 0) {
     return constraints;
@@ -380,9 +350,7 @@ std::shared_ptr<INode> Translator::FindConstraint(
   return constraints;
 }
 
-void Translator::TranslateListOfDropObjects(
-    std::shared_ptr<INode> node,
-    std::string& table_name) {
+void Translator::TranslateListOfDropObjects(std::shared_ptr<INode> node, std::string& table_name) {
   if (node->stmt_type != StmtType::kDropList) {
     LOGE << "invalid statement type for the dropList";
     end(EXIT_FAILURE);
@@ -399,9 +367,7 @@ void Translator::TranslateListOfDropObjects(
     TranslateListOfDropObjects(other_objects, table_name);
   }
 }
-void Translator::TranslateDropObject(
-    std::shared_ptr<INode> node,
-    std::string& table_name) {
+void Translator::TranslateDropObject(std::shared_ptr<INode> node, std::string& table_name) {
   if (node->ChildrenCount() == 0) {
     LOGE << "invalid drop object without children";
     end(EXIT_FAILURE);
@@ -409,8 +375,7 @@ void Translator::TranslateDropObject(
   std::string argument = TranslateIdentifier(node->get_child(0));
   std::vector<std::string> other_arguments;
   if (node->ChildrenCount() > 1) {
-    other_arguments =
-        GetListOf(node->get_child(1), StmtType::kIdentifier);
+    other_arguments = GetListOf(node->get_child(1), StmtType::kIdentifier);
   }
 
   if (node->stmt_type == StmtType::kDropColumn) {

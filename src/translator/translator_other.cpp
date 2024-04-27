@@ -4,12 +4,8 @@ namespace scc::translator {
 
 using namespace ast;
 
-// Basic statements
-
-void Translator::TranslatePrimaryKey(
-    std::shared_ptr<INode> key,
-    std::string& constraint_name,
-    std::string& table_name) {
+void Translator::TranslatePrimaryKey(std::shared_ptr<INode> key, std::string& constraint_name,
+                                     std::string& table_name) {
   if (key->stmt_type != StmtType::kPrimaryKey) {
     LOGE << "incorrect type for primaryKey node";
     end(EXIT_FAILURE);
@@ -22,29 +18,24 @@ void Translator::TranslatePrimaryKey(
   std::vector<std::string> properties;
   properties.push_back(TranslateIdentifier(key->get_child(0)));
   if (key->ChildrenCount() > 1) {
-    std::vector<std::string> other_properties =
-        GetListOf(key->get_child(1), StmtType::kIdentifier);
-    properties.insert(properties.end(),
-                      other_properties.begin(),
-                      other_properties.end());
+    std::vector<std::string> other_properties = GetListOf(key->get_child(1), StmtType::kIdentifier);
+    properties.insert(properties.end(), other_properties.begin(), other_properties.end());
   }
 
   CreateUniqueNodePropertyConstraint(
-      (constraint_name + "_" + std::to_string(constraint_counter++)),
+      constraint_name + "_" + std::to_string(constraint_counter++),
       table_name,
       properties
   );
   for (auto& i: properties) {
     CreateNodePropertyExistenceConstraint(
-        (constraint_name + "_" + std::to_string(constraint_counter++)),
+        constraint_name + "_" + std::to_string(constraint_counter++),
         table_name,
         i
     );
   }
 }
-void Translator::TranslateForeignKey(
-    std::shared_ptr<INode> key,
-    std::string& table_name) {
+void Translator::TranslateForeignKey(std::shared_ptr<INode> key, std::string& table_name) {
   if (key->stmt_type != StmtType::kForeignKey) {
     LOGE << "incorrect type for foreignKey node";
     end(EXIT_FAILURE);
@@ -63,11 +54,8 @@ void Translator::TranslateForeignKey(
       end(EXIT_FAILURE);
     }
     reference_child_num++;
-    std::vector<std::string> other_properties =
-        GetListOf(key->get_child(1), StmtType::kName);
-    properties.insert(properties.end(),
-                      other_properties.begin(),
-                      other_properties.end());
+    std::vector<std::string> other_properties = GetListOf(key->get_child(1), StmtType::kName);
+    properties.insert(properties.end(), other_properties.begin(), other_properties.end());
   }
 
   // Get reference
@@ -88,12 +76,8 @@ void Translator::TranslateForeignKey(
   if (reference->ChildrenCount() > 1) {
     ref_columns.push_back(TranslateName(reference->get_child(1)));
     if (reference->ChildrenCount() > 2) {
-      std::vector<std::string> other_props =
-          GetListOf(reference->get_child(2),
-                          StmtType::kName);
-      ref_columns.insert(ref_columns.end(),
-                         other_props.begin(),
-                         other_props.end());
+      std::vector<std::string> other_props = GetListOf(reference->get_child(2), StmtType::kName);
+      ref_columns.insert(ref_columns.end(), other_props.begin(), other_props.end());
     }
   }
 
@@ -101,12 +85,10 @@ void Translator::TranslateForeignKey(
 //  RemoveProperties(table_name, ref_columns);
   CreateRelationship(table_name, ref_table_name);
 }
-void Translator::CreateUniqueNodePropertyConstraint(
-    const std::string& constraint_name,
-    const std::string& LabelName,
-    const std::vector<std::string>& properties) {
-  out_ << "CREATE CONSTRAINT " << constraint_name
-       << " IF NOT EXISTS" << std::endl;
+void Translator::CreateUniqueNodePropertyConstraint(const std::string& constraint_name,
+                                                    const std::string& LabelName,
+                                                    const std::vector<std::string>& properties) {
+  out_ << "CREATE CONSTRAINT " << constraint_name << " IF NOT EXISTS" << std::endl;
   out_ << "FOR (n:" << LabelName << ")" << std::endl;
   out_ << "REQUIRE (";
   for (size_t i = 0; i < properties.size(); i++) {
@@ -117,27 +99,23 @@ void Translator::CreateUniqueNodePropertyConstraint(
   }
   out_ << ") IS UNIQUE;\n" << std::endl;
 }
-void Translator::CreateNodePropertyExistenceConstraint(
-    const std::string& constraint_name,
-    const std::string& LabelName,
-    const std::string& property) {
-  out_ << "CREATE CONSTRAINT " << constraint_name
-       << " IF NOT EXISTS" << std::endl;
+void Translator::CreateNodePropertyExistenceConstraint(const std::string& constraint_name,
+                                                       const std::string& LabelName,
+                                                       const std::string& property) {
+  out_ << "CREATE CONSTRAINT " << constraint_name << " IF NOT EXISTS" << std::endl;
   out_ << "FOR (n:" << LabelName << ")" << std::endl;
   out_ << "REQUIRE (n." << property << ") IS NOT NULL;\n" << std::endl;
 }
-void Translator::CreateRelationship(
-    const std::string& label_name,
-    const std::string& ref_label_name) {
+void Translator::CreateRelationship(const std::string& label_name,
+                                    const std::string& ref_label_name) {
   out_ << "MATCH (a:" << label_name << "), (b:" << ref_label_name << ")\n";
-  out_ << "CREATE (a)-[r:fk_"
-       << label_name << "_to_" << ref_label_name << "_" << relationship_counter
+  out_ << "CREATE (a)-[r:fk_" << label_name
+       << "_to_" << ref_label_name << "_" << relationship_counter
        << "]->(b);\n" << std::endl;
   relationship_counter++;
 }
-void Translator::RemoveProperties(
-    const std::string& label_name,
-    const std::vector<std::string>& properties) {
+void Translator::RemoveProperties(const std::string& label_name,
+                                  const std::vector<std::string>& properties) {
   if (properties.empty()) {
     return;
   }
@@ -152,9 +130,7 @@ void Translator::RemoveProperties(
   out_ << ";\n" << std::endl;
 }
 
-std::vector<std::string> Translator::GetListOf(
-    std::shared_ptr<INode> node,
-    StmtType type) {
+std::vector<std::string> Translator::GetListOf(std::shared_ptr<INode> node, StmtType type) {
   if (node->stmt_type != StmtType::kCommaDelimiter) {
     LOGE << "invalid ListOf: delimiter is not a comma";
     end(EXIT_FAILURE);
@@ -178,11 +154,8 @@ std::vector<std::string> Translator::GetListOf(
   }
 
   if (node->ChildrenCount() > 1) {
-    std::vector<std::string> other_arguments =
-        GetListOf(node->get_child(1), type);
-    arguments.insert(arguments.end(),
-                     other_arguments.begin(),
-                     other_arguments.end());
+    std::vector<std::string> other_arguments = GetListOf(node->get_child(1), type);
+    arguments.insert(arguments.end(), other_arguments.begin(), other_arguments.end());
   }
 
   return arguments;
@@ -195,7 +168,6 @@ std::string Translator::TranslateName(std::shared_ptr<INode> node) {
   }
 
   std::ostringstream name;
-
   name << TranslateIdentifier(node->get_child(0));
   if (node->ChildrenCount() > 1) {
     if (node->get_child(1)->stmt_type == StmtType::kDotDelimiter) {
@@ -208,8 +180,7 @@ std::string Translator::TranslateName(std::shared_ptr<INode> node) {
 
   return name.str();
 }
-std::string Translator::TranslateIdentifiers(
-    std::shared_ptr<INode> node) {
+std::string Translator::TranslateIdentifiers(std::shared_ptr<INode> node) {
   if (node->ChildrenCount() == 0) {
     LOGE << "invalid list of identifiers";
     end(EXIT_FAILURE);

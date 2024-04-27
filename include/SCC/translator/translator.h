@@ -50,18 +50,14 @@ private:
   void TranslateAlterTableActionDrop(std::shared_ptr<ast::INode> action_node,
                                      std::string& table_name);
 
-  std::vector<StdProperty> TranslateListOfColumnDefinitions(
-      std::shared_ptr<ast::INode> node);
+  std::vector<StdProperty> TranslateListOfColumnDefinitions(std::shared_ptr<ast::INode> node);
   StdProperty TranslateColumnDefinition(std::shared_ptr<ast::INode> node);
 
-  void TranslateListOfTableConstraints(std::shared_ptr<ast::INode> node,
-                                       std::string& table_name);
+  void TranslateListOfTableConstraints(std::shared_ptr<ast::INode> node, std::string& table_name);
   std::shared_ptr<ast::INode> FindConstraint(std::shared_ptr<ast::INode> node);
 
-  void TranslateDropObject(std::shared_ptr<ast::INode> node,
-                           std::string& table_name);
-  void TranslateListOfDropObjects(std::shared_ptr<ast::INode> node,
-                                  std::string& table_name);
+  void TranslateDropObject(std::shared_ptr<ast::INode> node, std::string& table_name);
+  void TranslateListOfDropObjects(std::shared_ptr<ast::INode> node, std::string& table_name);
 
   void TranslateInsert(std::shared_ptr<ast::INode> node);
   void TranslateDelete(std::shared_ptr<ast::INode> node);
@@ -69,28 +65,19 @@ private:
 
   // Basic statements
 
-  void TranslatePrimaryKey(
-      std::shared_ptr<ast::INode> key,
-      std::string& constraint_name,
-      std::string& table_name);
-  void TranslateForeignKey(
-      std::shared_ptr<ast::INode> key,
-      std::string& table_name);
-  void CreateUniqueNodePropertyConstraint(
-      const std::string& constraint_name,
-      const std::string& LabelName,
-      const std::vector<std::string>& properties);
-  void CreateNodePropertyExistenceConstraint(
-      const std::string& constraint_name,
-      const std::string& LabelName,
-      const std::string& property);
-  void CreateRelationship(const std::string& label_name,
-                          const std::string& ref_label_name);
-  void RemoveProperties(const std::string& label_name,
-                        const std::vector<std::string>& properties);
+  void TranslatePrimaryKey(std::shared_ptr<ast::INode> key, std::string& constraint_name,
+                           std::string& table_name);
+  void TranslateForeignKey(std::shared_ptr<ast::INode> key, std::string& table_name);
+  void CreateUniqueNodePropertyConstraint(const std::string& constraint_name,
+                                          const std::string& LabelName,
+                                          const std::vector<std::string>& properties);
+  void CreateNodePropertyExistenceConstraint(const std::string& constraint_name,
+                                             const std::string& LabelName,
+                                             const std::string& property);
+  void CreateRelationship(const std::string& label_name, const std::string& ref_label_name);
+  void RemoveProperties(const std::string& label_name, const std::vector<std::string>& properties);
 
-  std::vector<std::string> GetListOf(std::shared_ptr<ast::INode> node,
-                                     ast::StmtType type);
+  std::vector<std::string> GetListOf(std::shared_ptr<ast::INode> node, ast::StmtType type);
 
   std::string TranslateName(std::shared_ptr<ast::INode> node);
   std::string TranslateIdentifiers(std::shared_ptr<ast::INode> node);
