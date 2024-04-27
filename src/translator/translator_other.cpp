@@ -20,22 +20,22 @@ void Translator::TranslatePrimaryKey(
   }
 
   std::vector<std::string> properties;
-  properties.push_back(this->TranslateIdentifier(key->get_child(0)));
+  properties.push_back(TranslateIdentifier(key->get_child(0)));
   if (key->ChildrenCount() > 1) {
     std::vector<std::string> other_properties =
-        this->GetListOf(key->get_child(1), StmtType::kIdentifier);
+        GetListOf(key->get_child(1), StmtType::kIdentifier);
     properties.insert(properties.end(),
                       other_properties.begin(),
                       other_properties.end());
   }
 
-  this->CreateUniqueNodePropertyConstraint(
+  CreateUniqueNodePropertyConstraint(
       (constraint_name + "_" + std::to_string(constraint_counter++)),
       table_name,
       properties
   );
   for (auto& i: properties) {
-    this->CreateNodePropertyExistenceConstraint(
+    CreateNodePropertyExistenceConstraint(
         (constraint_name + "_" + std::to_string(constraint_counter++)),
         table_name,
         i
@@ -56,7 +56,7 @@ void Translator::TranslateForeignKey(
   int reference_child_num = 1;
 
   std::vector<std::string> properties;
-  properties.push_back(this->TranslateName(key->get_child(0)));
+  properties.push_back(TranslateName(key->get_child(0)));
   if (key->ChildrenCount() > 2) {
     if (key->get_child(1)->stmt_type != StmtType::kCommaDelimiter) {
       LOGE << "invalid delimiter between properties in foreign key";
@@ -64,7 +64,7 @@ void Translator::TranslateForeignKey(
     }
     reference_child_num++;
     std::vector<std::string> other_properties =
-        this->GetListOf(key->get_child(1), StmtType::kName);
+        GetListOf(key->get_child(1), StmtType::kName);
     properties.insert(properties.end(),
                       other_properties.begin(),
                       other_properties.end());
@@ -81,15 +81,15 @@ void Translator::TranslateForeignKey(
     end(EXIT_FAILURE);
   }
   auto table_name_node = reference->get_child(0);
-  std::string ref_table_name = this->TranslateName(table_name_node);
+  std::string ref_table_name = TranslateName(table_name_node);
 
   // Get ref columns if present
   std::vector<std::string> ref_columns;
   if (reference->ChildrenCount() > 1) {
-    ref_columns.push_back(this->TranslateName(reference->get_child(1)));
+    ref_columns.push_back(TranslateName(reference->get_child(1)));
     if (reference->ChildrenCount() > 2) {
       std::vector<std::string> other_props =
-          this->GetListOf(reference->get_child(2),
+          GetListOf(reference->get_child(2),
                           StmtType::kName);
       ref_columns.insert(ref_columns.end(),
                          other_props.begin(),
@@ -97,9 +97,9 @@ void Translator::TranslateForeignKey(
     }
   }
 
-//  this->RemoveProperties(table_name, properties);
-//  this->RemoveProperties(table_name, ref_columns);
-  this->CreateRelationship(table_name, ref_table_name);
+//  RemoveProperties(table_name, properties);
+//  RemoveProperties(table_name, ref_columns);
+  CreateRelationship(table_name, ref_table_name);
 }
 void Translator::CreateUniqueNodePropertyConstraint(
     const std::string& constraint_name,
@@ -167,10 +167,10 @@ std::vector<std::string> Translator::GetListOf(
   std::vector<std::string> arguments;
   switch (type) {
     case StmtType::kName:
-      arguments.push_back(this->TranslateName(node->get_child(0)));
+      arguments.push_back(TranslateName(node->get_child(0)));
       break;
     case StmtType::kIdentifier:
-      arguments.push_back(this->TranslateIdentifier(node->get_child(0)));
+      arguments.push_back(TranslateIdentifier(node->get_child(0)));
       break;
     default:
       LOGE << "invalid ListOf: unknown argument type";
@@ -179,7 +179,7 @@ std::vector<std::string> Translator::GetListOf(
 
   if (node->ChildrenCount() > 1) {
     std::vector<std::string> other_arguments =
-        this->GetListOf(node->get_child(1), type);
+        GetListOf(node->get_child(1), type);
     arguments.insert(arguments.end(),
                      other_arguments.begin(),
                      other_arguments.end());
@@ -196,10 +196,10 @@ std::string Translator::TranslateName(std::shared_ptr<INode> node) {
 
   std::ostringstream name;
 
-  name << this->TranslateIdentifier(node->get_child(0));
+  name << TranslateIdentifier(node->get_child(0));
   if (node->ChildrenCount() > 1) {
     if (node->get_child(1)->stmt_type == StmtType::kDotDelimiter) {
-      name << this->TranslateIdentifiers(node->get_child(1));
+      name << TranslateIdentifiers(node->get_child(1));
     } else {
       LOGE << "invalid name: delimiter is not a dot";
       end(EXIT_FAILURE);
@@ -216,10 +216,10 @@ std::string Translator::TranslateIdentifiers(
   }
 
   std::ostringstream identifiers;
-  identifiers << "." << this->TranslateIdentifier(node->get_child(0));
+  identifiers << "." << TranslateIdentifier(node->get_child(0));
 
   if (node->ChildrenCount() > 1) {
-    identifiers << this->TranslateIdentifiers(node->get_child(1));
+    identifiers << TranslateIdentifiers(node->get_child(1));
   }
 
   return identifiers.str();

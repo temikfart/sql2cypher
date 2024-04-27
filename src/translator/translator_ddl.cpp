@@ -13,19 +13,19 @@ void Translator::TranslateDDLStatement(std::shared_ptr<INode> node) {
   auto statement = node->get_child(0);
   switch (statement->stmt_type) {
     case StmtType::kCreateDatabaseStmt:
-      this->TranslateCreateDatabase(statement);
+      TranslateCreateDatabase(statement);
       break;
     case StmtType::kCreateTableStmt:
-      this->TranslateCreateTable(statement);
+      TranslateCreateTable(statement);
       break;
     case StmtType::kAlterTableStmt:
-      this->TranslateAlterTable(statement);
+      TranslateAlterTable(statement);
       break;
     case StmtType::kDropDatabaseStmt:
-      this->TranslateDropDatabase(statement);
+      TranslateDropDatabase(statement);
       break;
     case StmtType::kDropTableStmt:
-      this->TranslateDropTable(statement);
+      TranslateDropTable(statement);
       break;
     default:
       LOGE << "unknown DDL statement";
@@ -40,7 +40,7 @@ void Translator::TranslateCreateDatabase(std::shared_ptr<INode> node) {
   }
 
   out_ << "CREATE DATABASE "
-       << this->TranslateName(node->get_child(0))
+       << TranslateName(node->get_child(0))
        << ";\n" << std::endl;
 }
 void Translator::TranslateCreateTable(std::shared_ptr<INode> node) {
@@ -49,7 +49,7 @@ void Translator::TranslateCreateTable(std::shared_ptr<INode> node) {
     end(EXIT_FAILURE);
   }
 
-  std::string table_name = this->TranslateName(node->get_child(0));
+  std::string table_name = TranslateName(node->get_child(0));
   out_ << "CREATE (:" << table_name;
 
   if (node->ChildrenCount() < 2) {
@@ -72,7 +72,7 @@ void Translator::TranslateCreateTable(std::shared_ptr<INode> node) {
   out_ << " {";
 
   StdProperty first_property =
-      this->TranslateColumnDefinition(column_definition);
+      TranslateColumnDefinition(column_definition);
   out_ << std::get<0>(first_property) << ": "
        << std::get<1>(first_property);
 
@@ -90,7 +90,7 @@ void Translator::TranslateCreateTable(std::shared_ptr<INode> node) {
     if (comma->get_child(0)->stmt_type
         == StmtType::kColumnDef) {
       std::vector<StdProperty> other_props =
-          this->TranslateListOfColumnDefinitions(comma);
+          TranslateListOfColumnDefinitions(comma);
       for (auto& i: other_props) {
         out_ << ", " << std::get<0>(i) << ": " << std::get<1>(i);
       }
@@ -101,9 +101,9 @@ void Translator::TranslateCreateTable(std::shared_ptr<INode> node) {
 
   // Get constraints
   if (table_definition->ChildrenCount() > 1) {
-    auto constraints = this->FindConstraint(table_definition->get_child(1));
+    auto constraints = FindConstraint(table_definition->get_child(1));
     if (constraints != nullptr) {
-      this->TranslateListOfTableConstraints(constraints, table_name);
+      TranslateListOfTableConstraints(constraints, table_name);
     }
   }
 }
@@ -113,7 +113,7 @@ void Translator::TranslateAlterTable(std::shared_ptr<INode> node) {
     end(EXIT_FAILURE);
   }
 
-  std::string table_name = this->TranslateName(node->get_child(0));
+  std::string table_name = TranslateName(node->get_child(0));
 
   if (node->ChildrenCount() < 2) {
     LOGE << "alter table action is missed";
@@ -122,9 +122,9 @@ void Translator::TranslateAlterTable(std::shared_ptr<INode> node) {
 
   auto action_node = node->get_child(1);
   if (action_node->stmt_type == StmtType::kAddKW) {
-    this->TranslateAlterTableActionAdd(action_node, table_name);
+    TranslateAlterTableActionAdd(action_node, table_name);
   } else if (action_node->stmt_type == StmtType::kDropKW) {
-    this->TranslateAlterTableActionDrop(action_node, table_name);
+    TranslateAlterTableActionDrop(action_node, table_name);
   }
 }
 void Translator::TranslateDropDatabase(std::shared_ptr<INode> node) {
@@ -134,12 +134,12 @@ void Translator::TranslateDropDatabase(std::shared_ptr<INode> node) {
   }
 
   out_ << "DROP DATABASE "
-       << this->TranslateName(node->get_child(0))
+       << TranslateName(node->get_child(0))
        << ";\n" << std::endl;
 
   if (node->ChildrenCount() > 1) {
     std::vector<std::string> other_db_names =
-        this->GetListOf(node->get_child(1), StmtType::kName);
+        GetListOf(node->get_child(1), StmtType::kName);
     for (auto& i: other_db_names) {
       out_ << "DROP DATABASE " << i << ";\n" << std::endl;
     }
@@ -153,12 +153,12 @@ void Translator::TranslateDropTable(std::shared_ptr<INode> node) {
 
   std::vector<std::string> table_names;
   out_ << "MATCH (x:"
-       << this->TranslateName(node->get_child(0))
+       << TranslateName(node->get_child(0))
        << ") DELETE x;\n" << std::endl;
 
   if (node->ChildrenCount() > 1) {
     std::vector<std::string> other_table_names =
-        this->GetListOf(node->get_child(1), StmtType::kName);
+        GetListOf(node->get_child(1), StmtType::kName);
     for (auto& i: other_table_names) {
       out_ << "MATCH (x:" << i << ") DELETE x;\n" << std::endl;
     }
@@ -190,7 +190,7 @@ void Translator::TranslateAlterTableActionAdd(
     out_ << "SET ";
 
     StdProperty first_prop =
-        this->TranslateColumnDefinition(first_argument);
+        TranslateColumnDefinition(first_argument);
     out_ << "n." << std::get<0>(first_prop)
          << " = " << std::get<1>(first_prop);
 
@@ -204,7 +204,7 @@ void Translator::TranslateAlterTableActionAdd(
       if (comma->get_child(0)->stmt_type
           == StmtType::kColumnDef) {
         std::vector<StdProperty> other_props =
-            this->TranslateListOfColumnDefinitions(comma);
+            TranslateListOfColumnDefinitions(comma);
 
         for (auto& i: other_props) {
           out_ << ", n." << std::get<0>(i)
@@ -218,12 +218,12 @@ void Translator::TranslateAlterTableActionAdd(
 
   // Get table constraints
   if (is_constraint_first) {
-    this->TranslateListOfTableConstraints(table_definition, table_name);
+    TranslateListOfTableConstraints(table_definition, table_name);
   } else {
     auto constraints =
-        this->FindConstraint(table_definition->get_child(1));
+        FindConstraint(table_definition->get_child(1));
     if (constraints != nullptr) {
-      this->TranslateListOfTableConstraints(constraints, table_name);
+      TranslateListOfTableConstraints(constraints, table_name);
     }
   }
 }
@@ -241,11 +241,11 @@ void Translator::TranslateAlterTableActionDrop(
   }
   auto object = drop_list_def->get_child(0);
 
-  this->TranslateDropObject(object, table_name);
+  TranslateDropObject(object, table_name);
 
   if (drop_list_def->ChildrenCount() > 1) {
     auto other_objects = drop_list_def->get_child(1);
-    this->TranslateListOfDropObjects(other_objects, table_name);
+    TranslateListOfDropObjects(other_objects, table_name);
   }
 }
 
@@ -261,13 +261,13 @@ std::vector<StdProperty> Translator::TranslateListOfColumnDefinitions(
   }
 
   std::vector<StdProperty> column_definitions;
-  column_definitions.push_back(this->TranslateColumnDefinition(argument));
+  column_definitions.push_back(TranslateColumnDefinition(argument));
   if (node->ChildrenCount() > 1) {
     auto comma = node->get_child(1);
     if ((comma->get_child(0))->stmt_type
         == StmtType::kColumnDef) {
       std::vector<StdProperty> other_cols =
-          this->TranslateListOfColumnDefinitions(node->get_child(1));
+          TranslateListOfColumnDefinitions(node->get_child(1));
       column_definitions.insert(column_definitions.end(),
                                 other_cols.begin(),
                                 other_cols.end());
@@ -282,7 +282,7 @@ StdProperty Translator::TranslateColumnDefinition(
     LOGE << "empty column definition";
     end(EXIT_FAILURE);
   }
-  std::string column_name = this->TranslateIdentifier(node->get_child(0));
+  std::string column_name = TranslateIdentifier(node->get_child(0));
 
   if (node->ChildrenCount() == 1) {
     LOGE << "invalid column definition: datatype is missed";
@@ -338,7 +338,7 @@ void Translator::TranslateListOfTableConstraints(std::shared_ptr<INode> node,
     }
 
     constraint_name +=
-        this->TranslateIdentifier(constraint_kw->get_child(0));
+        TranslateIdentifier(constraint_kw->get_child(0));
   } else {
     constraint_name = table_name + "_constraint";
   }
@@ -350,13 +350,13 @@ void Translator::TranslateListOfTableConstraints(std::shared_ptr<INode> node,
   }
   auto key = constraint->get_child(key_node_number);
   if (key->stmt_type == StmtType::kPrimaryKey) {
-    this->TranslatePrimaryKey(key, constraint_name, table_name);
+    TranslatePrimaryKey(key, constraint_name, table_name);
   } else if (key->stmt_type == StmtType::kForeignKey) {
-    this->TranslateForeignKey(key, table_name);
+    TranslateForeignKey(key, table_name);
   }
 
   if (node->ChildrenCount() > 1) {
-    this->TranslateListOfTableConstraints(
+    TranslateListOfTableConstraints(
         node->get_child(1),
         table_name);
   }
@@ -373,7 +373,7 @@ std::shared_ptr<INode> Translator::FindConstraint(
     constraints = node;
   } else {
     if (node->ChildrenCount() > 1) {
-      constraints = this->FindConstraint(node->get_child(1));
+      constraints = FindConstraint(node->get_child(1));
     }
   }
 
@@ -392,11 +392,11 @@ void Translator::TranslateListOfDropObjects(
     end(EXIT_FAILURE);
   }
 
-  this->TranslateDropObject(node->get_child(0), table_name);
+  TranslateDropObject(node->get_child(0), table_name);
 
   if (node->ChildrenCount() > 1) {
     auto other_objects = node->get_child(1);
-    this->TranslateListOfDropObjects(other_objects, table_name);
+    TranslateListOfDropObjects(other_objects, table_name);
   }
 }
 void Translator::TranslateDropObject(
@@ -406,11 +406,11 @@ void Translator::TranslateDropObject(
     LOGE << "invalid drop object without children";
     end(EXIT_FAILURE);
   }
-  std::string argument = this->TranslateIdentifier(node->get_child(0));
+  std::string argument = TranslateIdentifier(node->get_child(0));
   std::vector<std::string> other_arguments;
   if (node->ChildrenCount() > 1) {
     other_arguments =
-        this->GetListOf(node->get_child(1), StmtType::kIdentifier);
+        GetListOf(node->get_child(1), StmtType::kIdentifier);
   }
 
   if (node->stmt_type == StmtType::kDropColumn) {
