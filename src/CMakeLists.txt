@@ -6,7 +6,7 @@ set(DIRS
         lexer
         log
         parser
-        query-assembler
+        translator
 )
 foreach(DIR ${DIRS})
     add_subdirectory(${DIR})

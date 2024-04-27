@@ -1,12 +1,12 @@
-#include "SCC/query-assembler/query_assembler.h"
+#include "SCC/translator/translator.h"
 
-namespace scc::query_assembler {
+namespace scc::translator {
 
 using namespace ast;
 
 // Basic statements
 
-void QueryAssembler::TranslatePrimaryKey(
+void Translator::TranslatePrimaryKey(
     std::shared_ptr<INode> key,
     std::string& constraint_name,
     std::string& table_name) {
@@ -42,7 +42,7 @@ void QueryAssembler::TranslatePrimaryKey(
     );
   }
 }
-void QueryAssembler::TranslateForeignKey(
+void Translator::TranslateForeignKey(
     std::shared_ptr<INode> key,
     std::string& table_name) {
   if (key->stmt_type != StmtType::kForeignKey) {
@@ -101,7 +101,7 @@ void QueryAssembler::TranslateForeignKey(
 //  this->RemoveProperties(table_name, ref_columns);
   this->CreateRelationship(table_name, ref_table_name);
 }
-void QueryAssembler::CreateUniqueNodePropertyConstraint(
+void Translator::CreateUniqueNodePropertyConstraint(
     const std::string& constraint_name,
     const std::string& LabelName,
     const std::vector<std::string>& properties) {
@@ -117,7 +117,7 @@ void QueryAssembler::CreateUniqueNodePropertyConstraint(
   }
   out_ << ") IS UNIQUE;\n" << std::endl;
 }
-void QueryAssembler::CreateNodePropertyExistenceConstraint(
+void Translator::CreateNodePropertyExistenceConstraint(
     const std::string& constraint_name,
     const std::string& LabelName,
     const std::string& property) {
@@ -126,7 +126,7 @@ void QueryAssembler::CreateNodePropertyExistenceConstraint(
   out_ << "FOR (n:" << LabelName << ")" << std::endl;
   out_ << "REQUIRE (n." << property << ") IS NOT NULL;\n" << std::endl;
 }
-void QueryAssembler::CreateRelationship(
+void Translator::CreateRelationship(
     const std::string& label_name,
     const std::string& ref_label_name) {
   out_ << "MATCH (a:" << label_name << "), (b:" << ref_label_name << ")\n";
@@ -135,7 +135,7 @@ void QueryAssembler::CreateRelationship(
        << "]->(b);\n" << std::endl;
   relationship_counter++;
 }
-void QueryAssembler::RemoveProperties(
+void Translator::RemoveProperties(
     const std::string& label_name,
     const std::vector<std::string>& properties) {
   if (properties.empty()) {
@@ -152,7 +152,7 @@ void QueryAssembler::RemoveProperties(
   out_ << ";\n" << std::endl;
 }
 
-std::vector<std::string> QueryAssembler::GetListOf(
+std::vector<std::string> Translator::GetListOf(
     std::shared_ptr<INode> node,
     StmtType type) {
   if (node->stmt_type != StmtType::kCommaDelimiter) {
@@ -188,7 +188,7 @@ std::vector<std::string> QueryAssembler::GetListOf(
   return arguments;
 }
 
-std::string QueryAssembler::TranslateName(std::shared_ptr<INode> node) {
+std::string Translator::TranslateName(std::shared_ptr<INode> node) {
   if (node->ChildrenCount() == 0) {
     LOGE << "empty name node";
     end(EXIT_FAILURE);
@@ -208,7 +208,7 @@ std::string QueryAssembler::TranslateName(std::shared_ptr<INode> node) {
 
   return name.str();
 }
-std::string QueryAssembler::TranslateIdentifiers(
+std::string Translator::TranslateIdentifiers(
     std::shared_ptr<INode> node) {
   if (node->ChildrenCount() == 0) {
     LOGE << "invalid list of identifiers";
@@ -224,7 +224,7 @@ std::string QueryAssembler::TranslateIdentifiers(
 
   return identifiers.str();
 }
-std::string QueryAssembler::TranslateIdentifier(std::shared_ptr<INode> node) {
+std::string Translator::TranslateIdentifier(std::shared_ptr<INode> node) {
   if (node->ChildrenCount() == 0) {
     LOGE << "empty identifier";
     end(EXIT_FAILURE);
@@ -233,4 +233,4 @@ std::string QueryAssembler::TranslateIdentifier(std::shared_ptr<INode> node) {
   return std::dynamic_pointer_cast<StringNode>(node->get_child(0))->data;
 }
 
-} // scc::query_assembler
+} // scc::translator

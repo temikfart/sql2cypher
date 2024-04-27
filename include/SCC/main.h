@@ -7,7 +7,7 @@
 #include "SCC/config/scc_config.h"
 #include "SCC/lexer/lexer.h"
 #include "SCC/log/log.h"
-#include "SCC/query-assembler/query_assembler.h"
+#include "SCC/translator/translator.h"
 #include "SCC/dump/tree_dump.h"
 #include "SCC/parser/parser.h"
 

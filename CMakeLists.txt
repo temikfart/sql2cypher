@@ -84,7 +84,7 @@ set(SCC_SOURCE_LIBS
         scc_lexer
         scc_log
         scc_parser
-        scc_query_assembler
+        scc_translator
 )
 
 ## Create executable

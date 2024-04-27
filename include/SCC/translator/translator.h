@@ -15,14 +15,14 @@
 
 #include "logger/log.hpp"
 
-namespace scc::query_assembler {
+namespace scc::translator {
 
 // Column as property with standard data
 using StdProperty = std::tuple<std::string, std::string>;
 
-class QueryAssembler {
+class Translator {
 public:
-  explicit QueryAssembler(std::shared_ptr<ast::INode> ast, const std::filesystem::path& out_path);
+  explicit Translator(std::shared_ptr<ast::INode> ast, const std::filesystem::path& out_path);
 
   void Translate();
 
@@ -97,4 +97,4 @@ private:
   std::string TranslateIdentifier(std::shared_ptr<ast::INode> node);
 };
 
-} // scc::query_assembler
+} // scc::translator

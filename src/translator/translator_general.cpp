@@ -1,13 +1,13 @@
-#include "SCC/query-assembler/query_assembler.h"
+#include "SCC/translator/translator.h"
 
-namespace scc::query_assembler {
+namespace scc::translator {
 
 using namespace ast;
 
-QueryAssembler::QueryAssembler(std::shared_ptr<INode> ast, const std::filesystem::path& out_path)
+Translator::Translator(std::shared_ptr<INode> ast, const std::filesystem::path& out_path)
     : ast_(std::move(ast)), out_(out_path) {}
 
-void QueryAssembler::Translate() {
+void Translator::Translate() {
   LOGI << "starting translation...";
   if (ast_ == nullptr) {
     LOGI << "translation is ended: nothing to translate";
@@ -30,7 +30,7 @@ void QueryAssembler::Translate() {
   LOGI << "translation is ended";
 }
 
-void QueryAssembler::TranslateProgram(std::shared_ptr<INode> node) {
+void Translator::TranslateProgram(std::shared_ptr<INode> node) {
   auto query = node->get_child(0);
   if (query->stmt_type == StmtType::kQuery) {
     this->TranslateQuery(query);
@@ -51,7 +51,7 @@ void QueryAssembler::TranslateProgram(std::shared_ptr<INode> node) {
     }
   }
 }
-void QueryAssembler::TranslateQuery(std::shared_ptr<INode> node) {
+void Translator::TranslateQuery(std::shared_ptr<INode> node) {
   if (node->ChildrenCount() == 0) {
     LOGD << "empty query";
     return;
@@ -71,4 +71,4 @@ void QueryAssembler::TranslateQuery(std::shared_ptr<INode> node) {
   }
 }
 
-} // scc::query_assembler
+} // scc::translator
