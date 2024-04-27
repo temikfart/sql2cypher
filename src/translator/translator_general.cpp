@@ -22,8 +22,7 @@ void Translator::Translate() {
       return;
     }
   } else {
-    LOGE <<
-        "invalid AST: root should be with \'Program\' statement type";
+    LOGE << "invalid AST: root should be with \'Program\' statement type";
     end(EXIT_FAILURE);
   }
 
