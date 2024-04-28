@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <memory>
 #include <tuple>
+#include <string>
 #include <sstream>
 #include <utility>
 
@@ -16,6 +17,11 @@
 #include "logger/log.hpp"
 
 namespace scc::translator {
+
+class translation_error : public std::logic_error {
+public:
+  explicit translation_error(const std::string& message);
+};
 
 // Column as property with standard data
 using StdProperty = std::tuple<std::string, std::string>;
@@ -84,6 +90,11 @@ private:
   std::string TranslateIdentifiers(const std::shared_ptr<ast::INode>& node);
   std::string TranslateIdentifier(const std::shared_ptr<ast::INode>& node);
 
+  void ValidateHasChildren(const std::shared_ptr<ast::INode>& node,
+                           unsigned min_children_count = 1,
+                           const std::string& details = "") const;
+  void ValidateIsCorrectStmtType(const std::shared_ptr<ast::INode>& node,
+                                 ast::StmtType stmt_type) const;
 };
 
 } // scc::translator
