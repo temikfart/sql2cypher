@@ -4,7 +4,7 @@ namespace scc::translator {
 
 using namespace ast;
 
-void Translator::TranslatePrimaryKey(std::shared_ptr<INode> key, std::string& constraint_name,
+void Translator::TranslatePrimaryKey(const NodePtr<INode>& key, std::string& constraint_name,
                                      std::string& table_name) {
   if (key->stmt_type != StmtType::kPrimaryKey) {
     LOGE << "incorrect type for primaryKey node";
@@ -35,7 +35,7 @@ void Translator::TranslatePrimaryKey(std::shared_ptr<INode> key, std::string& co
     );
   }
 }
-void Translator::TranslateForeignKey(std::shared_ptr<INode> key, std::string& table_name) {
+void Translator::TranslateForeignKey(const NodePtr<INode>& key, std::string& table_name) {
   if (key->stmt_type != StmtType::kForeignKey) {
     LOGE << "incorrect type for foreignKey node";
     end(EXIT_FAILURE);
@@ -130,7 +130,7 @@ void Translator::RemoveProperties(const std::string& label_name,
   out_ << ";\n" << std::endl;
 }
 
-std::vector<std::string> Translator::GetListOf(std::shared_ptr<INode> node, StmtType type) {
+std::vector<std::string> Translator::GetListOf(const NodePtr<INode>& node, StmtType type) {
   if (node->stmt_type != StmtType::kCommaDelimiter) {
     LOGE << "invalid ListOf: delimiter is not a comma";
     end(EXIT_FAILURE);
@@ -161,7 +161,7 @@ std::vector<std::string> Translator::GetListOf(std::shared_ptr<INode> node, Stmt
   return arguments;
 }
 
-std::string Translator::TranslateName(std::shared_ptr<INode> node) {
+std::string Translator::TranslateName(const NodePtr<INode>& node) {
   if (node->ChildrenCount() == 0) {
     LOGE << "empty name node";
     end(EXIT_FAILURE);
@@ -180,7 +180,7 @@ std::string Translator::TranslateName(std::shared_ptr<INode> node) {
 
   return name.str();
 }
-std::string Translator::TranslateIdentifiers(std::shared_ptr<INode> node) {
+std::string Translator::TranslateIdentifiers(const NodePtr<INode>& node) {
   if (node->ChildrenCount() == 0) {
     LOGE << "invalid list of identifiers";
     end(EXIT_FAILURE);
@@ -195,7 +195,7 @@ std::string Translator::TranslateIdentifiers(std::shared_ptr<INode> node) {
 
   return identifiers.str();
 }
-std::string Translator::TranslateIdentifier(std::shared_ptr<INode> node) {
+std::string Translator::TranslateIdentifier(const NodePtr<INode>& node) {
   if (node->ChildrenCount() == 0) {
     LOGE << "empty identifier";
     end(EXIT_FAILURE);
