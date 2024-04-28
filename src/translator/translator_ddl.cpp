@@ -8,28 +8,22 @@ template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
-void Translator::TranslateDDLStatement(const NodePtr<INode>& node) {
-  if (node->ChildrenCount() == 0) {
-    LOGD << "empty DDL query";
-    return;
-  }
-
-  auto statement = node->get_child(0);
-  switch (statement->stmt_type) {
+void Translator::TranslateDDLStatement(const NodePtr<INode>& ddl_statement) {
+  switch (ddl_statement->stmt_type) {
     case StmtType::kCreateDatabaseStmt:
-      TranslateCreateDatabase(statement);
+      TranslateCreateDatabase(ddl_statement);
       break;
     case StmtType::kCreateTableStmt:
-      TranslateCreateTable(statement);
+      TranslateCreateTable(ddl_statement);
       break;
     case StmtType::kAlterTableStmt:
-      TranslateAlterTable(statement);
+      TranslateAlterTable(ddl_statement);
       break;
     case StmtType::kDropDatabaseStmt:
-      TranslateDropDatabase(statement);
+      TranslateDropDatabase(ddl_statement);
       break;
     case StmtType::kDropTableStmt:
-      TranslateDropTable(statement);
+      TranslateDropTable(ddl_statement);
       break;
     default:
       LOGE << "unknown DDL statement";
