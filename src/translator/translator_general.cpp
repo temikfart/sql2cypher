@@ -4,7 +4,11 @@ namespace scc::translator {
 
 using namespace ast;
 
-Translator::Translator(std::shared_ptr<INode> ast, const std::filesystem::path& out_path)
+template<typename NodeType,
+    typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
+using NodePtr = std::shared_ptr<NodeType>;
+
+Translator::Translator(NodePtr<INode> ast, const std::filesystem::path& out_path)
     : ast_(std::move(ast)), out_(out_path) {}
 
 void Translator::Translate() {
@@ -29,7 +33,7 @@ void Translator::Translate() {
   LOGI << "translation is ended";
 }
 
-void Translator::TranslateProgram(std::shared_ptr<INode> node) {
+void Translator::TranslateProgram(const NodePtr<INode>& node) {
   auto query = node->get_child(0);
   if (query->stmt_type == StmtType::kQuery) {
     TranslateQuery(query);
@@ -50,7 +54,7 @@ void Translator::TranslateProgram(std::shared_ptr<INode> node) {
     }
   }
 }
-void Translator::TranslateQuery(std::shared_ptr<INode> node) {
+void Translator::TranslateQuery(const NodePtr<INode>& node) {
   if (node->ChildrenCount() == 0) {
     LOGD << "empty query";
     return;
