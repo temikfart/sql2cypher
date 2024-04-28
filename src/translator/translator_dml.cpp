@@ -8,13 +8,8 @@ template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
-void Translator::TranslateDMLStatement(const NodePtr<INode>& node) {
-  if (node->ChildrenCount() == 0) {
-    LOGD << "empty DML query";
-  }
-
-  auto statement = node->get_child(0);
-  switch (statement->stmt_type) {
+void Translator::TranslateDMLStatement(const NodePtr<INode>& dml_statement) {
+  switch (dml_statement->stmt_type) {
     case StmtType::kInsertStmt:
       TranslateInsert(statement);
       break;

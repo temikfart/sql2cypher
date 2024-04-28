@@ -39,11 +39,11 @@ private:
   int constraint_counter = 0;
   int relationship_counter = 0;
 
-  void TranslateProgram(const std::shared_ptr<ast::INode>& node);
-  void TranslateQuery(const std::shared_ptr<ast::INode>& node);
+  void TranslateProgram(const std::shared_ptr<ast::INode>& program);
+  void TranslateQuery(const std::shared_ptr<ast::INode>& query);
 
-  void TranslateDDLStatement(const std::shared_ptr<ast::INode>& node);
-  void TranslateDMLStatement(const std::shared_ptr<ast::INode>& node);
+  void TranslateDDLStatement(const std::shared_ptr<ast::INode>& ddl_statement);
+  void TranslateDMLStatement(const std::shared_ptr<ast::INode>& dml_statement);
 
   void TranslateCreateDatabase(const std::shared_ptr<ast::INode>& node);
   void TranslateCreateTable(const std::shared_ptr<ast::INode>& node);
@@ -66,9 +66,9 @@ private:
   void TranslateDropObject(const std::shared_ptr<ast::INode>& node, std::string& table_name);
   void TranslateListOfDropObjects(const std::shared_ptr<ast::INode>& node, std::string& table_name);
 
-  void TranslateInsert(const std::shared_ptr<ast::INode>& node);
-  void TranslateDelete(const std::shared_ptr<ast::INode>& node);
-  void TranslateUpdate(const std::shared_ptr<ast::INode>& node);
+  void TranslateInsertStatement(const std::shared_ptr<ast::INode>& insert_stmt);
+  void TranslateDeleteStatement(const std::shared_ptr<ast::INode>& delete_stmt);
+  void TranslateUpdateStatement(const std::shared_ptr<ast::INode>& update_stmt);
 
   // Basic statements
 
