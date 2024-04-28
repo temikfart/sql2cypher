@@ -11,37 +11,28 @@ using NodePtr = std::shared_ptr<NodeType>;
 void Translator::TranslateDMLStatement(const NodePtr<INode>& dml_statement) {
   switch (dml_statement->stmt_type) {
     case StmtType::kInsertStmt:
-      TranslateInsert(statement);
+      TranslateInsertStatement(dml_statement);
       break;
     case StmtType::kDeleteStmt:
-      TranslateDelete(statement);
+      TranslateDeleteStatement(dml_statement);
       break;
     case StmtType::kUpdateStmt:
-      TranslateUpdate(statement);
+      TranslateUpdateStatement(dml_statement);
       break;
     default:
-      LOGE << "unknown DML statement";
-      end(EXIT_FAILURE);
+      throw translation_error("Unknown DML statement type: \'"
+                                  + dml_statement->stmt_type.ToString() + "\'");
   }
 }
 
-void Translator::TranslateInsert(const NodePtr<INode>& node) {
-  if (node->ChildrenCount() == 0) {
-    LOGE << "insert statement without body";
-    end(EXIT_FAILURE);
-  }
+void Translator::TranslateInsertStatement(const NodePtr<INode>& insert_stmt) {
+  ValidateHasChildren(insert_stmt, 1, "Empty \'INSERT\' statement");
 }
-void Translator::TranslateDelete(const NodePtr<INode>& node) {
-  if (node->ChildrenCount() == 0) {
-    LOGE << "delete statement without body";
-    end(EXIT_FAILURE);
-  }
+void Translator::TranslateDeleteStatement(const NodePtr<INode>& delete_stmt) {
+  ValidateHasChildren(delete_stmt, 1, "Empty \'DELETE\' statement");
 }
-void Translator::TranslateUpdate(const NodePtr<INode>& node) {
-  if (node->ChildrenCount() == 0) {
-    LOGE << "update statement without body";
-    end(EXIT_FAILURE);
-  }
+void Translator::TranslateUpdateStatement(const NodePtr<INode>& update_stmt) {
+  ValidateHasChildren(update_stmt, 1, "Empty \'UPDATE\' statement");
 }
 
 } // scc::translator
