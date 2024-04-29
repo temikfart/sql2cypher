@@ -90,6 +90,10 @@ private:
   std::string TranslateIdentifiers(const std::shared_ptr<ast::INode>& node);
   std::string TranslateIdentifier(const std::shared_ptr<ast::INode>& node);
 
+  bool HasChildren(const std::shared_ptr<ast::INode>& node,
+                   unsigned min_children_count = 1) const;
+  bool IsCorrectStmtType(const std::shared_ptr<ast::INode>& node, ast::StmtType stmt_type) const;
+
   void ValidateHasChildren(const std::shared_ptr<ast::INode>& node,
                            unsigned min_children_count = 1,
                            const std::string& details = "") const;
