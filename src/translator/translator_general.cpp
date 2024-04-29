@@ -13,7 +13,7 @@ Translator::Translator(NodePtr<INode> ast, const std::filesystem::path& out_path
 
 void Translator::Translate() {
   LOGI << "Translation is started";
-  if (ast_ == nullptr || ast_->ChildrenCount() == 0) {
+  if (ast_ == nullptr || !HasChildren(ast_)) {
     LOGI << "Translation is ended. Nothing to translate";
     return;
   }
@@ -29,21 +29,22 @@ void Translator::TranslateProgram(const NodePtr<INode>& program) {
   ValidateIsCorrectStmtType(query, StmtType::kQuery);
   TranslateQuery(query);
 
-  if (program->ChildrenCount() > 1) {
+  if (HasChildren(program, 2)) {
     auto other_queries = program->get_child(1);
     ValidateIsCorrectStmtType(other_queries, StmtType::kSemicolonDelimiter);
-    if (other_queries->ChildrenCount() > 0) {
+    if (HasChildren(other_queries)) {
       TranslateProgram(other_queries);
     }
   }
 }
 void Translator::TranslateQuery(const NodePtr<INode>& query) {
-  if (query->ChildrenCount() == 0) {
+  if (!HasChildren(query)) {
     LOGD << "Empty query";
     return;
   }
 
   auto statement_type = query->get_child(0);
+  ValidateHasChildren(statement_type);
   auto statement = statement_type->get_child(0);
   ValidateHasChildren(statement);
   switch (statement_type->stmt_type) {
