@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include "SCC/common/string_utils.h"
+#include "SCC/translator/cypher/graph/constraint_types.h"
 #include "SCC/translator/cypher/graph/node.h"
 
 namespace scc::translator::cypher {
@@ -18,6 +19,12 @@ public:
 class CreateNodeClauseBuilder {
 public:
   static std::string Build(const Node& node);
+};
+
+class CreateConstraintClauseBuilder {
+public:
+  static std::string Build(const std::string& constraint_name, const Node& node,
+                           const NodeProperty& property, ConstraintType type);
 };
 
 } // scc::translator::cypher
