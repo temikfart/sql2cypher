@@ -6,18 +6,18 @@
 
 #include "SCC/common/string_utils.h"
 
-#define DT_NONE "none"
-#define DT_ROOT "root"
-#define DT_SERVICE "service"
-#define DT_INT "int"
-#define DT_FLOAT "float"
-#define DT_BRACKET "bracket"
-#define DT_PUNCTUATION "punctuation"
-#define DT_OPERATOR "operator"
-#define DT_WORD "word"
-#define DT_STRING "string"
-
 namespace scc::ast {
+
+constexpr std::string_view kDT_None = "NONE";
+constexpr std::string_view kDT_Root = "ROOT";
+constexpr std::string_view kDT_Service = "SERVICE";
+constexpr std::string_view kDT_Int = "INT";
+constexpr std::string_view kDT_Float = "FLOAT";
+constexpr std::string_view kDT_Bracket = "BRACKET";
+constexpr std::string_view kDT_Punctuation = "PUNCTUATION";
+constexpr std::string_view kDT_Operator = "OPERATOR";
+constexpr std::string_view kDT_Word = "WORD";
+constexpr std::string_view kDT_String = "STRING";
 
 class DataType {
 public:
@@ -36,13 +36,13 @@ public:
 
   DataType() = default;
   DataType(Value value);
-  explicit DataType(const std::string& std_data_type);
+  explicit DataType(const std::string_view& std_type);
 
   std::string ToString() const;
 
   explicit operator bool() const = delete;
   constexpr operator Value() const { return value_; }
-  constexpr std::strong_ordering operator<=>(const DataType& mode) const = default;
+  constexpr std::strong_ordering operator<=>(const DataType&) const = default;
   constexpr bool operator==(const Value& value) const { return value_ == value; }
   constexpr bool operator!=(const Value& value) const { return value_ != value; }
   constexpr bool operator<(const Value& value) const { return value_ < value; }
@@ -54,6 +54,6 @@ private:
   Value value_ = Value::kNone;
 };
 
-std::ostream& operator<<(std::ostream& os, const DataType& data_type);
+std::ostream& operator<<(std::ostream& os, const DataType& type);
 
 } // scc::ast

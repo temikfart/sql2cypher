@@ -7,116 +7,116 @@ StmtType::StmtType(Value value) {
     throw std::invalid_argument("Incorrect value for Statement Type");
   this->value_ = value;
 }
-StmtType::StmtType(const std::string_view& str_stmt_type) {
-  std::string stmt_type = scc::common::LowerCase(std::string(str_stmt_type));
-  if (stmt_type == kST_NONE)
+StmtType::StmtType(const std::string_view& str_type) {
+  std::string type = scc::common::LowerCase(std::string(str_type));
+  if (type == kST_NONE)
     this->value_ = kNone;
-  else if (stmt_type == kST_PROGRAM)
+  else if (type == kST_PROGRAM)
     this->value_ = kProgram;
-  else if (stmt_type == kST_QUERY)
+  else if (type == kST_QUERY)
     this->value_ = kQuery;
-  else if (stmt_type == kST_DDL_STMT)
+  else if (type == kST_DDL_STMT)
     this->value_ = kDdlStmt;
-  else if (stmt_type == kST_DML_STMT)
+  else if (type == kST_DML_STMT)
     this->value_ = kDmlStmt;
 
   /* DDL Statements */
-  else if (stmt_type == kST_ALTER_TABLE)
+  else if (type == kST_ALTER_TABLE)
     this->value_ = kAlterTableStmt;
-  else if (stmt_type == kST_CREATE_DATABASE)
+  else if (type == kST_CREATE_DATABASE)
     this->value_ = kCreateDatabaseStmt;
-  else if (stmt_type == kST_CREATE_TABLE)
+  else if (type == kST_CREATE_TABLE)
     this->value_ = kCreateTableStmt;
-  else if (stmt_type == kST_DROP_DATABASE)
+  else if (type == kST_DROP_DATABASE)
     this->value_ = kDropDatabaseStmt;
-  else if (stmt_type == kST_DROP_TABLE)
+  else if (type == kST_DROP_TABLE)
     this->value_ = kDropTableStmt;
 
   /* DDL Basic Statements */
-  else if (stmt_type == kST_TABLE_DEF)
+  else if (type == kST_TABLE_DEF)
     this->value_ = kTableDef;
-  else if (stmt_type == kST_COLUMN_DEF)
+  else if (type == kST_COLUMN_DEF)
     this->value_ = kColumnDef;
-  else if (stmt_type == kST_TABLE_CONSTRAINT)
+  else if (type == kST_TABLE_CONSTRAINT)
     this->value_ = kTableConstraint;
-  else if (stmt_type == kST_ALTER_ACTION_ADD)
+  else if (type == kST_ALTER_ACTION_ADD)
     this->value_ = kAlterActionAdd;
-  else if (stmt_type == kST_ALTER_ACTION_DROP)
+  else if (type == kST_ALTER_ACTION_DROP)
     this->value_ = kAlterActionDrop;
-  else if (stmt_type == kST_DROP_LIST)
+  else if (type == kST_DROP_LIST)
     this->value_ = kDropList;
-  else if (stmt_type == kST_DROP_CONSTRAINT)
+  else if (type == kST_DROP_CONSTRAINT)
     this->value_ = kDropConstraint;
-  else if (stmt_type == kST_DROP_COLUMN)
+  else if (type == kST_DROP_COLUMN)
     this->value_ = kDropColumn;
 
   /* DML Statements */
-  else if (stmt_type == kST_DELETE)
+  else if (type == kST_DELETE)
     this->value_ = kDeleteStmt;
-  else if (stmt_type == kST_INSERT)
+  else if (type == kST_INSERT)
     this->value_ = kInsertStmt;
-  else if (stmt_type == kST_UPDATE)
+  else if (type == kST_UPDATE)
     this->value_ = kUpdateStmt;
 
   /* DML Basic Statements */
-  else if (stmt_type == kST_CONDITION)
+  else if (type == kST_CONDITION)
     this->value_ = kCondition;
-  else if (stmt_type == kST_OR_CONDITION)
+  else if (type == kST_OR_CONDITION)
     this->value_ = kORCondition;
-  else if (stmt_type == kST_AND_CONDITION)
+  else if (type == kST_AND_CONDITION)
     this->value_ = kANDCondition;
-  else if (stmt_type == kST_NOT_CONDITION)
+  else if (type == kST_NOT_CONDITION)
     this->value_ = kNOTCondition;
-  else if (stmt_type == kST_PREDICATE)
+  else if (type == kST_PREDICATE)
     this->value_ = kPredicate;
-  else if (stmt_type == kST_EXPRESSION)
+  else if (type == kST_EXPRESSION)
     this->value_ = kExpression;
 
   /* Logical Operators */
-  else if (stmt_type == kST_OR_OPERATOR)
+  else if (type == kST_OR_OPERATOR)
     this->value_ = kOROperator;
-  else if (stmt_type == kST_AND_OPERATOR)
+  else if (type == kST_AND_OPERATOR)
     this->value_ = kANDOperator;
-  else if (stmt_type == kST_NOT_OPERATOR)
+  else if (type == kST_NOT_OPERATOR)
     this->value_ = kNOTOperator;
 
   /* Basic Statements */
-  else if (stmt_type == kST_PRIMARY_KEY)
+  else if (type == kST_PRIMARY_KEY)
     this->value_ = kPrimaryKey;
-  else if (stmt_type == kST_FOREIGN_KEY)
+  else if (type == kST_FOREIGN_KEY)
     this->value_ = kForeignKey;
-  else if (stmt_type == kST_IDENTIFIER)
+  else if (type == kST_IDENTIFIER)
     this->value_ = kIdentifier;
-  else if (stmt_type == kST_DOT_DELIMITER)
+  else if (type == kST_DOT_DELIMITER)
     this->value_ = kDotDelimiter;
-  else if (stmt_type == kST_COMMA_DELIMITER)
+  else if (type == kST_COMMA_DELIMITER)
     this->value_ = kCommaDelimiter;
-  else if (stmt_type == kST_SEMICOLON_DELIMITER)
+  else if (type == kST_SEMICOLON_DELIMITER)
     this->value_ = kSemicolonDelimiter;
 
   /* Other keywords */
-  else if (stmt_type == kST_CONSTRAINT_KW)
+  else if (type == kST_CONSTRAINT_KW)
     this->value_ = kConstraintKW;
-  else if (stmt_type == kST_COLUMN_KW)
+  else if (type == kST_COLUMN_KW)
     this->value_ = kColumnKW;
-  else if (stmt_type == kST_REFERENCES_KW)
+  else if (type == kST_REFERENCES_KW)
     this->value_ = kReferencesKW;
-  else if (stmt_type == kST_ADD_KW)
+  else if (type == kST_ADD_KW)
     this->value_ = kAddKW;
-  else if (stmt_type == kST_DROP_KW)
+  else if (type == kST_DROP_KW)
     this->value_ = kDropKW;
 
   /* SQL Data Types */
-  else if (stmt_type == kST_INT_TYPE || stmt_type == kST_INTEGER_TYPE)
+  else if (type == kST_INT_TYPE || type == kST_INTEGER_TYPE)
     this->value_ = kIntType;
-  else if (stmt_type == kST_FLOAT_TYPE)
+  else if (type == kST_FLOAT_TYPE)
     this->value_ = kFloatType;
-  else if (stmt_type == kST_CHAR_TYPE)
+  else if (type == kST_CHAR_TYPE)
     this->value_ = kCharType;
-  else if (stmt_type == kST_VARCHAR_TYPE)
+  else if (type == kST_VARCHAR_TYPE)
     this->value_ = kVarcharType;
   else
-    throw std::invalid_argument("No Statement Type for '" + std::string(str_stmt_type) + "'");
+    throw std::invalid_argument("No Statement Type for '" + std::string(str_type) + "'");
 }
 
 std::string StmtType::ToString() const {
@@ -232,8 +232,8 @@ std::string StmtType::ToString() const {
   }
 }
 
-std::ostream& operator<<(std::ostream& os, const StmtType& stmt_type) {
-  os << stmt_type.ToString();
+std::ostream& operator<<(std::ostream& os, const StmtType& type) {
+  os << type.ToString();
   return os;
 }
 

@@ -6,10 +6,10 @@
 
 #include "SCC/common/string_utils.h"
 
-#define INTERACTIVE "interactive"
-#define DAEMON "daemon"
-
 namespace scc::config {
+
+constexpr std::string_view kMode_Interactive = "interactive";
+constexpr std::string_view kMode_Daemon = "daemon";
 
 class SCCMode {
 public:
@@ -20,13 +20,13 @@ public:
 
   SCCMode() = default;
   SCCMode(Value value);
-  explicit SCCMode(const std::string& str_mode);
+  explicit SCCMode(const std::string_view& str_mode);
 
   std::string ToString() const;
 
   explicit operator bool() const = delete;
   constexpr operator Value() const { return value_; }
-  constexpr std::strong_ordering operator<=>(const SCCMode& mode) const = default;
+  constexpr std::strong_ordering operator<=>(const SCCMode&) const = default;
   constexpr bool operator==(const Value& value) const { return value_ == value; }
   constexpr bool operator!=(const Value& value) const { return value_ != value; }
   constexpr bool operator<(const Value& value) const { return value_ < value; }
