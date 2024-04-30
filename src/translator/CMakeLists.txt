@@ -1,5 +1,6 @@
 set(DIRS
         common
+        cypher
 )
 foreach(DIR ${DIRS})
     add_subdirectory(${DIR})
@@ -15,4 +16,5 @@ target_sources(scc_translator PRIVATE
 target_link_libraries(scc_translator PRIVATE scc_include)
 target_link_libraries(scc_translator PUBLIC
         scc_translator_common
+        scc_translator_cypher_graph
 )
