@@ -44,10 +44,10 @@ TEST(DataTypeCtorTests, InvalidValueTest) {
 }
 
 TEST(DataTypeCtorTests, StringValueTest) {
-  DataType root(DT_ROOT);
+  DataType root(kDT_Root);
   EXPECT_EQ(DataType::kRoot, (DataType::Value) root);
 
-  DataType punctuation(DT_PUNCTUATION);
+  DataType punctuation(kDT_Punctuation);
   EXPECT_EQ(DataType::kPunctuation, (DataType::Value) punctuation);
 
   DataType mixed_case_service("serViCE");
@@ -63,11 +63,11 @@ TEST(DataTypeCtorTests, InvalidStringValueTest) {
 }
 
 TEST(DataTypeoStringTests, ToStringTest) {
-  EXPECT_EQ(DT_NONE, DataType(DataType::kNone).ToString());
-  EXPECT_EQ(DT_ROOT, DataType(DataType::kRoot).ToString());
-  EXPECT_EQ(DT_INT, DataType(DataType::kInt).ToString());
-  EXPECT_EQ(DT_SERVICE, DataType(DataType::kService).ToString());
-  EXPECT_EQ(DT_WORD, DataType(DataType::kWord).ToString());
+  EXPECT_EQ(kDT_None, DataType(DataType::kNone).ToString());
+  EXPECT_EQ(kDT_Root, DataType(DataType::kRoot).ToString());
+  EXPECT_EQ(kDT_Int, DataType(DataType::kInt).ToString());
+  EXPECT_EQ(kDT_Service, DataType(DataType::kService).ToString());
+  EXPECT_EQ(kDT_Word, DataType(DataType::kWord).ToString());
 }
 
 TEST(DataTypeCastTests, CastToValueTest) {
@@ -83,19 +83,19 @@ TEST(DataTypeCastTests, CastToValueTest) {
 TEST(DataTypeOperatorsTests, OutputTest) {
   std::ostringstream oss_none;
   oss_none << DataType(DataType::kNone);
-  EXPECT_EQ(DT_NONE, oss_none.str());
+  EXPECT_EQ(kDT_None, oss_none.str());
 
   std::ostringstream oss_punctuation;
   oss_punctuation << DataType(DataType::kPunctuation);
-  EXPECT_EQ(DT_PUNCTUATION, oss_punctuation.str());
+  EXPECT_EQ(kDT_Punctuation, oss_punctuation.str());
 
   std::ostringstream oss_operator;
   oss_operator << DataType(DataType::kOperator);
-  EXPECT_EQ(DT_OPERATOR, oss_operator.str());
+  EXPECT_EQ(kDT_Operator, oss_operator.str());
 
   std::ostringstream oss_string;
   oss_string << DataType(DataType::kString);
-  EXPECT_EQ(DT_STRING, oss_string.str());
+  EXPECT_EQ(kDT_String, oss_string.str());
 }
 
 TEST(DataTypeOperatorsTests, CompareTwoEqualTypesTest) {

@@ -7,59 +7,59 @@ DataType::DataType(Value value) {
     throw std::invalid_argument("Incorrect value for Data Type");
   this->value_ = value;
 }
-DataType::DataType(const std::string& str_data_type) {
-  std::string data_type = scc::common::LowerCase(str_data_type);
-  if (data_type == DT_NONE)
+DataType::DataType(const std::string_view& str_type) {
+  std::string type = scc::common::UpperCase(std::string(str_type));
+  if (type == kDT_None)
     this->value_ = kNone;
-  else if (data_type == DT_ROOT)
+  else if (type == kDT_Root)
     this->value_ = kRoot;
-  else if (data_type == DT_SERVICE)
+  else if (type == kDT_Service)
     this->value_ = kService;
-  else if (data_type == DT_INT)
+  else if (type == kDT_Int)
     this->value_ = kInt;
-  else if (data_type == DT_FLOAT)
+  else if (type == kDT_Float)
     this->value_ = kFloat;
-  else if (data_type == DT_BRACKET)
+  else if (type == kDT_Bracket)
     this->value_ = kBracket;
-  else if (data_type == DT_PUNCTUATION)
+  else if (type == kDT_Punctuation)
     this->value_ = kPunctuation;
-  else if (data_type == DT_OPERATOR)
+  else if (type == kDT_Operator)
     this->value_ = kOperator;
-  else if (data_type == DT_WORD)
+  else if (type == kDT_Word)
     this->value_ = kWord;
-  else if (data_type == DT_STRING)
+  else if (type == kDT_String)
     this->value_ = kString;
   else
-    throw std::invalid_argument("No Data Type for '" + str_data_type + "'");
+    throw std::invalid_argument("No Data Type for '" + std::string(str_type) + "'");
 }
 
 std::string DataType::ToString() const {
   switch (value_) {
     case kNone:
-      return DT_NONE;
+      return std::string(kDT_None);
     case kRoot:
-      return DT_ROOT;
+      return std::string(kDT_Root);
     case kService:
-      return DT_SERVICE;
+      return std::string(kDT_Service);
     case kInt:
-      return DT_INT;
+      return std::string(kDT_Int);
     case kFloat:
-      return DT_FLOAT;
+      return std::string(kDT_Float);
     case kBracket:
-      return DT_BRACKET;
+      return std::string(kDT_Bracket);
     case kPunctuation:
-      return DT_PUNCTUATION;
+      return std::string(kDT_Punctuation);
     case kOperator:
-      return DT_OPERATOR;
+      return std::string(kDT_Operator);
     case kWord:
-      return DT_WORD;
+      return std::string(kDT_Word);
     case kString:
-      return DT_STRING;
+      return std::string(kDT_String);
   }
 }
 
-std::ostream& operator<<(std::ostream& os, const DataType& data_type) {
-  os << data_type.ToString();
+std::ostream& operator<<(std::ostream& os, const DataType& type) {
+  os << type.ToString();
   return os;
 }
 

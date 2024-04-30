@@ -6,17 +6,17 @@
 
 #include "SCC/common/string_utils.h"
 
-#define SYMT_UNKNOWN "unknown"
-#define SYMT_SPACE "space"
-#define SYMT_DIGIT "digit"
-#define SYMT_ALPHA "alpha"
-#define SYMT_OPERATOR "operator"
-#define SYMT_BRACKET "bracket"
-#define SYMT_PUNCTUATION "punctuation"
-#define SYMT_EOF "eof"
-#define SYMT_NULL_TERMINATOR "null terminator"
-
 namespace scc::lexer {
+
+constexpr std::string_view kSYMT_Unknown = "UNKNOWN";
+constexpr std::string_view kSYMT_Space = "SPACE";
+constexpr std::string_view kSYMT_Digit = "DIGIT";
+constexpr std::string_view kSYMT_Alpha = "ALPHA";
+constexpr std::string_view kSYMT_Operator = "OPERATOR";
+constexpr std::string_view kSYMT_Bracket = "BRACKET";
+constexpr std::string_view kSYMT_Punctuation = "PUNCTUATION";
+constexpr std::string_view kSYMT_EOF = "EOF";
+constexpr std::string_view kSYMT_NullTerminator = "NULL";
 
 class SymbolType {
 public:
@@ -34,13 +34,13 @@ public:
 
   SymbolType() = default;
   SymbolType(Value value);
-  explicit SymbolType(const std::string& str_sym_type);
+  explicit SymbolType(const std::string_view& str_type);
 
   std::string ToString() const;
 
   explicit operator bool() const = delete;
   constexpr operator Value() const { return value_; }
-  constexpr std::strong_ordering operator<=>(const SymbolType& sym_type) const = default;
+  constexpr std::strong_ordering operator<=>(const SymbolType&) const = default;
   constexpr bool operator==(const Value& value) const { return value_ == value; }
   constexpr bool operator!=(const Value& value) const { return value_ != value; }
   constexpr bool operator<(const Value& value) const { return value_ < value; }
@@ -52,6 +52,6 @@ private:
   Value value_ = Value::kUnknown;
 };
 
-std::ostream& operator<<(std::ostream& os, const SymbolType& sym_type);
+std::ostream& operator<<(std::ostream& os, const SymbolType& type);
 
 } // scc::lexer

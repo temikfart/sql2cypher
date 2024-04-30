@@ -42,10 +42,10 @@ TEST(SCCModeCtorTests, InvalidValueTest) {
 }
 
 TEST(SCCModeCtorTests, StringValueTest) {
-  SCCMode interactive(INTERACTIVE);
+  SCCMode interactive(kMode_Interactive);
   EXPECT_EQ(SCCMode::kInteractive, (SCCMode::Value) interactive);
 
-  SCCMode daemon(DAEMON);
+  SCCMode daemon(kMode_Daemon);
   EXPECT_EQ(SCCMode::kDaemon, (SCCMode::Value) daemon);
 
   SCCMode mixed_case_daemon("DaeMON");
@@ -58,8 +58,8 @@ TEST(SCCModeCtorTests, InvalidStringValueTest) {
 }
 
 TEST(SCCModeoStringTests, ToStringTest) {
-  EXPECT_EQ(DAEMON, SCCMode(SCCMode::kDaemon).ToString());
-  EXPECT_EQ(INTERACTIVE, SCCMode(SCCMode::kInteractive).ToString());
+  EXPECT_EQ(kMode_Daemon, SCCMode(SCCMode::kDaemon).ToString());
+  EXPECT_EQ(kMode_Interactive, SCCMode(SCCMode::kInteractive).ToString());
 }
 
 TEST(SCCModeCastTests, CastToValueTest) {
@@ -75,11 +75,11 @@ TEST(SCCModeCastTests, CastToValueTest) {
 TEST(SCCModeOperatorsTests, OutputTest) {
   std::ostringstream oss_interactive;
   oss_interactive << SCCMode(SCCMode::kInteractive);
-  EXPECT_EQ(INTERACTIVE, oss_interactive.str());
+  EXPECT_EQ(kMode_Interactive, oss_interactive.str());
 
   std::ostringstream oss_daemon;
   oss_daemon << SCCMode(SCCMode::kDaemon);
-  EXPECT_EQ(DAEMON, oss_daemon.str());
+  EXPECT_EQ(kMode_Daemon, oss_daemon.str());
 }
 
 TEST(SCCModeOperatorsTests, CompareTwoEqualModesTest) {

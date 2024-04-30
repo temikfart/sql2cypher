@@ -44,10 +44,10 @@ TEST(SymbolTypeCtorTests, InvalidValueTest) {
 }
 
 TEST(SymbolTypeCtorTests, StringValueTest) {
-  SymbolType space(SYMT_SPACE);
+  SymbolType space(kSYMT_Space);
   EXPECT_EQ(SymbolType::kSpace, (SymbolType::Value) space);
 
-  SymbolType operator_(SYMT_OPERATOR);
+  SymbolType operator_(kSYMT_Operator);
   EXPECT_EQ(SymbolType::kOperator, (SymbolType::Value) operator_);
 
   SymbolType mixed_case_bracket("brAcKEt");
@@ -63,11 +63,11 @@ TEST(SymbolTypeCtorTests, InvalidStringValueTest) {
 }
 
 TEST(SymbolTypeoStringTests, ToStringTest) {
-  EXPECT_EQ(SYMT_UNKNOWN, SymbolType(SymbolType::kUnknown).ToString());
-  EXPECT_EQ(SYMT_ALPHA, SymbolType(SymbolType::kAlpha).ToString());
-  EXPECT_EQ(SYMT_BRACKET, SymbolType(SymbolType::kBracket).ToString());
-  EXPECT_EQ(SYMT_NULL_TERMINATOR, SymbolType(SymbolType::kNullTerminator).ToString());
-  EXPECT_EQ(SYMT_EOF, SymbolType(SymbolType::kEOF).ToString());
+  EXPECT_EQ(kSYMT_Unknown, SymbolType(SymbolType::kUnknown).ToString());
+  EXPECT_EQ(kSYMT_Alpha, SymbolType(SymbolType::kAlpha).ToString());
+  EXPECT_EQ(kSYMT_Bracket, SymbolType(SymbolType::kBracket).ToString());
+  EXPECT_EQ(kSYMT_NullTerminator, SymbolType(SymbolType::kNullTerminator).ToString());
+  EXPECT_EQ(kSYMT_EOF, SymbolType(SymbolType::kEOF).ToString());
 }
 
 TEST(SymbolTypeCastTests, CastToValueTest) {
@@ -83,19 +83,19 @@ TEST(SymbolTypeCastTests, CastToValueTest) {
 TEST(SymbolTypeOperatorsTests, OutputTest) {
   std::ostringstream oss_unknown;
   oss_unknown << SymbolType(SymbolType::kUnknown);
-  EXPECT_EQ(SYMT_UNKNOWN, oss_unknown.str());
+  EXPECT_EQ(kSYMT_Unknown, oss_unknown.str());
 
   std::ostringstream oss_digit;
   oss_digit << SymbolType(SymbolType::kDigit);
-  EXPECT_EQ(SYMT_DIGIT, oss_digit.str());
+  EXPECT_EQ(kSYMT_Digit, oss_digit.str());
 
   std::ostringstream oss_space;
   oss_space << SymbolType(SymbolType::kSpace);
-  EXPECT_EQ(SYMT_SPACE, oss_space.str());
+  EXPECT_EQ(kSYMT_Space, oss_space.str());
 
   std::ostringstream oss_alpha;
   oss_alpha << SymbolType(SymbolType::kAlpha);
-  EXPECT_EQ(SYMT_ALPHA, oss_alpha.str());
+  EXPECT_EQ(kSYMT_Alpha, oss_alpha.str());
 }
 
 TEST(SymbolTypeOperatorsTests, CompareTwoEqualTypesTest) {

@@ -6,6 +6,8 @@
 
 #include "SCC/common/string_utils.h"
 
+namespace scc::ast {
+
 constexpr std::string_view kST_NONE = "none";
 constexpr std::string_view kST_PROGRAM = "program";
 constexpr std::string_view kST_QUERY = "query";
@@ -61,8 +63,6 @@ constexpr std::string_view kST_INTEGER_TYPE = "integer";
 constexpr std::string_view kST_FLOAT_TYPE = "float";
 constexpr std::string_view kST_CHAR_TYPE = "char";
 constexpr std::string_view kST_VARCHAR_TYPE = "varchar";
-
-namespace scc::ast {
 
 class StmtType {
 public:
@@ -133,13 +133,13 @@ public:
 
   StmtType() = default;
   StmtType(Value value);
-  explicit StmtType(const std::string_view& str_stmt_type);
+  explicit StmtType(const std::string_view& str_type);
 
   std::string ToString() const;
 
   explicit operator bool() const = delete;
   constexpr operator Value() const { return value_; }
-  constexpr std::strong_ordering operator<=>(const StmtType& mode) const = default;
+  constexpr std::strong_ordering operator<=>(const StmtType&) const = default;
   constexpr bool operator==(const Value& value) const { return value_ == value; }
   constexpr bool operator!=(const Value& value) const { return value_ != value; }
   constexpr bool operator<(const Value& value) const { return value_ < value; }
@@ -151,6 +151,6 @@ private:
   Value value_ = Value::kNone;
 };
 
-std::ostream& operator<<(std::ostream& os, const StmtType& stmt_type);
+std::ostream& operator<<(std::ostream& os, const StmtType& type);
 
 } // scc::ast

@@ -7,55 +7,55 @@ SymbolType::SymbolType(Value value) {
     throw std::invalid_argument("Incorrect value for Symbol Type");
   this->value_ = value;
 }
-SymbolType::SymbolType(const std::string& str_sym_type) {
-  std::string sym_type = scc::common::LowerCase(str_sym_type);
-  if (sym_type == SYMT_UNKNOWN)
+SymbolType::SymbolType(const std::string_view& str_type) {
+  std::string type = scc::common::UpperCase(std::string(str_type));
+  if (type == kSYMT_Unknown)
     this->value_ = kUnknown;
-  else if (sym_type == SYMT_SPACE)
+  else if (type == kSYMT_Space)
     this->value_ = kSpace;
-  else if (sym_type == SYMT_DIGIT)
+  else if (type == kSYMT_Digit)
     this->value_ = kDigit;
-  else if (sym_type == SYMT_ALPHA)
+  else if (type == kSYMT_Alpha)
     this->value_ = kAlpha;
-  else if (sym_type == SYMT_OPERATOR)
+  else if (type == kSYMT_Operator)
     this->value_ = kOperator;
-  else if (sym_type == SYMT_BRACKET)
+  else if (type == kSYMT_Bracket)
     this->value_ = kBracket;
-  else if (sym_type == SYMT_PUNCTUATION)
+  else if (type == kSYMT_Punctuation)
     this->value_ = kPunctuation;
-  else if (sym_type == SYMT_EOF)
+  else if (type == kSYMT_EOF)
     this->value_ = kEOF;
-  else if (sym_type == SYMT_NULL_TERMINATOR)
+  else if (type == kSYMT_NullTerminator)
     this->value_ = kNullTerminator;
   else
-    throw std::invalid_argument("No Symbol Type for '" + str_sym_type + "'");
+    throw std::invalid_argument("No Symbol Type for '" + std::string(str_type) + "'");
 }
 
 std::string SymbolType::ToString() const {
   switch (value_) {
     case kUnknown:
-      return SYMT_UNKNOWN;
+      return std::string(kSYMT_Unknown);
     case kSpace:
-      return SYMT_SPACE;
+      return std::string(kSYMT_Space);
     case kDigit:
-      return SYMT_DIGIT;
+      return std::string(kSYMT_Digit);
     case kAlpha:
-      return SYMT_ALPHA;
+      return std::string(kSYMT_Alpha);
     case kOperator:
-      return SYMT_OPERATOR;
+      return std::string(kSYMT_Operator);
     case kBracket:
-      return SYMT_BRACKET;
+      return std::string(kSYMT_Bracket);
     case kPunctuation:
-      return SYMT_PUNCTUATION;
+      return std::string(kSYMT_Punctuation);
     case kEOF:
-      return SYMT_EOF;
+      return std::string(kSYMT_EOF);
     case kNullTerminator:
-      return SYMT_NULL_TERMINATOR;
+      return std::string(kSYMT_NullTerminator);
   }
 }
 
-std::ostream& operator<<(std::ostream& os, const SymbolType& mode) {
-  os << mode.ToString();
+std::ostream& operator<<(std::ostream& os, const SymbolType& type) {
+  os << type.ToString();
   return os;
 }
 
