@@ -4,6 +4,10 @@ namespace scc::translator {
 
 using namespace ast;
 
+template<typename NodeType,
+    typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
+using NodePtr = std::shared_ptr<NodeType>;
+
 void Translator::TranslatePrimaryKey(const NodePtr<INode>& key, std::string& constraint_name,
                                      std::string& table_name) {
   if (key->stmt_type != StmtType::kPrimaryKey) {

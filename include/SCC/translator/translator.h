@@ -45,26 +45,27 @@ private:
   void TranslateDDLStatement(const std::shared_ptr<ast::INode>& ddl_statement);
   void TranslateDMLStatement(const std::shared_ptr<ast::INode>& dml_statement);
 
-  void TranslateCreateDatabase(const std::shared_ptr<ast::INode>& node);
-  void TranslateCreateTable(const std::shared_ptr<ast::INode>& node);
-  void TranslateAlterTable(const std::shared_ptr<ast::INode>& node);
-  void TranslateDropDatabase(const std::shared_ptr<ast::INode>& node);
-  void TranslateDropTable(const std::shared_ptr<ast::INode>& node);
+  void TranslateCreateDatabaseStatement(const std::shared_ptr<ast::INode>& stmt);
+  void TranslateCreateTableStatement(const std::shared_ptr<ast::INode>& stmt);
+  void TranslateAlterTableStatement(const std::shared_ptr<ast::INode>& stmt);
+  void TranslateDropDatabaseStatement(const std::shared_ptr<ast::INode>& stmt);
+  void TranslateDropTableStatement(const std::shared_ptr<ast::INode>& stmt);
 
   void TranslateAlterTableActionAdd(const std::shared_ptr<ast::INode>& action_node,
                                     std::string& table_name);
   void TranslateAlterTableActionDrop(const std::shared_ptr<ast::INode>& action_node,
                                      std::string& table_name);
 
-  std::vector<StdProperty> TranslateListOfColumnDefinitions(const std::shared_ptr<ast::INode>& node);
+  std::vector<StdProperty> TranslateColumnDefinitions(
+      const std::shared_ptr<ast::INode>& column_definition);
   StdProperty TranslateColumnDefinition(const std::shared_ptr<ast::INode>& node);
 
   void TranslateListOfTableConstraints(const std::shared_ptr<ast::INode>& node,
                                        std::string& table_name);
   std::shared_ptr<ast::INode> FindConstraint(const std::shared_ptr<ast::INode>& node);
 
-  void TranslateDropObject(const std::shared_ptr<ast::INode>& node, std::string& table_name);
-  void TranslateListOfDropObjects(const std::shared_ptr<ast::INode>& node, std::string& table_name);
+  void TranslateDropElement(const std::shared_ptr<ast::INode>& node, std::string& table_name);
+  void TranslateDropElements(const std::shared_ptr<ast::INode>& node, std::string& table_name);
 
   void TranslateInsertStatement(const std::shared_ptr<ast::INode>& insert_stmt);
   void TranslateDeleteStatement(const std::shared_ptr<ast::INode>& delete_stmt);
