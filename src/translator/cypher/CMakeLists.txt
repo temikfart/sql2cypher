@@ -1,4 +1,5 @@
 set(DIRS
+        clauses
         graph
 )
 foreach(DIR ${DIRS})
