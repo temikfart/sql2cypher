@@ -3,6 +3,7 @@
 namespace scc::translator {
 
 using namespace ast;
+using namespace ast::common;
 
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
@@ -10,19 +11,15 @@ using NodePtr = std::shared_ptr<NodeType>;
 
 void Translator::TranslatePrimaryKey(const NodePtr<INode>& key, std::string& constraint_name,
                                      std::string& table_name) {
-  if (key->stmt_type != StmtType::kPrimaryKey) {
-    LOGE << "incorrect type for primaryKey node";
-    end(EXIT_FAILURE);
-  }
-  if (key->ChildrenCount() == 0) {
-    LOGE << "PRIMARY KEY definition is missed";
-    end(EXIT_FAILURE);
-  }
-
   std::vector<std::string> properties;
-  properties.push_back(TranslateIdentifier(key->get_child(0)));
-  if (key->ChildrenCount() > 1) {
-    std::vector<std::string> other_properties = GetListOf(key->get_child(1), StmtType::kIdentifier);
+  auto column_name_node = key->get_child(0);
+  ValidateHasChildren(column_name_node);
+  properties.push_back(TranslateName(column_name_node));
+
+  if (HasChildren(key, 2)) {
+    auto other_column_name_node = key->get_child(1);
+    ValidateHasChildren(other_column_name_node);
+    std::vector<std::string> other_properties = GetListOf(other_column_name_node, StmtType::kName);
     properties.insert(properties.end(), other_properties.begin(), other_properties.end());
   }
 
@@ -40,47 +37,39 @@ void Translator::TranslatePrimaryKey(const NodePtr<INode>& key, std::string& con
   }
 }
 void Translator::TranslateForeignKey(const NodePtr<INode>& key, std::string& table_name) {
-  if (key->stmt_type != StmtType::kForeignKey) {
-    LOGE << "incorrect type for foreignKey node";
-    end(EXIT_FAILURE);
-  }
-  if (key->ChildrenCount() == 0) {
-    LOGE << "PRIMARY KEY definition is missed";
-    end(EXIT_FAILURE);
-  }
   int reference_child_num = 1;
 
   std::vector<std::string> properties;
-  properties.push_back(TranslateName(key->get_child(0)));
-  if (key->ChildrenCount() > 2) {
-    if (key->get_child(1)->stmt_type != StmtType::kCommaDelimiter) {
-      LOGE << "invalid delimiter between properties in foreign key";
-      end(EXIT_FAILURE);
-    }
+  auto column_name_node = key->get_child(0);
+  ValidateHasChildren(column_name_node);
+  properties.push_back(TranslateName(column_name_node));
+
+  if (HasChildren(key, 3)) {
     reference_child_num++;
-    std::vector<std::string> other_properties = GetListOf(key->get_child(1), StmtType::kName);
+    auto separator_node = key->get_child(1);
+    ValidateIsCorrectStmtType(separator_node, StmtType::kCommaDelimiter);
+    std::vector<std::string> other_properties = GetListOf(separator_node, StmtType::kName);
     properties.insert(properties.end(), other_properties.begin(), other_properties.end());
   }
 
-  // Get reference
   auto reference = key->get_child(reference_child_num);
-  if (reference->stmt_type != StmtType::kReferencesKW) {
-    LOGE << "invalid foreign key: incorrect reference statement type";
-    end(EXIT_FAILURE);
-  }
-  if (reference->ChildrenCount() == 0) {
-    LOGE << "empty reference";
-    end(EXIT_FAILURE);
-  }
+  ValidateIsCorrectStmtType(reference, StmtType::kReferencesKW);
+
+  ValidateHasChildren(reference);
   auto table_name_node = reference->get_child(0);
+
+  ValidateHasChildren(table_name_node);
   std::string ref_table_name = TranslateName(table_name_node);
 
-  // Get ref columns if present
   std::vector<std::string> ref_columns;
-  if (reference->ChildrenCount() > 1) {
-    ref_columns.push_back(TranslateName(reference->get_child(1)));
-    if (reference->ChildrenCount() > 2) {
-      std::vector<std::string> other_props = GetListOf(reference->get_child(2), StmtType::kName);
+  if (HasChildren(reference, 2)) {
+    auto ref_column_name_node = reference->get_child(1);
+    ValidateHasChildren(ref_column_name_node);
+    ref_columns.push_back(TranslateName(ref_column_name_node));
+    if (HasChildren(reference, 3)) {
+      auto other_ref_column_name_node = reference->get_child(2);
+      ValidateHasChildren(other_ref_column_name_node);
+      std::vector<std::string> other_props = GetListOf(other_ref_column_name_node, StmtType::kName);
       ref_columns.insert(ref_columns.end(), other_props.begin(), other_props.end());
     }
   }
@@ -135,15 +124,6 @@ void Translator::RemoveProperties(const std::string& label_name,
 }
 
 std::vector<std::string> Translator::GetListOf(const NodePtr<INode>& node, StmtType type) {
-  if (node->stmt_type != StmtType::kCommaDelimiter) {
-    LOGE << "invalid ListOf: delimiter is not a comma";
-    end(EXIT_FAILURE);
-  }
-  if (node->ChildrenCount() == 0) {
-    LOGE << "invalid ListOf: comma without children";
-    end(EXIT_FAILURE);
-  }
-
   std::vector<std::string> arguments;
   switch (type) {
     case StmtType::kName:
@@ -157,8 +137,10 @@ std::vector<std::string> Translator::GetListOf(const NodePtr<INode>& node, StmtT
       end(EXIT_FAILURE);
   }
 
-  if (node->ChildrenCount() > 1) {
-    std::vector<std::string> other_arguments = GetListOf(node->get_child(1), type);
+  if (HasChildren(node, 2)) {
+    auto next_separator_node = node->get_child(1);
+    ValidateHasChildren(next_separator_node);
+    std::vector<std::string> other_arguments = GetListOf(next_separator_node, type);
     arguments.insert(arguments.end(), other_arguments.begin(), other_arguments.end());
   }
 
@@ -166,46 +148,33 @@ std::vector<std::string> Translator::GetListOf(const NodePtr<INode>& node, StmtT
 }
 
 std::string Translator::TranslateName(const NodePtr<INode>& node) {
-  if (node->ChildrenCount() == 0) {
-    LOGE << "empty name node";
-    end(EXIT_FAILURE);
-  }
-
   std::ostringstream name;
-  name << TranslateIdentifier(node->get_child(0));
-  if (node->ChildrenCount() > 1) {
-    if (node->get_child(1)->stmt_type == StmtType::kDotDelimiter) {
-      name << TranslateIdentifiers(node->get_child(1));
-    } else {
-      LOGE << "invalid name: delimiter is not a dot";
-      end(EXIT_FAILURE);
-    }
+  auto identifier_node = node->get_child(0);
+  ValidateHasChildren(identifier_node);
+  name << TranslateIdentifier(identifier_node);
+  if (HasChildren(node, 2)) {
+    auto dot_delimiter_node = node->get_child(1);
+    ValidateIsCorrectStmtType(dot_delimiter_node, StmtType::kDotDelimiter);
+    name << TranslateIdentifiers(dot_delimiter_node);
   }
 
   return name.str();
 }
 std::string Translator::TranslateIdentifiers(const NodePtr<INode>& node) {
-  if (node->ChildrenCount() == 0) {
-    LOGE << "invalid list of identifiers";
-    end(EXIT_FAILURE);
-  }
-
   std::ostringstream identifiers;
-  identifiers << "." << TranslateIdentifier(node->get_child(0));
+  auto identifier_node = node->get_child(0);
+  ValidateHasChildren(identifier_node);
+  identifiers << "." << TranslateIdentifier(identifier_node);
 
-  if (node->ChildrenCount() > 1) {
-    identifiers << TranslateIdentifiers(node->get_child(1));
+  if (HasChildren(node, 2)) {
+    auto dot_delimiter_node = node->get_child(1);
+    identifiers << TranslateIdentifiers(dot_delimiter_node);
   }
 
   return identifiers.str();
 }
 std::string Translator::TranslateIdentifier(const NodePtr<INode>& node) {
-  if (node->ChildrenCount() == 0) {
-    LOGE << "empty identifier";
-    end(EXIT_FAILURE);
-  }
-
-  return std::dynamic_pointer_cast<StringNode>(node->get_child(0))->data;
+  return ASTUtils::CastToNodeType<StringNode>(node->get_child(0))->data;
 }
 
 } // scc::translator

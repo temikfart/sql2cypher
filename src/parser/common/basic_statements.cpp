@@ -137,11 +137,11 @@ NodePtr<INode> Parser::ParsePrimaryKey() {
   NextToken();
 
   ValidateHasTokens("Missed column name at line " + std::to_string(line));
-  NodePtr<INode> column_name = ParseIdentifier();
+  NodePtr<INode> column_name = ParseColumnName();
   ASTUtils::Link(primary_key, column_name);
 
   if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
-    NodePtr<INode> separator = ParseListOf(StmtType::kIdentifier);
+    NodePtr<INode> separator = ParseListOf(StmtType::kName);
     ASTUtils::Link(primary_key, separator);
   }
 
