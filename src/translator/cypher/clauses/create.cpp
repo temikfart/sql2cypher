@@ -29,7 +29,7 @@ std::string CreateConstraintClauseBuilder::Build(const std::string& constraint_n
   ss << ")" << "\n";
 
   ss << "REQUIRE (" << variable_name << "." << property.name << ")";
-  ss << "IS " << common::UpperCase(type.ToString());
+  ss << " IS " << common::UpperCase(type.ToString());
 
   return ss.str();
 }

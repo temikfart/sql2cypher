@@ -7,12 +7,14 @@
 #include <tuple>
 #include <string>
 #include <sstream>
+#include <vector>
 #include <utility>
 
 #include "SCC/ast/nodes/inode.h"
 #include "SCC/config/scc_config.h"
 #include "SCC/log/log.h"
 #include "SCC/parser/parser.h"
+#include "SCC/translator/cypher/clauses/create.h"
 
 #include "logger/log.hpp"
 
@@ -56,9 +58,9 @@ private:
   void TranslateAlterTableActionDrop(const std::shared_ptr<ast::INode>& action_node,
                                      std::string& table_name);
 
-  std::vector<StdProperty> TranslateColumnDefinitions(
+  std::vector<cypher::NodeProperty> TranslateColumnDefinitions(
       const std::shared_ptr<ast::INode>& column_definition);
-  StdProperty TranslateColumnDefinition(const std::shared_ptr<ast::INode>& node);
+  cypher::NodeProperty TranslateColumnDefinition(const std::shared_ptr<ast::INode>& node);
 
   void TranslateListOfTableConstraints(const std::shared_ptr<ast::INode>& node,
                                        std::string& table_name);
@@ -76,12 +78,10 @@ private:
   void TranslatePrimaryKey(const std::shared_ptr<ast::INode>& key, std::string& constraint_name,
                            std::string& table_name);
   void TranslateForeignKey(const std::shared_ptr<ast::INode>& key, std::string& table_name);
-  void CreateUniqueNodePropertyConstraint(const std::string& constraint_name,
-                                          const std::string& LabelName,
-                                          const std::vector<std::string>& properties);
-  void CreateNodePropertyExistenceConstraint(const std::string& constraint_name,
-                                             const std::string& LabelName,
-                                             const std::string& property);
+  void TranslateConstraint(const std::string& constraint_name,
+                           const std::string& label_name,
+                           const std::string& property,
+                           cypher::ConstraintType constraint_type);
   void CreateRelationship(const std::string& label_name, const std::string& ref_label_name);
   void RemoveProperties(const std::string& label_name, const std::vector<std::string>& properties);
 

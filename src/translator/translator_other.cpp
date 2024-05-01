@@ -23,17 +23,11 @@ void Translator::TranslatePrimaryKey(const NodePtr<INode>& key, std::string& con
     properties.insert(properties.end(), other_properties.begin(), other_properties.end());
   }
 
-  CreateUniqueNodePropertyConstraint(
-      constraint_name + "_" + std::to_string(constraint_counter++),
-      table_name,
-      properties
-  );
-  for (auto& i: properties) {
-    CreateNodePropertyExistenceConstraint(
-        constraint_name + "_" + std::to_string(constraint_counter++),
-        table_name,
-        i
-    );
+  for (const auto& property: properties) {
+    TranslateConstraint(constraint_name + "_" + std::to_string(constraint_counter++), table_name,
+                        property, cypher::ConstraintType::kUniqueness);
+    TranslateConstraint(constraint_name + "_" + std::to_string(constraint_counter++), table_name,
+                        property, cypher::ConstraintType::kExistence);
   }
 }
 void Translator::TranslateForeignKey(const NodePtr<INode>& key, std::string& table_name) {
@@ -78,34 +72,32 @@ void Translator::TranslateForeignKey(const NodePtr<INode>& key, std::string& tab
 //  RemoveProperties(table_name, ref_columns);
   CreateRelationship(table_name, ref_table_name);
 }
-void Translator::CreateUniqueNodePropertyConstraint(const std::string& constraint_name,
-                                                    const std::string& LabelName,
-                                                    const std::vector<std::string>& properties) {
-  out_ << "CREATE CONSTRAINT " << constraint_name << " IF NOT EXISTS" << std::endl;
-  out_ << "FOR (n:" << LabelName << ")" << std::endl;
-  out_ << "REQUIRE (";
-  for (size_t i = 0; i < properties.size(); i++) {
-    out_ << "n." << properties[i];
-    if (i + 1 != properties.size()) {
-      out_ << ", ";
-    }
-  }
-  out_ << ") IS UNIQUE;\n" << std::endl;
-}
-void Translator::CreateNodePropertyExistenceConstraint(const std::string& constraint_name,
-                                                       const std::string& LabelName,
-                                                       const std::string& property) {
-  out_ << "CREATE CONSTRAINT " << constraint_name << " IF NOT EXISTS" << std::endl;
-  out_ << "FOR (n:" << LabelName << ")" << std::endl;
-  out_ << "REQUIRE (n." << property << ") IS NOT NULL;\n" << std::endl;
+void Translator::TranslateConstraint(const std::string& constraint_name,
+                                     const std::string& label_name,
+                                     const std::string& property,
+                                     cypher::ConstraintType constraint_type) {
+  cypher::Node node = cypher::Node(cypher::Label(label_name));
+  cypher::NodeProperty prop(property, std::string(cypher::stub_str),
+                            cypher::PropertyType::kUnknown);
+  out_ << cypher::CreateConstraintClauseBuilder::Build(constraint_name, node, prop,
+                                                       constraint_type);
+  out_ << ";\n" << std::endl;
 }
 void Translator::CreateRelationship(const std::string& label_name,
                                     const std::string& ref_label_name) {
-  out_ << "MATCH (a:" << label_name << "), (b:" << ref_label_name << ")\n";
-  out_ << "CREATE (a)-[r:fk_" << label_name
-       << "_to_" << ref_label_name << "_" << relationship_counter
-       << "]->(b);\n" << std::endl;
-  relationship_counter++;
+  cypher::Node start_node((cypher::Label(label_name)));
+  start_node.SetVariable("a");
+
+  cypher::Node end_node((cypher::Label(ref_label_name)));
+  end_node.SetVariable("b");
+
+  std::string rel_type = "fk_" + label_name + "_to_" + ref_label_name
+      + "_" + std::to_string(relationship_counter++);
+  cypher::Relationship relationship(rel_type, start_node, end_node,
+                                    cypher::Relationship::Direction::kRight);
+
+  out_ << cypher::CreateRelationshipClauseBuilder::Build(relationship);
+  out_ << ";\n" << std::endl;
 }
 void Translator::RemoveProperties(const std::string& label_name,
                                   const std::vector<std::string>& properties) {
@@ -133,8 +125,7 @@ std::vector<std::string> Translator::GetListOf(const NodePtr<INode>& node, StmtT
       arguments.push_back(TranslateIdentifier(node->get_child(0)));
       break;
     default:
-      LOGE << "invalid ListOf: unknown argument type";
-      end(EXIT_FAILURE);
+      throw translation_error("Unknown argument type for list of elements");
   }
 
   if (HasChildren(node, 2)) {
