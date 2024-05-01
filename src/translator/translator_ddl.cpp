@@ -45,7 +45,7 @@ void Translator::TranslateCreateTableStatement(const NodePtr<INode>& stmt) {
   auto table_name_node = stmt->get_child(0);
   ValidateHasChildren(table_name_node);
   std::string table_name = TranslateName(table_name_node);
-  out_ << "CREATE (:" << table_name;
+  cypher::Node node((cypher::Label(table_name)));
 
   ValidateHasChildren(stmt, 2, "Missing table definition" + msg_suffix);
   auto table_definition = stmt->get_child(1);
@@ -54,9 +54,8 @@ void Translator::TranslateCreateTableStatement(const NodePtr<INode>& stmt) {
   auto column_definition = table_definition->get_child(0);
 
   ValidateIsCorrectStmtType(column_definition, StmtType::kColumnDef);
-  out_ << " {";
   cypher::NodeProperty first_property = TranslateColumnDefinition(column_definition);
-  out_ << first_property.name << ": " << first_property.value;
+  node.AddProperty(first_property);
 
   if (HasChildren(table_definition, 2)) {
     auto comma = table_definition->get_child(1);
@@ -67,11 +66,13 @@ void Translator::TranslateCreateTableStatement(const NodePtr<INode>& stmt) {
     if (IsCorrectStmtType(comma->get_child(0), StmtType::kColumnDef)) {
       std::vector<cypher::NodeProperty> other_props = TranslateColumnDefinitions(comma);
       for (auto& prop: other_props) {
-        out_ << ", " << prop.name << ": " << prop.value;
+        node.AddProperty(prop);
       }
     }
   }
-  out_ << "});\n" << std::endl;
+
+  out_ << cypher::CreateNodeClauseBuilder::Build(node);
+  out_ << ";\n" << std::endl;
 
   if (HasChildren(table_definition, 2)) {
     auto constraints = FindConstraint(table_definition->get_child(1));
@@ -117,14 +118,22 @@ void Translator::TranslateDropDatabaseStatement(const NodePtr<INode>& stmt) {
 void Translator::TranslateDropTableStatement(const NodePtr<INode>& stmt) {
   auto table_name_node = stmt->get_child(0);
   ValidateHasChildren(table_name_node);
-  out_ << "MATCH (x:" << TranslateName(table_name_node) << ") DELETE x;\n" << std::endl;
+
+  std::string table_name = TranslateName(table_name_node);
+  cypher::Node node((cypher::Label(table_name)));
+  out_ << cypher::DeleteNodeClauseBuilder::Build(node);
+  out_ << ";\n";
 
   if (HasChildren(stmt, 2)) {
     std::vector<std::string> other_table_names = GetListOf(stmt->get_child(1), StmtType::kName);
-    for (auto& i: other_table_names) {
-      out_ << "MATCH (x:" << i << ") DELETE x;\n" << std::endl;
+    for (auto& other_table_name: other_table_names) {
+      cypher::Node other_node((cypher::Label(other_table_name)));
+      out_ << cypher::DeleteNodeClauseBuilder::Build(other_node);
+      out_ << ";\n";
     }
   }
+
+  out_ << std::endl;
 }
 
 void Translator::TranslateAlterTableActionAdd(const NodePtr<INode>& action_node,
@@ -137,11 +146,11 @@ void Translator::TranslateAlterTableActionAdd(const NodePtr<INode>& action_node,
   auto first_argument = table_definition->get_child(0);
 
   if (IsCorrectStmtType(first_argument, StmtType::kColumnDef)) {
-    out_ << "MATCH (n:" << table_name << ")\n";
-    out_ << "SET ";
+    cypher::Node node((cypher::Label(table_name)));
 
     cypher::NodeProperty first_prop = TranslateColumnDefinition(first_argument);
-    out_ << "n." << first_prop.name << " = " << first_prop.value;
+    out_ << cypher::SetPropertyClauseBuilder::Build(node, first_prop);
+    out_ << ";\n";
 
     if (HasChildren(table_definition, 2)) {
       auto comma = table_definition->get_child(1);
@@ -150,12 +159,13 @@ void Translator::TranslateAlterTableActionAdd(const NodePtr<INode>& action_node,
       if (IsCorrectStmtType(comma->get_child(0), StmtType::kColumnDef)) {
         std::vector<cypher::NodeProperty> other_props = TranslateColumnDefinitions(comma);
         for (auto& prop: other_props) {
-          out_ << ", n." << prop.name << " = " << prop.value;
+          out_ << cypher::SetPropertyClauseBuilder::Build(node, prop);
+          out_ << ";\n";
         }
       }
     }
 
-    out_ << ";\n" << std::endl;
+    out_ << std::endl;
 
     auto constraints = FindConstraint(table_definition->get_child(1));
     if (constraints != nullptr) {
@@ -306,12 +316,11 @@ void Translator::TranslateDropElement(const NodePtr<INode>& node, std::string& t
 
   switch (node->stmt_type) {
     case StmtType::kDropColumn:
-      out_ << "MATCH (n:" << table_name << ")\n";
-      out_ << "SET n." << argument << " = null";
-      for (auto& i: other_arguments) {
-        out_ << ", n." << i << " = null";
+      for (const auto& arg: other_arguments) {
+        RemoveProperty(table_name, arg);
+        out_ << ";" << std::endl;
       }
-      out_ << ";\n" << std::endl;
+      out_ << std::endl;
       break;
     case StmtType::kDropConstraint:
       out_ << "DROP CONSTRAINT " << argument << ";\n" << std::endl;

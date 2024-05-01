@@ -68,8 +68,13 @@ void Translator::TranslateForeignKey(const NodePtr<INode>& key, std::string& tab
     }
   }
 
-//  RemoveProperties(table_name, properties);
-//  RemoveProperties(table_name, ref_columns);
+  // TODO: Match all nodes with correspond labels and remove properties.
+//  for (const auto& property: properties) {
+//    RemoveProperty(table_name, property);
+//  }
+//  for (const auto& ref_property: ref_columns) {
+//    RemoveProperty(ref_table_name, ref_property);
+//  }
   CreateRelationship(table_name, ref_table_name);
 }
 void Translator::TranslateConstraint(const std::string& constraint_name,
@@ -99,19 +104,9 @@ void Translator::CreateRelationship(const std::string& label_name,
   out_ << cypher::CreateRelationshipClauseBuilder::Build(relationship);
   out_ << ";\n" << std::endl;
 }
-void Translator::RemoveProperties(const std::string& label_name,
-                                  const std::vector<std::string>& properties) {
-  if (properties.empty()) {
-    return;
-  }
-  out_ << "MATCH (n:" << label_name << ")\n";
-  out_ << "SET ";
-  for (size_t i = 0; i < properties.size(); i++) {
-    out_ << "n." << properties[i] << " = null";
-    if (i + 1 != properties.size()) {
-      out_ << ", ";
-    }
-  }
+void Translator::RemoveProperty(const std::string& label_name, const std::string& property_name) {
+  cypher::Node node = cypher::Node(cypher::Label(label_name));
+  out_ << cypher::RemovePropertyClauseBuilder::Build(node, property_name);
   out_ << ";\n" << std::endl;
 }
 
