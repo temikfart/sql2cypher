@@ -19,9 +19,7 @@ struct Label {
 };
 
 std::ostream& operator<<(std::ostream& os, const Label& label);
-constexpr bool operator<(const Label& lhs, const Label& rhs) {
-  return lhs.value < rhs.value;
-}
+bool operator<(const Label& lhs, const Label& rhs);
 
 struct NodeProperty {
   std::string name;
@@ -34,12 +32,7 @@ struct NodeProperty {
 };
 
 std::ostream& operator<<(std::ostream& os, const NodeProperty& property);
-constexpr bool operator<(const NodeProperty& lhs, const NodeProperty& rhs) {
-  if (lhs.type != rhs.type) {
-    return lhs.type < rhs.type;
-  }
-  return lhs.name < rhs.name;
-}
+bool operator<(const NodeProperty& lhs, const NodeProperty& rhs);
 
 struct Node {
   std::set<Label> labels;
