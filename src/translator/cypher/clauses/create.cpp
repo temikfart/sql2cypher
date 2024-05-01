@@ -3,11 +3,11 @@
 namespace scc::translator::cypher {
 
 std::string CreateDatabaseClauseBuilder::Build(const std::string& database_name) {
-  return "CREATE DATABASE " + database_name + ";";
+  return "CREATE DATABASE " + database_name;
 }
 
 std::string CreateNodeClauseBuilder::Build(const Node& node) {
-  return "CREATE " + node.ToString() + ";";
+  return "CREATE " + node.ToString();
 }
 
 std::string CreateConstraintClauseBuilder::Build(const std::string& constraint_name,
@@ -31,6 +31,13 @@ std::string CreateConstraintClauseBuilder::Build(const std::string& constraint_n
   ss << "REQUIRE (" << variable_name << "." << property.name << ")";
   ss << "IS " << common::UpperCase(type.ToString());
 
+  return ss.str();
+}
+
+std::string CreateRelationshipClauseBuilder::Build(const Relationship& relationship) {
+  std::stringstream ss;
+  ss << "MATCH " << relationship.start.ToString() << ", " << relationship.end.ToString() << "\n";
+  ss << "CREATE " << relationship.ToString();
   return ss.str();
 }
 
