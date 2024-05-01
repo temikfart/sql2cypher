@@ -32,9 +32,12 @@ void Translator::TranslateDDLStatement(const NodePtr<INode>& ddl_statement) {
 }
 
 void Translator::TranslateCreateDatabaseStatement(const NodePtr<INode>& stmt) {
-  out_ << "CREATE DATABASE "
-       << TranslateName(stmt->get_child(0))
-       << ";\n" << std::endl;
+  auto database_name_node = stmt->get_child(0);
+  ValidateHasChildren(database_name_node);
+  std::string database_name = TranslateName(database_name_node);
+
+  out_ << cypher::CreateDatabaseClauseBuilder::Build(database_name);
+  out_ << ";\n" << std::endl;
 }
 void Translator::TranslateCreateTableStatement(const NodePtr<INode>& stmt) {
   const std::string msg_suffix = " in \'CREATE TABLE\' statement";
@@ -52,8 +55,8 @@ void Translator::TranslateCreateTableStatement(const NodePtr<INode>& stmt) {
 
   ValidateIsCorrectStmtType(column_definition, StmtType::kColumnDef);
   out_ << " {";
-  StdProperty first_property = TranslateColumnDefinition(column_definition);
-  out_ << std::get<0>(first_property) << ": " << std::get<1>(first_property);
+  cypher::NodeProperty first_property = TranslateColumnDefinition(column_definition);
+  out_ << first_property.name << ": " << first_property.value;
 
   if (HasChildren(table_definition, 2)) {
     auto comma = table_definition->get_child(1);
@@ -62,9 +65,9 @@ void Translator::TranslateCreateTableStatement(const NodePtr<INode>& stmt) {
         + ": comma without next element");
 
     if (IsCorrectStmtType(comma->get_child(0), StmtType::kColumnDef)) {
-      std::vector<StdProperty> other_props = TranslateColumnDefinitions(comma);
-      for (auto& i: other_props) {
-        out_ << ", " << std::get<0>(i) << ": " << std::get<1>(i);
+      std::vector<cypher::NodeProperty> other_props = TranslateColumnDefinitions(comma);
+      for (auto& prop: other_props) {
+        out_ << ", " << prop.name << ": " << prop.value;
       }
     }
   }
@@ -137,17 +140,17 @@ void Translator::TranslateAlterTableActionAdd(const NodePtr<INode>& action_node,
     out_ << "MATCH (n:" << table_name << ")\n";
     out_ << "SET ";
 
-    StdProperty first_prop = TranslateColumnDefinition(first_argument);
-    out_ << "n." << std::get<0>(first_prop) << " = " << std::get<1>(first_prop);
+    cypher::NodeProperty first_prop = TranslateColumnDefinition(first_argument);
+    out_ << "n." << first_prop.name << " = " << first_prop.value;
 
     if (HasChildren(table_definition, 2)) {
       auto comma = table_definition->get_child(1);
       ValidateIsCorrectStmtType(comma, StmtType::kCommaDelimiter);
 
       if (IsCorrectStmtType(comma->get_child(0), StmtType::kColumnDef)) {
-        std::vector<StdProperty> other_props = TranslateColumnDefinitions(comma);
-        for (auto& i: other_props) {
-          out_ << ", n." << std::get<0>(i) << " = " << std::get<1>(i);
+        std::vector<cypher::NodeProperty> other_props = TranslateColumnDefinitions(comma);
+        for (auto& prop: other_props) {
+          out_ << ", n." << prop.name << " = " << prop.value;
         }
       }
     }
@@ -180,25 +183,25 @@ void Translator::TranslateAlterTableActionDrop(const NodePtr<INode>& action_node
   }
 }
 
-std::vector<StdProperty> Translator::TranslateColumnDefinitions(
+std::vector<cypher::NodeProperty> Translator::TranslateColumnDefinitions(
     const NodePtr<INode>& column_definition) {
   auto argument = column_definition->get_child(0);
   ValidateIsCorrectStmtType(argument, StmtType::kColumnDef);
 
   ValidateHasChildren(argument);
-  std::vector<StdProperty> column_definitions;
+  std::vector<cypher::NodeProperty> column_definitions;
   column_definitions.push_back(TranslateColumnDefinition(argument));
   if (HasChildren(column_definition, 2)) {
     auto comma = column_definition->get_child(1);
     if (IsCorrectStmtType(comma->get_child(0), StmtType::kColumnDef)) {
-      std::vector<StdProperty> other_cols = TranslateColumnDefinitions(comma);
+      std::vector<cypher::NodeProperty> other_cols = TranslateColumnDefinitions(comma);
       column_definitions.insert(column_definitions.end(), other_cols.begin(), other_cols.end());
     }
   }
 
   return column_definitions;
 }
-StdProperty Translator::TranslateColumnDefinition(const NodePtr<INode>& node) {
+cypher::NodeProperty Translator::TranslateColumnDefinition(const NodePtr<INode>& node) {
   auto column_name_node = node->get_child(0);
   ValidateHasChildren(column_name_node);
   std::string column_name = TranslateIdentifier(column_name_node);
@@ -207,22 +210,26 @@ StdProperty Translator::TranslateColumnDefinition(const NodePtr<INode>& node) {
   StmtType datatype = node->get_child(1)->stmt_type;
 
   std::string datatype_str;
+  cypher::PropertyType property_type;
   switch (datatype) {
     case StmtType::kIntType:
       datatype_str = "0";
+      property_type = cypher::PropertyType::kInteger;
       break;
     case StmtType::kFloatType:
       datatype_str = "0.0";
+      property_type = cypher::PropertyType::kFloat;
       break;
     case StmtType::kCharType:
     case StmtType::kVarcharType:
       datatype_str = "\"\"";
+      property_type = cypher::PropertyType::kString;
       break;
     default:
       throw translation_error("Unknown SQL datatype \'" + datatype.ToString() + "\'");
   }
 
-  return std::tie(column_name, datatype_str);
+  return cypher::NodeProperty(column_name, datatype_str, property_type);
 }
 
 void Translator::TranslateListOfTableConstraints(const NodePtr<INode>& node,

@@ -10,6 +10,8 @@
 
 namespace scc::translator::cypher {
 
+constexpr std::string_view stub_str = "stub";
+
 struct Label {
   std::string value;
 
