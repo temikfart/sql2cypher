@@ -15,6 +15,8 @@
 #include "SCC/log/log.h"
 #include "SCC/parser/parser.h"
 #include "SCC/translator/cypher/clauses/create.h"
+#include "SCC/translator/cypher/clauses/delete.h"
+#include "SCC/translator/cypher/clauses/set.h"
 
 #include "logger/log.hpp"
 
@@ -83,7 +85,7 @@ private:
                            const std::string& property,
                            cypher::ConstraintType constraint_type);
   void CreateRelationship(const std::string& label_name, const std::string& ref_label_name);
-  void RemoveProperties(const std::string& label_name, const std::vector<std::string>& properties);
+  void RemoveProperty(const std::string& label_name, const std::string& property_name);
 
   std::vector<std::string> GetListOf(const std::shared_ptr<ast::INode>& node, ast::StmtType type);
 
