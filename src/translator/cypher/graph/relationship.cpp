@@ -1,19 +1,25 @@
+#include <utility>
+
 #include "SCC/translator/cypher/graph/relationship.h"
 
 namespace scc::translator::cypher {
 
 Relationship::Relationship(std::string type, Node start, Node end, Direction direction)
-    : type(type), start(std::move(start)), end(std::move(end)), direction(direction) {}
+    : type(std::move(type)), start(std::move(start)), end(std::move(end)), direction(direction) {}
 Relationship::Relationship(std::string type, Node start, Node end, std::string variable,
                            Direction direction)
-    : type(type), start(std::move(start)), end(std::move(end)), direction(direction),
+    : type(std::move(type)), start(std::move(start)), end(std::move(end)), direction(direction),
       variable(std::move(variable)) {}
 
 std::string Relationship::ToString() const {
   std::stringstream ss;
-  ss << start.ToString() << GetLeftArrow();
+  ss << (start.variable.empty() ? start.ToString() : "(" + start.variable + ")");
+  ss << GetLeftArrow();
   ss << "[" << variable << ":" << type << "]";
-  ss << GetRightArrow() << end.ToString();
+  ss << GetRightArrow();
+  ss << (end.variable.empty() ? end.ToString() : "(" + end.variable + ")");
+
+  return ss.str();
 }
 
 std::string Relationship::GetLeftArrow() const {

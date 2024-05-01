@@ -8,7 +8,7 @@ ConstraintType::ConstraintType(Value value) {
   this->value_ = value;
 }
 ConstraintType::ConstraintType(const std::string_view& str_type) {
-  std::string type = scc::common::LowerCase(std::string(str_type));
+  std::string type = scc::common::UpperCase(std::string(str_type));
   if (type == kCT_None)
     this->value_ = kNone;
   else if (type == kCT_Uniqueness)
