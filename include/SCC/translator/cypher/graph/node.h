@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -47,6 +48,7 @@ struct Node {
 
   Node& AddProperty(const NodeProperty& property);
   Node& AddProperty(const std::string& name, const std::string& value, PropertyType type);
+  bool HasProperty(const std::string& name) const;
   Node& AddLabel(const Label& label);
   Node& AddLabel(const std::string& label);
   Node& SetVariable(const std::string& variable);
