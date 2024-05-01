@@ -10,9 +10,9 @@
 
 namespace scc::translator::cypher {
 
-constexpr std::string_view kCT_None = "none";
-constexpr std::string_view kCT_Uniqueness = "uniqueness";
-constexpr std::string_view kCT_Existence = "existence";
+constexpr std::string_view kCT_None = "NONE";
+constexpr std::string_view kCT_Uniqueness = "UNIQUE";
+constexpr std::string_view kCT_Existence = "NOT NULL";
 
 class ConstraintType {
 public:

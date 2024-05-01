@@ -21,9 +21,7 @@ NodeProperty::NodeProperty(std::string  name, std::string value, PropertyType ty
     : name(std::move(name)), value(std::move(value)), type(type) {}
 
 std::string NodeProperty::ToString() const {
-  bool is_string = type == PropertyType::kString;
-  auto val = is_string ? ("\"" + value + "\"") : value;
-  return name + ": " + val;
+  return name + ": " + value;
 }
 
 std::ostream& operator<<(std::ostream& os, const NodeProperty &property) {
@@ -39,26 +37,26 @@ bool operator<(const NodeProperty& lhs, const NodeProperty& rhs) {
 
 Node::Node(Label label)
     : labels({std::move(label)}) {}
-Node::Node(Label label, std::set<NodeProperty> properties)
+Node::Node(Label label, std::vector<NodeProperty> properties)
     : labels({std::move(label)}), properties(std::move(properties)) {}
-Node::Node(Label label, std::set<NodeProperty> properties, std::string variable)
+Node::Node(Label label, std::vector<NodeProperty> properties, std::string variable)
     : labels({std::move(label)}), properties(std::move(properties)),
       variable(std::move(variable)) {}
 
 Node& Node::AddProperty(const NodeProperty& property) {
-  properties.insert(property);
+  properties.push_back(property);
   return *this;
 }
 Node& Node::AddProperty(const std::string& name, const std::string& value, PropertyType type) {
-  properties.insert(NodeProperty(name, value, type));
+  properties.emplace_back(name, value, type);
   return *this;
 }
 Node& Node::AddLabel(const Label& label) {
-  labels.insert(label);
+  labels.push_back(label);
   return *this;
 }
 Node& Node::AddLabel(const std::string& label) {
-  labels.insert(Label(label));
+  labels.emplace_back(label);
   return *this;
 }
 Node& Node::SetVariable(const std::string& variable) {

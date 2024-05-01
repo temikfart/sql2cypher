@@ -1,9 +1,9 @@
 #pragma once
 
 #include <ostream>
-#include <set>
 #include <sstream>
 #include <string>
+#include <vector>
 #include <utility>
 
 #include "SCC/translator/cypher/graph/property_types.h"
@@ -35,13 +35,13 @@ std::ostream& operator<<(std::ostream& os, const NodeProperty& property);
 bool operator<(const NodeProperty& lhs, const NodeProperty& rhs);
 
 struct Node {
-  std::set<Label> labels;
-  std::set<NodeProperty> properties;
+  std::vector<Label> labels;
+  std::vector<NodeProperty> properties;
   std::string variable;
 
   explicit Node(Label label);
-  explicit Node(Label label, std::set<NodeProperty> properties);
-  explicit Node(Label label, std::set<NodeProperty> properties, std::string variable);
+  explicit Node(Label label, std::vector<NodeProperty> properties);
+  explicit Node(Label label, std::vector<NodeProperty> properties, std::string variable);
 
   Node& AddProperty(const NodeProperty& property);
   Node& AddProperty(const std::string& name, const std::string& value, PropertyType type);
