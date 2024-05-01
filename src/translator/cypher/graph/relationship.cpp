@@ -1,5 +1,3 @@
-#pragma once
-
 #include "SCC/translator/cypher/graph/relationship.h"
 
 namespace scc::translator::cypher {

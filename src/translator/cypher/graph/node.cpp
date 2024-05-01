@@ -1,5 +1,3 @@
-#include <utility>
-
 #include "SCC/translator/cypher/graph/node.h"
 
 namespace scc::translator::cypher {
@@ -15,6 +13,9 @@ std::ostream& operator<<(std::ostream& os, const Label& label) {
   os << label.ToString();
   return os;
 }
+bool operator<(const Label& lhs, const Label& rhs) {
+  return lhs.value < rhs.value;
+}
 
 NodeProperty::NodeProperty(std::string  name, std::string value, PropertyType type)
     : name(std::move(name)), value(std::move(value)), type(type) {}
@@ -28,6 +29,12 @@ std::string NodeProperty::ToString() const {
 std::ostream& operator<<(std::ostream& os, const NodeProperty &property) {
   os << property.ToString();
   return os;
+}
+bool operator<(const NodeProperty& lhs, const NodeProperty& rhs) {
+  if (lhs.type != rhs.type) {
+    return lhs.type < rhs.type;
+  }
+  return lhs.name < rhs.name;
 }
 
 Node::Node(Label label)
