@@ -51,6 +51,10 @@ Node& Node::AddProperty(const std::string& name, const std::string& value, Prope
   properties.emplace_back(name, value, type);
   return *this;
 }
+bool Node::HasProperty(const std::string& name) const {
+  static auto predicate = [name](const NodeProperty& property) { return property.name == name; };
+  return std::find_if(properties.begin(), properties.end(), predicate) != properties.end();
+}
 Node& Node::AddLabel(const Label& label) {
   labels.push_back(label);
   return *this;
@@ -76,10 +80,10 @@ std::string Node::ToString() const {
   if (!properties.empty()) {
     ss << " {";
     for (auto it = properties.begin(); it != properties.end(); ++it) {
-      ss << it->ToString();
-      if (it != properties.end()) {
+      if (it != properties.begin()) {
         ss << ", ";
       }
+      ss << it->ToString();
     }
     ss << "}";
   }
