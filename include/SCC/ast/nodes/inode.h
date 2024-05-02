@@ -27,7 +27,7 @@ public:
   explicit INode(DataType data_type, StmtType stmt_type, int line);
   virtual ~INode();
 
-  std::shared_ptr<INode> get_child(std::size_t node_num);
+  std::shared_ptr<INode> Child(std::size_t node_num);
 
   std::size_t ChildrenCount() const;
   void AddChild(std::shared_ptr<INode> const& node);

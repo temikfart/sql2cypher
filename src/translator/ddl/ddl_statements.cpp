@@ -32,9 +32,9 @@ void Translator::TranslateDDLStatement(const NodePtr<INode>& ddl_statement) {
 }
 
 void Translator::TranslateCreateDatabaseStatement(const NodePtr<INode>& stmt) {
-  auto database_name_node = stmt->get_child(0);
+  auto database_name_node = stmt->Child(0);
   ValidateHasChildren(database_name_node);
-  std::string database_name = TranslateName(database_name_node);
+  std::string database_name = GetName(database_name_node);
 
   out_ << cypher::CreateDatabaseClauseBuilder::Build(database_name);
   out_ << ";\n" << std::endl;
@@ -42,28 +42,28 @@ void Translator::TranslateCreateDatabaseStatement(const NodePtr<INode>& stmt) {
 void Translator::TranslateCreateTableStatement(const NodePtr<INode>& stmt) {
   const std::string msg_suffix = " in \'CREATE TABLE\' statement";
 
-  auto table_name_node = stmt->get_child(0);
+  auto table_name_node = stmt->Child(0);
   ValidateHasChildren(table_name_node);
-  std::string table_name = TranslateName(table_name_node);
+  std::string table_name = GetName(table_name_node);
   cypher::Node node((cypher::Label(table_name)));
 
   ValidateHasChildren(stmt, 2, "Missing table definition" + msg_suffix);
-  auto table_definition = stmt->get_child(1);
+  auto table_definition = stmt->Child(1);
 
   ValidateHasChildren(table_definition, 1, "Empty table definition" + msg_suffix);
-  auto column_definition = table_definition->get_child(0);
+  auto column_definition = table_definition->Child(0);
 
   ValidateIsCorrectStmtType(column_definition, StmtType::kColumnDef);
   cypher::NodeProperty first_property = TranslateColumnDefinition(column_definition);
   node.AddProperty(first_property);
 
   if (HasChildren(table_definition, 2)) {
-    auto comma = table_definition->get_child(1);
+    auto comma = table_definition->Child(1);
     ValidateIsCorrectStmtType(comma, StmtType::kCommaDelimiter);
     ValidateHasChildren(comma, 1, "Invalid table definition" + msg_suffix
         + ": comma without next element");
 
-    if (IsCorrectStmtType(comma->get_child(0), StmtType::kColumnDef)) {
+    if (IsCorrectStmtType(comma->Child(0), StmtType::kColumnDef)) {
       std::vector<cypher::NodeProperty> other_props = TranslateColumnDefinitions(comma);
       for (auto& prop: other_props) {
         node.AddProperty(prop);
@@ -75,7 +75,7 @@ void Translator::TranslateCreateTableStatement(const NodePtr<INode>& stmt) {
   out_ << ";\n" << std::endl;
 
   if (HasChildren(table_definition, 2)) {
-    auto constraints = FindConstraint(table_definition->get_child(1));
+    auto constraints = FindConstraint(table_definition->Child(1));
     if (constraints != nullptr) {
       TranslateListOfTableConstraints(constraints, table_name);
     }
@@ -84,12 +84,12 @@ void Translator::TranslateCreateTableStatement(const NodePtr<INode>& stmt) {
 void Translator::TranslateAlterTableStatement(const NodePtr<INode>& stmt) {
   const std::string msg_suffix = " in \'ALTER TABLE\' statement";
 
-  auto table_name_node = stmt->get_child(0);
+  auto table_name_node = stmt->Child(0);
   ValidateHasChildren(table_name_node);
-  std::string table_name = TranslateName(table_name_node);
+  std::string table_name = GetName(table_name_node);
 
   ValidateHasChildren(stmt, 2, "Missing action" + msg_suffix);
-  auto action_node = stmt->get_child(1);
+  auto action_node = stmt->Child(1);
   ValidateHasChildren(action_node);
   switch (action_node->stmt_type) {
     case StmtType::kAddKW:
@@ -104,28 +104,28 @@ void Translator::TranslateAlterTableStatement(const NodePtr<INode>& stmt) {
   }
 }
 void Translator::TranslateDropDatabaseStatement(const NodePtr<INode>& stmt) {
-  auto database_name_node = stmt->get_child(0);
+  auto database_name_node = stmt->Child(0);
   ValidateHasChildren(database_name_node);
-  out_ << "DROP DATABASE " << TranslateName(database_name_node) << ";\n" << std::endl;
+  out_ << "DROP DATABASE " << GetName(database_name_node) << ";\n" << std::endl;
 
   if (HasChildren(stmt, 2)) {
-    std::vector<std::string> other_db_names = GetListOf(stmt->get_child(1), StmtType::kName);
+    std::vector<std::string> other_db_names = GetList(stmt->Child(1), StmtType::kName);
     for (auto& i: other_db_names) {
       out_ << "DROP DATABASE " << i << ";\n" << std::endl;
     }
   }
 }
 void Translator::TranslateDropTableStatement(const NodePtr<INode>& stmt) {
-  auto table_name_node = stmt->get_child(0);
+  auto table_name_node = stmt->Child(0);
   ValidateHasChildren(table_name_node);
 
-  std::string table_name = TranslateName(table_name_node);
+  std::string table_name = GetName(table_name_node);
   cypher::Node node((cypher::Label(table_name)));
   out_ << cypher::DeleteNodeClauseBuilder::Build(node);
   out_ << ";\n";
 
   if (HasChildren(stmt, 2)) {
-    std::vector<std::string> other_table_names = GetListOf(stmt->get_child(1), StmtType::kName);
+    std::vector<std::string> other_table_names = GetList(stmt->Child(1), StmtType::kName);
     for (auto& other_table_name: other_table_names) {
       cypher::Node other_node((cypher::Label(other_table_name)));
       out_ << cypher::DeleteNodeClauseBuilder::Build(other_node);
@@ -140,10 +140,10 @@ void Translator::TranslateAlterTableActionAdd(const NodePtr<INode>& action_node,
                                               std::string& table_name) {
   const std::string msg_suffix = " in \'ALTER TABLE ADD\' statement";
 
-  auto table_definition = action_node->get_child(0);
+  auto table_definition = action_node->Child(0);
 
   ValidateHasChildren(table_definition, 1, "Missing column definition or constraint" + msg_suffix);
-  auto first_argument = table_definition->get_child(0);
+  auto first_argument = table_definition->Child(0);
 
   if (IsCorrectStmtType(first_argument, StmtType::kColumnDef)) {
     cypher::Node node((cypher::Label(table_name)));
@@ -153,10 +153,10 @@ void Translator::TranslateAlterTableActionAdd(const NodePtr<INode>& action_node,
     out_ << ";\n";
 
     if (HasChildren(table_definition, 2)) {
-      auto comma = table_definition->get_child(1);
+      auto comma = table_definition->Child(1);
       ValidateIsCorrectStmtType(comma, StmtType::kCommaDelimiter);
 
-      if (IsCorrectStmtType(comma->get_child(0), StmtType::kColumnDef)) {
+      if (IsCorrectStmtType(comma->Child(0), StmtType::kColumnDef)) {
         std::vector<cypher::NodeProperty> other_props = TranslateColumnDefinitions(comma);
         for (auto& prop: other_props) {
           out_ << cypher::SetPropertyClauseBuilder::Build(node, prop);
@@ -167,7 +167,7 @@ void Translator::TranslateAlterTableActionAdd(const NodePtr<INode>& action_node,
 
     out_ << std::endl;
 
-    auto constraints = FindConstraint(table_definition->get_child(1));
+    auto constraints = FindConstraint(table_definition->Child(1));
     if (constraints != nullptr) {
       TranslateListOfTableConstraints(constraints, table_name);
     }
@@ -179,15 +179,15 @@ void Translator::TranslateAlterTableActionDrop(const NodePtr<INode>& action_node
                                                std::string& table_name) {
   std::string msg_suffix = " in \'ALTER TABLE DROP\' statement";
 
-  auto drop_list_def = action_node->get_child(0);
+  auto drop_list_def = action_node->Child(0);
 
   ValidateHasChildren(drop_list_def, 1, "Missing arguments" + msg_suffix);
-  auto object = drop_list_def->get_child(0);
+  auto object = drop_list_def->Child(0);
   ValidateHasChildren(object);
   TranslateDropElement(object, table_name);
 
   if (HasChildren(drop_list_def, 2)) {
-    auto other_objects = drop_list_def->get_child(1);
+    auto other_objects = drop_list_def->Child(1);
     ValidateHasChildren(other_objects);
     TranslateDropElements(other_objects, table_name);
   }
@@ -195,15 +195,15 @@ void Translator::TranslateAlterTableActionDrop(const NodePtr<INode>& action_node
 
 std::vector<cypher::NodeProperty> Translator::TranslateColumnDefinitions(
     const NodePtr<INode>& column_definition) {
-  auto argument = column_definition->get_child(0);
+  auto argument = column_definition->Child(0);
   ValidateIsCorrectStmtType(argument, StmtType::kColumnDef);
 
   ValidateHasChildren(argument);
   std::vector<cypher::NodeProperty> column_definitions;
   column_definitions.push_back(TranslateColumnDefinition(argument));
   if (HasChildren(column_definition, 2)) {
-    auto comma = column_definition->get_child(1);
-    if (IsCorrectStmtType(comma->get_child(0), StmtType::kColumnDef)) {
+    auto comma = column_definition->Child(1);
+    if (IsCorrectStmtType(comma->Child(0), StmtType::kColumnDef)) {
       std::vector<cypher::NodeProperty> other_cols = TranslateColumnDefinitions(comma);
       column_definitions.insert(column_definitions.end(), other_cols.begin(), other_cols.end());
     }
@@ -212,12 +212,12 @@ std::vector<cypher::NodeProperty> Translator::TranslateColumnDefinitions(
   return column_definitions;
 }
 cypher::NodeProperty Translator::TranslateColumnDefinition(const NodePtr<INode>& node) {
-  auto column_name_node = node->get_child(0);
+  auto column_name_node = node->Child(0);
   ValidateHasChildren(column_name_node);
-  std::string column_name = TranslateIdentifier(column_name_node);
+  std::string column_name = GetIdentifier(column_name_node);
 
   ValidateHasChildren(node, 2, "Missing datatype in column definition");
-  StmtType datatype = node->get_child(1)->stmt_type;
+  StmtType datatype = node->Child(1)->stmt_type;
 
   std::string datatype_str;
   cypher::PropertyType property_type;
@@ -244,7 +244,7 @@ cypher::NodeProperty Translator::TranslateColumnDefinition(const NodePtr<INode>&
 
 void Translator::TranslateListOfTableConstraints(const NodePtr<INode>& node,
                                                  std::string& table_name) {
-  auto constraint = node->get_child(0);
+  auto constraint = node->Child(0);
   ValidateHasChildren(constraint, 1, "Missing constraint definition");
 
   size_t key_node_number = 0;
@@ -252,16 +252,16 @@ void Translator::TranslateListOfTableConstraints(const NodePtr<INode>& node,
   if (HasChildren(constraint, 2)) {
     key_node_number++;
 
-    auto constraint_kw = constraint->get_child(0);
+    auto constraint_kw = constraint->Child(0);
     ValidateIsCorrectStmtType(constraint_kw, StmtType::kConstraintKW);
     ValidateHasChildren(constraint_kw);
-    constraint_name += TranslateIdentifier(constraint_kw->get_child(0));
+    constraint_name += GetIdentifier(constraint_kw->Child(0));
   } else {
     constraint_name = table_name + "_constraint";
   }
 
   ValidateHasChildren(constraint, key_node_number, "Missing constraint definition");
-  auto key = constraint->get_child(key_node_number);
+  auto key = constraint->Child(key_node_number);
   ValidateHasChildren(key);
   switch (key->stmt_type) {
     case StmtType::kPrimaryKey:
@@ -275,7 +275,7 @@ void Translator::TranslateListOfTableConstraints(const NodePtr<INode>& node,
   }
 
   if (HasChildren(node, 2)) {
-    TranslateListOfTableConstraints(node->get_child(1), table_name);
+    TranslateListOfTableConstraints(node->Child(1), table_name);
   }
 }
 std::shared_ptr<INode> Translator::FindConstraint(const NodePtr<INode>& node) {
@@ -284,12 +284,12 @@ std::shared_ptr<INode> Translator::FindConstraint(const NodePtr<INode>& node) {
     return constraints;
   }
 
-  auto left = node->get_child(0);
+  auto left = node->Child(0);
   if (IsCorrectStmtType(left, StmtType::kTableConstraint)) {
     constraints = node;
   } else {
     if (HasChildren(node, 2)) {
-      constraints = FindConstraint(node->get_child(1));
+      constraints = FindConstraint(node->Child(1));
     }
   }
 
@@ -298,20 +298,20 @@ std::shared_ptr<INode> Translator::FindConstraint(const NodePtr<INode>& node) {
 
 void Translator::TranslateDropElements(const NodePtr<INode>& node, std::string& table_name) {
   ValidateIsCorrectStmtType(node, StmtType::kDropList);
-  auto drop_object = node->get_child(0);
+  auto drop_object = node->Child(0);
   ValidateHasChildren(drop_object);
   TranslateDropElement(drop_object, table_name);
 
   if (HasChildren(node, 2)) {
-    auto other_objects = node->get_child(1);
+    auto other_objects = node->Child(1);
     TranslateDropElements(other_objects, table_name);
   }
 }
 void Translator::TranslateDropElement(const NodePtr<INode>& node, std::string& table_name) {
-  std::string argument = TranslateIdentifier(node->get_child(0));
+  std::string argument = GetIdentifier(node->Child(0));
   std::vector<std::string> other_arguments;
   if (HasChildren(node, 2)) {
-    other_arguments = GetListOf(node->get_child(1), StmtType::kIdentifier);
+    other_arguments = GetList(node->Child(1), StmtType::kIdentifier);
   }
 
   switch (node->stmt_type) {

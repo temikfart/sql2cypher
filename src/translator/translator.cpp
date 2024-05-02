@@ -25,12 +25,12 @@ void Translator::Translate() {
 }
 
 void Translator::TranslateProgram(const NodePtr<INode>& program) {
-  auto query = program->get_child(0);
+  auto query = program->Child(0);
   ValidateIsCorrectStmtType(query, StmtType::kQuery);
   TranslateQuery(query);
 
   if (HasChildren(program, 2)) {
-    auto other_queries = program->get_child(1);
+    auto other_queries = program->Child(1);
     ValidateIsCorrectStmtType(other_queries, StmtType::kSemicolonDelimiter);
     if (HasChildren(other_queries)) {
       TranslateProgram(other_queries);
@@ -43,9 +43,9 @@ void Translator::TranslateQuery(const NodePtr<INode>& query) {
     return;
   }
 
-  auto statement_type = query->get_child(0);
+  auto statement_type = query->Child(0);
   ValidateHasChildren(statement_type);
-  auto statement = statement_type->get_child(0);
+  auto statement = statement_type->Child(0);
   ValidateHasChildren(statement);
   switch (statement_type->stmt_type) {
     case StmtType::kDdlStmt:

@@ -38,10 +38,12 @@ std::ostream& operator<<(std::ostream& os, const NodeProperty& property);
 bool operator<(const NodeProperty& lhs, const NodeProperty& rhs);
 
 struct Node {
-  std::vector<Label> labels;
-  std::vector<NodeProperty> properties;
-  std::string variable;
+  std::vector<Label> labels = {};
+  std::vector<NodeProperty> properties = {};
+  std::string variable = "";
 
+  explicit Node(std::string label_name);
+  explicit Node(std::string label_name, std::string variable);
   explicit Node(Label label);
   explicit Node(Label label, std::vector<NodeProperty> properties);
   explicit Node(Label label, std::vector<NodeProperty> properties, std::string variable);

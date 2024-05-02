@@ -9,9 +9,9 @@ INode::INode(DataType data_type, StmtType stmt_type, int line)
     : line(line), data_type(data_type), stmt_type(stmt_type) {}
 INode::~INode() = default;
 
-std::shared_ptr<INode> INode::get_child(std::size_t node_num) {
+std::shared_ptr<INode> INode::Child(std::size_t node_num) {
   if (node_num >= children_.size())
-    return {};
+    throw std::out_of_range("Child node number is out of range");
   return children_[node_num];
 }
 std::size_t INode::ChildrenCount() const {

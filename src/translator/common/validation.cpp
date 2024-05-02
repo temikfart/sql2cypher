@@ -20,8 +20,7 @@ bool Translator::IsCorrectStmtType(const std::shared_ptr<ast::INode>& node,
   return node->stmt_type == stmt_type;
 }
 
-void Translator::ValidateHasChildren(const NodePtr<INode>& node,
-                                     unsigned min_children_count,
+void Translator::ValidateHasChildren(const NodePtr<INode>& node, unsigned min_children_count,
                                      const std::string& details) const {
   if (!HasChildren(node, min_children_count)) {
     std::string msg = "Unexpected absence of child nodes";
