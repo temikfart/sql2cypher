@@ -35,6 +35,10 @@ bool operator<(const NodeProperty& lhs, const NodeProperty& rhs) {
   return lhs.name < rhs.name;
 }
 
+Node::Node(std::string label_name)
+    : labels({Label(std::move(label_name))}) {}
+Node::Node(std::string label_name, std::string variable)
+    : labels({Label(std::move(label_name))}), variable(std::move(variable)) {}
 Node::Node(Label label)
     : labels({std::move(label)}) {}
 Node::Node(Label label, std::vector<NodeProperty> properties)

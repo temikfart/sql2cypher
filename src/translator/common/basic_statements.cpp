@@ -4,66 +4,72 @@ namespace scc::translator {
 
 using namespace ast;
 using namespace ast::common;
+using namespace cypher;
 
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
-void Translator::TranslatePrimaryKey(const NodePtr<INode>& key, std::string& constraint_name,
-                                     std::string& table_name) {
-  std::vector<std::string> properties;
-  auto column_name_node = key->get_child(0);
+void Translator::TranslatePrimaryKey(const NodePtr<INode>& primary_key,
+                                     const std::string& constraint_name,
+                                     const std::string& table_name) {
+  auto column_name_node = primary_key->Child(0);
   ValidateHasChildren(column_name_node);
-  properties.push_back(TranslateName(column_name_node));
+  auto column_name = GetName(column_name_node);
 
-  if (HasChildren(key, 2)) {
-    auto other_column_name_node = key->get_child(1);
+  std::vector<std::string> properties;
+  properties.push_back(column_name);
+
+  if (HasChildren(primary_key, 2)) {
+    auto other_column_name_node = primary_key->Child(1);
     ValidateHasChildren(other_column_name_node);
-    std::vector<std::string> other_properties = GetListOf(other_column_name_node, StmtType::kName);
+    std::vector<std::string> other_properties = GetList(other_column_name_node, StmtType::kName);
     properties.insert(properties.end(), other_properties.begin(), other_properties.end());
   }
 
   for (const auto& property: properties) {
-    TranslateConstraint(constraint_name + "_" + std::to_string(constraint_counter++), table_name,
-                        property, cypher::ConstraintType::kUniqueness);
-    TranslateConstraint(constraint_name + "_" + std::to_string(constraint_counter++), table_name,
-                        property, cypher::ConstraintType::kExistence);
+    CreateConstraint(constraint_name + "_" + std::to_string(constraint_counter++), table_name,
+                        property, ConstraintType::kUniqueness);
+    CreateConstraint(constraint_name + "_" + std::to_string(constraint_counter++), table_name,
+                        property, ConstraintType::kExistence);
   }
 }
-void Translator::TranslateForeignKey(const NodePtr<INode>& key, std::string& table_name) {
-  int reference_child_num = 1;
+void Translator::TranslateForeignKey(const NodePtr<INode>& foreign_key,
+                                     const std::string& table_name) {
+  auto column_name_node = foreign_key->Child(0);
+  ValidateHasChildren(column_name_node);
+  auto column_name = GetName(column_name_node);
 
   std::vector<std::string> properties;
-  auto column_name_node = key->get_child(0);
-  ValidateHasChildren(column_name_node);
-  properties.push_back(TranslateName(column_name_node));
+  properties.push_back(column_name);
 
-  if (HasChildren(key, 3)) {
+  int reference_child_num = 1;
+  if (HasChildren(foreign_key, 3)) {
     reference_child_num++;
-    auto separator_node = key->get_child(1);
+    auto separator_node = foreign_key->Child(1);
     ValidateIsCorrectStmtType(separator_node, StmtType::kCommaDelimiter);
-    std::vector<std::string> other_properties = GetListOf(separator_node, StmtType::kName);
+    std::vector<std::string> other_properties = GetList(separator_node, StmtType::kName);
     properties.insert(properties.end(), other_properties.begin(), other_properties.end());
   }
 
-  auto reference = key->get_child(reference_child_num);
+  auto reference = foreign_key->Child(reference_child_num);
   ValidateIsCorrectStmtType(reference, StmtType::kReferencesKW);
 
   ValidateHasChildren(reference);
-  auto table_name_node = reference->get_child(0);
+  auto table_name_node = reference->Child(0);
 
   ValidateHasChildren(table_name_node);
-  std::string ref_table_name = TranslateName(table_name_node);
+  std::string ref_table_name = GetName(table_name_node);
 
   std::vector<std::string> ref_columns;
   if (HasChildren(reference, 2)) {
-    auto ref_column_name_node = reference->get_child(1);
+    auto ref_column_name_node = reference->Child(1);
     ValidateHasChildren(ref_column_name_node);
-    ref_columns.push_back(TranslateName(ref_column_name_node));
+    ref_columns.push_back(GetName(ref_column_name_node));
     if (HasChildren(reference, 3)) {
-      auto other_ref_column_name_node = reference->get_child(2);
+      auto other_ref_column_name_node = reference->Child(2);
       ValidateHasChildren(other_ref_column_name_node);
-      std::vector<std::string> other_props = GetListOf(other_ref_column_name_node, StmtType::kName);
+      std::vector<std::string> other_props = GetList(other_ref_column_name_node, StmtType::kName);
       ref_columns.insert(ref_columns.end(), other_props.begin(), other_props.end());
     }
   }
@@ -77,90 +83,102 @@ void Translator::TranslateForeignKey(const NodePtr<INode>& key, std::string& tab
 //  }
   CreateRelationship(table_name, ref_table_name);
 }
-void Translator::TranslateConstraint(const std::string& constraint_name,
-                                     const std::string& label_name,
-                                     const std::string& property,
-                                     cypher::ConstraintType constraint_type) {
-  cypher::Node node = cypher::Node(cypher::Label(label_name));
-  cypher::NodeProperty prop(property, std::string(cypher::stub_str),
-                            cypher::PropertyType::kUnknown);
-  out_ << cypher::CreateConstraintClauseBuilder::Build(constraint_name, node, prop,
-                                                       constraint_type);
-  out_ << ";\n" << std::endl;
-}
-void Translator::CreateRelationship(const std::string& label_name,
-                                    const std::string& ref_label_name) {
-  cypher::Node start_node((cypher::Label(label_name)));
-  start_node.SetVariable("a");
 
-  cypher::Node end_node((cypher::Label(ref_label_name)));
-  end_node.SetVariable("b");
-
-  std::string rel_type = "fk_" + label_name + "_to_" + ref_label_name
-      + "_" + std::to_string(relationship_counter++);
-  cypher::Relationship relationship(rel_type, start_node, end_node,
-                                    cypher::Relationship::Direction::kRight);
-
-  out_ << cypher::CreateRelationshipClauseBuilder::Build(relationship);
-  out_ << ";\n" << std::endl;
-}
-void Translator::RemoveProperty(const std::string& label_name, const std::string& property_name) {
-  cypher::Node node = cypher::Node(cypher::Label(label_name));
-  out_ << cypher::RemovePropertyClauseBuilder::Build(node, property_name);
-  out_ << ";\n" << std::endl;
-}
-
-std::vector<std::string> Translator::GetListOf(const NodePtr<INode>& node, StmtType type) {
+std::vector<std::string> Translator::GetList(const NodePtr<INode>& node, StmtType type) const {
+  auto argument_node = node->Child(0);
+  ValidateHasChildren(argument_node);
   std::vector<std::string> arguments;
+  std::string argument;
   switch (type) {
     case StmtType::kName:
-      arguments.push_back(TranslateName(node->get_child(0)));
+      argument = GetName(argument_node);
       break;
     case StmtType::kIdentifier:
-      arguments.push_back(TranslateIdentifier(node->get_child(0)));
+      argument = GetIdentifier(argument_node);
       break;
     default:
       throw translation_error("Unknown argument type for list of elements");
   }
+  arguments.push_back(argument);
 
   if (HasChildren(node, 2)) {
-    auto next_separator_node = node->get_child(1);
+    auto next_separator_node = node->Child(1);
     ValidateHasChildren(next_separator_node);
-    std::vector<std::string> other_arguments = GetListOf(next_separator_node, type);
+    std::vector<std::string> other_arguments = GetList(next_separator_node, type);
     arguments.insert(arguments.end(), other_arguments.begin(), other_arguments.end());
   }
 
   return arguments;
 }
-
-std::string Translator::TranslateName(const NodePtr<INode>& node) {
-  std::ostringstream name;
-  auto identifier_node = node->get_child(0);
+std::string Translator::GetName(const NodePtr<INode>& node) const {
+  auto identifier_node = node->Child(0);
   ValidateHasChildren(identifier_node);
-  name << TranslateIdentifier(identifier_node);
+
+  std::ostringstream name;
+  name << GetIdentifier(identifier_node);
+
   if (HasChildren(node, 2)) {
-    auto dot_delimiter_node = node->get_child(1);
+    auto dot_delimiter_node = node->Child(1);
+    ValidateHasChildren(dot_delimiter_node);
     ValidateIsCorrectStmtType(dot_delimiter_node, StmtType::kDotDelimiter);
-    name << TranslateIdentifiers(dot_delimiter_node);
+    name << GetIdentifiersJoinedByDot(dot_delimiter_node);
   }
 
   return name.str();
 }
-std::string Translator::TranslateIdentifiers(const NodePtr<INode>& node) {
-  std::ostringstream identifiers;
-  auto identifier_node = node->get_child(0);
+std::string Translator::GetIdentifiersJoinedByDot(const NodePtr<INode>& node) const {
+  auto identifier_node = node->Child(0);
   ValidateHasChildren(identifier_node);
-  identifiers << "." << TranslateIdentifier(identifier_node);
+
+  std::ostringstream identifiers;
+  identifiers << "." << GetIdentifier(identifier_node);
 
   if (HasChildren(node, 2)) {
-    auto dot_delimiter_node = node->get_child(1);
-    identifiers << TranslateIdentifiers(dot_delimiter_node);
+    auto dot_delimiter_node = node->Child(1);
+    ValidateHasChildren(dot_delimiter_node);
+    ValidateIsCorrectStmtType(dot_delimiter_node, StmtType::kIdentifier);
+    identifiers << GetIdentifiersJoinedByDot(dot_delimiter_node);
   }
 
   return identifiers.str();
 }
-std::string Translator::TranslateIdentifier(const NodePtr<INode>& node) {
-  return ASTUtils::CastToNodeType<StringNode>(node->get_child(0))->data;
+std::string Translator::GetIdentifier(const NodePtr<INode>& node) const {
+  return ASTUtils::CastToNodeType<StringNode>(node->Child(0))->data;
+}
+
+void Translator::CreateConstraint(const std::string& constraint_name,
+                                  const std::string& label_name,
+                                  const std::string& property_name,
+                                  ConstraintType constraint_type) {
+  Node node(label_name);
+  NodeProperty property(property_name, std::string(stub_str), PropertyType::kUnknown);
+
+  out_ << CreateConstraintClauseBuilder::Build(constraint_name, node, property, constraint_type);
+  out_ << ";\n" << std::endl;
+}
+void Translator::CreateRelationship(const std::string& start_label_name,
+                                    const std::string& end_label_name) {
+  Node start_node(start_label_name, "a"), end_node(end_label_name, "b");
+
+  std::string relationship_type = CreateRelationshipType(start_label_name, end_label_name);
+  Relationship relationship(relationship_type, start_node, end_node,
+                            Relationship::Direction::kRight);
+
+  out_ << CreateRelationshipClauseBuilder::Build(relationship);
+  out_ << ";\n" << std::endl;
+}
+void Translator::RemoveProperty(const std::string& label_name, const std::string& property_name) {
+  Node node(label_name);
+  out_ << RemovePropertyClauseBuilder::Build(node, property_name);
+  out_ << ";\n" << std::endl;
+}
+std::string Translator::CreateRelationshipType(const std::string& start_label_name,
+                                               const std::string& end_label_name) {
+  std::stringstream ss;
+  ss << "fk_" << start_label_name << "_to_" << end_label_name << "_" << relationship_counter;
+  relationship_counter++;
+
+  return ss.str();
 }
 
 } // scc::translator

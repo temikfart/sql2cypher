@@ -49,6 +49,8 @@ private:
   void TranslateDDLStatement(const std::shared_ptr<ast::INode>& ddl_statement);
   void TranslateDMLStatement(const std::shared_ptr<ast::INode>& dml_statement);
 
+  // DDL statements
+
   void TranslateCreateDatabaseStatement(const std::shared_ptr<ast::INode>& stmt);
   void TranslateCreateTableStatement(const std::shared_ptr<ast::INode>& stmt);
   void TranslateAlterTableStatement(const std::shared_ptr<ast::INode>& stmt);
@@ -71,34 +73,40 @@ private:
   void TranslateDropElement(const std::shared_ptr<ast::INode>& node, std::string& table_name);
   void TranslateDropElements(const std::shared_ptr<ast::INode>& node, std::string& table_name);
 
+  // DML statements
+
   void TranslateInsertStatement(const std::shared_ptr<ast::INode>& insert_stmt);
   void TranslateDeleteStatement(const std::shared_ptr<ast::INode>& delete_stmt);
   void TranslateUpdateStatement(const std::shared_ptr<ast::INode>& update_stmt);
 
   // Basic statements
 
-  void TranslatePrimaryKey(const std::shared_ptr<ast::INode>& key, std::string& constraint_name,
-                           std::string& table_name);
-  void TranslateForeignKey(const std::shared_ptr<ast::INode>& key, std::string& table_name);
-  void TranslateConstraint(const std::string& constraint_name,
-                           const std::string& label_name,
-                           const std::string& property,
-                           cypher::ConstraintType constraint_type);
-  void CreateRelationship(const std::string& label_name, const std::string& ref_label_name);
+  void TranslatePrimaryKey(const std::shared_ptr<ast::INode>& primary_key,
+                           const std::string& constraint_name, const std::string& table_name);
+  void TranslateForeignKey(const std::shared_ptr<ast::INode>& foreign_key,
+                           const std::string& table_name);
+
+  std::vector<std::string> GetList(const std::shared_ptr<ast::INode>& node,
+                                   ast::StmtType type) const;
+  std::string GetName(const std::shared_ptr<ast::INode>& node) const;
+  std::string GetIdentifiersJoinedByDot(const std::shared_ptr<ast::INode>& node) const;
+  std::string GetIdentifier(const std::shared_ptr<ast::INode>& node) const;
+
+  void CreateConstraint(const std::string& constraint_name,
+                        const std::string& label_name,
+                        const std::string& property_name,
+                        cypher::ConstraintType constraint_type);
+  void CreateRelationship(const std::string& start_label_name, const std::string& end_label_name);
   void RemoveProperty(const std::string& label_name, const std::string& property_name);
+  std::string CreateRelationshipType(const std::string& start_label_name,
+                                     const std::string& end_label_name);
 
-  std::vector<std::string> GetListOf(const std::shared_ptr<ast::INode>& node, ast::StmtType type);
+  // Validation
 
-  std::string TranslateName(const std::shared_ptr<ast::INode>& node);
-  std::string TranslateIdentifiers(const std::shared_ptr<ast::INode>& node);
-  std::string TranslateIdentifier(const std::shared_ptr<ast::INode>& node);
-
-  bool HasChildren(const std::shared_ptr<ast::INode>& node,
-                   unsigned min_children_count = 1) const;
+  bool HasChildren(const std::shared_ptr<ast::INode>& node, unsigned min_children_count = 1) const;
   bool IsCorrectStmtType(const std::shared_ptr<ast::INode>& node, ast::StmtType stmt_type) const;
 
-  void ValidateHasChildren(const std::shared_ptr<ast::INode>& node,
-                           unsigned min_children_count = 1,
+  void ValidateHasChildren(const std::shared_ptr<ast::INode>& node, unsigned min_children_count = 1,
                            const std::string& details = "") const;
   void ValidateIsCorrectStmtType(const std::shared_ptr<ast::INode>& node,
                                  ast::StmtType stmt_type) const;

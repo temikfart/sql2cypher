@@ -158,7 +158,7 @@ void TreeDump::RecursiveTreeDump(const std::shared_ptr<INode>& node,
   }
 
   for (size_t i = 0; i < num_of_children; i++)
-    this->RecursiveTreeDump(node->get_child(i), current_node_num);
+    this->RecursiveTreeDump(node->Child(i), current_node_num);
 }
 
 void TreeDump::MakeDumpPng() {

@@ -78,7 +78,7 @@ bool ASTUtils::Equal(const std::shared_ptr<INode>& lhs, const std::shared_ptr<IN
   }
 
   for (std::size_t i = 0; i < lhs->ChildrenCount(); i++) {
-    if (!Equal(lhs->get_child(i), rhs->get_child(i))) {
+    if (!Equal(lhs->Child(i), rhs->Child(i))) {
       LOGT << "not equal: different subtrees";
       return false;
     }
