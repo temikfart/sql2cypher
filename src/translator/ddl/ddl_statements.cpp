@@ -37,8 +37,7 @@ void Translator::TranslateCreateDatabaseStatement(const NodePtr<INode>& stmt) {
   ValidateHasChildren(database_name_node);
   std::string database_name = GetName(database_name_node);
 
-  out_ << CreateDatabaseClauseBuilder::Build(database_name);
-  out_ << ";\n" << std::endl;
+  WriteCypherQuery(CreateDatabaseClauseBuilder::Build(database_name));
 }
 void Translator::TranslateCreateTableStatement(const NodePtr<INode>& stmt) {
   const std::string msg_suffix = " in \'CREATE TABLE\' statement";
@@ -72,8 +71,7 @@ void Translator::TranslateCreateTableStatement(const NodePtr<INode>& stmt) {
     }
   }
 
-  out_ << CreateNodeClauseBuilder::Build(node);
-  out_ << ";\n" << std::endl;
+  WriteCypherQuery(CreateNodeClauseBuilder::Build(node));
 
   if (HasChildren(table_definition, 2)) {
     auto constraints = FindConstraint(table_definition->Child(1));
@@ -108,14 +106,12 @@ void Translator::TranslateDropDatabaseStatement(const NodePtr<INode>& stmt) {
   auto database_name_node = stmt->Child(0);
   ValidateHasChildren(database_name_node);
   auto database_name = GetName(database_name_node);
-  out_ << DropDatabaseClauseBuilder::Build(database_name);
-  out_ << ";\n" << std::endl;
+  WriteCypherQuery(DropDatabaseClauseBuilder::Build(database_name));
 
   if (HasChildren(stmt, 2)) {
     std::vector<std::string> other_db_names = GetList(stmt->Child(1), StmtType::kName);
     for (const auto& other_database_name: other_db_names) {
-      out_ << DropDatabaseClauseBuilder::Build(other_database_name);
-      out_ << ";\n" << std::endl;
+      WriteCypherQuery(DropDatabaseClauseBuilder::Build(other_database_name));
     }
   }
 }
@@ -125,15 +121,13 @@ void Translator::TranslateDropTableStatement(const NodePtr<INode>& stmt) {
 
   std::string table_name = GetName(table_name_node);
   Node node((Label(table_name)));
-  out_ << DeleteNodeClauseBuilder::Build(node);
-  out_ << ";\n";
+  WriteCypherQuery(DeleteNodeClauseBuilder::Build(node));
 
   if (HasChildren(stmt, 2)) {
     std::vector<std::string> other_table_names = GetList(stmt->Child(1), StmtType::kName);
     for (auto& other_table_name: other_table_names) {
       Node other_node((Label(other_table_name)));
-      out_ << DeleteNodeClauseBuilder::Build(other_node);
-      out_ << ";\n";
+      WriteCypherQuery(DeleteNodeClauseBuilder::Build(other_node));
     }
   }
 
@@ -153,8 +147,7 @@ void Translator::TranslateAlterTableActionAdd(const NodePtr<INode>& action_node,
     Node node((Label(table_name)));
 
     NodeProperty first_prop = TranslateColumnDefinition(first_argument);
-    out_ << SetPropertyClauseBuilder::Build(node, first_prop);
-    out_ << ";\n";
+    WriteCypherQuery(SetPropertyClauseBuilder::Build(node, first_prop));
 
     if (HasChildren(table_definition, 2)) {
       auto comma = table_definition->Child(1);
@@ -163,13 +156,10 @@ void Translator::TranslateAlterTableActionAdd(const NodePtr<INode>& action_node,
       if (IsCorrectStmtType(comma->Child(0), StmtType::kColumnDef)) {
         std::vector<NodeProperty> other_props = TranslateColumnDefinitions(comma);
         for (auto& prop: other_props) {
-          out_ << SetPropertyClauseBuilder::Build(node, prop);
-          out_ << ";\n";
+          WriteCypherQuery(SetPropertyClauseBuilder::Build(node, prop));
         }
       }
     }
-
-    out_ << std::endl;
 
     auto constraints = FindConstraint(table_definition->Child(1));
     if (constraints != nullptr) {
@@ -321,21 +311,15 @@ void Translator::TranslateDropElement(const NodePtr<INode>& node, std::string& t
   switch (node->stmt_type) {
     case StmtType::kDropColumn:
       RemoveProperty(table_name, argument);
-      out_ << ";\n";
       for (const auto& arg: other_arguments) {
         RemoveProperty(table_name, arg);
-        out_ << ";\n";
       }
-      out_ << std::endl;
       break;
     case StmtType::kDropConstraint:
-      DropConstraintClauseBuilder::Build(argument);
-      out_ << ";\n";
+      WriteCypherQuery(DropConstraintClauseBuilder::Build(argument));
       for (const auto& arg: other_arguments) {
-        DropConstraintClauseBuilder::Build(arg);
-        out_ << ";\n";
+        WriteCypherQuery(DropConstraintClauseBuilder::Build(arg));
       }
-      out_ << std::endl;
       break;
     default:
       throw translation_error("Unknown drop object type \'" + node->stmt_type.ToString() + "\'");

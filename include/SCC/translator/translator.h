@@ -44,6 +44,9 @@ private:
   int constraint_counter = 0;
   int relationship_counter = 0;
 
+  void WriteCypherQuery(const std::string& query);
+  void FinishCypherQueriesGroup();
+
   void TranslateProgram(const std::shared_ptr<ast::INode>& program);
   void TranslateQuery(const std::shared_ptr<ast::INode>& query);
 

@@ -153,8 +153,9 @@ void Translator::CreateConstraint(const std::string& constraint_name,
   Node node(label_name);
   NodeProperty property(property_name, std::string(stub_str), PropertyType::kUnknown);
 
-  out_ << CreateConstraintClauseBuilder::Build(constraint_name, node, property, constraint_type);
-  out_ << ";\n" << std::endl;
+  WriteCypherQuery(
+      CreateConstraintClauseBuilder::Build(constraint_name, node, property, constraint_type)
+  );
 }
 void Translator::CreateRelationship(const std::string& start_label_name,
                                     const std::string& end_label_name) {
@@ -164,13 +165,11 @@ void Translator::CreateRelationship(const std::string& start_label_name,
   Relationship relationship(relationship_type, start_node, end_node,
                             Relationship::Direction::kRight);
 
-  out_ << CreateRelationshipClauseBuilder::Build(relationship);
-  out_ << ";\n" << std::endl;
+  WriteCypherQuery(CreateRelationshipClauseBuilder::Build(relationship));
 }
 void Translator::RemoveProperty(const std::string& label_name, const std::string& property_name) {
   Node node(label_name);
-  out_ << RemovePropertyClauseBuilder::Build(node, property_name);
-  out_ << ";\n" << std::endl;
+  WriteCypherQuery(RemovePropertyClauseBuilder::Build(node, property_name));
 }
 std::string Translator::CreateRelationshipType(const std::string& start_label_name,
                                                const std::string& end_label_name) {
