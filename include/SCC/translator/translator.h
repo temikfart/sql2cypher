@@ -16,6 +16,7 @@
 #include "SCC/parser/parser.h"
 #include "SCC/translator/cypher/clauses/create.h"
 #include "SCC/translator/cypher/clauses/delete.h"
+#include "SCC/translator/cypher/clauses/drop.h"
 #include "SCC/translator/cypher/clauses/set.h"
 
 #include "logger/log.hpp"
