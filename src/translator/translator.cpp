@@ -24,6 +24,13 @@ void Translator::Translate() {
   LOGI << "Translation is ended";
 }
 
+void Translator::WriteCypherQuery(const std::string& query) {
+  out_ << query << ";\n";
+}
+void Translator::FinishCypherQueriesGroup() {
+  out_ << std::endl;
+}
+
 void Translator::TranslateProgram(const NodePtr<INode>& program) {
   auto query = program->Child(0);
   ValidateIsCorrectStmtType(query, StmtType::kQuery);
@@ -58,6 +65,8 @@ void Translator::TranslateQuery(const NodePtr<INode>& query) {
       throw translation_error("Unknown query statement type: \'"
                                   + statement_type->stmt_type.ToString() + "\'");
   }
+
+  FinishCypherQueriesGroup();
 }
 
 } // scc::translator
