@@ -45,7 +45,7 @@ void Translator::TranslateCreateTableStatement(const NodePtr<INode>& stmt) {
   auto table_name_node = stmt->Child(0);
   ValidateHasChildren(table_name_node);
   std::string table_name = GetName(table_name_node);
-  Node node((Label(table_name)));
+  Node node(table_name);
 
   ValidateHasChildren(stmt, 2, "Missing table definition" + msg_suffix);
   auto table_definition = stmt->Child(1);
@@ -120,18 +120,16 @@ void Translator::TranslateDropTableStatement(const NodePtr<INode>& stmt) {
   ValidateHasChildren(table_name_node);
 
   std::string table_name = GetName(table_name_node);
-  Node node((Label(table_name)));
+  Node node(table_name);
   WriteCypherQuery(DeleteNodeClauseBuilder::Build(node));
 
   if (HasChildren(stmt, 2)) {
     std::vector<std::string> other_table_names = GetList(stmt->Child(1), StmtType::kName);
     for (auto& other_table_name: other_table_names) {
-      Node other_node((Label(other_table_name)));
+      Node other_node(other_table_name);
       WriteCypherQuery(DeleteNodeClauseBuilder::Build(other_node));
     }
   }
-
-  out_ << std::endl;
 }
 
 void Translator::TranslateAlterTableActionAdd(const NodePtr<INode>& action_node,
@@ -144,7 +142,7 @@ void Translator::TranslateAlterTableActionAdd(const NodePtr<INode>& action_node,
   auto first_argument = table_definition->Child(0);
 
   if (IsCorrectStmtType(first_argument, StmtType::kColumnDef)) {
-    Node node((Label(table_name)));
+    Node node(table_name, "n");
 
     NodeProperty first_prop = TranslateColumnDefinition(first_argument);
     WriteCypherQuery(SetPropertyClauseBuilder::Build(node, first_prop));
