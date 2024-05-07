@@ -110,37 +110,15 @@ std::vector<std::string> Translator::GetList(const NodePtr<INode>& node, StmtTyp
 
   return arguments;
 }
-std::string Translator::GetName(const NodePtr<INode>& node) const {
-  auto identifier_node = node->Child(0);
-  ValidateHasChildren(identifier_node);
-
+std::string Translator::GetName(const NodePtr<INode>& name_node) const {
   std::ostringstream name;
-  name << GetIdentifier(identifier_node);
-
-  if (HasChildren(node, 2)) {
-    auto dot_delimiter_node = node->Child(1);
-    ValidateHasChildren(dot_delimiter_node);
-    ValidateIsCorrectStmtType(dot_delimiter_node, StmtType::kDotDelimiter);
-    name << GetIdentifiersJoinedByDot(dot_delimiter_node);
+  ValidateHasChildren(name_node);
+  for (unsigned i = 0; HasChildren(name_node, i + 1); ++i) {
+    auto identifier_node = name_node->Child(i);
+    auto identifier = GetIdentifier(identifier_node);
+    name << identifier;
   }
-
   return name.str();
-}
-std::string Translator::GetIdentifiersJoinedByDot(const NodePtr<INode>& node) const {
-  auto identifier_node = node->Child(0);
-  ValidateHasChildren(identifier_node);
-
-  std::ostringstream identifiers;
-  identifiers << "." << GetIdentifier(identifier_node);
-
-  if (HasChildren(node, 2)) {
-    auto dot_delimiter_node = node->Child(1);
-    ValidateHasChildren(dot_delimiter_node);
-    ValidateIsCorrectStmtType(dot_delimiter_node, StmtType::kIdentifier);
-    identifiers << GetIdentifiersJoinedByDot(dot_delimiter_node);
-  }
-
-  return identifiers.str();
 }
 std::string Translator::GetIdentifier(const NodePtr<INode>& node) const {
   return ASTUtils::CastToNodeType<StringNode>(node->Child(0))->data;

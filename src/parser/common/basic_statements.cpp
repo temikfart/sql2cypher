@@ -305,31 +305,22 @@ NodePtr<INode> Parser::ParseString() {
 }
 NodePtr<INode> Parser::ParseName() {
   NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kName, PeekToken());
-  NodePtr<INode> identifier = ParseIdentifier();
-  ASTUtils::Link(service_node, identifier);
 
-  if (!tokens_.empty() && NodeDataClassifier::IsDot(PeekToken())) {
-    NodePtr<INode> next_identifiers = ParseIdentifiers();
-    ASTUtils::Link(service_node, next_identifiers);
+  while (!tokens_.empty()) {
+    NodePtr<INode> identifier = ParseIdentifier();
+    ASTUtils::Link(service_node, identifier);
+
+    if (!tokens_.empty() && NodeDataClassifier::IsDot(PeekToken())) {
+      auto next_token = NextToken();
+      ValidateHasTokens("Missing identifier after the dot delimiter at line "
+                            + std::to_string(next_token->line));
+      ValidateIsWord(PeekToken());
+    } else {
+      break;
+    }
   }
 
   return service_node;
-}
-NodePtr<INode> Parser::ParseIdentifiers() {
-  auto next_token = NextToken();
-  NodePtr<INode> delimiter = ASTUtils::CreateServiceNode(StmtType::kDotDelimiter, next_token);
-
-  ValidateHasTokens("Missing identifier after the dot delimiter at line "
-                        + std::to_string(next_token->line));
-  NodePtr<INode> identifier = ParseIdentifier();
-  ASTUtils::Link(delimiter, identifier);
-
-  if (!tokens_.empty() && NodeDataClassifier::IsDot(PeekToken())) {
-    NodePtr<INode> next_identifiers = ParseIdentifiers();
-    ASTUtils::Link(delimiter, next_identifiers);
-  }
-
-  return delimiter;
 }
 NodePtr<INode> Parser::ParseIdentifier() {
   auto next_token = NextToken();

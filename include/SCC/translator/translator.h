@@ -89,8 +89,7 @@ private:
 
   std::vector<std::string> GetList(const std::shared_ptr<ast::INode>& node,
                                    ast::StmtType type) const;
-  std::string GetName(const std::shared_ptr<ast::INode>& node) const;
-  std::string GetIdentifiersJoinedByDot(const std::shared_ptr<ast::INode>& node) const;
+  std::string GetName(const std::shared_ptr<ast::INode>& name_node) const;
   std::string GetIdentifier(const std::shared_ptr<ast::INode>& node) const;
 
   void CreateConstraint(const std::string& constraint_name,
