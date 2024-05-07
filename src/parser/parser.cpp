@@ -20,12 +20,14 @@ NodePtr<INode> Parser::Parse() {
   }
 
   NodePtr<INode> root = ASTUtils::CreateRootNode(StmtType::kProgram);
-  NodePtr<INode> query = ParseQuery();
-  ASTUtils::Link(root, query);
+  while (!tokens_.empty()) {
+    if (NodeDataClassifier::IsSemicolon(PeekToken())) {
+      NextToken();
+      continue;
+    }
 
-  if (!tokens_.empty() && NodeDataClassifier::IsSemicolon(PeekToken())) {
-    NodePtr<INode> next_queries = ParseNextQueries();
-    ASTUtils::Link(root, next_queries);
+    NodePtr<INode> query = ParseQuery();
+    ASTUtils::Link(root, query);
   }
 
   ValidateHasNotTokens();
@@ -65,22 +67,6 @@ NodePtr<INode> Parser::ParseBaseStatement() {
   } else {
     throw parsing_error("Unknown Base Statement at line " + std::to_string(peeked_token->line));
   }
-}
-NodePtr<INode> Parser::ParseNextQueries() {
-  NodePtr<INode> separator = ASTUtils::CreateServiceNode(StmtType::kSemicolonDelimiter,
-                                                         NextToken());
-
-  if (!tokens_.empty()) {
-    NodePtr<INode> query = ParseQuery();
-    ASTUtils::Link(separator, query);
-  }
-
-  if (!tokens_.empty() && NodeDataClassifier::IsSemicolon(PeekToken())) {
-    NodePtr<INode> next_queries = ParseNextQueries();
-    ASTUtils::Link(separator, next_queries);
-  }
-
-  return separator;
 }
 
 } // scc::parser

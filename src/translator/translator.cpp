@@ -19,7 +19,11 @@ void Translator::Translate() {
   }
 
   ValidateIsCorrectStmtType(ast_, StmtType::kProgram);
-  TranslateProgram(ast_);
+  for (unsigned i = 0; HasChildren(ast_, i + 1); ++i) {
+    auto query = ast_->Child(i);
+    ValidateIsCorrectStmtType(query, StmtType::kQuery);
+    TranslateQuery(query);
+  }
 
   LOGI << "Translation is ended";
 }
@@ -31,19 +35,6 @@ void Translator::FinishCypherQueriesGroup() {
   out_ << std::endl;
 }
 
-void Translator::TranslateProgram(const NodePtr<INode>& program) {
-  auto query = program->Child(0);
-  ValidateIsCorrectStmtType(query, StmtType::kQuery);
-  TranslateQuery(query);
-
-  if (HasChildren(program, 2)) {
-    auto other_queries = program->Child(1);
-    ValidateIsCorrectStmtType(other_queries, StmtType::kSemicolonDelimiter);
-    if (HasChildren(other_queries)) {
-      TranslateProgram(other_queries);
-    }
-  }
-}
 void Translator::TranslateQuery(const NodePtr<INode>& query) {
   if (!HasChildren(query)) {
     LOGD << "Empty query";
