@@ -65,7 +65,6 @@ private:
   std::shared_ptr<ast::INode> ParseTableConstraint(ast::StmtType stmt_type = ast::StmtType::kNone);
 
   std::shared_ptr<ast::INode> ParseDropListDefinition();
-  std::shared_ptr<ast::INode> ParseDropElements();
   std::shared_ptr<ast::INode> ParseDropElement();
 
   std::shared_ptr<ast::INode> ParseInsertStatement();

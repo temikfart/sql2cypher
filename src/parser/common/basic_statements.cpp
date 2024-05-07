@@ -19,18 +19,20 @@ StmtType Parser::DetermineConstraintType(const std::string& keyword) const {
   return StmtType::kNone;
 }
 StmtType Parser::DetermineAlterTableActionType(const std::string& keyword) const {
-  if (kST_ADD_KW.find(scc::common::LowerCase(keyword)) == 0) {
+  std::string keyword_lower = scc::common::LowerCase(keyword);
+  if (kST_ADD_KW.find(keyword_lower) == 0) {
     return StmtType::kAddKW;
-  } else if (kST_DROP_KW.find(scc::common::LowerCase(keyword)) == 0) {
+  } else if (kST_DROP_KW.find(keyword_lower) == 0) {
     return StmtType::kDropKW;
   }
   return StmtType::kNone;
 }
 StmtType Parser::DetermineDropElementType(const std::string& keyword) const {
-  if (kST_CONSTRAINT_KW.find(keyword) == 0) {
-    return StmtType::kConstraintKW;
-  } else if (kST_COLUMN_KW.find(keyword) == 0) {
-    return StmtType::kColumnKW;
+  std::string keyword_lower = scc::common::LowerCase(keyword);
+  if (kST_CONSTRAINT_KW.find(keyword_lower) == 0) {
+    return StmtType::kDropConstraint;
+  } else if (kST_COLUMN_KW.find(keyword_lower) == 0) {
+    return StmtType::kDropColumn;
   }
   return StmtType::kNone;
 }

@@ -168,7 +168,7 @@ void Translator::CreateRelationship(const std::string& start_label_name,
   WriteCypherQuery(CreateRelationshipClauseBuilder::Build(relationship));
 }
 void Translator::RemoveProperty(const std::string& label_name, const std::string& property_name) {
-  Node node(label_name);
+  Node node(label_name, "n");
   WriteCypherQuery(RemovePropertyClauseBuilder::Build(node, property_name));
 }
 std::string Translator::CreateRelationshipType(const std::string& start_label_name,
