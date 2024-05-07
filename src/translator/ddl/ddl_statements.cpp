@@ -290,20 +290,17 @@ std::shared_ptr<INode> Translator::FindConstraint(const NodePtr<INode>& node) {
 
 void Translator::TranslateDropElements(const NodePtr<INode>& node, std::string& table_name) {
   ValidateIsCorrectStmtType(node, StmtType::kDropList);
-  auto drop_object = node->Child(0);
-  ValidateHasChildren(drop_object);
-  TranslateDropElement(drop_object, table_name);
-
-  if (HasChildren(node, 2)) {
-    auto other_objects = node->Child(1);
-    TranslateDropElements(other_objects, table_name);
+  for (unsigned i = 0; HasChildren(node, i + 1); ++i) {
+    auto drop_object = node->Child(0);
+    ValidateHasChildren(drop_object);
+    TranslateDropElement(drop_object, table_name);
   }
 }
 void Translator::TranslateDropElement(const NodePtr<INode>& node, std::string& table_name) {
-  std::string argument = GetIdentifier(node->Child(0));
+  std::string argument = GetName(node->Child(0));
   std::vector<std::string> other_arguments;
   if (HasChildren(node, 2)) {
-    other_arguments = GetList(node->Child(1), StmtType::kIdentifier);
+    other_arguments = GetList(node->Child(1), StmtType::kName);
   }
 
   switch (node->stmt_type) {

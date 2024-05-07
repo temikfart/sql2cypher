@@ -261,29 +261,20 @@ NodePtr<INode> Parser::ParseTableConstraint(StmtType stmt_type) {
 NodePtr<INode> Parser::ParseDropListDefinition() {
   NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kDropList);
 
-  NodePtr<INode> drop_element = ParseDropElement();
-  ASTUtils::Link(service_node, drop_element);
+  while (!tokens_.empty()) {
+    NodePtr<INode> drop_element = ParseDropElement();
+    ASTUtils::Link(service_node, drop_element);
 
-  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
-    NodePtr<INode> drop_elements = ParseDropElements();
-    ASTUtils::Link(service_node, drop_elements);
+    if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+      auto next_token = NextToken();
+      ValidateHasTokens("Missing drop element in list at line " + std::to_string(next_token->line));
+      ValidateIsWord(PeekToken());
+    } else {
+      break;
+    }
   }
 
   return service_node;
-}
-NodePtr<INode> Parser::ParseDropElements() {
-  NodePtr<INode> separator = ASTUtils::CreateServiceNode(StmtType::kCommaDelimiter, NextToken());
-
-  ValidateIsWord(PeekToken());
-  NodePtr<INode> drop_element = ParseDropElement();
-  ASTUtils::Link(separator, drop_element);
-
-  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
-      NodePtr<INode> drop_elements = ParseDropElements();
-      ASTUtils::Link(separator, drop_elements);
-  }
-
-  return separator;
 }
 NodePtr<INode> Parser::ParseDropElement() {
   auto next_token = NextToken();
@@ -295,10 +286,11 @@ NodePtr<INode> Parser::ParseDropElement() {
   auto peeked_token = PeekToken();
   NodePtr<INode> argument;
   switch (drop_element_type) {
-    case StmtType::kColumnKW:
+    case StmtType::kDropColumn:
+      ValidateIsWord(peeked_token);
       argument = ParseName();
       break;
-    case StmtType::kConstraintKW:
+    case StmtType::kDropConstraint:
       argument = ParseTableConstraint();
       break;
     default:
@@ -307,12 +299,13 @@ NodePtr<INode> Parser::ParseDropElement() {
   }
   ASTUtils::Link(drop_element, argument);
 
-  if (!tokens_.empty() && NodeDataClassifier::IsComma(peeked_token)) {
+  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
     // TODO: check that we have at least 2 tokens.
     if (NodeDataTypeClassifier::IsWord(tokens_[1])) {
       std::string checking_word = ASTUtils::CastToNodeType<StringNode>(tokens_[1])->data;
       if (DetermineDropElementType(checking_word) == StmtType::kNone) {
-        NodePtr<INode> next_arguments = ParseListOf(StmtType::kIdentifier);
+        // TODO: COLUMN keyword is recognized as an identifier. Ignore keywords in ParseListOf.
+        NodePtr<INode> next_arguments = ParseListOf(StmtType::kName);
         ASTUtils::Link(drop_element, next_arguments);
       }
     }
