@@ -41,10 +41,12 @@ StmtType::StmtType(const std::string_view& str_type) {
     this->value_ = kTableConstraint;
   else if (type == kST_ALTER_ACTION_ADD)
     this->value_ = kAlterActionAdd;
+  else if (type == kST_ALTER_ADD_LIST)
+    this->value_ = kAlterAddList;
   else if (type == kST_ALTER_ACTION_DROP)
     this->value_ = kAlterActionDrop;
-  else if (type == kST_DROP_LIST)
-    this->value_ = kDropList;
+  else if (type == kST_ALTER_DROP_LIST)
+    this->value_ = kAlterDropList;
   else if (type == kST_DROP_CONSTRAINT)
     this->value_ = kDropConstraint;
   else if (type == kST_DROP_COLUMN)
@@ -153,10 +155,12 @@ std::string StmtType::ToString() const {
       return std::string(kST_TABLE_CONSTRAINT);
     case kAlterActionAdd:
       return std::string(kST_ALTER_ACTION_ADD);
+    case kAlterAddList:
+      return std::string(kST_ALTER_ADD_LIST);
     case kAlterActionDrop:
       return std::string(kST_ALTER_ACTION_DROP);
-    case kDropList:
-      return std::string(kST_DROP_LIST);
+    case kAlterDropList:
+      return std::string(kST_ALTER_DROP_LIST);
     case kDropConstraint:
       return std::string(kST_DROP_CONSTRAINT);
     case kDropColumn:

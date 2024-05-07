@@ -59,6 +59,9 @@ bool Node::HasProperty(const std::string& name) const {
   static auto predicate = [name](const NodeProperty& property) { return property.name == name; };
   return std::find_if(properties.begin(), properties.end(), predicate) != properties.end();
 }
+unsigned Node::PropertyCount() const {
+  return properties.size();
+}
 Node& Node::AddLabel(const Label& label) {
   labels.push_back(label);
   return *this;

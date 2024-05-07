@@ -85,9 +85,9 @@ TEST(StmtTypeOperatorsTests, OutputTest) {
   oss_create_database_stmt << StmtType(StmtType::kCreateDatabaseStmt);
   EXPECT_EQ(kST_CREATE_DATABASE, oss_create_database_stmt.str());
 
-  std::ostringstream oss_drop_list;
-  oss_drop_list << StmtType(StmtType::kDropList);
-  EXPECT_EQ(kST_DROP_LIST, oss_drop_list.str());
+  std::ostringstream oss_alter_drop_list;
+  oss_alter_drop_list << StmtType(StmtType::kAlterDropList);
+  EXPECT_EQ(kST_ALTER_DROP_LIST, oss_alter_drop_list.str());
 
   std::ostringstream oss_condition;
   oss_condition << StmtType(StmtType::kCondition);

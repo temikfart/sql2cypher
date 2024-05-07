@@ -68,10 +68,8 @@ private:
   std::vector<cypher::NodeProperty> TranslateColumnDefinitions(
       const std::shared_ptr<ast::INode>& column_definition);
   cypher::NodeProperty TranslateColumnDefinition(const std::shared_ptr<ast::INode>& node);
-
-  void TranslateListOfTableConstraints(const std::shared_ptr<ast::INode>& node,
-                                       std::string& table_name);
-  std::shared_ptr<ast::INode> FindConstraint(const std::shared_ptr<ast::INode>& node);
+  void TranslateTableConstraint(const std::shared_ptr<ast::INode>& constraint_definition,
+                                const std::string& table_name);
 
   void TranslateDropElement(const std::shared_ptr<ast::INode>& node, std::string& table_name);
   void TranslateDropElements(const std::shared_ptr<ast::INode>& node, std::string& table_name);

@@ -104,10 +104,10 @@ NodePtr<INode> Parser::ParseAlterTableStatement() {
   StmtType action_type = DetermineAlterTableActionType(action_keyword);
   switch (action_type) {
     case StmtType::kAddKW:
-      argument = ParseTableDefinitionElements();
+      argument = ParseAlterAddListDefinition();
       break;
     case StmtType::kDropKW:
-      argument = ParseDropListDefinition();
+      argument = ParseAlterDropListDefinition();
       break;
     default:
       line = PeekToken()->line;
@@ -150,25 +150,26 @@ NodePtr<INode> Parser::ParseDropTableStatement() {
 NodePtr<INode> Parser::ParseTableDefinition() {
   ValidateIsOpeningRoundBracket(NextToken());
 
-  NodePtr<INode> table_definition = ParseTableDefinitionElements();
+  NodePtr<INode> table_definition = ASTUtils::CreateServiceNode(StmtType::kTableDef);
+
+  while (!tokens_.empty()) {
+    NodePtr<INode> table_definition_element = ParseTableDefinitionElement();
+    ASTUtils::Link(table_definition, table_definition_element);
+
+    if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+      auto next_token = NextToken();
+      ValidateHasTokens("Invalid table definition at line " + std::to_string(next_token->line)
+                            + ": expected column or constraint definition");
+      ValidateIsWord(PeekToken());
+    } else {
+      break;
+    }
+  }
 
   ValidateHasTokens("Missing closing round bracket at line "); // TODO: add line number
   ValidateIsClosingRoundBracket(NextToken());
 
   return table_definition;
-}
-NodePtr<INode> Parser::ParseTableDefinitionElements() {
-  NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kTableDef);
-
-  NodePtr<INode> first_element = ParseTableDefinitionElement();
-  ASTUtils::Link(service_node, first_element);
-
-  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
-    NodePtr<INode> separator = ParseListOf(StmtType::kTableDef);
-    ASTUtils::Link(service_node, separator);
-  }
-
-  return service_node;
 }
 NodePtr<INode> Parser::ParseTableDefinitionElement() {
   auto peeked_token = PeekToken();
@@ -258,16 +259,17 @@ NodePtr<INode> Parser::ParseTableConstraint(StmtType stmt_type) {
   return service_node;
 }
 
-NodePtr<INode> Parser::ParseDropListDefinition() {
-  NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kDropList);
+NodePtr<INode> Parser::ParseAlterAddListDefinition() {
+  NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kAlterAddList);
 
   while (!tokens_.empty()) {
-    NodePtr<INode> drop_element = ParseDropElement();
-    ASTUtils::Link(service_node, drop_element);
+    NodePtr<INode> add_element = ParseAlterAddElement();
+    ASTUtils::Link(service_node, add_element);
 
     if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
       auto next_token = NextToken();
-      ValidateHasTokens("Missing drop element in list at line " + std::to_string(next_token->line));
+      ValidateHasTokens("Missing \'ALTER TABLE ... ADD\' element in list at line "
+                            + std::to_string(next_token->line));
       ValidateIsWord(PeekToken());
     } else {
       break;
@@ -276,13 +278,36 @@ NodePtr<INode> Parser::ParseDropListDefinition() {
 
   return service_node;
 }
-NodePtr<INode> Parser::ParseDropElement() {
+NodePtr<INode> Parser::ParseAlterAddElement() {
+  return ParseTableDefinitionElement();
+}
+NodePtr<INode> Parser::ParseAlterDropListDefinition() {
+  NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kAlterDropList);
+
+  while (!tokens_.empty()) {
+    NodePtr<INode> drop_element = ParseAlterDropElement();
+    ASTUtils::Link(service_node, drop_element);
+
+    if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+      auto next_token = NextToken();
+      ValidateHasTokens("Missing \'ALTER TABLE ... DROP\' element in list at line "
+                            + std::to_string(next_token->line));
+      ValidateIsWord(PeekToken());
+    } else {
+      break;
+    }
+  }
+
+  return service_node;
+}
+NodePtr<INode> Parser::ParseAlterDropElement() {
   auto next_token = NextToken();
   std::string keyword = ASTUtils::CastToNodeType<StringNode>(next_token)->data;
   StmtType drop_element_type = DetermineDropElementType(keyword);
   NodePtr<INode> drop_element = ASTUtils::CreateServiceNode(drop_element_type);
 
-  ValidateHasTokens("Missing drop element definition at line " + std::to_string(next_token->line));
+  ValidateHasTokens("Missing \'ALTER TABLE ... DROP\' element definition at line "
+                        + std::to_string(next_token->line));
   auto peeked_token = PeekToken();
   NodePtr<INode> argument;
   switch (drop_element_type) {
@@ -294,7 +319,7 @@ NodePtr<INode> Parser::ParseDropElement() {
       argument = ParseTableConstraint();
       break;
     default:
-      throw parsing_error("Unknown drop element type at line "
+      throw parsing_error("Unknown \'ALTER TABLE ... DROP\' element type at line "
                               + std::to_string(peeked_token->line));
   }
   ASTUtils::Link(drop_element, argument);
