@@ -45,7 +45,6 @@ private:
 
   std::shared_ptr<ast::INode> ParseQuery();
   std::shared_ptr<ast::INode> ParseBaseStatement();
-  std::shared_ptr<ast::INode> ParseNextQueries();
 
   ast::StmtType ParseDDLStatementType();
   ast::StmtType ParseDMLStatementType();

@@ -47,7 +47,6 @@ private:
   void WriteCypherQuery(const std::string& query);
   void FinishCypherQueriesGroup();
 
-  void TranslateProgram(const std::shared_ptr<ast::INode>& program);
   void TranslateQuery(const std::shared_ptr<ast::INode>& query);
 
   void TranslateDDLStatement(const std::shared_ptr<ast::INode>& ddl_statement);
