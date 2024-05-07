@@ -24,8 +24,9 @@ constexpr std::string_view kST_TABLE_DEF = "table definition";
 constexpr std::string_view kST_COLUMN_DEF = "column definition";
 constexpr std::string_view kST_TABLE_CONSTRAINT = "table constraint";
 constexpr std::string_view kST_ALTER_ACTION_ADD = "alter action add";
+constexpr std::string_view kST_ALTER_ADD_LIST = "alter add list";
 constexpr std::string_view kST_ALTER_ACTION_DROP = "alter action drop";
-constexpr std::string_view kST_DROP_LIST = "drop list";
+constexpr std::string_view kST_ALTER_DROP_LIST = "alter drop list";
 constexpr std::string_view kST_DROP_CONSTRAINT = "drop constraint";
 constexpr std::string_view kST_DROP_COLUMN = "drop column";
 
@@ -85,8 +86,9 @@ public:
     kColumnDef,
     kTableConstraint,
     kAlterActionAdd,
+    kAlterAddList,
     kAlterActionDrop,
-    kDropList,
+    kAlterDropList,
     kDropConstraint,
     kDropColumn,
 

@@ -58,14 +58,15 @@ private:
   std::shared_ptr<ast::INode> ParseDropTableStatement();
 
   std::shared_ptr<ast::INode> ParseTableDefinition();
-  std::shared_ptr<ast::INode> ParseTableDefinitionElements();
   std::shared_ptr<ast::INode> ParseTableDefinitionElement();
   ast::StmtType ParseTableDefinitionElementType();
   std::shared_ptr<ast::INode> ParseColumnDefinition();
   std::shared_ptr<ast::INode> ParseTableConstraint(ast::StmtType stmt_type = ast::StmtType::kNone);
 
-  std::shared_ptr<ast::INode> ParseDropListDefinition();
-  std::shared_ptr<ast::INode> ParseDropElement();
+  std::shared_ptr<ast::INode> ParseAlterAddListDefinition();
+  std::shared_ptr<ast::INode> ParseAlterAddElement();
+  std::shared_ptr<ast::INode> ParseAlterDropListDefinition();
+  std::shared_ptr<ast::INode> ParseAlterDropElement();
 
   std::shared_ptr<ast::INode> ParseInsertStatement();
   std::shared_ptr<ast::INode> ParseDeleteStatement();
