@@ -111,7 +111,6 @@ private:
   std::shared_ptr<ast::INode> ParseDataType();
   std::shared_ptr<ast::INode> ParseString();
   std::shared_ptr<ast::INode> ParseName();
-  std::shared_ptr<ast::INode> ParseIdentifiers();
   std::shared_ptr<ast::INode> ParseIdentifier();
 
   void ValidateHasTokens(const std::string& details = "") const;
