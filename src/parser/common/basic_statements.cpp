@@ -102,7 +102,7 @@ NodePtr<INode> Parser::ParseListOf(StmtType element_type) {
   }
   ASTUtils::Link(separator, next_element);
 
-  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+  if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
     NodePtr<INode> next_elements = ParseListOf(element_type);
     ASTUtils::Link(separator, next_elements);
   }
@@ -138,11 +138,11 @@ NodePtr<INode> Parser::ParsePrimaryKey() {
   ValidateIsOpeningRoundBracket(NextToken());
 
   ValidateHasTokens("Missed column name at line " + std::to_string(line));
-  while (!tokens_.empty()) {
+  while (HasTokens()) {
     NodePtr<INode> column_name = ParseColumnName();
     ASTUtils::Link(primary_key, column_name);
 
-    if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+    if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
       next_token = NextToken();
       ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
                             + ": missing column name after comma");
@@ -187,11 +187,11 @@ NodePtr<INode> Parser::ParseForeignKey() {
 
   ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
                         + ": missing referencing column name");
-  while (!tokens_.empty()) {
+  while (HasTokens()) {
     NodePtr<INode> referencing_column_name = ParseColumnName();
     ASTUtils::Link(foreign_key, referencing_column_name);
 
-    if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+    if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
       next_token = NextToken();
       ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
                             + ": missing referencing column name after comma");
@@ -229,16 +229,16 @@ NodePtr<INode> Parser::ParseReference() {
   NodePtr<INode> referenced_table_name = ParseTableName();
   ASTUtils::Link(reference, referenced_table_name);
 
-  if (!tokens_.empty() && NodeDataClassifier::IsOpeningRoundBracket(PeekToken())) {
+  if (HasTokens() && NodeDataClassifier::IsOpeningRoundBracket(PeekToken())) {
     next_token = NextToken();
 
     ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
                           + ": missing referenced column name");
-    while (!tokens_.empty()) {
+    while (HasTokens()) {
       NodePtr<INode> referenced_column_name = ParseColumnName();
       ASTUtils::Link(reference, referenced_column_name);
 
-      if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+      if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
         next_token = NextToken();
         ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
                               + ": missing referenced column name after comma");
@@ -323,11 +323,11 @@ NodePtr<INode> Parser::ParseString() {
 NodePtr<INode> Parser::ParseName() {
   NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kName, PeekToken());
 
-  while (!tokens_.empty()) {
+  while (HasTokens()) {
     NodePtr<INode> identifier = ParseIdentifier();
     ASTUtils::Link(service_node, identifier);
 
-    if (!tokens_.empty() && NodeDataClassifier::IsDot(PeekToken())) {
+    if (HasTokens() && NodeDataClassifier::IsDot(PeekToken())) {
       auto next_token = NextToken();
       ValidateHasTokens("Missing identifier after the dot delimiter at line "
                             + std::to_string(next_token->line));

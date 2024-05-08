@@ -27,7 +27,7 @@ NodePtr<INode> Parser::ParseMathExpression() {
 NodePtr<INode> Parser::ParseMathSum() {
   NodePtr<INode> lhs_product = ParseMathProduct();
 
-  if (!tokens_.empty() && NodeDataTypeClassifier::IsOperator(PeekToken())) {
+  if (HasTokens() && NodeDataTypeClassifier::IsOperator(PeekToken())) {
     NodePtr<INode> operator_node = PeekToken();
     std::string operator_str = ASTUtils::CastToNodeType<StringNode>(operator_node)->data;
     if (operator_str == "+" || operator_str == "-") {
@@ -48,7 +48,7 @@ NodePtr<INode> Parser::ParseMathSum() {
 NodePtr<INode> Parser::ParseMathProduct() {
   NodePtr<INode> lhs_power = ParseMathPower();
 
-  if (!tokens_.empty() && NodeDataTypeClassifier::IsOperator(PeekToken())) {
+  if (HasTokens() && NodeDataTypeClassifier::IsOperator(PeekToken())) {
     NodePtr<INode> operator_node = PeekToken();
     std::string operator_str = ASTUtils::CastToNodeType<StringNode>(operator_node)->data;
     if (operator_str == "*" || operator_str == "/") {
@@ -69,7 +69,7 @@ NodePtr<INode> Parser::ParseMathProduct() {
 NodePtr<INode> Parser::ParseMathPower() {
   NodePtr<INode> value = ParseMathValue();
 
-  if (!tokens_.empty() && NodeDataTypeClassifier::IsOperator(PeekToken())) {
+  if (HasTokens() && NodeDataTypeClassifier::IsOperator(PeekToken())) {
     NodePtr<INode> operator_node = PeekToken();
     std::string operator_str = ASTUtils::CastToNodeType<StringNode>(operator_node)->data;
     if (operator_str == "^") {

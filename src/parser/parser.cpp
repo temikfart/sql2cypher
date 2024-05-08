@@ -14,13 +14,13 @@ Parser::Parser(std::deque<NodePtr<INode>>&& tokens) : tokens_(std::move(tokens))
 
 NodePtr<INode> Parser::Parse() {
   LOGI << "Parsing is started";
-  if (tokens_.empty()) {
+  if (!HasTokens()) {
     LOGI << "Parsing is finished. Nothing to parse";
     return {};
   }
 
   NodePtr<INode> root = ASTUtils::CreateRootNode(StmtType::kProgram);
-  while (!tokens_.empty()) {
+  while (HasTokens()) {
     if (NodeDataClassifier::IsSemicolon(PeekToken())) {
       NextToken();
       continue;
