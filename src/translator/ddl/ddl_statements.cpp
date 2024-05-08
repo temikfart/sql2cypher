@@ -88,32 +88,22 @@ void Translator::TranslateAlterTableStatement(const NodePtr<INode>& stmt) {
   }
 }
 void Translator::TranslateDropDatabaseStatement(const NodePtr<INode>& stmt) {
-  auto database_name_node = stmt->Child(0);
-  ValidateHasChildren(database_name_node);
-  auto database_name = GetName(database_name_node);
-  WriteCypherQuery(DropDatabaseClauseBuilder::Build(database_name));
+  for (unsigned i = 0; HasChildren(stmt, i + 1); ++i) {
+    auto database_name_node = stmt->Child(i);
+    ValidateHasChildren(database_name_node);
+    auto database_name = GetName(database_name_node);
 
-  if (HasChildren(stmt, 2)) {
-    std::vector<std::string> other_db_names = GetList(stmt->Child(1), StmtType::kName);
-    for (const auto& other_database_name: other_db_names) {
-      WriteCypherQuery(DropDatabaseClauseBuilder::Build(other_database_name));
-    }
+    WriteCypherQuery(DropDatabaseClauseBuilder::Build(database_name));
   }
 }
 void Translator::TranslateDropTableStatement(const NodePtr<INode>& stmt) {
-  auto table_name_node = stmt->Child(0);
-  ValidateHasChildren(table_name_node);
+  for (unsigned i = 0; HasChildren(stmt, i + 1); ++i) {
+    auto table_name_node = stmt->Child(i);
+    ValidateHasChildren(table_name_node);
+    auto table_name = GetName(table_name_node);
 
-  std::string table_name = GetName(table_name_node);
-  Node node(table_name);
-  WriteCypherQuery(DeleteNodeClauseBuilder::Build(node));
-
-  if (HasChildren(stmt, 2)) {
-    std::vector<std::string> other_table_names = GetList(stmt->Child(1), StmtType::kName);
-    for (auto& other_table_name: other_table_names) {
-      Node other_node(other_table_name);
-      WriteCypherQuery(DeleteNodeClauseBuilder::Build(other_node));
-    }
+    Node node(table_name);
+    WriteCypherQuery(DeleteNodeClauseBuilder::Build(node));
   }
 }
 
