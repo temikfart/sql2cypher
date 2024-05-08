@@ -30,7 +30,7 @@ void Parser::ValidateHasTokens(unsigned min_count) const {
   }
 }
 void Parser::ValidateHasNotTokens() const {
-  if (!tokens_.empty()) {
+  if (HasTokens()) {
     throw parsing_error("Unexpected non empty tokens array");
   }
 }

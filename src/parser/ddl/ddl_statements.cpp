@@ -123,11 +123,11 @@ NodePtr<INode> Parser::ParseAlterTableStatement() {
 NodePtr<INode> Parser::ParseDropDatabaseStatement() {
   NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kDropDatabaseStmt);
 
-  while (!tokens_.empty()) {
+  while (HasTokens()) {
     NodePtr<INode> database_name = ParseName();
     ASTUtils::Link(service_node, database_name);
 
-    if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+    if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
       auto next_token = NextToken();
       ValidateHasTokens("Invalid \'DROP DATABASE\' statement at line "
                             + std::to_string(next_token->line)
@@ -143,11 +143,11 @@ NodePtr<INode> Parser::ParseDropDatabaseStatement() {
 NodePtr<INode> Parser::ParseDropTableStatement() {
   NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kDropTableStmt);
 
-  while (!tokens_.empty()) {
+  while (HasTokens()) {
     NodePtr<INode> table_name = ParseName();
     ASTUtils::Link(service_node, table_name);
 
-    if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+    if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
       auto next_token = NextToken();
       ValidateHasTokens("Invalid \'DROP TABLE\' statement at line "
                             + std::to_string(next_token->line)
@@ -166,11 +166,11 @@ NodePtr<INode> Parser::ParseTableDefinition() {
 
   NodePtr<INode> table_definition = ASTUtils::CreateServiceNode(StmtType::kTableDef);
 
-  while (!tokens_.empty()) {
+  while (HasTokens()) {
     NodePtr<INode> table_definition_element = ParseTableDefinitionElement();
     ASTUtils::Link(table_definition, table_definition_element);
 
-    if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+    if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
       auto next_token = NextToken();
       ValidateHasTokens("Invalid table definition at line " + std::to_string(next_token->line)
                             + ": expected column or constraint definition");
@@ -224,7 +224,7 @@ NodePtr<INode> Parser::ParseColumnDefinition() {
   NodePtr<INode> datatype = ParseDataType();
   ASTUtils::Link(service_node, datatype);
 
-  if (!tokens_.empty()) {
+  if (HasTokens()) {
     // TODO: parse options such as IDENTITY or (NOT) NULL.
   }
 
@@ -276,11 +276,11 @@ NodePtr<INode> Parser::ParseTableConstraint(StmtType stmt_type) {
 NodePtr<INode> Parser::ParseAlterAddListDefinition() {
   NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kAlterAddList);
 
-  while (!tokens_.empty()) {
+  while (HasTokens()) {
     NodePtr<INode> add_element = ParseAlterAddElement();
     ASTUtils::Link(service_node, add_element);
 
-    if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+    if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
       auto next_token = NextToken();
       ValidateHasTokens("Missing \'ALTER TABLE ... ADD\' element in list at line "
                             + std::to_string(next_token->line));
@@ -298,11 +298,11 @@ NodePtr<INode> Parser::ParseAlterAddElement() {
 NodePtr<INode> Parser::ParseAlterDropListDefinition() {
   NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kAlterDropList);
 
-  while (!tokens_.empty()) {
+  while (HasTokens()) {
     NodePtr<INode> drop_element = ParseAlterDropElement();
     ASTUtils::Link(service_node, drop_element);
 
-    if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+    if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
       auto next_token = NextToken();
       ValidateHasTokens("Missing \'ALTER TABLE ... DROP\' element in list at line "
                             + std::to_string(next_token->line));

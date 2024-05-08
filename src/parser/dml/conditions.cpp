@@ -22,7 +22,7 @@ NodePtr<INode> Parser::ParseORCondition() {
   ASTUtils::Link(service_node, and_condition);
 
   auto peeked_token = PeekToken();
-  if (!tokens_.empty() && NodeDataTypeClassifier::IsWord(peeked_token)) {
+  if (HasTokens() && NodeDataTypeClassifier::IsWord(peeked_token)) {
     std::string checking_word = ASTUtils::CastToNodeType<StringNode>(peeked_token)->data;
     if (DetermineIsOROperator(checking_word)) {
       NextToken();
@@ -41,7 +41,7 @@ NodePtr<INode> Parser::ParseANDCondition() {
   ASTUtils::Link(service_node, not_condition);
 
   auto peeked_token = PeekToken();
-  if (!tokens_.empty() && NodeDataTypeClassifier::IsWord(peeked_token)) {
+  if (HasTokens() && NodeDataTypeClassifier::IsWord(peeked_token)) {
     std::string checking_word = ASTUtils::CastToNodeType<StringNode>(peeked_token)->data;
     if (DetermineIsANDOperator(checking_word)) {
       NextToken();
