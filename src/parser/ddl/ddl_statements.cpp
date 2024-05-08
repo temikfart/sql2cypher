@@ -123,12 +123,19 @@ NodePtr<INode> Parser::ParseAlterTableStatement() {
 NodePtr<INode> Parser::ParseDropDatabaseStatement() {
   NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kDropDatabaseStmt);
 
-  NodePtr<INode> database_name = ParseName();
-  ASTUtils::Link(service_node, database_name);
+  while (!tokens_.empty()) {
+    NodePtr<INode> database_name = ParseName();
+    ASTUtils::Link(service_node, database_name);
 
-  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
-    NodePtr<INode> names_list = ParseListOf(StmtType::kName);
-    ASTUtils::Link(service_node, names_list);
+    if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+      auto next_token = NextToken();
+      ValidateHasTokens("Invalid \'DROP DATABASE\' statement at line "
+                            + std::to_string(next_token->line)
+                            + ": expected database name after comma");
+      ValidateIsWord(PeekToken());
+    } else {
+      break;
+    }
   }
 
   return service_node;
@@ -136,12 +143,19 @@ NodePtr<INode> Parser::ParseDropDatabaseStatement() {
 NodePtr<INode> Parser::ParseDropTableStatement() {
   NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kDropTableStmt);
 
-  NodePtr<INode> table_name = ParseName();
-  ASTUtils::Link(service_node, table_name);
+  while (!tokens_.empty()) {
+    NodePtr<INode> table_name = ParseName();
+    ASTUtils::Link(service_node, table_name);
 
-  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
-    NodePtr<INode> names_list = ParseListOf(StmtType::kName);
-    ASTUtils::Link(service_node, names_list);
+    if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+      auto next_token = NextToken();
+      ValidateHasTokens("Invalid \'DROP TABLE\' statement at line "
+                            + std::to_string(next_token->line)
+                            + ": expected table name after comma");
+      ValidateIsWord(PeekToken());
+    } else {
+      break;
+    }
   }
 
   return service_node;
