@@ -13,46 +13,32 @@ using NodePtr = std::shared_ptr<NodeType>;
 void Translator::TranslatePrimaryKey(const NodePtr<INode>& primary_key,
                                      const std::string& constraint_name,
                                      const std::string& table_name) {
-  auto column_name_node = primary_key->Child(0);
-  ValidateHasChildren(column_name_node);
-  auto column_name = GetName(column_name_node);
+  for (unsigned i = 0; HasChildren(primary_key, i + 1); ++i) {
+    auto column_name_node = primary_key->Child(i);
+    ValidateHasChildren(column_name_node);
+    auto column_name = GetName(column_name_node);
 
-  std::vector<std::string> properties;
-  properties.push_back(column_name);
-
-  if (HasChildren(primary_key, 2)) {
-    auto other_column_name_node = primary_key->Child(1);
-    ValidateHasChildren(other_column_name_node);
-    std::vector<std::string> other_properties = GetList(other_column_name_node, StmtType::kName);
-    properties.insert(properties.end(), other_properties.begin(), other_properties.end());
-  }
-
-  for (const auto& property: properties) {
     CreateConstraint(constraint_name + "_" + std::to_string(constraint_counter++), table_name,
-                        property, ConstraintType::kUniqueness);
+                     column_name, ConstraintType::kUniqueness);
     CreateConstraint(constraint_name + "_" + std::to_string(constraint_counter++), table_name,
-                        property, ConstraintType::kExistence);
+                     column_name, ConstraintType::kExistence);
   }
 }
 void Translator::TranslateForeignKey(const NodePtr<INode>& foreign_key,
                                      const std::string& table_name) {
-  auto column_name_node = foreign_key->Child(0);
-  ValidateHasChildren(column_name_node);
-  auto column_name = GetName(column_name_node);
-
   std::vector<std::string> properties;
-  properties.push_back(column_name);
-
-  int reference_child_num = 1;
-  if (HasChildren(foreign_key, 3)) {
-    reference_child_num++;
-    auto separator_node = foreign_key->Child(1);
-    ValidateIsCorrectStmtType(separator_node, StmtType::kCommaDelimiter);
-    std::vector<std::string> other_properties = GetList(separator_node, StmtType::kName);
-    properties.insert(properties.end(), other_properties.begin(), other_properties.end());
+  for (unsigned i = 0; HasChildren(foreign_key, i + 1); ++i) {
+    auto column_name_node = foreign_key->Child(i);
+    if (!IsCorrectStmtType(column_name_node, StmtType::kName)) {
+      break;
+    }
+    ValidateHasChildren(column_name_node);
+    auto column_name = GetName(column_name_node);
+    properties.push_back(column_name);
   }
 
-  auto reference = foreign_key->Child(reference_child_num);
+  ValidateHasChildren(foreign_key, properties.size() + 1);
+  auto reference = foreign_key->Child(properties.size());
   ValidateIsCorrectStmtType(reference, StmtType::kReferencesKW);
 
   ValidateHasChildren(reference);
@@ -62,16 +48,14 @@ void Translator::TranslateForeignKey(const NodePtr<INode>& foreign_key,
   std::string ref_table_name = GetName(table_name_node);
 
   std::vector<std::string> ref_columns;
-  if (HasChildren(reference, 2)) {
-    auto ref_column_name_node = reference->Child(1);
-    ValidateHasChildren(ref_column_name_node);
-    ref_columns.push_back(GetName(ref_column_name_node));
-    if (HasChildren(reference, 3)) {
-      auto other_ref_column_name_node = reference->Child(2);
-      ValidateHasChildren(other_ref_column_name_node);
-      std::vector<std::string> other_props = GetList(other_ref_column_name_node, StmtType::kName);
-      ref_columns.insert(ref_columns.end(), other_props.begin(), other_props.end());
+  for (unsigned i = 1; HasChildren(reference, i + 1); ++i) {
+    auto ref_column_name_node = reference->Child(i);
+    if (!IsCorrectStmtType(ref_column_name_node, StmtType::kName)) {
+      break;
     }
+    ValidateHasChildren(ref_column_name_node);
+    auto column_name = GetName(ref_column_name_node);
+    ref_columns.push_back(column_name);
   }
 
   // TODO: Match all nodes with correspond labels and remove properties.

@@ -206,9 +206,9 @@ void Translator::TranslateTableConstraint(const NodePtr<INode>& constraint_defin
                                           const std::string& table_name) {
   ValidateHasChildren(constraint_definition, 1, "Missing constraint definition");
 
-  size_t key_node_number = 0;
+  size_t key_node_number = 1;
   std::string constraint_name;
-  if (HasChildren(constraint_definition, 2)) {
+  if (HasChildren(constraint_definition, key_node_number + 1)) {
     key_node_number++;
 
     auto constraint_kw = constraint_definition->Child(0);
@@ -220,7 +220,7 @@ void Translator::TranslateTableConstraint(const NodePtr<INode>& constraint_defin
   }
 
   ValidateHasChildren(constraint_definition, key_node_number, "Missing constraint definition");
-  auto key = constraint_definition->Child(key_node_number);
+  auto key = constraint_definition->Child(key_node_number - 1);
   ValidateHasChildren(key);
   switch (key->stmt_type) {
     case StmtType::kPrimaryKey:
