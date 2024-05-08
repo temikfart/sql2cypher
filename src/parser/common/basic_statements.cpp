@@ -135,21 +135,25 @@ NodePtr<INode> Parser::ParsePrimaryKey() {
   ValidateHasTokens("Missing \'PRIMARY KEY\' definition at line "
                         + std::to_string(next_token->line));
   int line = PeekToken()->line;
-  ValidateIsOpeningRoundBracket(PeekToken());
-  NextToken();
+  ValidateIsOpeningRoundBracket(NextToken());
 
   ValidateHasTokens("Missed column name at line " + std::to_string(line));
-  NodePtr<INode> column_name = ParseColumnName();
-  ASTUtils::Link(primary_key, column_name);
+  while (!tokens_.empty()) {
+    NodePtr<INode> column_name = ParseColumnName();
+    ASTUtils::Link(primary_key, column_name);
 
-  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
-    NodePtr<INode> separator = ParseListOf(StmtType::kName);
-    ASTUtils::Link(primary_key, separator);
+    if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+      next_token = NextToken();
+      ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
+                            + ": missing column name after comma");
+      ValidateIsWord(PeekToken());
+    } else {
+      break;
+    }
   }
 
   ValidateHasTokens("Missed closing round bracket at line " + std::to_string(line));
-  ValidateIsClosingRoundBracket(PeekToken());
-  NextToken();
+  ValidateIsClosingRoundBracket(NextToken());
 
   return primary_key;
 }
@@ -176,63 +180,76 @@ NodePtr<INode> Parser::ParseForeignKey() {
                             + ": expected \'KEY\' keyword");
   }
 
-  ValidateHasTokens("Missing \'FOREIGN KEY\' definition at line "
-                        + std::to_string(next_token->line));
+  ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
+                        + ": missing \'FOREIGN KEY\' definition");
   next_token = NextToken();
   ValidateIsOpeningRoundBracket(next_token);
 
-  ValidateHasTokens("Missing referencing column name in \'FOREIGN KEY\' definition at line "
-                        + std::to_string(next_token->line));
-  NodePtr<INode> referencing_column_name = ParseColumnName();
-  ASTUtils::Link(foreign_key, referencing_column_name);
+  ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
+                        + ": missing referencing column name");
+  while (!tokens_.empty()) {
+    NodePtr<INode> referencing_column_name = ParseColumnName();
+    ASTUtils::Link(foreign_key, referencing_column_name);
 
-  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
-    NodePtr<INode> next_referencing_column_names = ParseListOf(StmtType::kName);
-    ASTUtils::Link(foreign_key, next_referencing_column_names);
+    if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+      next_token = NextToken();
+      ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
+                            + ": missing referencing column name after comma");
+      ValidateIsWord(PeekToken());
+    } else {
+      break;
+    }
   }
 
-  ValidateHasTokens("Missing closing parenthesis in \'FOREIGN KEY\' definition at line "
-                        + std::to_string(referencing_column_name->line));
+  ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
+                        + ": missing closing parenthesis");
   next_token = NextToken();
   ValidateIsClosingRoundBracket(next_token);
 
-  ValidateHasTokens("Missing \'REFERENCES\' keyword in \'FOREIGN KEY\' definition at line "
-                        + std::to_string(next_token->line));
+  ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
+                        + ": missing \'REFERENCES\' keyword");
   NodePtr<INode> reference = ParseReference();
   ASTUtils::Link(foreign_key, reference);
 
   return foreign_key;
 }
 NodePtr<INode> Parser::ParseReference() {
+  std::string incorrect_msg_prefix = "Incorrect \'REFERENCES\' definition at line ";
+
   auto next_token = NextToken();
   ValidateIsWord(next_token);
   std::string references_keyword = ASTUtils::CastToNodeType<StringNode>(next_token)->data;
   if (!DetermineIsReferences(references_keyword)) {
-    throw parsing_error("Incorrect \'REFERENCES\' definition at line "
-                            + std::to_string(next_token->line));
+    throw parsing_error(incorrect_msg_prefix + std::to_string(next_token->line));
   }
   NodePtr<INode> reference = ASTUtils::CreateServiceNode(StmtType::kReferencesKW, next_token);
 
-  ValidateHasTokens("Missing references table name at line " + std::to_string(next_token->line));
+  ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
+                        + ": missing references table name");
   NodePtr<INode> referenced_table_name = ParseTableName();
   ASTUtils::Link(reference, referenced_table_name);
 
   if (!tokens_.empty() && NodeDataClassifier::IsOpeningRoundBracket(PeekToken())) {
     next_token = NextToken();
 
-    ValidateHasTokens("Missing referenced column name at line " + std::to_string(next_token->line));
-    NodePtr<INode> referenced_column_name = ParseColumnName();
-    ASTUtils::Link(reference, referenced_column_name);
+    ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
+                          + ": missing referenced column name");
+    while (!tokens_.empty()) {
+      NodePtr<INode> referenced_column_name = ParseColumnName();
+      ASTUtils::Link(reference, referenced_column_name);
 
-    ValidateHasTokens("Missing closing parenthesis or comma at line "
-                          + std::to_string(referenced_column_name->line));
-    auto peeked_token = PeekToken();
-    if (NodeDataClassifier::IsComma(peeked_token)) {
-      NodePtr<INode> next_referenced_column_names = ParseListOf(StmtType::kName);
-      ASTUtils::Link(reference, next_referenced_column_names);
+      if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
+        next_token = NextToken();
+        ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
+                              + ": missing referenced column name after comma");
+        ValidateIsWord(PeekToken());
+      } else {
+        break;
+      }
     }
 
-    ValidateHasTokens("Missing closing parenthesis at line " + std::to_string(peeked_token->line));
+    ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
+                          + ": missing closing parenthesis");
     ValidateIsClosingRoundBracket(NextToken());
   }
 
