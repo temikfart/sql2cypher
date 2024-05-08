@@ -327,30 +327,44 @@ NodePtr<INode> Parser::ParseAlterDropElement() {
   switch (drop_element_type) {
     case StmtType::kDropColumn:
       ValidateIsWord(peeked_token);
-      argument = ParseName();
+      ParseAlterDropColumns(drop_element);
       break;
     case StmtType::kDropConstraint:
       argument = ParseTableConstraint();
+      ASTUtils::Link(drop_element, argument);
       break;
     default:
       throw parsing_error("Unknown \'ALTER TABLE ... DROP\' element type at line "
                               + std::to_string(peeked_token->line));
   }
-  ASTUtils::Link(drop_element, argument);
-
-  if (!tokens_.empty() && NodeDataClassifier::IsComma(PeekToken())) {
-    // TODO: check that we have at least 2 tokens.
-    if (NodeDataTypeClassifier::IsWord(tokens_[1])) {
-      std::string checking_word = ASTUtils::CastToNodeType<StringNode>(tokens_[1])->data;
-      if (DetermineDropElementType(checking_word) == StmtType::kNone) {
-        // TODO: COLUMN keyword is recognized as an identifier. Ignore keywords in ParseListOf.
-        NodePtr<INode> next_arguments = ParseListOf(StmtType::kName);
-        ASTUtils::Link(drop_element, next_arguments);
-      }
-    }
-  }
 
   return drop_element;
+}
+void Parser::ParseAlterDropColumns(NodePtr<INode>& parent) {
+  auto has_next_column_name_node = [this]() {
+    if (HasTokens(2) && NodeDataClassifier::IsComma(PeekToken())) {
+      auto peeked_token = PeekToken(1);
+      if (NodeDataTypeClassifier::IsWord(peeked_token)) {
+        std::string checking_word = ASTUtils::CastToNodeType<StringNode>(peeked_token)->data;
+        return DetermineDropElementType(checking_word) == StmtType::kNone;
+      }
+    }
+    return false;
+  };
+
+  while (HasTokens()) {
+    auto column_name_node = ParseName();
+    ASTUtils::Link(parent, column_name_node);
+
+    if (!has_next_column_name_node()) {
+      break;
+    }
+
+    auto next_token = NextToken();
+    ValidateHasTokens("Missing column name after comma at line "
+                          + std::to_string(next_token->line));
+    ValidateIsWord(PeekToken());
+  }
 }
 
 } // scc::parser

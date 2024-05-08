@@ -131,19 +131,12 @@ void Translator::TranslateAlterTableActionAdd(const NodePtr<INode>& action_node,
 }
 void Translator::TranslateAlterTableActionDrop(const NodePtr<INode>& action_node,
                                                std::string& table_name) {
-  std::string msg_suffix = " in \'ALTER TABLE DROP\' statement";
-
-  auto drop_list_def = action_node->Child(0);
-
-  ValidateHasChildren(drop_list_def, 1, "Missing arguments" + msg_suffix);
-  auto object = drop_list_def->Child(0);
-  ValidateHasChildren(object);
-  TranslateDropElement(object, table_name);
-
-  if (HasChildren(drop_list_def, 2)) {
-    auto other_objects = drop_list_def->Child(1);
-    ValidateHasChildren(other_objects);
-    TranslateDropElements(other_objects, table_name);
+  auto alter_drop_list = action_node->Child(0);
+  ValidateHasChildren(alter_drop_list, 1, "Missing arguments in \'ALTER TABLE DROP\' statement");
+  for (unsigned i = 0; HasChildren(alter_drop_list, i + 1); ++i) {
+    auto drop_element = alter_drop_list->Child(i);
+    ValidateHasChildren(drop_element);
+    TranslateDropElement(drop_element, table_name);
   }
 }
 
@@ -224,31 +217,23 @@ void Translator::TranslateTableConstraint(const NodePtr<INode>& constraint_defin
   }
 }
 
-void Translator::TranslateDropElements(const NodePtr<INode>& node, std::string& table_name) {
-  ValidateIsCorrectStmtType(node, StmtType::kAlterDropList);
-  for (unsigned i = 0; HasChildren(node, i + 1); ++i) {
-    auto drop_object = node->Child(0);
-    ValidateHasChildren(drop_object);
-    TranslateDropElement(drop_object, table_name);
-  }
-}
 void Translator::TranslateDropElement(const NodePtr<INode>& node, std::string& table_name) {
-  std::string argument = GetName(node->Child(0));
-  std::vector<std::string> other_arguments;
-  if (HasChildren(node, 2)) {
-    other_arguments = GetList(node->Child(1), StmtType::kName);
+  std::vector<std::string> arguments;
+  for (unsigned i = 0; HasChildren(node, i + 1); ++i) {
+    auto argument_node = node->Child(i);
+    ValidateHasChildren(argument_node);
+    auto argument_name = GetName(argument_node);
+    arguments.push_back(argument_name);
   }
 
   switch (node->stmt_type) {
     case StmtType::kDropColumn:
-      RemoveProperty(table_name, argument);
-      for (const auto& arg: other_arguments) {
+      for (const auto& arg: arguments) {
         RemoveProperty(table_name, arg);
       }
       break;
     case StmtType::kDropConstraint:
-      WriteCypherQuery(DropConstraintClauseBuilder::Build(argument));
-      for (const auto& arg: other_arguments) {
+      for (const auto& arg: arguments) {
         WriteCypherQuery(DropConstraintClauseBuilder::Build(arg));
       }
       break;

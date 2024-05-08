@@ -35,12 +35,12 @@ NodePtr<INode> Parser::Parse() {
   return root;
 }
 
-const NodePtr<INode>& Parser::PeekToken() const {
-  ValidateHasTokens();
-  return tokens_.front();
+const NodePtr<INode>& Parser::PeekToken(unsigned idx) const {
+  ValidateHasTokens(idx + 1);
+  return tokens_[idx];
 }
 NodePtr<INode> Parser::NextToken() {
-  ValidateHasTokens();
+  ValidateHasTokens(1);
   NodePtr<INode> node = tokens_.front();
   tokens_.pop_front();
   return node;
