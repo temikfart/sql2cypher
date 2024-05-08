@@ -40,7 +40,7 @@ public:
 private:
   std::deque<std::shared_ptr<ast::INode>> tokens_;
 
-  const std::shared_ptr<ast::INode>& PeekToken() const;
+  const std::shared_ptr<ast::INode>& PeekToken(unsigned idx = 0) const;
   std::shared_ptr<ast::INode> NextToken();
 
   std::shared_ptr<ast::INode> ParseQuery();
@@ -67,6 +67,7 @@ private:
   std::shared_ptr<ast::INode> ParseAlterAddElement();
   std::shared_ptr<ast::INode> ParseAlterDropListDefinition();
   std::shared_ptr<ast::INode> ParseAlterDropElement();
+  void ParseAlterDropColumns(std::shared_ptr<ast::INode>& parent);
 
   std::shared_ptr<ast::INode> ParseInsertStatement();
   std::shared_ptr<ast::INode> ParseDeleteStatement();
@@ -113,7 +114,9 @@ private:
   std::shared_ptr<ast::INode> ParseName();
   std::shared_ptr<ast::INode> ParseIdentifier();
 
+  bool HasTokens(unsigned min_count = 1) const;
   void ValidateHasTokens(const std::string& details = "") const;
+  void ValidateHasTokens(unsigned min_count = 1) const;
   void ValidateHasNotTokens() const;
   void ValidateIsWord(const std::shared_ptr<ast::INode>& node) const;
   void ValidateIsOpeningRoundBracket(const std::shared_ptr<ast::INode>& node) const;

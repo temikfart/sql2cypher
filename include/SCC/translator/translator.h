@@ -72,7 +72,6 @@ private:
                                 const std::string& table_name);
 
   void TranslateDropElement(const std::shared_ptr<ast::INode>& node, std::string& table_name);
-  void TranslateDropElements(const std::shared_ptr<ast::INode>& node, std::string& table_name);
 
   // DML statements
 
@@ -87,8 +86,6 @@ private:
   void TranslateForeignKey(const std::shared_ptr<ast::INode>& foreign_key,
                            const std::string& table_name);
 
-  std::vector<std::string> GetList(const std::shared_ptr<ast::INode>& node,
-                                   ast::StmtType type) const;
   std::string GetName(const std::shared_ptr<ast::INode>& name_node) const;
   std::string GetIdentifier(const std::shared_ptr<ast::INode>& node) const;
 

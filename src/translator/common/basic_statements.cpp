@@ -68,32 +68,6 @@ void Translator::TranslateForeignKey(const NodePtr<INode>& foreign_key,
   CreateRelationship(table_name, ref_table_name);
 }
 
-std::vector<std::string> Translator::GetList(const NodePtr<INode>& node, StmtType type) const {
-  auto argument_node = node->Child(0);
-  ValidateHasChildren(argument_node);
-  std::vector<std::string> arguments;
-  std::string argument;
-  switch (type) {
-    case StmtType::kName:
-      argument = GetName(argument_node);
-      break;
-    case StmtType::kIdentifier:
-      argument = GetIdentifier(argument_node);
-      break;
-    default:
-      throw translation_error("Unknown argument type for list of elements");
-  }
-  arguments.push_back(argument);
-
-  if (HasChildren(node, 2)) {
-    auto next_separator_node = node->Child(1);
-    ValidateHasChildren(next_separator_node);
-    std::vector<std::string> other_arguments = GetList(next_separator_node, type);
-    arguments.insert(arguments.end(), other_arguments.begin(), other_arguments.end());
-  }
-
-  return arguments;
-}
 std::string Translator::GetName(const NodePtr<INode>& name_node) const {
   std::ostringstream name;
   ValidateHasChildren(name_node);
