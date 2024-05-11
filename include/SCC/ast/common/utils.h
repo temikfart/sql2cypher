@@ -32,7 +32,73 @@ public:
   static std::shared_ptr<INode> CreateStringNode(const std::string& str, DataType data_type);
 
   static void Link(std::shared_ptr<INode>& parent, std::shared_ptr<INode>& child);
-  static bool Equal(const std::shared_ptr<INode>& lhs, const std::shared_ptr<INode>& rhs);
 };
+
+template<typename NodeType,
+    typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
+bool operator==(const std::shared_ptr<NodeType>& lhs, const std::shared_ptr<NodeType>& rhs) {
+  LOGT << "Comparing nodes";
+
+  if (lhs->line != rhs->line) {
+    LOGT << "Line numbers are different";
+    return false;
+  }
+
+  if (lhs->data_type != rhs->data_type) {
+    LOGT << "DataTypes mismatch";
+    return false;
+  }
+
+  if (lhs->stmt_type != rhs->stmt_type) {
+    LOGT << "Different statement types";
+    return false;
+  }
+
+  switch (lhs->data_type) {
+    case DataType::kNone:
+    case DataType::kRoot:
+    case DataType::kService:
+      break;
+    case DataType::kInt:
+      if (ASTUtils::CastToNodeType<IntNumNode>(lhs)->data !=
+          ASTUtils::CastToNodeType<IntNumNode>(rhs)->data) {
+        LOGT << "IntNumNode data mismatch";
+        return false;
+      }
+      break;
+    case DataType::kFloat:
+      if (ASTUtils::CastToNodeType<FloatNumNode>(lhs)->data !=
+          ASTUtils::CastToNodeType<FloatNumNode>(rhs)->data) {
+        LOGT << "FloatNumNode data mismatch";
+        return false;
+      }
+      break;
+    case DataType::kBracket:
+    case DataType::kPunctuation:
+      if (ASTUtils::CastToNodeType<CharNode>(lhs)->data !=
+          ASTUtils::CastToNodeType<CharNode>(rhs)->data) {
+        LOGT << "CharNode data mismatch";
+        return false;
+      }
+      break;
+    case DataType::kOperator:
+    case DataType::kWord:
+    case DataType::kString:
+      if (ASTUtils::CastToNodeType<StringNode>(lhs)->data !=
+          ASTUtils::CastToNodeType<StringNode>(rhs)->data) {
+        LOGT << "StringNode data mismatch";
+        return false;
+      }
+      break;
+  }
+
+  LOGT << "Nodes are equal";
+  return true;
+}
+template<typename NodeType,
+    typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
+bool operator!=(const std::shared_ptr<NodeType>& lhs, const std::shared_ptr<NodeType>& rhs) {
+  return !(lhs == rhs);
+}
 
 } // scc::ast::common
