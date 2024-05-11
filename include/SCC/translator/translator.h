@@ -84,7 +84,7 @@ private:
   void TranslatePrimaryKey(const std::shared_ptr<ast::INode>& primary_key,
                            const std::string& constraint_name, const std::string& table_name);
   void TranslateForeignKey(const std::shared_ptr<ast::INode>& foreign_key,
-                           const std::string& table_name);
+                           const std::string& constraint_name, const std::string& table_name);
 
   std::string GetName(const std::shared_ptr<ast::INode>& name_node) const;
   std::string GetIdentifier(const std::shared_ptr<ast::INode>& node) const;
@@ -93,10 +93,13 @@ private:
                         const std::string& label_name,
                         const std::string& property_name,
                         cypher::ConstraintType constraint_type);
-  void CreateRelationship(const std::string& start_label_name, const std::string& end_label_name);
+  void CreateRelationship(const std::string& relationship_type, const std::string& start_label_name,
+                          const std::string& end_label_name);
   void RemoveProperty(const std::string& label_name, const std::string& property_name);
-  std::string CreateRelationshipType(const std::string& start_label_name,
-                                     const std::string& end_label_name);
+  std::string CreateRelationshipType(const std::string& type_prefix);
+  std::string CreatePrimaryKeyConstraintName(const std::string& table_name) const;
+  std::string CreateForeignKeyConstraintName(const std::string& table_name,
+                                             const std::string& ref_table_name) const;
 
   // Validation
 

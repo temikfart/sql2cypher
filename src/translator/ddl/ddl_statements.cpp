@@ -197,9 +197,7 @@ void Translator::TranslateTableConstraint(const NodePtr<INode>& constraint_defin
     auto constraint_kw = constraint_definition->Child(0);
     ValidateIsCorrectStmtType(constraint_kw, StmtType::kConstraintKW);
     ValidateHasChildren(constraint_kw);
-    constraint_name += GetIdentifier(constraint_kw->Child(0));
-  } else {
-    constraint_name = table_name + "_constraint";
+    constraint_name += GetName(constraint_kw->Child(0));
   }
 
   ValidateHasChildren(constraint_definition, key_node_number, "Missing constraint definition");
@@ -210,7 +208,7 @@ void Translator::TranslateTableConstraint(const NodePtr<INode>& constraint_defin
       TranslatePrimaryKey(key, constraint_name, table_name);
       break;
     case StmtType::kForeignKey:
-      TranslateForeignKey(key, table_name);
+      TranslateForeignKey(key, constraint_name, table_name);
       break;
     default:
       throw translation_error("Unknown constraint type \'" + key->stmt_type.ToString() + "\'");
