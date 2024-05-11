@@ -100,7 +100,6 @@ private:
   bool DetermineIsNOTOperator(const std::string& keyword) const;
   bool DetermineIsPrefix(const std::string_view& string, const std::string& prefix) const;
 
-  std::shared_ptr<ast::INode> ParseListOf(ast::StmtType element_type);
   std::shared_ptr<ast::INode> ParsePrimaryKey();
   std::shared_ptr<ast::INode> ParseForeignKey();
   std::shared_ptr<ast::INode> ParseReference();

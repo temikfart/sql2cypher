@@ -72,43 +72,6 @@ bool Parser::DetermineIsPrefix(const std::string_view& string, const std::string
   return string.find(scc::common::LowerCase(prefix)) == 0;
 }
 
-NodePtr<INode> Parser::ParseListOf(StmtType element_type) {
-  auto next_token = NextToken();
-  NodePtr<INode> separator = ASTUtils::CreateServiceNode(StmtType::kCommaDelimiter, next_token);
-
-  ValidateHasTokens("Invalid statement at line " + std::to_string(next_token->line)
-                        + ": expected something after the comma");
-  NodePtr<INode> next_element;
-  switch (element_type) {
-    case StmtType::kIdentifier:
-      next_element = ParseIdentifier();
-      break;
-    case StmtType::kTableDef:
-      next_element = ParseTableDefinitionElement();
-      break;
-    case StmtType::kColumnDef:
-      next_element = ParseColumnDefinition();
-      break;
-    case StmtType::kTableConstraint:
-      next_element = ParseTableConstraint();
-      break;
-    case StmtType::kName:
-      next_element = ParseName();
-      break;
-    default:
-      throw parsing_error("Invalid statatement at line " + std::to_string(PeekToken()->line)
-                              + ": unsupported elements in the list \'" + element_type.ToString()
-                              + "\'");
-  }
-  ASTUtils::Link(separator, next_element);
-
-  if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
-    NodePtr<INode> next_elements = ParseListOf(element_type);
-    ASTUtils::Link(separator, next_elements);
-  }
-
-  return separator;
-}
 NodePtr<INode> Parser::ParsePrimaryKey() {
   NodePtr<INode> primary_key = ASTUtils::CreateServiceNode(StmtType::kPrimaryKey);
 
