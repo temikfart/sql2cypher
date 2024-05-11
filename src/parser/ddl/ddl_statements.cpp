@@ -124,7 +124,7 @@ NodePtr<INode> Parser::ParseDropDatabaseStatement() {
   NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kDropDatabaseStmt);
 
   while (HasTokens()) {
-    NodePtr<INode> database_name = ParseName();
+    NodePtr<INode> database_name = ParseDatabaseName();
     ASTUtils::Link(service_node, database_name);
 
     if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
@@ -144,7 +144,7 @@ NodePtr<INode> Parser::ParseDropTableStatement() {
   NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kDropTableStmt);
 
   while (HasTokens()) {
-    NodePtr<INode> table_name = ParseName();
+    NodePtr<INode> table_name = ParseTableName();
     ASTUtils::Link(service_node, table_name);
 
     if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
@@ -217,7 +217,7 @@ NodePtr<INode> Parser::ParseColumnDefinition() {
   NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kColumnDef);
 
   int line = PeekToken()->line;
-  NodePtr<INode> column_name = ParseIdentifier();
+  NodePtr<INode> column_name = ParseColumnName();
   ASTUtils::Link(service_node, column_name);
 
   ValidateHasTokens("Missing column datatype at line " + std::to_string(line));
@@ -241,7 +241,7 @@ NodePtr<INode> Parser::ParseTableConstraint(StmtType stmt_type) {
 
     ValidateHasTokens("Missing constraint name at line "
                           + std::to_string(constraint_keyword->line));
-    NodePtr<INode> constraint_name = ParseIdentifier();
+    NodePtr<INode> constraint_name = ParseConstraintName();
     line = constraint_name->line;
     ASTUtils::Link(constraint_keyword, constraint_name);
   }
@@ -323,15 +323,13 @@ NodePtr<INode> Parser::ParseAlterDropElement() {
   ValidateHasTokens("Missing \'ALTER TABLE ... DROP\' element definition at line "
                         + std::to_string(next_token->line));
   auto peeked_token = PeekToken();
-  NodePtr<INode> argument;
+  ValidateIsWord(peeked_token);
   switch (drop_element_type) {
     case StmtType::kDropColumn:
-      ValidateIsWord(peeked_token);
       ParseAlterDropColumns(drop_element);
       break;
     case StmtType::kDropConstraint:
-      argument = ParseTableConstraint();
-      ASTUtils::Link(drop_element, argument);
+      ParseAlterDropConstraints(drop_element);
       break;
     default:
       throw parsing_error("Unknown \'ALTER TABLE ... DROP\' element type at line "
@@ -353,10 +351,36 @@ void Parser::ParseAlterDropColumns(NodePtr<INode>& parent) {
   };
 
   while (HasTokens()) {
-    auto column_name_node = ParseName();
+    auto column_name_node = ParseColumnName();
     ASTUtils::Link(parent, column_name_node);
 
     if (!has_next_column_name_node()) {
+      break;
+    }
+
+    auto next_token = NextToken();
+    ValidateHasTokens("Missing column name after comma at line "
+                          + std::to_string(next_token->line));
+    ValidateIsWord(PeekToken());
+  }
+}
+void Parser::ParseAlterDropConstraints(NodePtr<INode>& parent) {
+  auto has_next_constraint_name_node = [this]() {
+    if (HasTokens(2) && NodeDataClassifier::IsComma(PeekToken())) {
+      auto peeked_token = PeekToken(1);
+      if (NodeDataTypeClassifier::IsWord(peeked_token)) {
+        std::string checking_word = ASTUtils::CastToNodeType<StringNode>(peeked_token)->data;
+        return DetermineDropElementType(checking_word) == StmtType::kNone;
+      }
+    }
+    return false;
+  };
+
+  while (HasTokens()) {
+    auto constraint_name_node = ParseConstraintName();
+    ASTUtils::Link(parent, constraint_name_node);
+
+    if (!has_next_constraint_name_node()) {
       break;
     }
 

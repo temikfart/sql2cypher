@@ -68,6 +68,7 @@ private:
   std::shared_ptr<ast::INode> ParseAlterDropListDefinition();
   std::shared_ptr<ast::INode> ParseAlterDropElement();
   void ParseAlterDropColumns(std::shared_ptr<ast::INode>& parent);
+  void ParseAlterDropConstraints(std::shared_ptr<ast::INode>& parent);
 
   std::shared_ptr<ast::INode> ParseInsertStatement();
   std::shared_ptr<ast::INode> ParseDeleteStatement();
@@ -107,6 +108,7 @@ private:
   std::shared_ptr<ast::INode> ParseDatabaseName();
   std::shared_ptr<ast::INode> ParseTableName();
   std::shared_ptr<ast::INode> ParseColumnName();
+  std::shared_ptr<ast::INode> ParseConstraintName();
 
   std::shared_ptr<ast::INode> ParseDataType();
   std::shared_ptr<ast::INode> ParseString();

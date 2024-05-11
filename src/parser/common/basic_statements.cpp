@@ -228,6 +228,9 @@ NodePtr<INode> Parser::ParseTableName() {
 NodePtr<INode> Parser::ParseColumnName() {
   return ParseName();
 }
+NodePtr<INode> Parser::ParseConstraintName() {
+  return ParseName();
+}
 
 NodePtr<INode> Parser::ParseDataType() {
   auto next_token = NextToken();
