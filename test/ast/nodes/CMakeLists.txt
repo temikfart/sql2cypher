@@ -1,3 +1,9 @@
 scc_test(scc_test_ast_nodes
+        char_node_test.cpp
+        float_node_test.cpp
         inode_test.cpp
+        int_node_test.cpp
+        root_node_test.cpp
+        service_node_test.cpp
+        string_node_test.cpp
 )
