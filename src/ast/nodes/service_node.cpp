@@ -7,9 +7,4 @@ ServiceNode::ServiceNode(StmtType stmt_type) : INode(DataType::kService, stmt_ty
 ServiceNode::ServiceNode(StmtType stmt_type, int line)
     : INode(DataType::kService, stmt_type, line) {}
 
-std::ostream& ServiceNode::operator<<(std::ostream& os) {
-  os << "service";
-  return os;
-}
-
 } // scc::ast

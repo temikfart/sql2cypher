@@ -12,8 +12,6 @@ public:
   char data;
 
   CharNode(char ch, DataType data_type);
-
-  std::ostream& operator<<(std::ostream& os) override;
 };
 
 } // scc::ast
