@@ -30,9 +30,7 @@ public:
   std::shared_ptr<INode> Child(std::size_t node_num);
 
   std::size_t ChildrenCount() const;
-  void AddChild(std::shared_ptr<INode> const& node);
-
-  virtual std::ostream& operator<<(std::ostream& os) = 0;
+  void AddChild(const std::shared_ptr<INode>& node);
 
 protected:
   std::vector<std::shared_ptr<INode>> children_ = {};

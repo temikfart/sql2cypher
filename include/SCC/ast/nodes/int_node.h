@@ -12,8 +12,6 @@ public:
   int data;
 
   explicit IntNumNode(int value);
-
-  std::ostream& operator<<(std::ostream& os) override;
 };
 
 } // scc::ast

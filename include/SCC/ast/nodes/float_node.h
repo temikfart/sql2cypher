@@ -12,8 +12,6 @@ public:
   double data;
 
   explicit FloatNumNode(double value);
-
-  std::ostream& operator<<(std::ostream& os) override;
 };
 
 } // scc::ast

@@ -12,8 +12,6 @@ public:
   std::string data;
 
   explicit StringNode(std::string string, DataType type);
-
-  std::ostream& operator<<(std::ostream& os) override;
 };
 
 } // scc::ast
