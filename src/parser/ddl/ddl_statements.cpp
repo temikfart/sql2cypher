@@ -241,6 +241,7 @@ NodePtr<INode> Parser::ParseTableConstraint(StmtType stmt_type) {
 
     ValidateHasTokens("Missing constraint name at line "
                           + std::to_string(constraint_keyword->line));
+    ValidateIsWord(PeekToken());
     NodePtr<INode> constraint_name = ParseConstraintName();
     line = constraint_name->line;
     ASTUtils::Link(constraint_keyword, constraint_name);
@@ -249,7 +250,7 @@ NodePtr<INode> Parser::ParseTableConstraint(StmtType stmt_type) {
   ValidateHasTokens("Missing constraint definition at line " + std::to_string(line));
   auto peeked_token = PeekToken();
   StmtType constraint_type;
-  if (stmt_type != StmtType::kNone) {
+  if (stmt_type != StmtType::kNone && stmt_type != StmtType::kConstraintKW) {
     constraint_type = stmt_type;
   } else {
     ValidateIsWord(peeked_token);
