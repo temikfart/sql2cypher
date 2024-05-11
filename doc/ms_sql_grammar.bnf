@@ -1,42 +1,78 @@
-program ::= "" | (query ";")+
-query ::= ddl_statement | dml_statement
+program ::= {query} ;
+query ::= [ddl_stmt | dml_stmt] (';')+ ;
 
 // DDL Statements
-ddl_statement ::= create_statement | alter_statement | drop_statement
+ddl_stmt ::= create_database_stmt | create_table_stmt | alter_table_stmt
+        | drop_database_stmt | drop_table_stmt ;
+create_database_stmt ::= 'CREATE DATABASE' database_name ;
+create_table_stmt ::= 'CREATE TABLE' table_name table_def ;
+alter_table_stmt ::= 'ALTER TABLE' table_name
+        (('ADD' alter_table_add_list) | ('DROP' alter_table_drop_list)) ;
+drop_database_stmt ::= 'DROP DATABASE' database_name_list_ ;
+drop_table_stmt ::= 'DROP TABLE' table_name_list_ ;
 
-create_statement ::= "CREATE" create_database_statement | create_table_statement
+table_def ::= '(' table_def_element_list_ ')' ;
+column_def ::= column_name data_type ;
+table_constraint ::= ['CONSTRAINT' constraint_name] (primary_key | foreign_key) ;
 
-create_database_statement ::= "DATABASE" database_name
-database_name ::= name
-
-create_table_statement ::= "TABLE" table_name table_definition
-table_name ::= name
-table_definition ::= "(" column_definition ("," column_definition)+ ("," table_constraint)* ")"
-column_definition ::= column_name data_type
-column_name ::= identifier
-data_type ::= "float" | ("int" | "integer") | "varchar" | "char"
-table_constraint ::= ("CONSTRAINT" constraint_name)? (primary_key_constraint | foreign_key_constraint)
-constraint_name ::= identifier
-primary_key_constraint ::= "PRIMARY KEY" "(" column_name ("," column_name)* ")"
-foreign_key_constraint ::= "FOREIGN KEY" "(" column_name ("," column_name)* ")" "REFERENCES" referenced_table_name ("(" ref_column ("," ref_column)*")")
-referenced_table_name ::= table_name
-ref_column ::= column_name
-
-alter_statement ::= "ALTER" alter_table_statement
-alter_table_statement ::= "TABLE" table_name alter_table_add_action | alter_table_drop_action
-alter_table_add_action ::= "ADD" column_definition | table_constraint ("," column_definition | table_constraint)*
-alter_table_drop_action ::= "DROP" ("CONSTRAINT" constraint_name ("," constraint_name)* | "COLUMN" column_name ("," column_name)*)
-
-drop_statement ::= "DROP" drop_database_statement | drop_table_statement
-drop_database_statement ::= "DATABASE" database_name
-drop_table_statement ::= "TABLE" table_name
+alter_table_add_list ::= table_def_element_list_ ;
+alter_table_drop_list ::= alter_table_drop_element_ {',' alter_table_drop_element_} ;
 
 // DML Statements
-dml_statement ::= insert_statement | update_statement | delete_statement
-insert_statement ::= "INSERT" // stub
-update_statement ::= "UPDATE" // stub
-delete_statement ::= "DELETE" // stub
 
-// Base statements
-name ::= identifier ("." identifier)
-identifier ::= "regexp:[a-zA-z][_a-zA-z0-9]+"
+dml_stmt ::= insert_stmt | update_stmt | delete_stmt
+insert_stmt ::= 'INSERT' // stub
+update_stmt ::= 'UPDATE' // stub
+delete_stmt ::= 'DELETE' // stub
+
+// Helpers
+
+name_list_ ::= name {',' name} ;
+table_def_element_list_ ::= table_def_element_ {',' table_def_element_} ;
+table_def_element_ ::= column_def | table_constraint ;
+column_name_list_ ::= column_name {',' column_name} ;
+constraint_name_list_ ::= constraint_name {',' constraint_name} ;
+alter_table_drop_element_ ::= alter_table_drop_column_ | alter_table_drop_constraint_ ;
+alter_table_drop_column_ ::= 'COLUMN' column_name_list_ ;
+alter_table_drop_constraint_ ::= 'CONSTRAINT' constraint_name_list_ ;
+database_name_list_ ::= database_name {',' database_name} ;
+table_name_list_ ::= table_name {',' table_name} ;
+
+// Basic Statements
+
+primary_key ::= 'PRIMARY KEY' '(' column_name_list_ ')' ;
+foreign_key ::= 'FOREIGN KEY' '(' column_name_list_ ')' reference ;
+reference ::= 'REFERENCES' table_name ['(' column_name_list_ ')'] ;
+
+database_name ::= name ;
+table_name ::= name ;
+column_name ::= name ;
+constraint_name ::= identifier ;
+name ::= identifier {'.' identifier} ;
+data_type ::= 'float' | ('int' | 'integer') | 'varchar' | 'char' ;
+
+// Conditions
+
+condition ::= or_condition ;
+or_condition ::= and_condition ['OR' and_condition] ;
+and_condition ::= not_condition ['AND' not_condition] ;
+not_condition ::= 'NOT' predicate ;
+predicate ::= expr binary_operator_ expr ;
+expr ::= name_list_ | (unary_operator_ expr) | ('(' expr ')') | string | math_expr ;
+
+// Math Expressions (PEG)
+
+math_expr ::= sum ;
+sum       ::= product [('+' | '-') product] ;
+product   ::= power [('*' | '/') power] ;
+power     ::= value ['^' power] ;
+value     ::= 'regexp:[0-9]+' | ('(' math_expr ')') ;
+
+// Base
+
+identifier ::= "regexp:[_a-zA-z0-9]+" ;
+string ::= ("'" string_ "'") | ('"' string_ '"') ;
+
+string_ ::= 'regexp: [a-zA-z0-9_\-+*/=!.<>]'
+binary_operator_ ::= '!=' | '=' | '!>' | '>' | '>=' | '!<' | '<' | '<=' | '<>' ;
+unary_operator_ ::= '+' | '-' ;
