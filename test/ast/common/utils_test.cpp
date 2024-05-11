@@ -1,6 +1,14 @@
 #include "gtest/gtest.h"
 
 #include "SCC/ast/data_types.h"
+#include "SCC/ast/nodes/char_node.h"
+#include "SCC/ast/nodes/float_node.h"
+#include "SCC/ast/nodes/inode.h"
+#include "SCC/ast/nodes/int_node.h"
+#include "SCC/ast/nodes/root_node.h"
+#include "SCC/ast/nodes/service_node.h"
+#include "SCC/ast/nodes/string_node.h"
+#include "SCC/ast/stmt_types.h"
 #include "SCC/ast/common/utils.h"
 
 using namespace scc::ast;
