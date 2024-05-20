@@ -158,7 +158,7 @@ std::vector<NodeProperty> Translator::TranslateColumnDefinitions(const NodePtr<I
 NodeProperty Translator::TranslateColumnDefinition(const NodePtr<INode>& node) {
   auto column_name_node = node->Child(0);
   ValidateHasChildren(column_name_node);
-  std::string column_name = GetIdentifier(column_name_node);
+  std::string column_name = GetName(column_name_node);
 
   ValidateHasChildren(node, 2, "Missing datatype in column definition");
   StmtType datatype = node->Child(1)->stmt_type;
