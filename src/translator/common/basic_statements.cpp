@@ -20,10 +20,10 @@ void Translator::TranslatePrimaryKey(const NodePtr<INode>& primary_key,
 
     std::string constraint_name_prefix = constraint_name.empty()
         ? CreatePrimaryKeyConstraintName(table_name) : constraint_name;
-    CreateConstraint(constraint_name + "_" + std::to_string(constraint_counter++), table_name,
-                     column_name, ConstraintType::kUniqueness);
-    CreateConstraint(constraint_name + "_" + std::to_string(constraint_counter++), table_name,
-                     column_name, ConstraintType::kExistence);
+    CreateConstraint(constraint_name_prefix + "_" + std::to_string(constraint_counter++),
+                     table_name, column_name, ConstraintType::kUniqueness);
+    CreateConstraint(constraint_name_prefix + "_" + std::to_string(constraint_counter++),
+                     table_name, column_name, ConstraintType::kExistence);
   }
 }
 void Translator::TranslateForeignKey(const NodePtr<INode>& foreign_key,
