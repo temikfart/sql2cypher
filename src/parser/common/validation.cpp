@@ -5,6 +5,8 @@ namespace scc::parser {
 using namespace ast;
 using namespace common;
 
+using std::format;
+
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
@@ -24,9 +26,9 @@ void Parser::ValidateHasTokens(const std::string& details) const {
 }
 void Parser::ValidateHasTokens(unsigned min_count) const {
   if (!HasTokens(min_count)) {
-    std::string msg = "Unexpected empty tokens array";
-    std::string cause = ": expected at least " + std::to_string(min_count) + " tokens";
-    throw parsing_error(msg + cause);
+    std::string msg = format("Unexpected empty tokens array: expected at least {} tokens",
+                             min_count);
+    throw parsing_error(msg);
   }
 }
 void Parser::ValidateHasNotTokens() const {
@@ -36,32 +38,38 @@ void Parser::ValidateHasNotTokens() const {
 }
 void Parser::ValidateIsWord(const NodePtr<INode>& node) const {
   if (!NodeDataTypeClassifier::IsWord(node)) {
-    throw parsing_error("Expected Word at line " + std::to_string(node->line));
+    std::string msg = format("Expected Word at line {}", node->line);
+    throw parsing_error(msg);
   }
 }
 void Parser::ValidateIsOpeningRoundBracket(const NodePtr<INode>& node) const {
   if (!NodeDataClassifier::IsOpeningRoundBracket(node)) {
-    throw parsing_error("Expected Opening Round Bracket at line " + std::to_string(node->line));
+    std::string msg = format("Expected Opening Round Bracket at line {}", node->line);
+    throw parsing_error(msg);
   }
 }
 void Parser::ValidateIsClosingRoundBracket(const NodePtr<INode>& node) const {
   if (!NodeDataClassifier::IsClosingRoundBracket(node)) {
-    throw parsing_error("Expected Closing Round Bracket at line " + std::to_string(node->line));
+    std::string msg = format("Expected Closing Round Bracket at line {}", node->line);
+    throw parsing_error(msg);
   }
 }
 void Parser::ValidateIsSingleQuote(const NodePtr<INode>& node) const {
   if (!NodeDataClassifier::IsSingleQuote(node)) {
-    throw parsing_error("Expected Single Quote at line " + std::to_string(node->line));
+    std::string msg = format("Expected Single Quote at line {}", node->line);
+    throw parsing_error(msg);
   }
 }
 void Parser::ValidateIsDoubleQuote(const NodePtr<INode>& node) const {
   if (!NodeDataClassifier::IsSingleQuote(node)) {
-    throw parsing_error("Expected Double Quote at line " + std::to_string(node->line));
+    std::string msg = format("Expected Double Quote at line {}", node->line);
+    throw parsing_error(msg);
   }
 }
 void Parser::ValidateIsBinaryOperator(const NodePtr<INode>& node) const {
   if (!NodeDataClassifier::IsBinaryOperator(node)) {
-    throw parsing_error("Expected Binary Operator at line " + std::to_string(node->line));
+    std::string msg = format("Expected Binary Operator at line {}", node->line);
+    throw parsing_error(msg);
   }
 }
 
