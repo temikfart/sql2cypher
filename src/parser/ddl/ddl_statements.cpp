@@ -6,6 +6,8 @@ using namespace ast;
 using namespace ast::common;
 using namespace parser::common;
 
+using std::format;
+
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
@@ -16,8 +18,8 @@ StmtType Parser::ParseDDLStatementType() {
   auto first_keyword_token = ASTUtils::CastToNodeType<StringNode>(next_token);
   std::string first_keyword = first_keyword_token->data;
 
-  ValidateHasTokens("Missed keyword for \'" + first_keyword + "\' DDL statement at line "
-                        + std::to_string(first_keyword_token->line));
+  ValidateHasTokens(format("Missed keyword for \'{}\' DDL statement at line {}",
+                           first_keyword, first_keyword_token->line));
   next_token = NextToken();
   ValidateIsWord(next_token);
   auto second_keyword_token = ASTUtils::CastToNodeType<StringNode>(next_token);
@@ -28,8 +30,8 @@ StmtType Parser::ParseDDLStatementType() {
     StmtType ddl_stmt_type(ddl_stmt);
     return ddl_stmt_type;
   } catch (const std::invalid_argument& ia) {
-    throw parsing_error("Unsupported DDL Statement \'" + ddl_stmt + "\' at line "
-                            + std::to_string(first_keyword_token->line));
+    throw parsing_error(format("Unsupported DDL Statement \'{}\' at line {}",
+                               ddl_stmt, first_keyword_token->line));
   }
 }
 NodePtr<INode> Parser::ParseDDLStatement() {
@@ -37,8 +39,8 @@ NodePtr<INode> Parser::ParseDDLStatement() {
   NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kDdlStmt, peeked_token);
 
   StmtType ddl_stmt_type = ParseDDLStatementType();
-  ValidateHasTokens("Missed body for \'" + scc::common::UpperCase(ddl_stmt_type.ToString())
-                        + "\' statement at line" + std::to_string(peeked_token->line));
+  ValidateHasTokens(format("Missed body for \'{}\' statement at line {}",
+                           scc::common::UpperCase(ddl_stmt_type.ToString()), peeked_token->line));
   NodePtr<INode> statement;
   switch (ddl_stmt_type) {
     case StmtType::kCreateDatabaseStmt:
@@ -57,7 +59,7 @@ NodePtr<INode> Parser::ParseDDLStatement() {
       statement = ParseDropTableStatement();
       break;
     default:
-      throw parsing_error("Unknown DDL Statement at line " + std::to_string(peeked_token->line));
+      throw parsing_error(format("Unknown DDL Statement at line {}", peeked_token->line));
   }
   ASTUtils::Link(service_node, statement);
 
@@ -77,7 +79,7 @@ NodePtr<INode> Parser::ParseCreateTableStatement() {
   NodePtr<INode> table_name = ParseTableName();
   ASTUtils::Link(service_node, table_name);
 
-  ValidateHasTokens("Missed table definition at line " + std::to_string(peeked_token->line));
+  ValidateHasTokens(format("Missed table definition at line {}", peeked_token->line));
   NodePtr<INode> table_definition = ParseTableDefinition();
   ASTUtils::Link(service_node, table_definition);
 
@@ -90,16 +92,15 @@ NodePtr<INode> Parser::ParseAlterTableStatement() {
   NodePtr<INode> table_name = ParseName();
   ASTUtils::Link(service_node, table_name);
 
-  std::string incorrect_msg_prefix = "Incorrect \'ALTER TABLE\' definition at line ";
+  std::string msg_prefix = "Incorrect \'ALTER TABLE\' definition at line";
 
-  ValidateHasTokens(incorrect_msg_prefix + std::to_string(line)
-                        + ": expected \'ADD\' or \'DROP\' keyword");
+  ValidateHasTokens(format(R"({} {}: expected 'ADD' or 'DROP' keyword)", msg_prefix, line));
   auto next_token = NextToken();
   ValidateIsWord(next_token);
   std::string action_keyword = ASTUtils::CastToNodeType<StringNode>(next_token)->data;
 
-  ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line) + ": expected \'"
-                        + action_keyword + "\' definition");
+  ValidateHasTokens(format("{} {}: expected \'{}\' definition",
+                           msg_prefix , next_token->line, action_keyword));
   NodePtr<INode> argument;
   StmtType action_type = DetermineAlterTableActionType(action_keyword);
   switch (action_type) {
@@ -111,8 +112,8 @@ NodePtr<INode> Parser::ParseAlterTableStatement() {
       break;
     default:
       line = PeekToken()->line;
-      throw parsing_error(incorrect_msg_prefix + std::to_string(line) + ": unknown action \'"
-                              + action_keyword + "\'");
+      throw parsing_error(format("{} {}: unknown action \'{}\'",
+                                 msg_prefix, line, action_keyword));
   }
   NodePtr<INode> action = ASTUtils::CreateServiceNode(action_type);
   ASTUtils::Link(action, argument);
@@ -129,9 +130,8 @@ NodePtr<INode> Parser::ParseDropDatabaseStatement() {
 
     if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
       auto next_token = NextToken();
-      ValidateHasTokens("Invalid \'DROP DATABASE\' statement at line "
-                            + std::to_string(next_token->line)
-                            + ": expected database name after comma");
+      ValidateHasTokens(format("Invalid \'DROP DATABASE\' statement at line {}"
+                               ": expected database name after comma", next_token->line));
       ValidateIsWord(PeekToken());
     } else {
       break;
@@ -149,9 +149,8 @@ NodePtr<INode> Parser::ParseDropTableStatement() {
 
     if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
       auto next_token = NextToken();
-      ValidateHasTokens("Invalid \'DROP TABLE\' statement at line "
-                            + std::to_string(next_token->line)
-                            + ": expected table name after comma");
+      ValidateHasTokens(format("Invalid \'DROP TABLE\' statement at line {}"
+                               ": expected table name after comma", next_token->line));
       ValidateIsWord(PeekToken());
     } else {
       break;
@@ -162,7 +161,8 @@ NodePtr<INode> Parser::ParseDropTableStatement() {
 }
 
 NodePtr<INode> Parser::ParseTableDefinition() {
-  ValidateIsOpeningRoundBracket(NextToken());
+  auto next_token = NextToken();
+  ValidateIsOpeningRoundBracket(next_token);
 
   NodePtr<INode> table_definition = ASTUtils::CreateServiceNode(StmtType::kTableDef);
 
@@ -171,16 +171,16 @@ NodePtr<INode> Parser::ParseTableDefinition() {
     ASTUtils::Link(table_definition, table_definition_element);
 
     if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
-      auto next_token = NextToken();
-      ValidateHasTokens("Invalid table definition at line " + std::to_string(next_token->line)
-                            + ": expected column or constraint definition");
+      next_token = NextToken();
+      ValidateHasTokens(format("Invalid table definition at line {}"
+                               ": expected column or constraint definition", next_token->line));
       ValidateIsWord(PeekToken());
     } else {
       break;
     }
   }
 
-  ValidateHasTokens("Missing closing round bracket at line "); // TODO: add line number
+  ValidateHasTokens(format("Missing closing round bracket at line {}", next_token->line));
   ValidateIsClosingRoundBracket(NextToken());
 
   return table_definition;
@@ -196,8 +196,8 @@ NodePtr<INode> Parser::ParseTableDefinitionElement() {
     case StmtType::kForeignKey:
       return ParseTableConstraint(stmt_type);
     default:
-      throw parsing_error("Unknown element in table definition at line "
-                              + std::to_string(peeked_token->line));
+      throw parsing_error(format("Unknown element in table definition at line {}",
+                                 peeked_token->line));
   }
 }
 StmtType Parser::ParseTableDefinitionElementType() {
@@ -220,13 +220,9 @@ NodePtr<INode> Parser::ParseColumnDefinition() {
   NodePtr<INode> column_name = ParseColumnName();
   ASTUtils::Link(service_node, column_name);
 
-  ValidateHasTokens("Missing column datatype at line " + std::to_string(line));
+  ValidateHasTokens(format("Missing column datatype at line {}" , line));
   NodePtr<INode> datatype = ParseDataType();
   ASTUtils::Link(service_node, datatype);
-
-  if (HasTokens()) {
-    // TODO: parse options such as IDENTITY or (NOT) NULL.
-  }
 
   return service_node;
 }
@@ -239,15 +235,14 @@ NodePtr<INode> Parser::ParseTableConstraint(StmtType stmt_type) {
         ASTUtils::CreateServiceNode(StmtType::kConstraintKW, NextToken());
     ASTUtils::Link(service_node, constraint_keyword);
 
-    ValidateHasTokens("Missing constraint name at line "
-                          + std::to_string(constraint_keyword->line));
+    ValidateHasTokens(format("Missing constraint name at line {}", constraint_keyword->line));
     ValidateIsWord(PeekToken());
     NodePtr<INode> constraint_name = ParseConstraintName();
     line = constraint_name->line;
     ASTUtils::Link(constraint_keyword, constraint_name);
   }
 
-  ValidateHasTokens("Missing constraint definition at line " + std::to_string(line));
+  ValidateHasTokens(format("Missing constraint definition at line {}" , line));
   auto peeked_token = PeekToken();
   StmtType constraint_type;
   if (stmt_type != StmtType::kNone && stmt_type != StmtType::kConstraintKW) {
@@ -267,7 +262,7 @@ NodePtr<INode> Parser::ParseTableConstraint(StmtType stmt_type) {
       constraint_definition = ParseForeignKey();
       break;
     default:
-      throw parsing_error("Unknown constraint type at line " + std::to_string(peeked_token->line));
+      throw parsing_error(format("Unknown constraint type at line {}" , peeked_token->line));
   }
   ASTUtils::Link(service_node, constraint_definition);
 
@@ -283,8 +278,8 @@ NodePtr<INode> Parser::ParseAlterAddListDefinition() {
 
     if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
       auto next_token = NextToken();
-      ValidateHasTokens("Missing \'ALTER TABLE ... ADD\' element in list at line "
-                            + std::to_string(next_token->line));
+      ValidateHasTokens(format("Missing \'ALTER TABLE ... ADD\' element in list at line {}",
+                               next_token->line));
       ValidateIsWord(PeekToken());
     } else {
       break;
@@ -305,8 +300,8 @@ NodePtr<INode> Parser::ParseAlterDropListDefinition() {
 
     if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
       auto next_token = NextToken();
-      ValidateHasTokens("Missing \'ALTER TABLE ... DROP\' element in list at line "
-                            + std::to_string(next_token->line));
+      ValidateHasTokens(format("Missing \'ALTER TABLE ... DROP\' element in list at line {}",
+                               next_token->line));
       ValidateIsWord(PeekToken());
     } else {
       break;
@@ -321,8 +316,8 @@ NodePtr<INode> Parser::ParseAlterDropElement() {
   StmtType drop_element_type = DetermineDropElementType(keyword);
   NodePtr<INode> drop_element = ASTUtils::CreateServiceNode(drop_element_type);
 
-  ValidateHasTokens("Missing \'ALTER TABLE ... DROP\' element definition at line "
-                        + std::to_string(next_token->line));
+  ValidateHasTokens(format("Missing \'ALTER TABLE ... DROP\' element definition at line {}",
+                           next_token->line));
   auto peeked_token = PeekToken();
   ValidateIsWord(peeked_token);
   switch (drop_element_type) {
@@ -333,8 +328,8 @@ NodePtr<INode> Parser::ParseAlterDropElement() {
       ParseAlterDropConstraints(drop_element);
       break;
     default:
-      throw parsing_error("Unknown \'ALTER TABLE ... DROP\' element type at line "
-                              + std::to_string(peeked_token->line));
+      throw parsing_error(format("Unknown \'ALTER TABLE ... DROP\' element type at line {}",
+                                 peeked_token->line));
   }
 
   return drop_element;
@@ -360,8 +355,7 @@ void Parser::ParseAlterDropColumns(NodePtr<INode>& parent) {
     }
 
     auto next_token = NextToken();
-    ValidateHasTokens("Missing column name after comma at line "
-                          + std::to_string(next_token->line));
+    ValidateHasTokens(format("Missing column name after comma at line {}", next_token->line));
     ValidateIsWord(PeekToken());
   }
 }
@@ -386,8 +380,7 @@ void Parser::ParseAlterDropConstraints(NodePtr<INode>& parent) {
     }
 
     auto next_token = NextToken();
-    ValidateHasTokens("Missing column name after comma at line "
-                          + std::to_string(next_token->line));
+    ValidateHasTokens(format("Missing column name after comma at line {}", next_token->line));
     ValidateIsWord(PeekToken());
   }
 }
