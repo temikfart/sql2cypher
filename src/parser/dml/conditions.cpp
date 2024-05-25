@@ -6,6 +6,8 @@ using namespace ast;
 using namespace ast::common;
 using namespace parser::common;
 
+using std::format;
+
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
@@ -26,8 +28,9 @@ NodePtr<INode> Parser::ParseORCondition() {
     std::string checking_word = ASTUtils::CastToNodeType<StringNode>(peeked_token)->data;
     if (DetermineIsOROperator(checking_word)) {
       NextToken();
-      ValidateHasTokens("Incorrect \'OR\' condition: expected \'AND\' condition"
-                        "as second operand at line " + std::to_string(peeked_token->line));
+      ValidateHasTokens(format("Incorrect \'OR\' condition:"
+                               "expected \'AND\' condition as second operand at line {}",
+                               peeked_token->line));
       NodePtr<INode> next_and_conditions = ParseANDCondition();
       ASTUtils::Link(service_node, next_and_conditions);
     }
@@ -45,8 +48,9 @@ NodePtr<INode> Parser::ParseANDCondition() {
     std::string checking_word = ASTUtils::CastToNodeType<StringNode>(peeked_token)->data;
     if (DetermineIsANDOperator(checking_word)) {
       NextToken();
-      ValidateHasTokens("Incorrect \'AND\' condition: expected \'NOT\' condition"
-                        "as second operand at line " + std::to_string(peeked_token->line));
+      ValidateHasTokens(format("Incorrect \'AND\' condition:"
+                               "expected \'NOT\' condition as second operand at line {}",
+                               peeked_token->line));
       NodePtr<INode> next_not_conditions = ParseNOTCondition();
       ASTUtils::Link(service_node, next_not_conditions);
     }
@@ -66,8 +70,8 @@ NodePtr<INode> Parser::ParseNOTCondition() {
     }
   }
 
-  ValidateHasTokens("Incorrect \'NOT\' condition: expected predicate at line "
-                        + std::to_string(peeked_token->line));
+  ValidateHasTokens(format("Incorrect \'NOT\' condition:"
+                           "expected predicate at line {}", peeked_token->line));
   NodePtr<INode> predicate = ParsePredicate();
   ASTUtils::Link(service_node, predicate);
 
@@ -79,14 +83,14 @@ NodePtr<INode> Parser::ParsePredicate() {
   ASTUtils::Link(service_node, first_operand);
 
   auto peeked_token = PeekToken();
-  ValidateHasTokens("Incorrect predicate at line " + std::to_string(peeked_token->line)
-                        + ": expected binary operator");
+  ValidateHasTokens(format("Incorrect predicate at line {}: expected binary operator",
+                           peeked_token->line));
   ValidateIsBinaryOperator(peeked_token);
   NodePtr<INode> binary_operator = NextToken();
   ASTUtils::Link(service_node, binary_operator);
 
-  ValidateHasTokens("Incorrect predicate at line " + std::to_string(peeked_token->line)
-                        + ": expected second operand for binary operator");
+  ValidateHasTokens(format("Incorrect predicate at line {}:"
+                           "expected second operand for binary operator", peeked_token->line));
   NodePtr<INode> second_operand = ParseExpression();
   ASTUtils::Link(service_node, second_operand);
 
@@ -110,8 +114,8 @@ NodePtr<INode> Parser::ParseExpression() {
     NodePtr<INode> unary_operator = NextToken();
     ASTUtils::Link(service_node, unary_operator);
 
-    ValidateHasTokens("Incorrect unary operator at line " + std::to_string(peeked_token->line)
-                          + ": expected operand");
+    ValidateHasTokens(format("Incorrect unary operator at line {}: expected operand",
+                             peeked_token->line));
     NodePtr<INode> expression = ParseExpression();
     ASTUtils::Link(service_node, expression);
 
@@ -122,12 +126,12 @@ NodePtr<INode> Parser::ParseExpression() {
   if (NodeDataClassifier::IsOpeningRoundBracket(peeked_token)) {
     NextToken();
 
-    ValidateHasTokens("Incorrect expression at line " + std::to_string(peeked_token->line)
-                          + ": incorrect parenthesis sequence \'(\'");
+    ValidateHasTokens(format("Incorrect expression at line {}:"
+                             "incorrect parenthesis sequence \'(\'", peeked_token->line));
     service_node = ParseExpression();
 
-    ValidateHasTokens("Incorrect expression at line " + std::to_string(peeked_token->line)
-                          + ": missing closing parenthesis");
+    ValidateHasTokens(format("Incorrect expression at line {}: missing closing parenthesis",
+                             peeked_token->line));
     ValidateIsClosingRoundBracket(NextToken());
 
     return service_node;
@@ -137,8 +141,8 @@ NodePtr<INode> Parser::ParseExpression() {
   if (NodeDataClassifier::IsQuote(PeekToken())) {
     NextToken();
 
-    ValidateHasTokens("Incorrect expression at line " + std::to_string(peeked_token->line)
-                          + ": expected string literal or closing quote");
+    ValidateHasTokens(format("Incorrect expression at line {}:"
+                             "expected string literal or closing quote", peeked_token->line));
     NodePtr<INode> string = ParseString();
     ASTUtils::Link(service_node, string);
 

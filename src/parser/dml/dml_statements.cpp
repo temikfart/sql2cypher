@@ -6,6 +6,8 @@ using namespace ast;
 using namespace ast::common;
 using namespace parser::common;
 
+using std::format;
+
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
@@ -20,8 +22,8 @@ StmtType Parser::ParseDMLStatementType() {
     StmtType ddl_stmt_type(keyword);
     return ddl_stmt_type;
   } catch (const std::invalid_argument& ia) {
-    throw parsing_error("Unsupported DML Statement \'" + keyword + "\' at line "
-                            + std::to_string(keyword_token->line));
+    throw parsing_error(format("Unsupported DML Statement \'{}\' at line {}",
+                               keyword, keyword_token->line));
   }
 }
 NodePtr<INode> Parser::ParseDMLStatement() {
@@ -29,8 +31,8 @@ NodePtr<INode> Parser::ParseDMLStatement() {
   NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kDmlStmt, peeked_token);
 
   StmtType dml_stmt_type = ParseDMLStatementType();
-  ValidateHasTokens("Missed body for \'" + scc::common::UpperCase(dml_stmt_type.ToString())
-                        + "\' statement at line" + std::to_string(peeked_token->line));
+  ValidateHasTokens(format("Missed body for \'{}\' statement at line {}",
+                           scc::common::UpperCase(dml_stmt_type.ToString()), peeked_token->line));
   NodePtr<INode> statement;
   switch (dml_stmt_type) {
     case StmtType::kUpdateStmt:
@@ -43,7 +45,7 @@ NodePtr<INode> Parser::ParseDMLStatement() {
       statement = ParseInsertStatement();
       break;
     default:
-      throw parsing_error("Unknown DML Statement at line " + std::to_string(peeked_token->line));
+      throw parsing_error(format("Unknown DML Statement at line {}", peeked_token->line));
   }
   ASTUtils::Link(service_node, statement);
 

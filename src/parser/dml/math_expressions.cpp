@@ -6,6 +6,8 @@ using namespace ast;
 using namespace ast::common;
 using namespace parser::common;
 
+using std::format;
+
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
@@ -34,9 +36,9 @@ NodePtr<INode> Parser::ParseMathSum() {
       NextToken();
       ASTUtils::Link(operator_node, lhs_product);
 
-      ValidateHasTokens("Incorrect math expression at line " + std::to_string(operator_node->line)
-                            + ": missing second operand for \'" + operator_str
-                            + "\' binary operator");
+      ValidateHasTokens(format("Incorrect math expression at line {}"
+                               ": missing second operand for \'{}\' binary operator",
+                               operator_node->line, operator_str));
       NodePtr<INode> rhs_product = ParseMathProduct();
       ASTUtils::Link(operator_node, rhs_product);
       return operator_node;
@@ -55,9 +57,9 @@ NodePtr<INode> Parser::ParseMathProduct() {
       NextToken();
       ASTUtils::Link(operator_node, lhs_power);
 
-      ValidateHasTokens("Incorrect math expression at line " + std::to_string(operator_node->line)
-                            + ": missing second operand for \'" + operator_str
-                            + "\' binary operator");
+      ValidateHasTokens(format("Incorrect math expression at line {}"
+                               ": missing second operand for \'\' binary operator",
+                               operator_node->line, operator_str));
       NodePtr<INode> rhs_power = ParseMathPower();
       ASTUtils::Link(operator_node, rhs_power);
       return operator_node;
@@ -76,9 +78,9 @@ NodePtr<INode> Parser::ParseMathPower() {
       NextToken();
       ASTUtils::Link(operator_node, value);
 
-      ValidateHasTokens("Incorrect math expression at line " + std::to_string(operator_node->line)
-                            + ": missing second operand for \'" + operator_str
-                            + "\' binary operator");
+      ValidateHasTokens(format("Incorrect math expression at line {}"
+                               ": missing second operand for \'{}\' binary operator",
+                               operator_node->line, operator_str));
       NodePtr<INode> power = ParseMathPower();
       ASTUtils::Link(operator_node, power);
       return operator_node;
@@ -95,25 +97,25 @@ NodePtr<INode> Parser::ParseMathValue() {
     return number;
   }
 
-  std::string incorrect_msg_prefix = "Incorrect math expression at line ";
+  std::string msg_prefix = "Incorrect math expression at line ";
 
   if (NodeDataClassifier::IsOpeningRoundBracket(peeked_token)) {
     auto next_token = NextToken();
 
-    ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
-                          + ": incorrect parenthesis sequence \'(\'");
+    ValidateHasTokens(format("{} {}: incorrect parenthesis sequence \'(\'",
+                             msg_prefix, next_token->line));
     NodePtr<INode> math_expression = ParseMathExpression();
 
-    ValidateHasTokens(incorrect_msg_prefix + std::to_string(math_expression->line)
-                          + ": missing closing parenthesis");
+    ValidateHasTokens(format("{} {}: missing closing parenthesis",
+                             msg_prefix, math_expression->line));
     next_token = NextToken();
     ValidateIsClosingRoundBracket(next_token);
 
     return math_expression;
   }
 
-  throw parsing_error(incorrect_msg_prefix + std::to_string(peeked_token->line)
-                          + ": expected number or math expression in parentheses");
+  throw parsing_error(format("{} {}: expected number or math expression in parentheses",
+                             msg_prefix, peeked_token->line));
 }
 
 } // scc::parser
