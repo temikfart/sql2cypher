@@ -6,6 +6,8 @@ using namespace ast;
 using namespace ast::common;
 using namespace parser::common;
 
+using std::format;
+
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
@@ -75,47 +77,44 @@ bool Parser::DetermineIsPrefix(const std::string_view& string, const std::string
 NodePtr<INode> Parser::ParsePrimaryKey() {
   NodePtr<INode> primary_key = ASTUtils::CreateServiceNode(StmtType::kPrimaryKey);
 
-  std::string incorrect_msg_prefix = "Incorrect \'PRIMARY KEY\' definition at line ";
+  std::string msg_prefix = "Incorrect \'PRIMARY KEY\' definition at line";
 
   auto next_token = NextToken();
   ValidateIsWord(next_token);
   std::string primary_keyword = ASTUtils::CastToNodeType<StringNode>(next_token)->data;
   if (!DetermineIsPrimaryKey(primary_keyword)) {
-    throw parsing_error(incorrect_msg_prefix + std::to_string(next_token->line)
-                            + ": expected \'PRIMARY\' keyword");
+    throw parsing_error(format("{} {}: expected \'PRIMARY\' keyword",
+                               msg_prefix, next_token->line));
   }
 
-  ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
-                        + ": missing \'KEY\' keyword");
+  ValidateHasTokens(format("{} {}: missing \'KEY\' keyword", msg_prefix, next_token->line));
   next_token = NextToken();
   ValidateIsWord(next_token);
   std::string key_keyword = ASTUtils::CastToNodeType<StringNode>(next_token)->data;
   if (scc::common::LowerCase(key_keyword) != "key") {
-    throw parsing_error(incorrect_msg_prefix + std::to_string(next_token->line)
-                            + ": expected \'KEY\' keyword");
+    throw parsing_error(format("{} {}: expected \'KEY\' keyword", msg_prefix, next_token->line));
   }
 
-  ValidateHasTokens("Missing \'PRIMARY KEY\' definition at line "
-                        + std::to_string(next_token->line));
+  ValidateHasTokens(format("Missing \'PRIMARY KEY\' definition at line {}", next_token->line));
   int line = PeekToken()->line;
   ValidateIsOpeningRoundBracket(NextToken());
 
-  ValidateHasTokens("Missed column name at line " + std::to_string(line));
+  ValidateHasTokens(format("Missed column name at line {}", line));
   while (HasTokens()) {
     NodePtr<INode> column_name = ParseColumnName();
     ASTUtils::Link(primary_key, column_name);
 
     if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
       next_token = NextToken();
-      ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
-                            + ": missing column name after comma");
+      ValidateHasTokens(format("{} {}: missing column name after comma",
+                               msg_prefix, next_token->line));
       ValidateIsWord(PeekToken());
     } else {
       break;
     }
   }
 
-  ValidateHasTokens("Missed closing round bracket at line " + std::to_string(line));
+  ValidateHasTokens(format("Missed closing round bracket at line {}", line));
   ValidateIsClosingRoundBracket(NextToken());
 
   return primary_key;
@@ -123,96 +122,89 @@ NodePtr<INode> Parser::ParsePrimaryKey() {
 NodePtr<INode> Parser::ParseForeignKey() {
   NodePtr<INode> foreign_key = ASTUtils::CreateServiceNode(StmtType::kForeignKey);
 
-  std::string incorrect_msg_prefix = "Incorrect \'FOREIGN KEY\' definition at line ";
+  std::string msg_prefix = "Incorrect \'FOREIGN KEY\' definition at line ";
 
   auto next_token = NextToken();
   ValidateIsWord(next_token);
   std::string foreign_keyword = ASTUtils::CastToNodeType<StringNode>(next_token)->data;
   if (!DetermineIsForeignKey(foreign_keyword)) {
-    throw parsing_error(incorrect_msg_prefix + std::to_string(next_token->line)
-                            + ": expected \'FOREIGN\' keyword");
+    throw parsing_error(format("{} {}: expected \'FOREIGN\' keyword",
+                               msg_prefix, next_token->line));
   }
 
-  ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
-                        + ": missing \'KEY\' keyword");
+  ValidateHasTokens(format("{} {}: missing \'KEY\' keyword", msg_prefix, next_token->line));
   next_token = NextToken();
   ValidateIsWord(next_token);
   std::string key_keyword = ASTUtils::CastToNodeType<StringNode>(next_token)->data;
   if (scc::common::LowerCase(key_keyword) != "key") {
-    throw parsing_error(incorrect_msg_prefix + std::to_string(next_token->line)
-                            + ": expected \'KEY\' keyword");
+    throw parsing_error(format("{} {}: expected \'KEY\' keyword", msg_prefix, next_token->line));
   }
 
-  ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
-                        + ": missing \'FOREIGN KEY\' definition");
+  ValidateHasTokens(format("{} {}: missing \'FOREIGN KEY\' definition",
+                           msg_prefix, next_token->line));
   next_token = NextToken();
   ValidateIsOpeningRoundBracket(next_token);
 
-  ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
-                        + ": missing referencing column name");
+  ValidateHasTokens(format("{} {}: missing referencing column name", msg_prefix, next_token->line));
   while (HasTokens()) {
     NodePtr<INode> referencing_column_name = ParseColumnName();
     ASTUtils::Link(foreign_key, referencing_column_name);
 
     if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
       next_token = NextToken();
-      ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
-                            + ": missing referencing column name after comma");
+      ValidateHasTokens(format("{} {}: missing referencing column name after comma",
+                               msg_prefix, next_token->line));
       ValidateIsWord(PeekToken());
     } else {
       break;
     }
   }
 
-  ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
-                        + ": missing closing parenthesis");
+  ValidateHasTokens(format("{} {}: missing closing parenthesis", msg_prefix, next_token->line));
   next_token = NextToken();
   ValidateIsClosingRoundBracket(next_token);
 
-  ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
-                        + ": missing \'REFERENCES\' keyword");
+  ValidateHasTokens(format("{} {}: missing \'REFERENCES\' keyword", msg_prefix, next_token->line));
   NodePtr<INode> reference = ParseReference();
   ASTUtils::Link(foreign_key, reference);
 
   return foreign_key;
 }
 NodePtr<INode> Parser::ParseReference() {
-  std::string incorrect_msg_prefix = "Incorrect \'REFERENCES\' definition at line ";
+  std::string msg_prefix = "Incorrect \'REFERENCES\' definition at line ";
 
   auto next_token = NextToken();
   ValidateIsWord(next_token);
   std::string references_keyword = ASTUtils::CastToNodeType<StringNode>(next_token)->data;
   if (!DetermineIsReferences(references_keyword)) {
-    throw parsing_error(incorrect_msg_prefix + std::to_string(next_token->line));
+    throw parsing_error(format("{} {}", msg_prefix, next_token->line));
   }
   NodePtr<INode> reference = ASTUtils::CreateServiceNode(StmtType::kReferencesKW, next_token);
 
-  ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
-                        + ": missing references table name");
+  ValidateHasTokens(format("{} {}: missing references table name", msg_prefix, next_token->line));
   NodePtr<INode> referenced_table_name = ParseTableName();
   ASTUtils::Link(reference, referenced_table_name);
 
   if (HasTokens() && NodeDataClassifier::IsOpeningRoundBracket(PeekToken())) {
     next_token = NextToken();
 
-    ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
-                          + ": missing referenced column name");
+    ValidateHasTokens(format("{} {}: missing referenced column name",
+                             msg_prefix, next_token->line));
     while (HasTokens()) {
       NodePtr<INode> referenced_column_name = ParseColumnName();
       ASTUtils::Link(reference, referenced_column_name);
 
       if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
         next_token = NextToken();
-        ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
-                              + ": missing referenced column name after comma");
+        ValidateHasTokens(format("{} {}: missing referenced column name after comma",
+                                 msg_prefix, next_token->line));
         ValidateIsWord(PeekToken());
       } else {
         break;
       }
     }
 
-    ValidateHasTokens(incorrect_msg_prefix + std::to_string(next_token->line)
-                          + ": missing closing parenthesis");
+    ValidateHasTokens(format("{} {}: missing closing parenthesis", msg_prefix, next_token->line));
     ValidateIsClosingRoundBracket(NextToken());
   }
 
@@ -240,8 +232,7 @@ NodePtr<INode> Parser::ParseDataType() {
     StmtType sql_datatype(datatype);
     next_token->stmt_type = sql_datatype;
   } catch (const std::invalid_argument& ia) {
-    throw parsing_error("Unknown Data Type \'" + datatype
-                            + "\' at line " + std::to_string(next_token->line));
+    throw parsing_error(format("Unknown Data Type \'{}\' at line {}", datatype, next_token->line));
   }
   return next_token;
 }
@@ -249,8 +240,8 @@ NodePtr<INode> Parser::ParseString() {
   auto next_token = NextToken();
   ValidateIsSingleQuote(next_token);
 
-  ValidateHasTokens("Missing string literal content or closing single quote at line "
-                        + std::to_string(next_token->line));
+  ValidateHasTokens(format("Missing string literal content or closing single quote at line {}",
+                           next_token->line));
   NodePtr<StringNode> string = ASTUtils::CastToNodeType<StringNode>(
       ASTUtils::CreateStringNode("", DataType::kString)
   );
@@ -276,11 +267,12 @@ NodePtr<INode> Parser::ParseString() {
         string->data += ASTUtils::CastToNodeType<StringNode>(next_word)->data;
         break;
       default:
-        throw parsing_error("Invalid string at line " + std::to_string(next_word->line)
-                                + ": unsupported data type for string literal part");
+        throw parsing_error(format("Invalid string at line {}:"
+                                   "unsupported data type for string literal part",
+                                   next_word->line));
     }
-    ValidateHasTokens("Missing closing single quote or string literal part at line "
-                          + std::to_string(next_word->line));
+    ValidateHasTokens(format("Missing closing single quote or string literal part at line {}",
+                             next_word->line));
   }
   NextToken(); // Pop closing single quote
 
@@ -295,8 +287,8 @@ NodePtr<INode> Parser::ParseName() {
 
     if (HasTokens() && NodeDataClassifier::IsDot(PeekToken())) {
       auto next_token = NextToken();
-      ValidateHasTokens("Missing identifier after the dot delimiter at line "
-                            + std::to_string(next_token->line));
+      ValidateHasTokens(format("Missing identifier after the dot delimiter at line {}",
+                               next_token->line));
       ValidateIsWord(PeekToken());
     } else {
       break;
