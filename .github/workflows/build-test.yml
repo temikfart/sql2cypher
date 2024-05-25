@@ -4,8 +4,8 @@ on:
   push:
   pull_request:
     types:
-    - reopened
-    - ready_for_review
+      - reopened
+      - ready_for_review
     branches:
       - main
       - develop
@@ -13,17 +13,25 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: sudo apt install graphviz
-    - name: Configure
-      run: cmake -S . -B build
-    - name: Build
-      run: cd build && cmake --build .
-    - name: Unit tests
-      run: cd build && ctest
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y cmake graphviz
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo apt install -y g++-13 gcc-13
+
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        env:
+          CC: gcc-13
+          CXX: g++-13
+        run: cmake -S . -B build
+
+      - name: Build
+        run: cd build && cmake --build .
+
+      - name: Unit tests
+        run: cd build && ctest
