@@ -6,6 +6,8 @@ using namespace ast;
 using namespace ast::common;
 using namespace parser::common;
 
+using std::format;
+
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
@@ -65,7 +67,7 @@ NodePtr<INode> Parser::ParseBaseStatement() {
   } else if (BaseStmtTypeClassifier::IsDMLKeyword(keyword)) {
     return ParseDMLStatement();
   } else {
-    throw parsing_error("Unknown Base Statement at line " + std::to_string(peeked_token->line));
+    throw parsing_error(format("Unknown Base Statement at line {}", peeked_token->line));
   }
 }
 
