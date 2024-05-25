@@ -5,6 +5,8 @@ namespace scc::translator {
 using namespace ast;
 using namespace scc::common;
 
+using std::format;
+
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
@@ -30,8 +32,9 @@ void Translator::ValidateHasChildren(const NodePtr<INode>& node, unsigned min_ch
 }
 void Translator::ValidateIsCorrectStmtType(const NodePtr<INode>& node, StmtType stmt_type) const {
   if (!IsCorrectStmtType(node, stmt_type)) {
-    throw translation_error("Unexpected statement type \'" + UpperCase(node->stmt_type.ToString())
-                                + "\': Expected \'" + UpperCase(stmt_type.ToString()) + "\'");
+    throw translation_error(format("Unexpected statement type \'{}\': expected \'{}\'",
+                                   UpperCase(node->stmt_type.ToString()),
+                                   UpperCase(stmt_type.ToString())));
   }
 }
 

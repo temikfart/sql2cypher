@@ -4,6 +4,8 @@ namespace scc::translator {
 
 using namespace ast;
 
+using std::format;
+
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
@@ -20,8 +22,8 @@ void Translator::TranslateDMLStatement(const NodePtr<INode>& dml_statement) {
       TranslateUpdateStatement(dml_statement);
       break;
     default:
-      throw translation_error("Unknown DML statement type: \'"
-                                  + dml_statement->stmt_type.ToString() + "\'");
+      throw translation_error(format("Unknown DML statement type: \'{}\'",
+                                     dml_statement->stmt_type.ToString()));
   }
 }
 

@@ -5,6 +5,8 @@ namespace scc::translator {
 using namespace ast;
 using namespace cypher;
 
+using std::format;
+
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
@@ -27,8 +29,8 @@ void Translator::TranslateDDLStatement(const NodePtr<INode>& ddl_statement) {
       TranslateDropTableStatement(ddl_statement);
       break;
     default:
-      throw translation_error("Unknown DDL statement type: \'"
-                                  + ddl_statement->stmt_type.ToString() + "\'");
+      throw translation_error(format("Unknown DDL statement type: \'{}\'",
+                                     ddl_statement->stmt_type.ToString()));
   }
 }
 
@@ -83,8 +85,8 @@ void Translator::TranslateAlterTableStatement(const NodePtr<INode>& stmt) {
       TranslateAlterTableActionDrop(action_node, table_name);
       break;
     default:
-      throw translation_error("Unknown action type \'" + action_node->stmt_type.ToString()
-                                  + "\'" + msg_suffix);
+      throw translation_error(format("Unknown action type \'{}\' {}",
+                                     action_node->stmt_type.ToString(), msg_suffix));
   }
 }
 void Translator::TranslateDropDatabaseStatement(const NodePtr<INode>& stmt) {
@@ -180,7 +182,7 @@ NodeProperty Translator::TranslateColumnDefinition(const NodePtr<INode>& node) {
       property_type = PropertyType::kString;
       break;
     default:
-      throw translation_error("Unknown SQL datatype \'" + datatype.ToString() + "\'");
+      throw translation_error(format("Unknown SQL datatype \'{}\'", datatype.ToString()));
   }
 
   return NodeProperty(column_name, datatype_str, property_type);
@@ -211,7 +213,7 @@ void Translator::TranslateTableConstraint(const NodePtr<INode>& constraint_defin
       TranslateForeignKey(key, constraint_name, table_name);
       break;
     default:
-      throw translation_error("Unknown constraint type \'" + key->stmt_type.ToString() + "\'");
+      throw translation_error(format("Unknown constraint type \'{}\'", key->stmt_type.ToString()));
   }
 }
 
@@ -236,7 +238,8 @@ void Translator::TranslateDropElement(const NodePtr<INode>& node, std::string& t
       }
       break;
     default:
-      throw translation_error("Unknown drop object type \'" + node->stmt_type.ToString() + "\'");
+      throw translation_error(format("Unknown drop object type \'{}\'",
+                                     node->stmt_type.ToString()));
   }
 }
 

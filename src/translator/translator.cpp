@@ -53,8 +53,8 @@ void Translator::TranslateQuery(const NodePtr<INode>& query) {
       TranslateDMLStatement(statement);
       break;
     default:
-      throw translation_error("Unknown query statement type: \'"
-                                  + statement_type->stmt_type.ToString() + "\'");
+      throw translation_error(format("Unknown query statement type: \'{}\'",
+                                     statement_type->stmt_type.ToString()));
   }
 
   FinishCypherQueriesGroup();
