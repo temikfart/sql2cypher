@@ -249,7 +249,7 @@ NodePtr<INode> Parser::ParseString() {
   while (!NodeDataClassifier::IsSingleQuote(peeked_token)) {
     NodePtr<INode> next_word = NextToken();
     if (!string->data.empty()) {
-      string->data + " "; // TODO: Lexer should save whitespace characters.
+      string->data += " "; // TODO: Lexer should save whitespace characters.
     }
     switch (next_word->data_type) {
       case DataType::kInt:
