@@ -34,3 +34,23 @@ jobs:
 
       - name: Unit testing
         run: cd build && ctest
+
+  build-test-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          brew install cmake graphviz
+          softwareupdate --install -a
+          /usr/bin/xcodebuild -version
+
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -DEXPERIMENTAL=1
+
+      - name: Build
+        run: cd build && cmake --build .
+
+      - name: Unit testing
+        run: cd build && ctest

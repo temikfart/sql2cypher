@@ -47,6 +47,10 @@ if (COVERAGE)
     set(COMPILATION_FLAGS "${COMPILATION_FLAGS} --coverage")
 endif()
 set(CMAKE_C_FLAGS ${COMPILATION_FLAGS})
+if (EXPERIMENTAL)
+    message("Adding -fexperimental-library flag to C++ compilation")
+    set(COMPILATION_FLAGS "${COMPILATION_FLAGS} -fexperimental-library")
+endif()
 set(CMAKE_CXX_FLAGS ${COMPILATION_FLAGS})
 
 ## Download dependencies
