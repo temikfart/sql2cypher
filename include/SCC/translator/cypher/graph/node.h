@@ -13,18 +13,15 @@ namespace scc::translator::cypher {
 
 constexpr std::string_view stub_str = "stub";
 
-struct Label {
-  std::string value;
-
-  explicit Label(std::string value);
-
-  std::string ToString() const;
-};
-
-std::ostream& operator<<(std::ostream& os, const Label& label);
-bool operator<(const Label& lhs, const Label& rhs);
-
 struct Node {
+  struct Label {
+    std::string value;
+
+    explicit Label(std::string value);
+
+    std::string ToString() const;
+  };
+
   std::vector<Label> labels = {};
   std::vector<Property> properties = {};
   std::string variable = "";
@@ -45,6 +42,9 @@ struct Node {
 
   std::string ToString() const;
 };
+
+std::ostream& operator<<(std::ostream& os, const Node::Label& label);
+bool operator<(const Node::Label& lhs, const Node::Label& rhs);
 
 std::ostream& operator<<(std::ostream& os, const Node& node);
 
