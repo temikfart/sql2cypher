@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "SCC/translator/cypher/graph/node.h"
+#include "SCC/translator/cypher/graph/property.h"
 
 namespace scc::translator::cypher {
 
@@ -22,7 +23,7 @@ struct Relationship {
   Node end;
   Direction direction;
   std::string variable;
-//  std::set<NodeProperty> properties;
+  std::vector<Property> properties;
 
   explicit Relationship(std::string type, Node start, Node end,
                         Direction direction = Direction::kRight);

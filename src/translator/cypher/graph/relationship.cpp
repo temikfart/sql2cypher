@@ -15,7 +15,19 @@ std::string Relationship::ToString() const {
   std::stringstream ss;
   ss << (start.variable.empty() ? start.ToString() : "(" + start.variable + ")");
   ss << GetLeftArrow();
-  ss << "[" << variable << ":" << type << "]";
+  ss << "[";
+  ss << variable << ":" << type;
+  if (!properties.empty()) {
+    ss << " {";
+    for (auto it = properties.begin(); it != properties.end(); ++it) {
+      if (it != properties.begin()) {
+        ss << ", ";
+      }
+      ss << it->ToString();
+    }
+    ss << "}";
+  }
+  ss << "]";
   ss << GetRightArrow();
   ss << (end.variable.empty() ? end.ToString() : "(" + end.variable + ")");
 
