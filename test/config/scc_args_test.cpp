@@ -54,7 +54,7 @@ TEST_F(SCCArgsTests, CypherArgumentDefaultValueTest) {
   EXPECT_NO_THROW(ParseArgsWrapper());
 
   std::string default_cypher_file = parser.Get("--cypher");
-  EXPECT_TRUE(default_cypher_file.find("out.cypher") != std::string::npos);
+  EXPECT_TRUE(default_cypher_file.find("out.cql") != std::string::npos);
 }
 TEST_F(SCCArgsTests, CypherArgumentWithoutParameterTest) {
   GTEST_SKIP() << "Argument without value did not throw an exception.";

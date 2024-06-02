@@ -35,7 +35,7 @@ SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, argparse::default_arg
       .help("Specify path to the file with SQL queries to be converted")
       .metavar("FILENAME");
 
-  std::string default_cypher_file = (std::filesystem::current_path() / "out.cypher").string();
+  std::string default_cypher_file = (std::filesystem::current_path() / "out.cql").string();
   add_argument("--cypher")
       .help("Specify path to the file with the result CypherQL queries")
       .metavar("FILENAME")
