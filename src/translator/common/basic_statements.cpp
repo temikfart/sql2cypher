@@ -92,7 +92,7 @@ void Translator::CreateConstraint(const std::string& constraint_name,
                                   const std::string& property_name,
                                   ConstraintType constraint_type) {
   Node node(label_name);
-  NodeProperty property(property_name, std::string(stub_str), PropertyType::kUnknown);
+  Property property(property_name, std::string(stub_str), PropertyType::kUnknown);
 
   WriteCypherQuery(
       CreateConstraintClauseBuilder::Build(constraint_name, node, property, constraint_type)

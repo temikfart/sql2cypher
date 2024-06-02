@@ -66,9 +66,9 @@ private:
   void TranslateAlterTableActionDrop(const std::shared_ptr<ast::INode>& action_node,
                                      std::string& table_name);
 
-  std::vector<cypher::NodeProperty> TranslateColumnDefinitions(
+  std::vector<cypher::Property> TranslateColumnDefinitions(
       const std::shared_ptr<ast::INode>& column_definition);
-  cypher::NodeProperty TranslateColumnDefinition(const std::shared_ptr<ast::INode>& node);
+  cypher::Property TranslateColumnDefinition(const std::shared_ptr<ast::INode>& node);
   void TranslateTableConstraint(const std::shared_ptr<ast::INode>& constraint_definition,
                                 const std::string& table_name);
 

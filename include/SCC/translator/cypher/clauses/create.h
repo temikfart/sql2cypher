@@ -25,7 +25,7 @@ public:
 class CreateConstraintClauseBuilder {
 public:
   static std::string Build(const std::string& constraint_name, const Node& node,
-                           const NodeProperty& property, ConstraintType type);
+                           const Property& property, ConstraintType type);
 };
 
 class CreateRelationshipClauseBuilder {

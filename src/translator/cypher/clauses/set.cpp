@@ -2,7 +2,7 @@
 
 namespace scc::translator::cypher {
 
-std::string SetPropertyClauseBuilder::Build(const Node& node, const NodeProperty& property) {
+std::string SetPropertyClauseBuilder::Build(const Node& node, const Property& property) {
   std::stringstream ss;
   ss << "MATCH " << node.ToString() << "\n";
   ss << "SET " << node.variable << "." << property.name << " = " << property.value;

@@ -17,18 +17,18 @@ bool operator<(const Label& lhs, const Label& rhs) {
   return lhs.value < rhs.value;
 }
 
-NodeProperty::NodeProperty(std::string  name, std::string value, PropertyType type)
+Property::Property(std::string  name, std::string value, PropertyType type)
     : name(std::move(name)), value(std::move(value)), type(type) {}
 
-std::string NodeProperty::ToString() const {
+std::string Property::ToString() const {
   return name + ": " + value;
 }
 
-std::ostream& operator<<(std::ostream& os, const NodeProperty &property) {
+std::ostream& operator<<(std::ostream& os, const Property &property) {
   os << property.ToString();
   return os;
 }
-bool operator<(const NodeProperty& lhs, const NodeProperty& rhs) {
+bool operator<(const Property& lhs, const Property& rhs) {
   if (lhs.type != rhs.type) {
     return lhs.type < rhs.type;
   }
@@ -41,13 +41,13 @@ Node::Node(std::string label_name, std::string variable)
     : labels({Label(std::move(label_name))}), variable(std::move(variable)) {}
 Node::Node(Label label)
     : labels({std::move(label)}) {}
-Node::Node(Label label, std::vector<NodeProperty> properties)
+Node::Node(Label label, std::vector<Property> properties)
     : labels({std::move(label)}), properties(std::move(properties)) {}
-Node::Node(Label label, std::vector<NodeProperty> properties, std::string variable)
+Node::Node(Label label, std::vector<Property> properties, std::string variable)
     : labels({std::move(label)}), properties(std::move(properties)),
       variable(std::move(variable)) {}
 
-Node& Node::AddProperty(const NodeProperty& property) {
+Node& Node::AddProperty(const Property& property) {
   properties.push_back(property);
   return *this;
 }
@@ -56,7 +56,7 @@ Node& Node::AddProperty(const std::string& name, const std::string& value, Prope
   return *this;
 }
 bool Node::HasProperty(const std::string& name) const {
-  static auto predicate = [name](const NodeProperty& property) { return property.name == name; };
+  static auto predicate = [name](const Property& property) { return property.name == name; };
   return std::find_if(properties.begin(), properties.end(), predicate) != properties.end();
 }
 unsigned Node::PropertyCount() const {
