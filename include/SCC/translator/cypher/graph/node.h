@@ -7,7 +7,7 @@
 #include <vector>
 #include <utility>
 
-#include "SCC/translator/cypher/graph/property_types.h"
+#include "SCC/translator/cypher/graph/property.h"
 
 namespace scc::translator::cypher {
 
@@ -23,19 +23,6 @@ struct Label {
 
 std::ostream& operator<<(std::ostream& os, const Label& label);
 bool operator<(const Label& lhs, const Label& rhs);
-
-struct Property {
-  std::string name;
-  std::string value;
-  PropertyType type;
-
-  explicit Property(std::string name, std::string value, PropertyType type);
-
-  std::string ToString() const;
-};
-
-std::ostream& operator<<(std::ostream& os, const Property& property);
-bool operator<(const Property& lhs, const Property& rhs);
 
 struct Node {
   std::vector<Label> labels = {};
