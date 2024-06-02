@@ -20,10 +20,8 @@ void Translator::TranslatePrimaryKey(const NodePtr<INode>& primary_key,
 
     std::string constraint_name_prefix = constraint_name.empty()
         ? CreatePrimaryKeyConstraintName(table_name) : constraint_name;
-    CreateConstraint(constraint_name_prefix + "_" + std::to_string(constraint_counter++),
-                     table_name, column_name, ConstraintType::kUniqueness);
-    CreateConstraint(constraint_name_prefix + "_" + std::to_string(constraint_counter++),
-                     table_name, column_name, ConstraintType::kExistence);
+    CreateConstraints(constraint_name_prefix, table_name, column_name,
+                      {ConstraintType::kUniqueness, ConstraintType::kExistence});
   }
 }
 void Translator::TranslateForeignKey(const NodePtr<INode>& foreign_key,
@@ -87,16 +85,19 @@ std::string Translator::GetIdentifier(const NodePtr<INode>& node) const {
   return ASTUtils::CastToNodeType<StringNode>(node->Child(0))->data;
 }
 
-void Translator::CreateConstraint(const std::string& constraint_name,
-                                  const std::string& label_name,
-                                  const std::string& property_name,
-                                  ConstraintType constraint_type) {
+void Translator::CreateConstraints(const std::string& constraint_name_prefix,
+                                   const std::string& label_name, const std::string& property_name,
+                                   const std::vector<ConstraintType>& constraints) {
   Node node(label_name);
   Property property(property_name, std::string(stub_str), PropertyType::kUnknown);
 
-  WriteCypherQuery(
-      CreateConstraintClauseBuilder::Build(constraint_name, node, property, constraint_type)
-  );
+  for (const auto& constraint : constraints) {
+    std::string constraint_name = std::format("{}_{}", constraint_name_prefix, constraint_counter);
+    WriteCypherQuery(
+        CreateConstraintClauseBuilder::Build(constraint_name, node, property, constraint)
+    );
+    constraint_counter++;
+  }
 }
 void Translator::CreateRelationship(const std::string& relationship_type,
                                     const std::string& start_label_name,
@@ -119,10 +120,6 @@ std::string Translator::CreateRelationshipType(const std::string& type_prefix) {
 }
 std::string Translator::CreatePrimaryKeyConstraintName(const std::string& table_name) const {
   return table_name + "_constraint";
-}
-std::string Translator::CreateForeignKeyConstraintName(const std::string& table_name,
-                                                       const std::string& ref_table_name) const {
-  return "fk_" + table_name + "_to_" + ref_table_name;
 }
 
 } // scc::translator
