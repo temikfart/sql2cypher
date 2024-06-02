@@ -55,7 +55,7 @@ TEST_F(SCCConfigTests, DefaultConfigTest) {
   fs::path default_sql_file = fs::canonical(sql_path);
   EXPECT_EQ(default_sql_file, config->get_sql_file());
 
-  fs::path default_cypher_file = fs::current_path() / "out.cypher";
+  fs::path default_cypher_file = fs::current_path() / "out.cql";
   EXPECT_EQ(default_cypher_file, config->get_cypher_file());
 
   EXPECT_TRUE(config->get_ast_dump_file().empty());
