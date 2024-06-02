@@ -54,3 +54,21 @@ jobs:
 
       - name: Unit testing
         run: cd build && ctest
+
+  build-test-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          choco install -y graphviz cmake
+
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build
+
+      - name: Build
+        run: cd build && cmake --build .
+
+      - name: Unit testing
+        run: cd build && ctest
