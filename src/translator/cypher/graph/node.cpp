@@ -2,18 +2,18 @@
 
 namespace scc::translator::cypher {
 
-Label::Label(std::string name)
+Node::Label::Label(std::string name)
     : value(std::move(name)) {}
 
-std::string Label::ToString() const {
+std::string Node::Label::ToString() const {
   return ":" + value;
 }
 
-std::ostream& operator<<(std::ostream& os, const Label& label) {
+std::ostream& operator<<(std::ostream& os, const Node::Label& label) {
   os << label.ToString();
   return os;
 }
-bool operator<(const Label& lhs, const Label& rhs) {
+bool operator<(const Node::Label& lhs, const Node::Label& rhs) {
   return lhs.value < rhs.value;
 }
 
