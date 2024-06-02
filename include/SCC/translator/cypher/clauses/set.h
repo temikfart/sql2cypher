@@ -10,7 +10,7 @@ namespace scc::translator::cypher {
 
 class SetPropertyClauseBuilder {
 public:
-  static std::string Build(const Node& node, const NodeProperty& property);
+  static std::string Build(const Node& node, const Property& property);
 };
 
 class RemovePropertyClauseBuilder {

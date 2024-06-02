@@ -11,7 +11,7 @@ std::string CreateNodeClauseBuilder::Build(const Node& node) {
 }
 
 std::string CreateConstraintClauseBuilder::Build(const std::string& constraint_name,
-                                                 const Node& node, const NodeProperty& property,
+                                                 const Node& node, const Property& property,
                                                  ConstraintType type) {
   if (type == ConstraintType::kNone) {
     throw std::invalid_argument("Could not build \'CREATE CONSTRAINT\' clause for \'"

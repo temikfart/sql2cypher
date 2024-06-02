@@ -24,31 +24,31 @@ struct Label {
 std::ostream& operator<<(std::ostream& os, const Label& label);
 bool operator<(const Label& lhs, const Label& rhs);
 
-struct NodeProperty {
+struct Property {
   std::string name;
   std::string value;
   PropertyType type;
 
-  explicit NodeProperty(std::string name, std::string value, PropertyType type);
+  explicit Property(std::string name, std::string value, PropertyType type);
 
   std::string ToString() const;
 };
 
-std::ostream& operator<<(std::ostream& os, const NodeProperty& property);
-bool operator<(const NodeProperty& lhs, const NodeProperty& rhs);
+std::ostream& operator<<(std::ostream& os, const Property& property);
+bool operator<(const Property& lhs, const Property& rhs);
 
 struct Node {
   std::vector<Label> labels = {};
-  std::vector<NodeProperty> properties = {};
+  std::vector<Property> properties = {};
   std::string variable = "";
 
   explicit Node(std::string label_name);
   explicit Node(std::string label_name, std::string variable);
   explicit Node(Label label);
-  explicit Node(Label label, std::vector<NodeProperty> properties);
-  explicit Node(Label label, std::vector<NodeProperty> properties, std::string variable);
+  explicit Node(Label label, std::vector<Property> properties);
+  explicit Node(Label label, std::vector<Property> properties, std::string variable);
 
-  Node& AddProperty(const NodeProperty& property);
+  Node& AddProperty(const Property& property);
   Node& AddProperty(const std::string& name, const std::string& value, PropertyType type);
   bool HasProperty(const std::string& name) const;
   unsigned PropertyCount() const;

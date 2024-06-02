@@ -55,7 +55,7 @@ void Translator::TranslateCreateTableStatement(const NodePtr<INode>& stmt) {
   ValidateHasChildren(table_definition, 1, "Empty table definition" + msg_suffix);
   auto table_definition_element = table_definition->Child(0);
   if (IsCorrectStmtType(table_definition_element, StmtType::kColumnDef)) {
-    std::vector<NodeProperty> properties = TranslateColumnDefinitions(table_definition);
+    std::vector<Property> properties = TranslateColumnDefinitions(table_definition);
     for (auto& property: properties) {
       node.AddProperty(property);
     }
@@ -119,7 +119,7 @@ void Translator::TranslateAlterTableActionAdd(const NodePtr<INode>& action_node,
   ValidateHasChildren(table_definition, 1, "Missing column definition or constraint" + msg_suffix);
   auto add_element = table_definition->Child(0);
   if (IsCorrectStmtType(add_element, StmtType::kColumnDef)) {
-    std::vector<NodeProperty> properties = TranslateColumnDefinitions(table_definition);
+    std::vector<Property> properties = TranslateColumnDefinitions(table_definition);
     for (auto& property: properties) {
       WriteCypherQuery(SetPropertyClauseBuilder::Build(node, property));
       node.AddProperty(property);
@@ -142,8 +142,8 @@ void Translator::TranslateAlterTableActionDrop(const NodePtr<INode>& action_node
   }
 }
 
-std::vector<NodeProperty> Translator::TranslateColumnDefinitions(const NodePtr<INode>& node) {
-  std::vector<NodeProperty> properties;
+std::vector<Property> Translator::TranslateColumnDefinitions(const NodePtr<INode>& node) {
+  std::vector<Property> properties;
 
   for (unsigned i = 0; HasChildren(node, i + 1); ++i) {
     auto column_definition = node->Child(i);
@@ -151,13 +151,13 @@ std::vector<NodeProperty> Translator::TranslateColumnDefinitions(const NodePtr<I
       break;
     }
     ValidateHasChildren(column_definition);
-    NodeProperty property = TranslateColumnDefinition(column_definition);
+    Property property = TranslateColumnDefinition(column_definition);
     properties.push_back(property);
   }
 
   return properties;
 }
-NodeProperty Translator::TranslateColumnDefinition(const NodePtr<INode>& node) {
+Property Translator::TranslateColumnDefinition(const NodePtr<INode>& node) {
   auto column_name_node = node->Child(0);
   ValidateHasChildren(column_name_node);
   std::string column_name = GetName(column_name_node);
@@ -185,7 +185,7 @@ NodeProperty Translator::TranslateColumnDefinition(const NodePtr<INode>& node) {
       throw translation_error(format("Unknown SQL datatype \'{}\'", datatype.ToString()));
   }
 
-  return NodeProperty(column_name, datatype_str, property_type);
+  return Property(column_name, datatype_str, property_type);
 }
 void Translator::TranslateTableConstraint(const NodePtr<INode>& constraint_definition,
                                           const std::string& table_name) {
