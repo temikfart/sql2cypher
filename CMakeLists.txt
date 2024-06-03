@@ -64,6 +64,12 @@ FetchContent_Declare(
         GIT_TAG 997da9255618311d1fcb0135ce86022729d1f1cb # release-2.9
 )
 FetchContent_MakeAvailable(argparse)
+FetchContent_Declare(
+        json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG 1d597743d89eec9a1b599bfc69e36db94a5fe05c # release-3.11.3
+)
+FetchContent_MakeAvailable(json)
 
 ## Build sources
 
@@ -72,6 +78,7 @@ target_include_directories(scc_include INTERFACE
         include
         ${logger_SOURCE_DIR}/include
         ${argparse_SOURCE_DIR}/include
+        ${json_SOURCE_DIR}/include
 )
 set(SCC_INCLUDE_LIBS scc_include)
 
@@ -98,6 +105,7 @@ target_link_libraries(${PRJ_TARGET} PUBLIC
 target_link_libraries(${PRJ_TARGET} PUBLIC
         liblogger
         argparse
+        nlohmann_json::nlohmann_json
 )
 
 # Tests
