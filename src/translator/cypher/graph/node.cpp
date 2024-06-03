@@ -4,33 +4,13 @@ namespace scc::translator::cypher {
 
 using std::format;
 
-Node::Label::Label(std::string name)
-    : value(std::move(name)) {}
-
-std::string Node::Label::ToString() const {
-  return ":" + value;
-}
-
-bool operator==(const Node::Label& lhs, const  Node::Label& rhs)  {
-  return lhs.value == rhs.value;
-}
-std::ostream& operator<<(std::ostream& os, const Node::Label& label) {
-  os << label.ToString();
-  return os;
-}
-bool operator<(const Node::Label& lhs, const Node::Label& rhs) {
-  return lhs.value < rhs.value;
-}
-
-Node::Node(std::string label_name)
-    : labels({Label(std::move(label_name))}) {}
-Node::Node(std::string label_name, std::string variable)
-    : labels({Label(std::move(label_name))}), variable(std::move(variable)) {}
-Node::Node(Label label)
+Node::Node(std::string label)
     : labels({std::move(label)}) {}
-Node::Node(Label label, std::vector<Property> properties)
+Node::Node(std::string label_name, std::string variable)
+    : labels({std::move(label_name)}), variable(std::move(variable)) {}
+Node::Node(std::string label, std::vector<Property> properties)
     : labels({std::move(label)}), properties(std::move(properties)) {}
-Node::Node(Label label, std::vector<Property> properties, std::string variable)
+Node::Node(std::string label, std::vector<Property> properties, std::string variable)
     : labels({std::move(label)}), properties(std::move(properties)),
       variable(std::move(variable)) {}
 
@@ -53,14 +33,6 @@ bool Node::HasProperty(const std::string& name) const {
 unsigned Node::PropertyCount() const {
   return properties.size();
 }
-Node& Node::AddLabel(const Label& label) {
-  labels.insert(label);
-  return *this;
-}
-Node& Node::AddLabel(const std::string& label) {
-  labels.insert(Label(label));
-  return *this;
-}
 Node& Node::SetVariable(const std::string& variable) {
   this->variable = variable;
   return *this;
@@ -73,7 +45,7 @@ std::string Node::ToString() const {
     ss << variable;
   }
   for (const auto& label : labels) {
-    ss << label.ToString();
+    ss << ":" << label;
   }
   if (!properties.empty()) {
     ss << " {";
