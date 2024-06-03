@@ -104,7 +104,7 @@ void Translator::CreateRelationship(const std::string& relationship_type,
                                     const std::string& end_label_name) {
   Node start_node(start_label_name, "a"), end_node(end_label_name, "b");
   Relationship relationship(relationship_type, start_node, end_node,
-                            Relationship::Direction::kRight);
+                            Direction::kRight);
   WriteCypherQuery(CreateRelationshipClauseBuilder::Build(relationship));
 }
 void Translator::RemoveProperty(const std::string& label_name, const std::string& property_name) {

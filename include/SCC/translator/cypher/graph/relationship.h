@@ -11,19 +11,19 @@
 
 namespace scc::translator::cypher {
 
-struct Relationship {
-  enum class Direction {
-    kLeft,
-    kRight,
-    kBoth,
-  };
+enum class Direction {
+  kLeft,
+  kRight,
+  kBoth,
+};
 
+struct Relationship {
   std::string type;
   Node start;
   Node end;
   Direction direction;
-  std::string variable;
   std::vector<Property> properties;
+  std::string variable;
 
   explicit Relationship(std::string type, Node start, Node end,
                         Direction direction = Direction::kRight);
