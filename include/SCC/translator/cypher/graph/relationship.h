@@ -40,4 +40,15 @@ private:
 bool operator==(const Relationship& lhs, const Relationship& rhs);
 std::ostream& operator<<(std::ostream& os, const Relationship& rel);
 
+struct ApplyCondition {
+public:
+  int spi;
+  int epi;
+};
+
+struct ConditionalRelationship : public Relationship {
+private:
+  std::vector<ApplyCondition> conditions;
+};
+
 } // scc::translation::cypher
