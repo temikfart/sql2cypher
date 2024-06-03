@@ -24,7 +24,7 @@ std::string CreateConstraintClauseBuilder::Build(const std::string& constraint_n
   std::string variable_name = node.variable.empty() ? std::string(kDefaultVar) : node.variable;
   ss << "FOR (" << variable_name;
   for (const auto& label : node.labels) {
-    ss << label.ToString();
+    ss << ":" << label;
   }
   ss << ")" << "\n";
 
