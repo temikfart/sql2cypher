@@ -37,6 +37,7 @@ private:
   std::string GetRightArrow() const;
 };
 
+bool operator==(const Relationship& lhs, const Relationship& rhs);
 std::ostream& operator<<(std::ostream& os, const Relationship& rel);
 
 } // scc::translation::cypher

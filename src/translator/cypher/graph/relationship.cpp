@@ -45,6 +45,20 @@ std::string Relationship::GetRightArrow() const {
   return "-";
 }
 
+bool operator==(const Relationship& lhs, const Relationship& rhs) {
+  if (lhs.properties != rhs.properties) {
+    return false;
+  }
+
+  if (lhs.type != rhs.type
+      || lhs.start != rhs.start
+      || lhs.end != rhs.end
+      || lhs.direction != rhs.direction) {
+    return false;
+  }
+
+  return true;
+}
 std::ostream& operator<<(std::ostream& os, const Relationship& relationship) {
   os << relationship.ToString();
   return os;
