@@ -27,8 +27,8 @@ Node& Node::AddProperty(const std::string& name, const std::string& value, Prope
   return *this;
 }
 bool Node::HasProperty(const std::string& name) const {
-  static auto predicate = [name](const Property& property) { return property.name == name; };
-  return std::find_if(properties.begin(), properties.end(), predicate) != properties.end();
+  auto predicate = [name](const Property& property) { return property.name == name; };
+  return std::any_of(properties.begin(), properties.end(), predicate);
 }
 unsigned Node::PropertyCount() const {
   return properties.size();
