@@ -2,6 +2,8 @@
 
 namespace scc::translator::cypher {
 
+using std::format;
+
 std::string CreateDatabaseClauseBuilder::Build(const std::string& database_name) {
   return "CREATE DATABASE " + database_name;
 }
@@ -14,8 +16,9 @@ std::string CreateConstraintClauseBuilder::Build(const std::string& constraint_n
                                                  const Node& node, const Property& property,
                                                  ConstraintType type) {
   if (type == ConstraintType::kNone) {
-    throw std::invalid_argument("Could not build \'CREATE CONSTRAINT\' clause for \'"
-                                    + type.ToString() + "\' cypher constraint type");
+    std::string msg = format("Could not build \'CREATE CONSTRAINT\' clause "
+                             "for \'{}\' cypher constraint type", type.ToString());
+    throw std::invalid_argument(msg);
   }
 
   std::stringstream ss;
@@ -23,9 +26,7 @@ std::string CreateConstraintClauseBuilder::Build(const std::string& constraint_n
 
   std::string variable_name = node.variable.empty() ? std::string(kDefaultVar) : node.variable;
   ss << "FOR (" << variable_name;
-  for (const auto& label : node.labels) {
-    ss << ":" << label;
-  }
+  ss << ":" << node.label;
   ss << ")" << "\n";
 
   ss << "REQUIRE (" << variable_name << "." << property.name << ")";

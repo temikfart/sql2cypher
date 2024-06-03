@@ -5,26 +5,26 @@ namespace scc::translator::cypher {
 using std::format;
 
 Node::Node(std::string label)
-    : labels({std::move(label)}) {}
-Node::Node(std::string label_name, std::string variable)
-    : labels({std::move(label_name)}), variable(std::move(variable)) {}
+    : label(std::move(label)) {}
+Node::Node(std::string label, std::string variable)
+    : label(std::move(label)), variable(std::move(variable)) {}
 Node::Node(std::string label, std::vector<Property> properties)
-    : labels({std::move(label)}), properties(std::move(properties)) {}
+    : label(std::move(label)), properties(std::move(properties)) {}
 Node::Node(std::string label, std::vector<Property> properties, std::string variable)
-    : labels({std::move(label)}), properties(std::move(properties)),
+    : label(std::move(label)), properties(std::move(properties)),
       variable(std::move(variable)) {}
 
 Node& Node::AddProperty(const Property& property) {
   if (HasProperty(property.name)) {
-    std::string msg = format("Property {} already exists", property.ToString());
+    std::string msg = format(R"(Property with name '{}' already exists in node '{}')",
+                             property.name, label);
     throw std::runtime_error(msg);
   }
   properties.push_back(property);
   return *this;
 }
 Node& Node::AddProperty(const std::string& name, const std::string& value, PropertyType type) {
-  properties.emplace_back(name, value, type);
-  return *this;
+  return AddProperty(Property(name, value, type));
 }
 bool Node::HasProperty(const std::string& name) const {
   auto predicate = [name](const Property& property) { return property.name == name; };
@@ -44,9 +44,7 @@ std::string Node::ToString() const {
   if (!variable.empty()) {
     ss << variable;
   }
-  for (const auto& label : labels) {
-    ss << ":" << label;
-  }
+  ss << ":" << label;
   if (!properties.empty()) {
     ss << " {";
     for (auto it = properties.begin(); it != properties.end(); ++it) {
@@ -62,7 +60,7 @@ std::string Node::ToString() const {
 }
 
 bool operator==(const Node& lhs, const Node& rhs)  {
-  if (lhs.labels != rhs.labels) {
+  if (lhs.label != rhs.label) {
     return false;
   }
 

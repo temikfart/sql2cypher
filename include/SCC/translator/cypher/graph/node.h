@@ -16,9 +16,8 @@ namespace scc::translator::cypher {
 
 constexpr std::string_view stub_str = "stub";
 
-
 struct Node {
-  std::set<std::string> labels;
+  std::string label;
   std::vector<Property> properties;
   std::string variable;
 
