@@ -33,6 +33,11 @@ std::string Property::ToString() const {
   return name + ": " + value;
 }
 
+bool operator==(const Property& lhs, const Property& rhs) {
+  return lhs.name == rhs.name
+      && lhs.value == rhs.value
+      && lhs.type == rhs.type;
+}
 std::ostream& operator<<(std::ostream& os, const Property &property) {
   os << property.ToString();
   return os;

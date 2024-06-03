@@ -2,6 +2,8 @@
 
 namespace scc::translator::cypher {
 
+using std::format;
+
 Node::Label::Label(std::string name)
     : value(std::move(name)) {}
 
@@ -9,6 +11,9 @@ std::string Node::Label::ToString() const {
   return ":" + value;
 }
 
+bool operator==(const Node::Label& lhs, const  Node::Label& rhs)  {
+  return lhs.value == rhs.value;
+}
 std::ostream& operator<<(std::ostream& os, const Node::Label& label) {
   os << label.ToString();
   return os;
@@ -30,6 +35,10 @@ Node::Node(Label label, std::vector<Property> properties, std::string variable)
       variable(std::move(variable)) {}
 
 Node& Node::AddProperty(const Property& property) {
+  if (HasProperty(property.name)) {
+    std::string msg = format("Property {} already exists", property.ToString());
+    throw std::runtime_error(msg);
+  }
   properties.push_back(property);
   return *this;
 }
@@ -45,11 +54,11 @@ unsigned Node::PropertyCount() const {
   return properties.size();
 }
 Node& Node::AddLabel(const Label& label) {
-  labels.push_back(label);
+  labels.insert(label);
   return *this;
 }
 Node& Node::AddLabel(const std::string& label) {
-  labels.emplace_back(label);
+  labels.insert(Label(label));
   return *this;
 }
 Node& Node::SetVariable(const std::string& variable) {
@@ -80,6 +89,17 @@ std::string Node::ToString() const {
   return ss.str();
 }
 
+bool operator==(const Node& lhs, const Node& rhs)  {
+  if (lhs.labels != rhs.labels) {
+    return false;
+  }
+
+  if (lhs.properties != rhs.properties) {
+    return false;
+  }
+
+  return true;
+}
 std::ostream& operator<<(std::ostream& os, const Node& node) {
   os << node.ToString();
   return os;

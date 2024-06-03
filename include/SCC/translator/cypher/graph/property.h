@@ -32,6 +32,7 @@ private:
   std::vector<ConstraintType> constraints;
 };
 
+bool operator==(const Property& lhs, const Property& rhs);
 std::ostream& operator<<(std::ostream& os, const Property& property);
 bool operator<(const Property& lhs, const Property& rhs);
 

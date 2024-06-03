@@ -1,9 +1,12 @@
 #pragma once
 
 #include <algorithm>
+#include <format>
 #include <ostream>
+#include <stdexcept>
 #include <sstream>
 #include <string>
+#include <set>
 #include <vector>
 #include <utility>
 
@@ -22,9 +25,9 @@ struct Node {
     std::string ToString() const;
   };
 
-  std::vector<Label> labels = {};
-  std::vector<Property> properties = {};
-  std::string variable = "";
+  std::set<Label> labels;
+  std::vector<Property> properties;
+  std::string variable;
 
   explicit Node(std::string label_name);
   explicit Node(std::string label_name, std::string variable);
@@ -43,9 +46,11 @@ struct Node {
   std::string ToString() const;
 };
 
+bool operator==(const Node::Label& lhs, const Node::Label& rhs);
 std::ostream& operator<<(std::ostream& os, const Node::Label& label);
 bool operator<(const Node::Label& lhs, const Node::Label& rhs);
 
+bool operator==(const Node& lhs, const Node& rhs);
 std::ostream& operator<<(std::ostream& os, const Node& node);
 
 } // scc::translator::cypher
