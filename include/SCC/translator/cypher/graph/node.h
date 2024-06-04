@@ -18,10 +18,14 @@ namespace scc::translator::cypher {
 
 constexpr std::string_view stub_str = "stub";
 
-struct Node {
+class BaseNode {
 public:
   std::string label;
   std::vector<Property> properties;
+};
+
+class Node : public BaseNode {
+public:
   std::string variable;
 
   explicit Node(std::string label);

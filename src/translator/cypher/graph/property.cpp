@@ -3,10 +3,10 @@
 namespace scc::translator::cypher {
 
 Property::Property(std::string  name, std::string value, PropertyType type)
-    : name(std::move(name)), value(std::move(value)), type(type) {}
+    : BaseProperty::BaseProperty(std::move(name), type), value(std::move(value)) {}
 Property::Property(std::string name, std::string value, PropertyType type,
                    std::vector<ConstraintType> constraints)
-    : name(std::move(name)), value(std::move(value)), type(type),
+    : BaseProperty::BaseProperty(std::move(name), type), value(std::move(value)),
       constraints(std::move(constraints)) {}
 
 void Property::AddConstraint(ConstraintType constraint) {
