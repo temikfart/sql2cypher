@@ -5,17 +5,17 @@
 namespace scc::translator::cypher {
 
 Relationship::Relationship(std::string type, Node start, Node end, Direction direction)
-    : BaseRelationship::BaseRelationship(std::move(type), std::move(start), std::move(end), {}),
-      direction(direction) {}
+    : BaseRelationship::BaseRelationship(std::move(type)), start(std::move(start)),
+      end(std::move(end)), direction(direction) {}
 Relationship::Relationship(std::string type, Node start, Node end, std::string variable,
                            Direction direction)
-    : BaseRelationship::BaseRelationship(std::move(type), std::move(start), std::move(end), {}),
-      direction(direction), variable(std::move(variable)) {}
+    : BaseRelationship::BaseRelationship(std::move(type)), start(std::move(start)),
+      end(std::move(end)), direction(direction), variable(std::move(variable)) {}
 Relationship::Relationship(std::string type, Node start, Node end, std::vector<Property> properties,
                            std::string variable, Direction direction)
-    : BaseRelationship::BaseRelationship(std::move(type), std::move(start), std::move(end),
-                                         std::move(properties)),
-      direction(direction), variable(std::move(variable)) {}
+    : BaseRelationship::BaseRelationship(std::move(type)), start(std::move(start)),
+      end(std::move(end)), direction(direction), properties(std::move(properties)),
+      variable(std::move(variable)) {}
 
 std::string Relationship::ToString() const {
   std::stringstream ss;
@@ -52,14 +52,14 @@ std::string Relationship::GetRightArrow() const {
 }
 
 bool operator==(const Relationship& lhs, const Relationship& rhs) {
-  if (lhs.properties != rhs.properties) {
-    return false;
-  }
-
   if (lhs.type != rhs.type
       || lhs.start != rhs.start
       || lhs.end != rhs.end
       || lhs.direction != rhs.direction) {
+    return false;
+  }
+
+  if (lhs.properties != rhs.properties) {
     return false;
   }
 
@@ -69,12 +69,5 @@ std::ostream& operator<<(std::ostream& os, const Relationship& relationship) {
   os << relationship.ToString();
   return os;
 }
-
-ConditionalRelationship::ConditionalRelationship(const Relationship& relationship,
-                                                 std::vector<ApplyCondition> conditions)
-    : Relationship::Relationship(relationship.type, relationship.start, relationship.end,
-                                 relationship.properties, relationship.variable,
-                                 relationship.direction),
-      conditions(std::move(conditions)) {}
 
 } // scc::translator::cypher

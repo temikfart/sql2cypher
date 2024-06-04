@@ -8,10 +8,10 @@
 
 #include "nlohmann/json.hpp"
 
-#include "SCC/translator/cypher/graph/node.h"
-#include "SCC/translator/cypher/graph/relationship.h"
+#include "SCC/translator/schema/node.h"
+#include "SCC/translator/schema/relationship.h"
 
-namespace scc::translator::cypher {
+namespace scc::translator::schema {
 
 class Schema {
 public:
@@ -21,13 +21,13 @@ public:
   explicit Schema(std::string database_name);
 
   void AddNode(const Node& node);
-  void AddConditionalRelationship(const ConditionalRelationship& relationship);
+  void AddConditionalRelationship(const Relationship& relationship);
 
   NLOHMANN_DEFINE_TYPE_INTRUSIVE(Schema, database_name, nodes, relationships);
 
 private:
   std::vector<Node> nodes;
-  std::vector<ConditionalRelationship> relationships;
+  std::vector<Relationship> relationships;
 };
 
 } // scc::translator::cypher

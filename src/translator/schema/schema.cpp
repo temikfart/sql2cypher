@@ -1,6 +1,6 @@
-#include "SCC/translator/cypher/schema.h"
+#include "SCC/translator/schema/schema.h"
 
-namespace scc::translator::cypher {
+namespace scc::translator::schema {
 
 Schema::Schema(std::string database_name) : database_name(std::move(database_name)) {}
 
@@ -13,7 +13,7 @@ void Schema::AddNode(const Node& node) {
   }
   nodes.push_back(node);
 }
-void Schema::AddConditionalRelationship(const ConditionalRelationship& relationship) {
+void Schema::AddConditionalRelationship(const Relationship& relationship) {
   auto it = std::find(relationships.begin(), relationships.end(), relationship);
   if (it != relationships.end()) {
     std::string msg = format(R"(Relationship '{}' already exists in schema for database '{}')",
