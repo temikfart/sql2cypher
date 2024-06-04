@@ -17,13 +17,9 @@ enum class Direction {
   kBoth,
 };
 
-class BaseRelationship {
+class Relationship {
 public:
   std::string type;
-};
-
-class Relationship : public BaseRelationship {
-public:
   Node start;
   Node end;
   Direction direction;

@@ -1,14 +1,21 @@
 #pragma once
 
+#include <algorithm>
+#include <format>
+#include <stdexcept>
+#include <string>
+#include <vector>
+#include <utility>
+
 #include "nlohmann/json.hpp"
 
-#include "SCC/translator/cypher/graph/node.h"
 #include "SCC/translator/schema/property.h"
 
 namespace scc::translator::schema {
 
-class Node : public cypher::BaseNode {
+class Node  {
 public:
+  std::string label;
   std::vector<Property> properties;
 
   explicit Node(std::string label);

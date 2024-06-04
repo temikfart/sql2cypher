@@ -2,12 +2,12 @@
 
 namespace scc::translator::schema {
 
-using cypher::BaseNode;
+using std::format;
 
 Node::Node(std::string label)
-    : BaseNode::BaseNode(std::move(label)) {}
+    : label(std::move(label)) {}
 Node::Node(std::string label, std::vector<Property> properties)
-    : BaseNode::BaseNode(std::move(label)), properties(std::move(properties)) {}
+    : label(std::move(label)), properties(std::move(properties)) {}
 
 Node& Node::AddProperty(const Property& property) {
   if (HasProperty(property.name)) {

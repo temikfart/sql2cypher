@@ -1,21 +1,17 @@
-#include <utility>
-
 #include "SCC/translator/cypher/graph/relationship.h"
 
 namespace scc::translator::cypher {
 
 Relationship::Relationship(std::string type, Node start, Node end, Direction direction)
-    : BaseRelationship::BaseRelationship(std::move(type)), start(std::move(start)),
-      end(std::move(end)), direction(direction) {}
+    : type(std::move(type)), start(std::move(start)), end(std::move(end)), direction(direction) {}
 Relationship::Relationship(std::string type, Node start, Node end, std::string variable,
                            Direction direction)
-    : BaseRelationship::BaseRelationship(std::move(type)), start(std::move(start)),
-      end(std::move(end)), direction(direction), variable(std::move(variable)) {}
+    : type(std::move(type)), start(std::move(start)), end(std::move(end)), direction(direction),
+      variable(std::move(variable)) {}
 Relationship::Relationship(std::string type, Node start, Node end, std::vector<Property> properties,
                            std::string variable, Direction direction)
-    : BaseRelationship::BaseRelationship(std::move(type)), start(std::move(start)),
-      end(std::move(end)), direction(direction), properties(std::move(properties)),
-      variable(std::move(variable)) {}
+    : type(std::move(type)), start(std::move(start)), end(std::move(end)), direction(direction),
+      properties(std::move(properties)), variable(std::move(variable)) {}
 
 std::string Relationship::ToString() const {
   std::stringstream ss;

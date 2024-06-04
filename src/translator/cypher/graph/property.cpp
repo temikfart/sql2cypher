@@ -3,7 +3,7 @@
 namespace scc::translator::cypher {
 
 Property::Property(std::string  name, std::string value, PropertyType type)
-    : BaseProperty::BaseProperty(std::move(name), type), value(std::move(value)) {}
+    : name(std::move(name)), type(type), value(std::move(value)) {}
 
 std::string Property::ToString() const {
   return name + ": " + value;
