@@ -13,7 +13,7 @@ target_sources(scc_translator_cypher PRIVATE
 target_link_libraries(scc_translator_cypher PRIVATE
         scc_include
 )
-target_link_libraries(scc_parser PUBLIC
+target_link_libraries(scc_translator_cypher PUBLIC
         scc_translator_cypher_clauses
         scc_translator_cypher_graph
 )

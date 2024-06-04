@@ -10,6 +10,10 @@ Relationship::Relationship(std::string type, Node start, Node end, std::string v
                            Direction direction)
     : type(std::move(type)), start(std::move(start)), end(std::move(end)), direction(direction),
       variable(std::move(variable)) {}
+Relationship::Relationship(std::string type, Node start, Node end, std::vector<Property> properties,
+                           std::string variable, Direction direction)
+    : type(std::move(type)), start(std::move(start)), end(std::move(end)), direction(direction),
+      properties(std::move(properties)), variable(std::move(variable)) {}
 
 std::string Relationship::ToString() const {
   std::stringstream ss;
@@ -63,5 +67,12 @@ std::ostream& operator<<(std::ostream& os, const Relationship& relationship) {
   os << relationship.ToString();
   return os;
 }
+
+ConditionalRelationship::ConditionalRelationship(const Relationship& relationship,
+                                                 std::vector<ApplyCondition> conditions)
+    : Relationship::Relationship(relationship.type, relationship.start, relationship.end,
+                                 relationship.properties, relationship.variable,
+                                 relationship.direction),
+      conditions(std::move(conditions)) {}
 
 } // scc::translator::cypher
