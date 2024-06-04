@@ -10,6 +10,8 @@
 #include <vector>
 #include <utility>
 
+#include "nlohmann/json.hpp"
+
 #include "SCC/translator/cypher/graph/property.h"
 
 namespace scc::translator::cypher {
@@ -17,6 +19,7 @@ namespace scc::translator::cypher {
 constexpr std::string_view stub_str = "stub";
 
 struct Node {
+public:
   std::string label;
   std::vector<Property> properties;
   std::string variable;
@@ -35,6 +38,7 @@ struct Node {
   std::string ToString() const;
 };
 
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Node, label, properties, variable)
 
 bool operator==(const Node& lhs, const Node& rhs);
 std::ostream& operator<<(std::ostream& os, const Node& node);

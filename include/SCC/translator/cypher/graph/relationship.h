@@ -6,6 +6,8 @@
 #include <string>
 #include <utility>
 
+#include "nlohmann/json.hpp"
+
 #include "SCC/translator/cypher/graph/node.h"
 #include "SCC/translator/cypher/graph/property.h"
 
@@ -16,6 +18,12 @@ enum class Direction {
   kRight,
   kBoth,
 };
+
+NLOHMANN_JSON_SERIALIZE_ENUM(Direction, {
+  { Direction::kLeft, "<" },
+  { Direction::kRight, ">" },
+  { Direction::kBoth, "-" },
+})
 
 struct Relationship {
   std::string type;
@@ -37,6 +45,8 @@ private:
   std::string GetRightArrow() const;
 };
 
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Relationship, type, start, end, direction, properties, variable)
+
 bool operator==(const Relationship& lhs, const Relationship& rhs);
 std::ostream& operator<<(std::ostream& os, const Relationship& rel);
 
@@ -46,7 +56,12 @@ public:
   int epi;
 };
 
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ApplyCondition, spi, epi)
+
 struct ConditionalRelationship : public Relationship {
+public:
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(ConditionalRelationship, conditions)
+
 private:
   std::vector<ApplyCondition> conditions;
 };

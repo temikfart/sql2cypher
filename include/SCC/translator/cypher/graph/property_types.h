@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include <string>
 
+#include "nlohmann/json.hpp"
+
 #include "SCC/common/string_utils.h"
 
 namespace scc::translator::cypher {
@@ -42,9 +44,19 @@ public:
   constexpr bool operator>(const Value& value) const { return value_ > value; }
   constexpr bool operator>=(const Value& value) const { return value_ >= value; }
 
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(PropertyType, value_)
+
 private:
   Value value_ = Value::kUnknown;
 };
+
+NLOHMANN_JSON_SERIALIZE_ENUM(PropertyType::Value, {
+  { PropertyType::Value::kUnknown, kPT_Unknown },
+  { PropertyType::Value::kBoolean, kPT_Boolean },
+  { PropertyType::Value::kFloat, kPT_Float },
+  { PropertyType::Value::kInteger, kPT_Integer },
+  { PropertyType::Value::kString, kPT_String },
+})
 
 std::ostream& operator<<(std::ostream& os, const PropertyType& type);
 

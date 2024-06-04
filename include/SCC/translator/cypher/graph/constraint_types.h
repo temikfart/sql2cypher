@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include <string>
 
+#include "nlohmann/json.hpp"
+
 #include "SCC/common/string_utils.h"
 
 namespace scc::translator::cypher {
@@ -38,9 +40,17 @@ public:
   constexpr bool operator>(const Value& value) const { return value_ > value; }
   constexpr bool operator>=(const Value& value) const { return value_ >= value; }
 
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(ConstraintType, value_)
+
 private:
   Value value_ = Value::kNone;
 };
+
+NLOHMANN_JSON_SERIALIZE_ENUM(ConstraintType::Value, {
+  { ConstraintType::Value::kNone, kCT_None },
+  { ConstraintType::Value::kUniqueness, kCT_Uniqueness },
+  { ConstraintType::Value::kExistence, kCT_Existence },
+})
 
 std::ostream& operator<<(std::ostream& os, const ConstraintType& type);
 
