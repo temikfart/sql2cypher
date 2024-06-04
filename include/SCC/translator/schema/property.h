@@ -1,15 +1,22 @@
 #pragma once
 
+#include <algorithm>
+#include <string>
+#include <vector>
+#include <utility>
+
 #include "nlohmann/json.hpp"
 
 #include "SCC/translator/cypher/graph/constraint_types.h"
-#include "SCC/translator/cypher/graph/property.h"
 #include "SCC/translator/cypher/graph/property_types.h"
 
 namespace scc::translator::schema {
 
-class Property : public cypher::BaseProperty {
+class Property {
 public:
+  std::string name;
+  cypher::PropertyType type;
+
   explicit Property(std::string name, cypher::PropertyType type);
   explicit Property(std::string name, cypher::PropertyType type,
                     std::vector<cypher::ConstraintType> constraints);

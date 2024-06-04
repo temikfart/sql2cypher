@@ -1,8 +1,10 @@
 #pragma once
 
+#include <string>
+#include <utility>
+
 #include "nlohmann/json.hpp"
 
-#include "SCC/translator/cypher/graph/relationship.h"
 #include "SCC/translator/schema/node.h"
 #include "SCC/translator/schema/property.h"
 
@@ -19,8 +21,9 @@ constexpr bool operator==(const ApplyCondition& lhs, const ApplyCondition& rhs) 
   return lhs.spi == rhs.spi && lhs.epi == rhs.epi;
 }
 
-class Relationship : public cypher::BaseRelationship {
+class Relationship {
 public:
+  std::string type;
   Node start;
   Node end;
   std::vector<Property> properties;

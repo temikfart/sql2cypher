@@ -6,9 +6,9 @@ using cypher::ConstraintType;
 using cypher::PropertyType;
 
 Property::Property(std::string name, PropertyType type)
-    : BaseProperty::BaseProperty(std::move(name), type) {}
+    : name(std::move(name)), type(type) {}
 Property::Property(std::string name, PropertyType type, std::vector<ConstraintType> constraints)
-    : BaseProperty::BaseProperty(std::move(name), type), constraints(std::move(constraints)) {}
+    : name(std::move(name)), type(type), constraints(std::move(constraints)) {}
 
 void Property::AddConstraint(ConstraintType constraint) {
   if (std::find(constraints.begin(), constraints.end(), constraint) == constraints.end()) {
