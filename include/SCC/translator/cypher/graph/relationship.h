@@ -25,12 +25,17 @@ NLOHMANN_JSON_SERIALIZE_ENUM(Direction, {
   { Direction::kBoth, "-" },
 })
 
-struct Relationship {
+class BaseRelationship {
+public:
   std::string type;
   Node start;
   Node end;
-  Direction direction;
   std::vector<Property> properties;
+};
+
+class Relationship : public BaseRelationship {
+public:
+  Direction direction;
   std::string variable;
 
   explicit Relationship(std::string type, Node start, Node end,
@@ -53,14 +58,13 @@ bool operator==(const Relationship& lhs, const Relationship& rhs);
 std::ostream& operator<<(std::ostream& os, const Relationship& rel);
 
 struct ApplyCondition {
-public:
   int spi;
   int epi;
 };
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ApplyCondition, spi, epi)
 
-struct ConditionalRelationship : public Relationship {
+class ConditionalRelationship : public Relationship {
 public:
   explicit ConditionalRelationship(const Relationship& relationship,
                                    std::vector<ApplyCondition> conditions);

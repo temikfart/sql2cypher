@@ -14,10 +14,15 @@
 
 namespace scc::translator::cypher {
 
-struct Property {
+class BaseProperty {
+public:
   std::string name;
-  std::string value;
   PropertyType type;
+};
+
+class Property : public BaseProperty {
+public:
+  std::string value;
 
   explicit Property(std::string name, std::string value, PropertyType type);
   explicit Property(std::string name, std::string value, PropertyType type,
