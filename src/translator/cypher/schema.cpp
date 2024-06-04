@@ -4,4 +4,23 @@ namespace scc::translator::cypher {
 
 Schema::Schema(std::string database_name) : database_name(std::move(database_name)) {}
 
+void Schema::AddNode(const Node& node) {
+  auto it = std::find(nodes.begin(), nodes.end(), node);
+  if (it != nodes.end()) {
+    std::string msg = format(R"(Node '{}' already exists in schema for database '{}')",
+                             node.label, database_name);
+    throw std::runtime_error(msg);
+  }
+  nodes.push_back(node);
+}
+void Schema::AddConditionalRelationship(const ConditionalRelationship& relationship) {
+  auto it = std::find(relationships.begin(), relationships.end(), relationship);
+  if (it != relationships.end()) {
+    std::string msg = format(R"(Relationship '{}' already exists in schema for database '{}')",
+                             relationship.type, database_name);
+    throw std::runtime_error(msg);
+  }
+  relationships.push_back(relationship);
+}
+
 } // scc::translator::cypher

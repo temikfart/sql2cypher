@@ -37,6 +37,8 @@ struct Relationship {
                         Direction direction = Direction::kRight);
   explicit Relationship(std::string type, Node start, Node end, std::string variable,
                         Direction direction = Direction::kRight);
+  explicit Relationship(std::string type, Node start, Node end, std::vector<Property> properties,
+                        std::string variable, Direction direction = Direction::kRight);
 
   std::string ToString() const;
 
@@ -60,10 +62,27 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ApplyCondition, spi, epi)
 
 struct ConditionalRelationship : public Relationship {
 public:
-  NLOHMANN_DEFINE_TYPE_INTRUSIVE(ConditionalRelationship, conditions)
+  explicit ConditionalRelationship(const Relationship& relationship,
+                                   std::vector<ApplyCondition> conditions);
+
+  ConditionalRelationship& AddCondition(ApplyCondition condition);
+
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(ConditionalRelationship, type, start, end, direction, properties,
+                                 variable, conditions)
 
 private:
   std::vector<ApplyCondition> conditions;
 };
+
+inline void to_json(nlohmann::json& j, const std::vector<ConditionalRelationship>& relationships) {
+  j = nlohmann::json::array();
+  for (const auto& relationship : relationships) {
+    j.push_back(relationship);
+  }
+}
+
+inline void from_json(const nlohmann::json& j, std::vector<ConditionalRelationship>& relationships) {
+  relationships = j.get<std::vector<ConditionalRelationship>>();
+}
 
 } // scc::translation::cypher
