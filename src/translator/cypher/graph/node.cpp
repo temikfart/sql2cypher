@@ -5,13 +5,14 @@ namespace scc::translator::cypher {
 using std::format;
 
 Node::Node(std::string label)
-    : BaseNode::BaseNode(std::move(label), {}) {}
+    : BaseNode::BaseNode(std::move(label)) {}
 Node::Node(std::string label, std::string variable)
-    : BaseNode::BaseNode(std::move(label), {}), variable(std::move(variable)) {}
+    : BaseNode::BaseNode(std::move(label)), variable(std::move(variable)) {}
 Node::Node(std::string label, std::vector<Property> properties)
-    : BaseNode::BaseNode(std::move(label), std::move(properties)) {}
+    : BaseNode::BaseNode(std::move(label)), properties(std::move(properties)) {}
 Node::Node(std::string label, std::vector<Property> properties, std::string variable)
-    : BaseNode::BaseNode(std::move(label), std::move(properties)), variable(std::move(variable)) {}
+    : BaseNode::BaseNode(std::move(label)), properties(std::move(properties)),
+      variable(std::move(variable)) {}
 
 Node& Node::AddProperty(const Property& property) {
   if (HasProperty(property.name)) {
