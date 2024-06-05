@@ -23,6 +23,8 @@ public:
 
   Node& AddProperty(const Property& property);
   bool HasProperty(const std::string& name) const;
+  int PropertyIndex(const std::string& name) const;
+  unsigned PropertyCount() const;
 
   bool operator==(const Node& other) const;
   bool operator!=(const Node& other) const;
