@@ -52,6 +52,9 @@ TEST_F(SCCConfigTests, DefaultConfigTest) {
   SCCMode default_mode = SCCMode::kInteractive;
   EXPECT_EQ(default_mode, config->mode);
 
+  bool default_translate_schema_flag = true;
+  EXPECT_EQ(default_translate_schema_flag, config->translate_schema);
+
   fs::path default_sql_file = fs::canonical(sql_path);
   EXPECT_EQ(default_sql_file, config->get_sql_file());
 
@@ -61,6 +64,8 @@ TEST_F(SCCConfigTests, DefaultConfigTest) {
   EXPECT_TRUE(config->get_ast_dump_file().empty());
 }
 TEST_F(CustomSCCConfigTests, CustomConfigTest) {
+  AddArg("--translate-schema");
+
   std::string custom_sql_file = sql_path;
   AddArg("--sql", custom_sql_file);
 
@@ -81,6 +86,7 @@ TEST_F(CustomSCCConfigTests, CustomConfigTest) {
       InitializeConfig();
   );
 
+  EXPECT_EQ(true, config->translate_schema);
   EXPECT_EQ(fs::canonical(custom_sql_file), config->get_sql_file());
   EXPECT_EQ(logger::to_severity(custom_log_severity), config->log_severity);
   EXPECT_EQ(fs::weakly_canonical(fs::path{custom_log_directory}), config->log_directory);

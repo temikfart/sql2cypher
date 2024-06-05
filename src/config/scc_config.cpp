@@ -30,6 +30,8 @@ SCCConfig::SCCConfig(const SCCArgs& args) {
     else
       mode = args.Get<SCCMode>("--mode");
 
+    translate_schema = args.Get<bool>("--translate-schema");
+
     std::string sql_file_path = args.Get("--sql");
     scc::common::ValidateFileExists(sql_file_path);
     sql_file_ = fs::canonical(sql_file_path);

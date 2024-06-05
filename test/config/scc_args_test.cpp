@@ -50,6 +50,13 @@ TEST_F(SCCArgsBaseTests, SQLArgumentWithoutParameterTest) {
   EXPECT_THROW(ParseArgsWrapper(), std::runtime_error);
 }
 
+TEST_F(SCCArgsTests, TranslateSchemaDefaultValueTest) {
+  EXPECT_NO_THROW(ParseArgsWrapper());
+
+  bool default_translate_schema_flag = parser.Get<bool>("--translate-schema");
+  EXPECT_TRUE(default_translate_schema_flag);
+}
+
 TEST_F(SCCArgsTests, CypherArgumentDefaultValueTest) {
   EXPECT_NO_THROW(ParseArgsWrapper());
 
