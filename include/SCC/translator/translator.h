@@ -32,12 +32,14 @@ public:
 
 class Translator {
 public:
-  explicit Translator(std::shared_ptr<ast::INode> ast, const std::filesystem::path& out_path);
+  explicit Translator(std::shared_ptr<ast::INode> ast, const std::filesystem::path& out_path,
+                      bool translate_schema);
 
-  void Translate(bool translate_schema);
+  void Translate();
 
 private:
   std::shared_ptr<ast::INode> ast_;
+  bool translate_schema_;
   schema::Schema schema_;
   std::filesystem::path schema_path_;
   std::ofstream out_;
