@@ -7,27 +7,25 @@ using cypher::PropertyType;
 
 Property::Property(std::string name, PropertyType type)
     : name(std::move(name)), type(type) {}
-Property::Property(std::string name, PropertyType type, std::vector<ConstraintType> constraints)
+Property::Property(std::string name, PropertyType type, std::vector<PropertyConstraint> constraints)
     : name(std::move(name)), type(type), constraints(std::move(constraints)) {}
 
-void Property::AddConstraint(ConstraintType constraint) {
-  if (std::find(constraints.begin(), constraints.end(), constraint) == constraints.end()) {
+void Property::AddConstraint(const PropertyConstraint& constraint) {
+  if (!HasConstraint(constraint)) {
     constraints.push_back(constraint);
   }
 }
-void Property::RemoveConstraint(ConstraintType constraint) {
+void Property::RemoveConstraint(const PropertyConstraint& constraint) {
   auto it = std::find(constraints.begin(), constraints.end(), constraint);
   if (it != constraints.end()) {
     constraints.erase(it);
   }
 }
 bool Property::MustBeUnique() const {
-  return std::any_of(constraints.begin(), constraints.end(),
-                     [](ConstraintType c) { return c == ConstraintType::kUniqueness; });
+  return HasConstraintType(ConstraintType::kUniqueness);
 }
 bool Property::MustBeNotNull() const {
-  return std::any_of(constraints.begin(), constraints.end(),
-                     [](ConstraintType c) { return c == ConstraintType::kExistence; });
+  return HasConstraintType(ConstraintType::kExistence);
 }
 
 bool Property::operator==(const Property& other) const {
@@ -37,6 +35,16 @@ bool Property::operator==(const Property& other) const {
 }
 bool Property::operator!=(const Property& other) const {
   return !(*this == other);
+}
+
+bool Property::HasConstraintType(ConstraintType constraint_type) const {
+  return std::any_of(constraints.begin(), constraints.end(),
+                     [constraint_type](const PropertyConstraint& c) {
+                       return c.type == constraint_type;
+                     });
+}
+bool Property::HasConstraint(const PropertyConstraint& constraint) const {
+  return std::find(constraints.begin(), constraints.end(), constraint) != constraints.end();
 }
 
 } // scc::translator::schema

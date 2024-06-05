@@ -4,11 +4,10 @@ namespace scc::translator {
 
 using namespace ast;
 using namespace ast::common;
-using namespace cypher;
+using namespace schema;
 
-template<typename NodeType,
-    typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
-using NodePtr = std::shared_ptr<NodeType>;
+using cypher::ConstraintType;
+using cypher::PropertyType;
 
 void Translator::TranslatePrimaryKey(const NodePtr<INode>& primary_key,
                                      const std::string& constraint_name,
