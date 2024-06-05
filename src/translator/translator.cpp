@@ -3,19 +3,29 @@
 namespace scc::translator {
 
 using namespace ast;
+namespace fs = std::filesystem;
 
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
-Translator::Translator(NodePtr<INode> ast, const std::filesystem::path& out_path)
-    : ast_(std::move(ast)), out_(out_path) {}
+Translator::Translator(NodePtr<INode> ast, const fs::path& out_path)
+    : ast_(std::move(ast)), schema_path_(out_path) {}
 
-void Translator::Translate() {
+void Translator::Translate(bool translate_schema) {
   LOGI << "Translation is started";
   if (ast_ == nullptr || !HasChildren(ast_)) {
     LOGI << "Translation is ended. Nothing to translate";
     return;
+  }
+
+  if (!translate_schema) {
+    LOGW << "Currently only translation of schema migration queries is supported."
+         << " Use --translate-schema flag to translate schema";
+    return;
+  } else {
+    schema_path_.replace_extension(".json");
+    out_.open(schema_path_);
   }
 
   ValidateIsCorrectStmtType(ast_, StmtType::kProgram);
@@ -24,8 +34,11 @@ void Translator::Translate() {
     ValidateIsCorrectStmtType(query, StmtType::kQuery);
     TranslateQuery(query);
   }
-
   LOGI << "Translation is ended";
+
+  LOGI << "Serializing Neo4j schema to json...";
+  out_ << schema_.ToJsonString() << std::endl;
+  LOGI << "Serialized Neo4j schema saved at " << schema_path_.string();
 }
 
 void Translator::WriteCypherQuery(const std::string& query) {

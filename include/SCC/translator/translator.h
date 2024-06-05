@@ -19,6 +19,7 @@
 #include "SCC/translator/cypher/clauses/delete.h"
 #include "SCC/translator/cypher/clauses/drop.h"
 #include "SCC/translator/cypher/clauses/set.h"
+#include "SCC/translator/schema/schema.h"
 
 #include "logger/log.hpp"
 
@@ -29,17 +30,16 @@ public:
   explicit translation_error(const std::string& message);
 };
 
-// Column as property with standard data
-using StdProperty = std::tuple<std::string, std::string>;
-
 class Translator {
 public:
   explicit Translator(std::shared_ptr<ast::INode> ast, const std::filesystem::path& out_path);
 
-  void Translate();
+  void Translate(bool translate_schema);
 
 private:
   std::shared_ptr<ast::INode> ast_;
+  schema::Schema schema_;
+  std::filesystem::path schema_path_;
   std::ofstream out_;
 
   int constraint_counter = 0;

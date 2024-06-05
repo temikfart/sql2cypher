@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
     }
 
     scc::translator::Translator translator(AST, config->get_cypher_file());
-    translator.Translate();
+    translator.Translate(config->translate_schema);
 
     end(EXIT_SUCCESS);
   } catch (const std::exception& e) {
