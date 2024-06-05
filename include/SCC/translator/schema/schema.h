@@ -23,6 +23,8 @@ public:
   void AddNode(const Node& node);
   void AddConditionalRelationship(const Relationship& relationship);
 
+  std::string ToJsonString(const int indent = 2, const char indent_char = ' ') const;
+
   NLOHMANN_DEFINE_TYPE_INTRUSIVE(Schema, database_name, nodes, relationships);
 
 private:

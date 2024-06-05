@@ -2,6 +2,8 @@
 
 namespace scc::translator::schema {
 
+using nlohmann::json;
+
 Schema::Schema(std::string database_name) : database_name(std::move(database_name)) {}
 
 void Schema::AddNode(const Node& node) {
@@ -21,6 +23,12 @@ void Schema::AddConditionalRelationship(const Relationship& relationship) {
     throw std::runtime_error(msg);
   }
   relationships.push_back(relationship);
+}
+
+std::string Schema::ToJsonString(const int indent, const char indent_char) const {
+  json schema_json;
+  to_json(schema_json, *this);
+  return schema_json.dump(indent, indent_char);
 }
 
 } // scc::translator::cypher
