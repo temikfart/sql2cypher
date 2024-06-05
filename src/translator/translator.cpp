@@ -70,7 +70,9 @@ void Translator::TranslateQuery(const NodePtr<INode>& query) {
                                      statement_type->stmt_type.ToString()));
   }
 
-  FinishCypherQueriesGroup();
+  if (statement_type->stmt_type != StmtType::kDdlStmt) {
+    FinishCypherQueriesGroup();
+  }
 }
 
 } // scc::translator

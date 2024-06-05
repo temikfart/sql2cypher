@@ -3,15 +3,17 @@
 namespace scc::translator {
 
 using namespace ast;
-using namespace cypher;
+using namespace schema;
+
+using cypher::PropertyType;
 
 using std::format;
 
-template<typename NodeType,
-    typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
-using NodePtr = std::shared_ptr<NodeType>;
+template<typename ASTNodeType,
+    typename std::enable_if<std::is_base_of<INode, ASTNodeType>::value>::type* = nullptr>
+using ASTNodePtr = std::shared_ptr<ASTNodeType>;
 
-void Translator::TranslateDDLStatement(const NodePtr<INode>& ddl_statement) {
+void Translator::TranslateDDLStatement(const ASTNodePtr<INode>& ddl_statement) {
   switch (ddl_statement->stmt_type) {
     case StmtType::kCreateDatabaseStmt:
       TranslateCreateDatabaseStatement(ddl_statement);
@@ -34,14 +36,12 @@ void Translator::TranslateDDLStatement(const NodePtr<INode>& ddl_statement) {
   }
 }
 
-void Translator::TranslateCreateDatabaseStatement(const NodePtr<INode>& stmt) {
+void Translator::TranslateCreateDatabaseStatement(const ASTNodePtr<INode>& stmt) {
   auto database_name_node = stmt->Child(0);
   ValidateHasChildren(database_name_node);
-  std::string database_name = GetName(database_name_node);
-
-  WriteCypherQuery(CreateDatabaseClauseBuilder::Build(database_name));
+  schema_.database_name = GetName(database_name_node);
 }
-void Translator::TranslateCreateTableStatement(const NodePtr<INode>& stmt) {
+void Translator::TranslateCreateTableStatement(const ASTNodePtr<INode>& stmt) {
   const std::string msg_suffix = " in \'CREATE TABLE\' statement";
 
   auto table_name_node = stmt->Child(0);
@@ -67,7 +67,7 @@ void Translator::TranslateCreateTableStatement(const NodePtr<INode>& stmt) {
     TranslateTableConstraint(constraint_definition, table_name);
   }
 }
-void Translator::TranslateAlterTableStatement(const NodePtr<INode>& stmt) {
+void Translator::TranslateAlterTableStatement(const ASTNodePtr<INode>& stmt) {
   const std::string msg_suffix = " in \'ALTER TABLE\' statement";
 
   auto table_name_node = stmt->Child(0);
@@ -89,7 +89,7 @@ void Translator::TranslateAlterTableStatement(const NodePtr<INode>& stmt) {
                                      action_node->stmt_type.ToString(), msg_suffix));
   }
 }
-void Translator::TranslateDropDatabaseStatement(const NodePtr<INode>& stmt) {
+void Translator::TranslateDropDatabaseStatement(const ASTNodePtr<INode>& stmt) {
   for (unsigned i = 0; HasChildren(stmt, i + 1); ++i) {
     auto database_name_node = stmt->Child(i);
     ValidateHasChildren(database_name_node);
@@ -98,7 +98,7 @@ void Translator::TranslateDropDatabaseStatement(const NodePtr<INode>& stmt) {
     WriteCypherQuery(DropDatabaseClauseBuilder::Build(database_name));
   }
 }
-void Translator::TranslateDropTableStatement(const NodePtr<INode>& stmt) {
+void Translator::TranslateDropTableStatement(const ASTNodePtr<INode>& stmt) {
   for (unsigned i = 0; HasChildren(stmt, i + 1); ++i) {
     auto table_name_node = stmt->Child(i);
     ValidateHasChildren(table_name_node);
@@ -109,7 +109,7 @@ void Translator::TranslateDropTableStatement(const NodePtr<INode>& stmt) {
   }
 }
 
-void Translator::TranslateAlterTableActionAdd(const NodePtr<INode>& action_node,
+void Translator::TranslateAlterTableActionAdd(const ASTNodePtr<INode>& action_node,
                                               std::string& table_name) {
   const std::string msg_suffix = " in \'ALTER TABLE ADD\' statement";
 
@@ -131,7 +131,7 @@ void Translator::TranslateAlterTableActionAdd(const NodePtr<INode>& action_node,
     TranslateTableConstraint(constraint_definition, table_name);
   }
 }
-void Translator::TranslateAlterTableActionDrop(const NodePtr<INode>& action_node,
+void Translator::TranslateAlterTableActionDrop(const ASTNodePtr<INode>& action_node,
                                                std::string& table_name) {
   auto alter_drop_list = action_node->Child(0);
   ValidateHasChildren(alter_drop_list, 1, "Missing arguments in \'ALTER TABLE DROP\' statement");
@@ -142,7 +142,7 @@ void Translator::TranslateAlterTableActionDrop(const NodePtr<INode>& action_node
   }
 }
 
-std::vector<Property> Translator::TranslateColumnDefinitions(const NodePtr<INode>& node) {
+std::vector<Property> Translator::TranslateColumnDefinitions(const ASTNodePtr<INode>& node) {
   std::vector<Property> properties;
 
   for (unsigned i = 0; HasChildren(node, i + 1); ++i) {
@@ -157,7 +157,7 @@ std::vector<Property> Translator::TranslateColumnDefinitions(const NodePtr<INode
 
   return properties;
 }
-Property Translator::TranslateColumnDefinition(const NodePtr<INode>& node) {
+Property Translator::TranslateColumnDefinition(const ASTNodePtr<INode>& node) {
   auto column_name_node = node->Child(0);
   ValidateHasChildren(column_name_node);
   std::string column_name = GetName(column_name_node);
@@ -185,9 +185,9 @@ Property Translator::TranslateColumnDefinition(const NodePtr<INode>& node) {
       throw translation_error(format("Unknown SQL datatype \'{}\'", datatype.ToString()));
   }
 
-  return Property(column_name, datatype_str, property_type);
+  return Property(column_name, property_type);
 }
-void Translator::TranslateTableConstraint(const NodePtr<INode>& constraint_definition,
+void Translator::TranslateTableConstraint(const ASTNodePtr<INode>& constraint_definition,
                                           const std::string& table_name) {
   ValidateHasChildren(constraint_definition, 1, "Missing constraint definition");
 
@@ -217,7 +217,7 @@ void Translator::TranslateTableConstraint(const NodePtr<INode>& constraint_defin
   }
 }
 
-void Translator::TranslateDropElement(const NodePtr<INode>& node, std::string& table_name) {
+void Translator::TranslateDropElement(const ASTNodePtr<INode>& node, std::string& table_name) {
   std::vector<std::string> arguments;
   for (unsigned i = 0; HasChildren(node, i + 1); ++i) {
     auto argument_node = node->Child(i);
