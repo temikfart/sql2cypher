@@ -22,6 +22,17 @@ bool Node::HasProperty(const std::string& name) const {
   auto predicate = [name](const Property& property) { return property.name == name; };
   return std::any_of(properties.begin(), properties.end(), predicate);
 }
+int Node::PropertyIndex(const std::string& name) const {
+  auto predicate = [name](const Property& property) { return property.name == name; };
+  auto it = std::find_if(properties.begin(), properties.end(), predicate);
+  if (it == properties.end()) {
+    return -1;
+  }
+  return std::distance(properties.begin(), it);
+}
+unsigned Node::PropertyCount() const {
+  return properties.size();
+}
 
 bool Node::operator==(const Node& other) const {
   if (label != other.label) {

@@ -2,6 +2,12 @@
 
 namespace scc::translator::schema {
 
+Relationship::Relationship(std::string type, Node start, Node end)
+    : type(std::move(type)), start(std::move(start)), end(std::move(end)) {}
+Relationship::Relationship(std::string type, Node start, Node end,
+                           std::vector<ApplyCondition> conditions)
+    : type(std::move(type)), start(std::move(start)), end(std::move(end)),
+      conditions(std::move(conditions)) {}
 Relationship::Relationship(std::string type, Node start, Node end, std::vector<Property> properties,
                            std::vector<ApplyCondition> conditions)
     : type(std::move(type)), start(std::move(start)), end(std::move(end)),
@@ -12,6 +18,16 @@ Relationship& Relationship::AddCondition(ApplyCondition condition) {
     conditions.push_back(condition);
   }
   return *this;
+}
+void Relationship::RemoveConditionBySPI(int spi) {
+  std::remove_if(conditions.begin(), conditions.end(), [spi](ApplyCondition& condition) {
+    return condition.spi == spi;
+  });
+}
+void Relationship::RemoveConditionByEPI(int epi) {
+  std::remove_if(conditions.begin(), conditions.end(), [epi](ApplyCondition& condition) {
+    return condition.epi == epi;
+  });
 }
 
 bool Relationship::operator==(const Relationship& other) const {

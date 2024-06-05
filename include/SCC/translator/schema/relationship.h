@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <string>
 #include <utility>
 
@@ -28,10 +29,15 @@ public:
   Node end;
   std::vector<Property> properties;
 
+  explicit Relationship(std::string type, Node start, Node end);
+  explicit Relationship(std::string type, Node start, Node end,
+                        std::vector<ApplyCondition> conditions);
   explicit Relationship(std::string type, Node start, Node end, std::vector<Property> properties,
                         std::vector<ApplyCondition> conditions);
 
   Relationship& AddCondition(ApplyCondition condition);
+  void RemoveConditionBySPI(int spi);
+  void RemoveConditionByEPI(int epi);
 
   bool operator==(const Relationship& other) const;
   bool operator!=(const Relationship& other) const;
