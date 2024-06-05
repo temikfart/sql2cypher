@@ -21,6 +21,7 @@ public:
   logger::Severity log_severity;
   fs::path log_directory;
   SCCMode mode;
+  bool translate_schema;
 
   explicit SCCConfig(const SCCArgs& args);
 

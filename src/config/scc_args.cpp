@@ -30,6 +30,11 @@ SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, argparse::default_arg
       .implicit_value(true)
       .nargs(0);
 
+  add_argument("--translate-schema")
+      .help("Use this option to translate SQL schema migration queries into Cypher")
+      .default_value(true)
+      .implicit_value(true);
+
   add_argument("--sql")
       .required()
       .help("Specify path to the file with SQL queries to be converted")
