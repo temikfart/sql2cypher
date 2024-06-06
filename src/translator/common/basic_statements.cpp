@@ -112,8 +112,7 @@ void Translator::AddPropertyConstraints(const std::string& constraint_name_prefi
 void Translator::AddRelationship(const std::string& relationship_type,
                                  const std::string& start_label, const std::string& end_label,
                                  const std::vector<ApplyCondition>& apply_conditions) {
-  Node start(start_label), end(end_label);
-  Relationship relationship(relationship_type, start, end, apply_conditions);
+  Relationship relationship(relationship_type, start_label, end_label, apply_conditions);
   schema_.AddRelationship(relationship);
 }
 
