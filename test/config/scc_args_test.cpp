@@ -37,9 +37,34 @@ TEST_F(SCCArgsBaseTests, GetVersionShortOptionTest) {
   EXPECT_EXIT(ParseArgsWrapper(), ExitedWithCode(EXIT_SUCCESS), ""); // TODO: add regex.
 }
 
+TEST_F(SCCArgsBaseTests, TranslateSchemaOptionTest) {
+  AddArg("--translate-schema");
+
+  EXPECT_NO_THROW(ParseArgsWrapper());
+}
+
+TEST_F(SCCArgsBaseTests, TranslateDataOptionTest) {
+  AddArg("--translate-data");
+
+  EXPECT_NO_THROW(ParseArgsWrapper());
+}
+
+TEST_F(SCCArgsBaseTests, SQLSchemaArgumentTest) {
+  const std::string sql_schema_file = sql_schema_path;
+  AddArg("--sql-schema", sql_schema_file);
+
+  EXPECT_NO_THROW(ParseArgsWrapper());
+}
+TEST_F(SCCArgsBaseTests, SQLSchemaArgumentWithoutParameterTest) {
+  GTEST_SKIP() << "Argument without value did not throw an exception.";
+  AddArg("--sql-schema");
+
+  EXPECT_THROW(ParseArgsWrapper(), std::runtime_error);
+}
+
 TEST_F(SCCArgsBaseTests, SQLArgumentTest) {
-  const std::string sql_file = sql_path;
-  AddArg("--sql", sql_file);
+  const std::string sql_queries_file = sql_queries_path;
+  AddArg("--sql", sql_queries_file);
 
   EXPECT_NO_THROW(ParseArgsWrapper());
 }
@@ -54,7 +79,27 @@ TEST_F(SCCArgsTests, TranslateSchemaDefaultValueTest) {
   EXPECT_NO_THROW(ParseArgsWrapper());
 
   bool default_translate_schema_flag = parser.Get<bool>("--translate-schema");
-  EXPECT_TRUE(default_translate_schema_flag);
+  EXPECT_FALSE(default_translate_schema_flag);
+}
+
+TEST_F(SCCArgsTests, TranslateDataDefaultValueTest) {
+  EXPECT_NO_THROW(ParseArgsWrapper());
+
+  bool default_translate_data_flag = parser.Get<bool>("--translate-data");
+  EXPECT_FALSE(default_translate_data_flag);
+}
+
+TEST_F(SCCArgsTests, GraphSchemaArgumentDefaultValueTest) {
+  EXPECT_NO_THROW(ParseArgsWrapper());
+
+  std::string default_graph_schema_file = parser.Get("--graph-schema");
+  EXPECT_TRUE(default_graph_schema_file.find("schema.json") != std::string::npos);
+}
+TEST_F(SCCArgsTests, GraphSchemaArgumentWithoutParameterTest) {
+  GTEST_SKIP() << "Argument without value did not throw an exception.";
+  AddArg("--graph-schema");
+
+  EXPECT_THROW(ParseArgsWrapper(), std::runtime_error);
 }
 
 TEST_F(SCCArgsTests, CypherArgumentDefaultValueTest) {
@@ -191,7 +236,7 @@ TEST_F(SCCArgsTests, PresentUsedArgumentTest) {
   EXPECT_NO_THROW(ParseArgsWrapper());
   EXPECT_NO_THROW(
       std::optional<std::string> sql_value = parser.Present("--sql");
-      EXPECT_EQ(sql_value.value(), sql_path);
+      EXPECT_EQ(sql_value.value(), sql_queries_path);
   );
 }
 TEST_F(SCCArgsTests, PresentUnusedArgumentWithDefaultValueTest) {

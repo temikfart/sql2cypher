@@ -55,7 +55,7 @@ TEST_F(SCCConfigTests, DefaultConfigTest) {
   bool default_translate_schema_flag = true;
   EXPECT_EQ(default_translate_schema_flag, config->translate_schema);
 
-  fs::path default_sql_file = fs::canonical(sql_path);
+  fs::path default_sql_file = fs::canonical(sql_queries_path);
   EXPECT_EQ(default_sql_file, config->get_sql_file());
 
   fs::path default_cypher_file = fs::current_path() / "out.cql";
@@ -66,7 +66,7 @@ TEST_F(SCCConfigTests, DefaultConfigTest) {
 TEST_F(CustomSCCConfigTests, CustomConfigTest) {
   AddArg("--translate-schema");
 
-  std::string custom_sql_file = sql_path;
+  std::string custom_sql_file = sql_queries_path;
   AddArg("--sql", custom_sql_file);
 
   std::string custom_log_severity = std::string{logger::to_string(logger::Severity::fatal)};
