@@ -32,12 +32,27 @@ SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, argparse::default_arg
 
   add_argument("--translate-schema")
       .help("Use this option to translate SQL schema migration queries into Cypher")
-      .default_value(true)
+      .default_value(false)
+      .implicit_value(true);
+
+  add_argument("--sql-schema")
+      .help("Specify path to the file with SQL schema migration queries to be converted")
+      .metavar("FILENAME");
+
+  std::string default_graph_schema_file =
+      (std::filesystem::current_path() / "schema.json").string();
+  add_argument("--graph-schema")
+      .help("Specify path to the file with Neo4j graph schema")
+      .metavar("FILENAME")
+      .default_value(default_graph_schema_file);
+
+  add_argument("--translate-data")
+      .help("Use this option to translate SQL data migration queries into Cypher")
+      .default_value(false)
       .implicit_value(true);
 
   add_argument("--sql")
-      .required()
-      .help("Specify path to the file with SQL queries to be converted")
+      .help("Specify path to the file with SQL data migration queries to be converted")
       .metavar("FILENAME");
 
   std::string default_cypher_file = (std::filesystem::current_path() / "out.cql").string();
