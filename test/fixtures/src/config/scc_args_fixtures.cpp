@@ -44,6 +44,12 @@ void SCCArgsBaseTests::TearDown() {
   DeleteArgs();
 }
 
+void SCCArgsTests::AddTranslateSchemaOption() {
+  AddArg("--translate-schema");
+}
+void SCCArgsTests::AddTranslateDataOption() {
+  AddArg("--translate-data");
+}
 void SCCArgsTests::AddSqlSchemaArgWithDefaultValue() {
   AddArg("--sql-schema", sql_schema_path);
 }
@@ -53,6 +59,7 @@ void SCCArgsTests::AddSqlArgWithDefaultValue() {
 
 void SCCArgsTests::SetUp() {
   SCCArgsBaseTests::SetUp();
+  AddSqlSchemaArgWithDefaultValue();
   AddSqlArgWithDefaultValue();
 }
 void SCCArgsTests::TearDown() {
