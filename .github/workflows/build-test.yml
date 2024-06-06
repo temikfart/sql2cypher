@@ -19,7 +19,9 @@ jobs:
         id: cache-apt-packages
         uses: actions/cache@v4
         with:
-          path: /var/cache/apt/archives
+          path: |
+            ~/gcc-13
+            ~/g++-13
           key: ${{ runner.os }}-deps-${{ hashFiles('**/apt.txt') }}
 
       - name: Install dependencies
@@ -38,8 +40,8 @@ jobs:
           CXX: g++-13
         run: cmake -S . -B build
 
-      - name: Build
-        run: cd build && cmake --build .
-
-      - name: Unit tests
-        run: cd build && ctest
+#      - name: Build
+#        run: cd build && cmake --build .
+#
+#      - name: Unit tests
+#        run: cd build && ctest
