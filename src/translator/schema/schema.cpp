@@ -104,7 +104,7 @@ void Schema::RemoveNode(const std::string& label) {
   nodes.erase(nodeIt);
 
   for (auto relIt = relationships.begin(); relIt != relationships.end(); ++relIt) {
-    if (relIt->start.label == label || relIt->end.label == label) {
+    if (relIt->start == label || relIt->end == label) {
       relationships.erase(relIt);
     }
   }
@@ -151,9 +151,9 @@ std::string Schema::ToJsonString(int indent, char indent_char) const {
 
 void Schema::RemovePropertyIdxFromConditions(const std::string& label, int pi) {
   for (auto& relationship : relationships) {
-    if (relationship.start.label == label) {
+    if (relationship.start == label) {
       relationship.RemoveConditionBySPI(pi);
-    } else if (relationship.end.label == label) {
+    } else if (relationship.end == label) {
       relationship.RemoveConditionByEPI(pi);
     }
   }

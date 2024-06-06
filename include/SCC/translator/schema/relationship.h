@@ -25,14 +25,11 @@ constexpr bool operator==(const ApplyCondition& lhs, const ApplyCondition& rhs) 
 class Relationship {
 public:
   std::string type;
-  Node start;
-  Node end;
-  std::vector<Property> properties;
+  std::string start;
+  std::string end;
 
-  explicit Relationship(std::string type, Node start, Node end);
-  explicit Relationship(std::string type, Node start, Node end,
-                        std::vector<ApplyCondition> conditions);
-  explicit Relationship(std::string type, Node start, Node end, std::vector<Property> properties,
+  explicit Relationship(std::string type, std::string start, std::string end);
+  explicit Relationship(std::string type, std::string start, std::string end,
                         std::vector<ApplyCondition> conditions);
 
   Relationship& AddCondition(ApplyCondition condition);
@@ -42,7 +39,7 @@ public:
   bool operator==(const Relationship& other) const;
   bool operator!=(const Relationship& other) const;
 
-  NLOHMANN_DEFINE_TYPE_INTRUSIVE(Relationship, type, start, end, properties, conditions)
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(Relationship, type, start, end, conditions)
 
 private:
   std::vector<ApplyCondition> conditions;
