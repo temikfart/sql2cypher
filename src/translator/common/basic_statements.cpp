@@ -116,9 +116,6 @@ void Translator::AddRelationship(const std::string& relationship_type,
   Relationship relationship(relationship_type, start, end, apply_conditions);
   schema_.AddRelationship(relationship);
 }
-void Translator::RemoveNodeProperty(const std::string& label, const std::string& property_name) {
-  schema_.RemoveNodeProperty(label, property_name);
-}
 
 std::vector<ApplyCondition> Translator::CreateApplyConditions(
     const std::string& start_label, const std::vector<std::string>& start_node_props,

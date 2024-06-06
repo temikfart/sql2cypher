@@ -123,6 +123,20 @@ void Schema::RemoveNodeProperty(const std::string& label, const std::string& pro
   properties.erase(propertyIt);
   RemovePropertyIdxFromConditions(label, pi);
 }
+void Schema::RemoveNodePropertyConstraints(const std::string& label,
+                                           const std::string& constraint_prefix) {
+  auto& node = GetNodeOrThrow(label);
+  auto& properties  = node.properties;
+  for (auto& property : properties) {
+    property.RemoveConstraintsByPrefix(constraint_prefix);
+  }
+}
+void Schema::RemoveRelationship(const std::string& type) {
+  std::remove_if(relationships.begin(), relationships.end(),
+                 [type](Relationship& relationship) {
+                   return relationship.type == type;
+                 });
+}
 void Schema::Clear() {
   database_name.clear();
   nodes.clear();

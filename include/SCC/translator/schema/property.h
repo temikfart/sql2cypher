@@ -34,7 +34,7 @@ public:
                     std::vector<PropertyConstraint> constraints);
 
   void AddConstraint(const PropertyConstraint& constraint);
-  void RemoveConstraint(const PropertyConstraint& constraint);
+  void RemoveConstraintsByPrefix(const std::string& prefix);
   bool MustBeUnique() const;
   bool MustBeNotNull() const;
 
