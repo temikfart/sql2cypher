@@ -19,6 +19,9 @@
 #include "SCC/translator/cypher/clauses/delete.h"
 #include "SCC/translator/cypher/clauses/drop.h"
 #include "SCC/translator/cypher/clauses/set.h"
+#include "SCC/translator/schema/node.h"
+#include "SCC/translator/schema/property.h"
+#include "SCC/translator/schema/relationship.h"
 #include "SCC/translator/schema/schema.h"
 
 #include "logger/log.hpp"
@@ -92,14 +95,24 @@ private:
   std::string GetName(const std::shared_ptr<ast::INode>& name_node) const;
   std::string GetIdentifier(const std::shared_ptr<ast::INode>& node) const;
 
-  void CreateConstraints(const std::string& constraint_name_prefix, const std::string& label_name,
-                         const std::string& property_name,
-                         const std::vector<cypher::ConstraintType>& constraints);
-  void CreateRelationship(const std::string& relationship_type, const std::string& start_label_name,
-                          const std::string& end_label_name);
-  void RemoveProperty(const std::string& label_name, const std::string& property_name);
+  void AddPropertyConstraints(const std::string& constraint_name_prefix, const std::string& label,
+                              const std::string& property_name,
+                              const std::vector<cypher::ConstraintType>& constraint_types);
+  void AddRelationship(const std::string& relationship_type,
+                       const std::string& start_label, const std::string& end_label,
+                       const std::vector<schema::ApplyCondition>& apply_conditions);
+  void RemoveNodeProperty(const std::string& label, const std::string& property_name);
+
+  std::vector<schema::ApplyCondition> CreateApplyConditions(
+      const std::string& start_label, const std::vector<std::string>& start_node_props,
+      const std::string& end_label, const std::vector<std::string>& end_node_props
+  );
   std::string CreateRelationshipType(const std::string& type_prefix);
-  std::string CreatePrimaryKeyConstraintName(const std::string& table_name) const;
+  std::string CreatePKConstraintPrefix(const std::string& table_name) const;
+  std::string CreateFKConstraintPrefix(const std::string& table_name,
+                                       const std::string& ref_table_name) const;
+
+  const schema::Node& GetNodeFromSchema(const std::string& label) const;
 
   // Validation
 
