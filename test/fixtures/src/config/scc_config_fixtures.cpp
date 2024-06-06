@@ -4,6 +4,8 @@ using namespace scc::config;
 
 void SCCConfigBaseTests::SetUp() {
   SCCArgsTests::SetUp();
+  SCCArgsTests::AddTranslateSchemaOption();
+  SCCArgsTests::AddTranslateDataOption();
   ParseArgsWrapper();
 }
 void SCCConfigBaseTests::TearDown() {

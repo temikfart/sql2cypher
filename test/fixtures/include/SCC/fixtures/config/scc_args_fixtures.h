@@ -38,6 +38,8 @@ protected:
 
 class SCCArgsTests : public SCCArgsBaseTests {
 protected:
+  void AddTranslateSchemaOption();
+  void AddTranslateDataOption();
   void AddSqlSchemaArgWithDefaultValue();
   void AddSqlArgWithDefaultValue();
 
