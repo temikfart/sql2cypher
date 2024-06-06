@@ -22,7 +22,8 @@ protected:
 
   Args args;
   scc::config::SCCArgs parser;
-  const std::string sql_path = scc::common::ResourcesPath() + "/sql_queries.sql";
+  const std::string sql_schema_path = scc::common::ResourcesPath() + "/schema.sql";
+  const std::string sql_queries_path = scc::common::ResourcesPath() + "/queries.sql";
 
   void ParseArgsWrapper();
   void AddArg(const std::string& option);
@@ -37,6 +38,7 @@ protected:
 
 class SCCArgsTests : public SCCArgsBaseTests {
 protected:
+  void AddSqlSchemaArgWithDefaultValue();
   void AddSqlArgWithDefaultValue();
 
   void SetUp() override;

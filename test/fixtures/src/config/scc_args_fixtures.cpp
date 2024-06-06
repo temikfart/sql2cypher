@@ -44,8 +44,11 @@ void SCCArgsBaseTests::TearDown() {
   DeleteArgs();
 }
 
+void SCCArgsTests::AddSqlSchemaArgWithDefaultValue() {
+  AddArg("--sql-schema", sql_schema_path);
+}
 void SCCArgsTests::AddSqlArgWithDefaultValue() {
-  AddArg("--sql", sql_path);
+  AddArg("--sql", sql_queries_path);
 }
 
 void SCCArgsTests::SetUp() {
