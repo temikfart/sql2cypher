@@ -31,11 +31,28 @@ SCCConfig::SCCConfig(const SCCArgs& args) {
       mode = args.Get<SCCMode>("--mode");
 
     translate_schema = args.Get<bool>("--translate-schema");
+    if (translate_schema) {
+      std::string sql_schema_file_path = args.Get("--sql-schema");
+      scc::common::ValidateFileExists(sql_schema_file_path);
+      sql_schema_file_ = fs::canonical(sql_schema_file_path);
+    }
+    graph_schema_file_ = fs::weakly_canonical(args.Get("--graph-schema"));
 
-    std::string sql_file_path = args.Get("--sql");
-    scc::common::ValidateFileExists(sql_file_path);
-    sql_file_ = fs::canonical(sql_file_path);
-    cypher_file_ = fs::weakly_canonical(args.Get("--cypher"));
+    translate_data = args.Get<bool>("--translate-data");
+    if (translate_data) {
+      if (!translate_schema) {
+        scc::common::ValidateFileExists(graph_schema_file_);
+      }
+      std::string sql_file_path = args.Get("--sql");
+      scc::common::ValidateFileExists(sql_file_path);
+      sql_file_ = fs::canonical(sql_file_path);
+      cypher_file_ = fs::weakly_canonical(args.Get("--cypher"));
+    }
+
+    if (!(translate_schema || translate_data)) {
+      throw std::logic_error("Either --translate-schema or --translate-data must be specified");
+    }
+
     if (args.IsUsed("--dump"))
       ast_dump_file_ = fs::weakly_canonical(args.Get("--dump"));
   } catch (const std::logic_error& e) {
@@ -52,6 +69,12 @@ SCCConfig* SCCConfig::Get() {
   return instance;
 }
 
+const fs::path& SCCConfig::get_sql_schema_file() const {
+  return sql_schema_file_;
+}
+const fs::path& SCCConfig::get_graph_schema_file() const {
+  return graph_schema_file_;
+}
 const fs::path& SCCConfig::get_sql_file() const {
   return sql_file_;
 }
