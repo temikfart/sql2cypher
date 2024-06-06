@@ -15,10 +15,6 @@
 #include "SCC/config/scc_config.h"
 #include "SCC/log/log.h"
 #include "SCC/parser/parser.h"
-#include "SCC/translator/cypher/clauses/create.h"
-#include "SCC/translator/cypher/clauses/delete.h"
-#include "SCC/translator/cypher/clauses/drop.h"
-#include "SCC/translator/cypher/clauses/set.h"
 #include "SCC/translator/schema/node.h"
 #include "SCC/translator/schema/property.h"
 #include "SCC/translator/schema/relationship.h"
@@ -71,9 +67,9 @@ private:
   void TranslateAlterTableActionDrop(const std::shared_ptr<ast::INode>& action_node,
                                      std::string& table_name);
 
-  std::vector<cypher::Property> TranslateColumnDefinitions(
+  std::vector<schema::Property> TranslateColumnDefinitions(
       const std::shared_ptr<ast::INode>& column_definition);
-  cypher::Property TranslateColumnDefinition(const std::shared_ptr<ast::INode>& node);
+  schema::Property TranslateColumnDefinition(const std::shared_ptr<ast::INode>& node);
   void TranslateTableConstraint(const std::shared_ptr<ast::INode>& constraint_definition,
                                 const std::string& table_name);
 
@@ -101,7 +97,6 @@ private:
   void AddRelationship(const std::string& relationship_type,
                        const std::string& start_label, const std::string& end_label,
                        const std::vector<schema::ApplyCondition>& apply_conditions);
-  void RemoveNodeProperty(const std::string& label, const std::string& property_name);
 
   std::vector<schema::ApplyCondition> CreateApplyConditions(
       const std::string& start_label, const std::vector<std::string>& start_node_props,

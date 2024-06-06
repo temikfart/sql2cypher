@@ -15,11 +15,11 @@ void Property::AddConstraint(const PropertyConstraint& constraint) {
     constraints.push_back(constraint);
   }
 }
-void Property::RemoveConstraint(const PropertyConstraint& constraint) {
-  auto it = std::find(constraints.begin(), constraints.end(), constraint);
-  if (it != constraints.end()) {
-    constraints.erase(it);
-  }
+void Property::RemoveConstraintsByPrefix(const std::string& prefix) {
+  std::remove_if(constraints.begin(), constraints.end(),
+                 [prefix](PropertyConstraint& constraint) {
+                   return constraint.name.starts_with(prefix);
+                 });
 }
 bool Property::MustBeUnique() const {
   return HasConstraintType(ConstraintType::kUniqueness);

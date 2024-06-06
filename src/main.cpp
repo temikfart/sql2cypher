@@ -21,8 +21,9 @@ int main(int argc, char* argv[]) {
       dump.DumpTree(AST);
     }
 
-    scc::translator::Translator translator(AST, config->get_cypher_file());
-    translator.Translate(config->translate_schema);
+    scc::translator::Translator translator(AST, config->get_cypher_file(),
+                                           config->translate_schema);
+    translator.Translate();
 
     end(EXIT_SUCCESS);
   } catch (const std::exception& e) {

@@ -60,7 +60,7 @@ void Translator::TranslateCreateTableStatement(const ASTNodePtr<INode>& stmt) {
       node.AddProperty(property);
     }
   }
-  WriteCypherQuery(CreateNodeClauseBuilder::Build(node));
+  schema_.AddNode(node);
 
   for (unsigned i = node.PropertyCount(); HasChildren(table_definition, i + 1); ++i) {
     auto constraint_definition = table_definition->Child(i);
@@ -95,7 +95,7 @@ void Translator::TranslateDropDatabaseStatement(const ASTNodePtr<INode>& stmt) {
     ValidateHasChildren(database_name_node);
     auto database_name = GetName(database_name_node);
 
-    WriteCypherQuery(DropDatabaseClauseBuilder::Build(database_name));
+    schema_.Clear();
   }
 }
 void Translator::TranslateDropTableStatement(const ASTNodePtr<INode>& stmt) {
@@ -103,9 +103,7 @@ void Translator::TranslateDropTableStatement(const ASTNodePtr<INode>& stmt) {
     auto table_name_node = stmt->Child(i);
     ValidateHasChildren(table_name_node);
     auto table_name = GetName(table_name_node);
-
-    Node node(table_name);
-    WriteCypherQuery(DeleteNodeClauseBuilder::Build(node));
+    schema_.RemoveNode(table_name);
   }
 }
 
@@ -115,18 +113,18 @@ void Translator::TranslateAlterTableActionAdd(const ASTNodePtr<INode>& action_no
 
   auto table_definition = action_node->Child(0);
 
-  Node node(table_name, "n");
   ValidateHasChildren(table_definition, 1, "Missing column definition or constraint" + msg_suffix);
   auto add_element = table_definition->Child(0);
+  unsigned added_columns = 0;
   if (IsCorrectStmtType(add_element, StmtType::kColumnDef)) {
     std::vector<Property> properties = TranslateColumnDefinitions(table_definition);
     for (auto& property: properties) {
-      WriteCypherQuery(SetPropertyClauseBuilder::Build(node, property));
-      node.AddProperty(property);
+      schema_.AddNodeProperty(table_name, property);
     }
+    added_columns = properties.size();
   }
 
-  for (unsigned i = node.PropertyCount(); HasChildren(table_definition, i + 1); ++i) {
+  for (unsigned i = added_columns; HasChildren(table_definition, i + 1); ++i) {
     auto constraint_definition = table_definition->Child(i);
     TranslateTableConstraint(constraint_definition, table_name);
   }
@@ -165,20 +163,16 @@ Property Translator::TranslateColumnDefinition(const ASTNodePtr<INode>& node) {
   ValidateHasChildren(node, 2, "Missing datatype in column definition");
   StmtType datatype = node->Child(1)->stmt_type;
 
-  std::string datatype_str;
   PropertyType property_type;
   switch (datatype) {
     case StmtType::kIntType:
-      datatype_str = "0";
       property_type = PropertyType::kInteger;
       break;
     case StmtType::kFloatType:
-      datatype_str = "0.0";
       property_type = PropertyType::kFloat;
       break;
     case StmtType::kCharType:
     case StmtType::kVarcharType:
-      datatype_str = "\"\"";
       property_type = PropertyType::kString;
       break;
     default:
@@ -229,12 +223,14 @@ void Translator::TranslateDropElement(const ASTNodePtr<INode>& node, std::string
   switch (node->stmt_type) {
     case StmtType::kDropColumn:
       for (const auto& arg: arguments) {
-        RemoveProperty(table_name, arg);
+        schema_.RemoveNodeProperty(table_name, arg);
       }
       break;
     case StmtType::kDropConstraint:
       for (const auto& arg: arguments) {
-        WriteCypherQuery(DropConstraintClauseBuilder::Build(arg));
+        // TODO: return bool to indicate success and do not find relationship to remove.
+        schema_.RemoveNodePropertyConstraints(table_name, arg);
+        schema_.RemoveRelationship(arg);
       }
       break;
     default:

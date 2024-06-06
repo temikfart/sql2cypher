@@ -36,6 +36,8 @@ public:
 
   void RemoveNode(const std::string& label);
   void RemoveNodeProperty(const std::string& label, const std::string& property_name);
+  void RemoveNodePropertyConstraints(const std::string& label, const std::string& constraint_name);
+  void RemoveRelationship(const std::string& type);
   void Clear();
 
   std::string ToJsonString(int indent = 2, char indent_char = ' ') const;
