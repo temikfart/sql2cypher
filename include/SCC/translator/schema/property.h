@@ -22,7 +22,14 @@ public:
   }
 };
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PropertyConstraint, name, type)
+inline void to_json(nlohmann::json& j, const PropertyConstraint& constraint)  {
+  j["name"] = constraint.name;
+  j["type"] = constraint.type.ToString();
+}
+inline void from_json(const nlohmann::json& j, PropertyConstraint& constraint) {
+  j.at("name").get_to(constraint.name);
+  j.at("type").get_to(constraint.type);
+}
 
 class Property {
 public:
@@ -41,7 +48,16 @@ public:
   bool operator==(const Property& other) const;
   bool operator!=(const Property& other) const;
 
-  NLOHMANN_DEFINE_TYPE_INTRUSIVE(Property, name, type, constraints)
+  friend void to_json(nlohmann::json& j, const Property& property) {
+    j["name"] = property.name;
+    j["type"] = property.type.ToString();
+    j["constraints"] = property.constraints;
+  }
+  friend void from_json(const nlohmann::json& j, Property& property) {
+    j.at("name").get_to(property.name);
+    j.at("type").get_to(property.type);
+    j.at("constraints").get_to(property.constraints);
+  }
 
 private:
   std::vector<PropertyConstraint> constraints;
