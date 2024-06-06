@@ -15,7 +15,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Cache apt packages
+        id: cache-apt-packages
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: ${{ runner.os }}-deps-${{ hashFiles('**/apt.txt') }}
+
       - name: Install dependencies
+        if: steps.cache-apt-packages.outputs.cache-hit != 'true'
         run: |
           sudo apt update
           sudo apt install -y cmake graphviz
