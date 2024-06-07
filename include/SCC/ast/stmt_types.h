@@ -58,12 +58,20 @@ constexpr std::string_view kST_COLUMN_KW = "column";
 constexpr std::string_view kST_REFERENCES_KW = "references";
 constexpr std::string_view kST_ADD_KW = "add";
 constexpr std::string_view kST_DROP_KW = "drop";
+constexpr std::string_view kST_INTO_KW = "into";
+constexpr std::string_view kST_SET_KW = "set";
+constexpr std::string_view kST_FROM_KW = "from";
+constexpr std::string_view kST_WHERE_KW = "where";
+constexpr std::string_view kST_VALUES_KW = "values";
 
 constexpr std::string_view kST_INT_TYPE = "int";
 constexpr std::string_view kST_INTEGER_TYPE = "integer";
 constexpr std::string_view kST_FLOAT_TYPE = "float";
 constexpr std::string_view kST_CHAR_TYPE = "char";
 constexpr std::string_view kST_VARCHAR_TYPE = "varchar";
+
+constexpr std::string_view kST_NULL_VALUE = "null";
+constexpr std::string_view kST_UNKNOWN_VALUE = "unknown";
 
 class StmtType {
 public:
@@ -125,12 +133,21 @@ public:
     kReferencesKW,
     kAddKW,
     kDropKW,
+    kIntoKW,
+    kSetKW,
+    kFromKW,
+    kWhereKW,
+    kValuesKW,
 
     // SQL Data Types
     kIntType,
     kFloatType,
     kCharType,
     kVarcharType,
+
+    // Special values
+    kNullValue,
+    kUnknownValue,
   };
 
   StmtType() = default;
