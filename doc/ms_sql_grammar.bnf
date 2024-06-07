@@ -21,9 +21,10 @@ alter_table_drop_list ::= alter_table_drop_element_ {',' alter_table_drop_elemen
 // DML Statements
 
 dml_stmt    ::= insert_stmt | update_stmt | delete_stmt
-insert_stmt ::= 'INSERT' // stub
-update_stmt ::= 'UPDATE' // stub
-delete_stmt ::= 'DELETE' // stub
+insert_stmt ::= 'INSERT' ['INTO'] table_name ['(' column_name_list_ ')']
+                'VALUES' '(' insert_values_list_ ')';
+update_stmt ::= 'UPDATE' table_name 'SET' update_column_list_ ['WHERE' condition] ;
+delete_stmt ::= 'DELETE' ['FROM'] table_name 'WHERE' condition ;
 
 // Helpers
 
@@ -37,6 +38,10 @@ alter_table_drop_column_     ::= 'COLUMN' column_name_list_ ;
 alter_table_drop_constraint_ ::= 'CONSTRAINT' constraint_name_list_ ;
 database_name_list_          ::= database_name {',' database_name} ;
 table_name_list_             ::= table_name {',' table_name} ;
+insert_values_list_          ::= insert_values_element_ {',' insert_values_element_} ;
+insert_values_element_       ::= '(' ('NULL' | expr) ')' ;
+update_column_list_          ::= update_column_element_ {',' update_column_element_} ;
+update_column_element_       ::= column_name '=' ('NULL' | expr) ;
 
 // Basic Statements
 
