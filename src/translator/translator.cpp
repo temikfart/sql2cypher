@@ -5,27 +5,32 @@ namespace scc::translator {
 using namespace ast;
 namespace fs = std::filesystem;
 
+using std::format;
+
 template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
-Translator::Translator(NodePtr<INode> ast, const fs::path& out_path, bool translate_schema)
-    : ast_(std::move(ast)), translate_schema_(translate_schema), schema_path_(out_path) {}
+Translator::Translator(std::shared_ptr<ast::INode> ast, const std::filesystem::path& out_path)
+    : ast_(std::move(ast)), translate_schema_(true), out_(out_path) {}
+Translator::Translator(std::shared_ptr<ast::INode> ast, std::filesystem::path graph_schema_path,
+                       const std::filesystem::path& out_path)
+    : ast_(std::move(ast)), translate_data_(true), schema_path_(std::move(graph_schema_path)),
+      out_(out_path) {
+  try {
+    scc::common::ValidateFileExists(schema_path_);
+    std::ifstream(schema_path_) >> schema_;
+  } catch (const std::runtime_error& e) {
+    std::string msg = format("Could not load Graph Schema: {}", e.what());
+    throw translation_error(msg);
+  }
+}
 
 void Translator::Translate() {
   LOGI << "Translation is started";
   if (ast_ == nullptr || !HasChildren(ast_)) {
     LOGI << "Translation is ended. Nothing to translate";
     return;
-  }
-
-  if (!translate_schema_) {
-    LOGW << "Currently only translation of schema migration queries is supported."
-         << " Use --translate-schema flag to translate schema";
-    return;
-  } else {
-    schema_path_.replace_extension(".json");
-    out_.open(schema_path_);
   }
 
   ValidateIsCorrectStmtType(ast_, StmtType::kProgram);
@@ -70,7 +75,7 @@ void Translator::TranslateQuery(const NodePtr<INode>& query) {
                                      statement_type->stmt_type.ToString()));
   }
 
-  if (statement_type->stmt_type != StmtType::kDdlStmt) {
+  if (!translate_schema_) {
     FinishCypherQueriesGroup();
   }
 }

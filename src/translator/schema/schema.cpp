@@ -159,4 +159,10 @@ void Schema::RemovePropertyIdxFromConditions(const std::string& label, int pi) {
   }
 }
 
+std::ifstream& operator>>(std::ifstream& is, Schema& schema) {
+  json json_data = json::parse(is);
+  from_json(json_data, schema);
+  return is;
+}
+
 } // scc::translator::cypher

@@ -2,11 +2,13 @@
 
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 #include <filesystem>
 #include <format>
 #include <memory>
 #include <tuple>
 #include <string>
+#include <stdexcept>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -31,14 +33,16 @@ public:
 
 class Translator {
 public:
-  explicit Translator(std::shared_ptr<ast::INode> ast, const std::filesystem::path& out_path,
-                      bool translate_schema);
+  explicit Translator(std::shared_ptr<ast::INode> ast, const std::filesystem::path& out_path);
+  explicit Translator(std::shared_ptr<ast::INode> ast, std::filesystem::path graph_schema_path,
+                      const std::filesystem::path& out_path);
 
   void Translate();
 
 private:
   std::shared_ptr<ast::INode> ast_;
-  bool translate_schema_;
+  bool translate_schema_ = false;
+  bool translate_data_ = false;
   schema::Schema schema_;
   std::filesystem::path schema_path_;
   std::ofstream out_;

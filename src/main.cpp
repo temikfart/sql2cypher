@@ -10,20 +10,33 @@ int main(int argc, char* argv[]) {
 
     logger::init(config->log_severity, config->log_directory);
 
-    scc::lexer::Lexer lexer(config->get_sql_file());
-    std::deque<std::shared_ptr<scc::ast::INode>> tokens = lexer.Analyze();
+    if (config->translate_schema) {
+      scc::lexer::Lexer lexer(config->get_sql_schema_file());
+      std::deque<std::shared_ptr<scc::ast::INode>> tokens = lexer.Analyze();
 
-    scc::parser::Parser parser(std::move(tokens));
-    std::shared_ptr<scc::ast::INode> AST = parser.Parse();
+      scc::parser::Parser parser(std::move(tokens));
+      std::shared_ptr<scc::ast::INode> AST = parser.Parse();
 
-    if (scc_args.IsUsed("--dump")) {
-      scc::dump::TreeDump dump(config->get_ast_dump_file());
-      dump.DumpTree(AST);
+      if (scc_args.IsUsed("--dump")) {
+        scc::dump::TreeDump dump(config->get_ast_dump_file());
+        dump.DumpTree(AST);
+      }
+
+      scc::translator::Translator schema_translator(AST, config->get_graph_schema_file());
+      schema_translator.Translate();
     }
 
-    scc::translator::Translator translator(AST, config->get_cypher_file(),
-                                           config->translate_schema);
-    translator.Translate();
+    if (config->translate_data) {
+      scc::lexer::Lexer lexer(config->get_sql_file());
+      std::deque<std::shared_ptr<scc::ast::INode>> tokens = lexer.Analyze();
+
+      scc::parser::Parser parser(std::move(tokens));
+      std::shared_ptr<scc::ast::INode> AST = parser.Parse();
+
+      scc::translator::Translator data_translator(AST, config->get_graph_schema_file(),
+                                                  config->get_cypher_file());
+      data_translator.Translate();
+    }
 
     end(EXIT_SUCCESS);
   } catch (const std::exception& e) {
