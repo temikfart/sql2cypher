@@ -107,6 +107,16 @@ StmtType::StmtType(const std::string_view& str_type) {
     this->value_ = kAddKW;
   else if (type == kST_DROP_KW)
     this->value_ = kDropKW;
+  else if (type == kST_INTO_KW)
+    this->value_ = kIntoKW;
+  else if (type == kST_SET_KW)
+    this->value_ = kSetKW;
+  else if (type == kST_FROM_KW)
+    this->value_ = kFromKW;
+  else if (type == kST_WHERE_KW)
+    this->value_ = kWhereKW;
+  else if (type == kST_VALUES_KW)
+    this->value_ = kValuesKW;
 
   /* SQL Data Types */
   else if (type == kST_INT_TYPE || type == kST_INTEGER_TYPE)
@@ -117,6 +127,13 @@ StmtType::StmtType(const std::string_view& str_type) {
     this->value_ = kCharType;
   else if (type == kST_VARCHAR_TYPE)
     this->value_ = kVarcharType;
+
+  /* Special values */
+  else if (type == kST_NULL_VALUE)
+    this->value_ = kNullValue;
+  else if (type == kST_UNKNOWN_VALUE)
+    this->value_ = kUnknownValue;
+
   else
     throw std::invalid_argument("No Statement Type for '" + std::string(str_type) + "'");
 }
@@ -223,6 +240,16 @@ std::string StmtType::ToString() const {
       return std::string(kST_ADD_KW);
     case kDropKW:
       return std::string(kST_DROP_KW);
+    case kIntoKW:
+      return std::string(kST_INTO_KW);
+    case kSetKW:
+      return std::string(kST_SET_KW);
+    case kFromKW:
+      return std::string(kST_FROM_KW);
+    case kWhereKW:
+      return std::string(kST_WHERE_KW);
+    case kValuesKW:
+      return std::string(kST_VALUES_KW);
 
     /* SQL Data Types */
     case kIntType:
