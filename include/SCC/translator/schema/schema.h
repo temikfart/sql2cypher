@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <format>
+#include <fstream>
 #include <functional>
 #include <optional>
 #include <stdexcept>
@@ -50,5 +51,7 @@ private:
 
   void RemovePropertyIdxFromConditions(const std::string& label, int pi);
 };
+
+std::ifstream& operator>>(std::ifstream& is, Schema& schema);
 
 } // scc::translator::cypher
