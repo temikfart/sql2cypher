@@ -53,13 +53,104 @@ NodePtr<INode> Parser::ParseDMLStatement() {
 }
 
 NodePtr<INode> Parser::ParseInsertStatement() {
-  return ASTUtils::CreateServiceNode(StmtType::kInsertStmt);
+  NodePtr<INode> service_node = ASTUtils::CreateServiceNode(StmtType::kInsertStmt);
+
+  auto peeked_token = PeekToken();
+  ValidateIsWord(peeked_token);
+  std::string next_word = ASTUtils::CastToNodeType<StringNode>(peeked_token)->data;
+  try {
+    StmtType into_kw(next_word);
+    if (into_kw != StmtType::kIntoKW) {
+      throw parsing_error(format("Expected \'INTO\' keyword at line {}", peeked_token->line));
+    }
+    NextToken();
+  } catch (const std::invalid_argument& ignored) {}
+
+  ValidateHasTokens(format("Missing table name at line {}", peeked_token->line));
+  NodePtr<INode> table_name = ParseTableName();
+  ASTUtils::Link(service_node, table_name);
+
+  ValidateHasTokens(format("Incorrect \'INSERT\' statement: "
+                           "expected column list or \'VALUES\' keyword at line {}",
+                           peeked_token->line));
+  peeked_token = PeekToken();
+  if (NodeDataClassifier::IsOpeningRoundBracket(peeked_token)) {
+    auto next_token = NextToken();
+    ValidateHasTokens(format("Missing column list where to insert at line {}", next_token->line));
+
+    while (HasTokens()) {
+      auto column_name = ParseColumnName();
+      ASTUtils::Link(service_node, column_name);
+
+      if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
+        next_token = NextToken();
+        ValidateHasTokens(format("Missing column name after comma at line {}", next_token->line));
+        ValidateIsWord(PeekToken());
+      } else {
+        break;
+      }
+    }
+
+    ValidateHasTokens(format("Missing closing round bracket at line {}", next_token->line));
+    peeked_token = PeekToken();
+    ValidateIsClosingRoundBracket(NextToken());
+  }
+
+  ValidateHasTokens(format("Missing VALUES clause at line {}", peeked_token->line));
+  peeked_token = PeekToken();
+  ValidateIsWord(peeked_token);
+  auto values_list = ParseInsertValuesList();
+  ASTUtils::Link(service_node, values_list);
+
+  return service_node;
 }
 NodePtr<INode> Parser::ParseDeleteStatement() {
   return ASTUtils::CreateServiceNode(StmtType::kDeleteStmt);
 }
 NodePtr<INode> Parser::ParseUpdateStatement() {
   return ASTUtils::CreateServiceNode(StmtType::kUpdateStmt);
+}
+
+NodePtr<INode> Parser::ParseInsertValuesList() {
+  auto peeked_token = PeekToken();
+  std::string values_keyword = ASTUtils::CastToNodeType<StringNode>(peeked_token)->data;
+  std::string invalid_values_keyword_error = format("Expected \'VALUES\' keyword at line {}",
+                                                    peeked_token->line);
+  try {
+    StmtType values_kw(values_keyword);
+    if (values_kw != StmtType::kValuesKW) {
+      throw parsing_error(invalid_values_keyword_error);
+    }
+    NextToken();
+  } catch (const std::invalid_argument& ignored) {
+    throw parsing_error(invalid_values_keyword_error);
+  }
+  auto values_list = ASTUtils::CreateServiceNode(StmtType::kValuesKW);
+
+  ValidateHasTokens(format("Incorrect \'INSERT\' statement: expected expression list at line {}",
+                           values_list->line));
+  peeked_token = PeekToken();
+  if (NodeDataClassifier::IsOpeningRoundBracket(peeked_token)) {
+    auto next_token = NextToken();
+    ValidateHasTokens(format("Missing expression list at line {}", next_token->line));
+
+    while (HasTokens()) {
+      auto expression_or_null = ParseExpressionOrNull();
+      ASTUtils::Link(values_list, expression_or_null);
+
+      if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
+        next_token = NextToken();
+        ValidateHasTokens(format("Missing expression after comma at line {}", next_token->line));
+      } else {
+        break;
+      }
+    }
+
+    ValidateHasTokens(format("Missing closing round bracket at line {}", next_token->line));
+    ValidateIsClosingRoundBracket(NextToken());
+  }
+
+  return values_list;
 }
 
 } // scc::parser
