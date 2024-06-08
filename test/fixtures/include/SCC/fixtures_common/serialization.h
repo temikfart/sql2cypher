@@ -5,38 +5,35 @@
 
 #include "nlohmann/json.hpp"
 
-using std::format;
-using nlohmann::json;
-
 constexpr int indent = 2;
 constexpr char indent_char = ' ';
 
-inline std::string dump(const json& j) {
+inline std::string dump(const nlohmann::json& j) {
   return j.dump(indent, indent_char);
 }
 
 template<typename T>
 inline std::string create_enum_json_string(const T& type) {
-  return format(R"({{
+  return std::format(R"({{
   "value_": "{}"
 }})", type.ToString());
 }
 template<typename T>
-inline json create_enum_json(const T& type) {
-  return json::parse(create_enum_json_string(type));
+inline nlohmann::json create_enum_json(const T& type) {
+  return nlohmann::json::parse(create_enum_json_string(type));
 }
 
 template<typename T>
 inline void EnumToJsonTestBody(const T& type, const std::string_view& expected) {
   ASSERT_NO_THROW(
-      json type_json = type;
+      nlohmann::json type_json = type;
       EXPECT_EQ(expected, type_json);
   );
 }
 template<typename T>
 inline void EnumFromJsonTestBody(const std::string_view& json_str, const T& expected) {
   ASSERT_NO_THROW(
-      json type_json = json_str;
+      nlohmann::json type_json = json_str;
       EXPECT_EQ(expected, type_json.template get<T>());
   );
 }
@@ -44,7 +41,7 @@ inline void EnumFromJsonTestBody(const std::string_view& json_str, const T& expe
 template<typename T>
 inline void EnumClassToJsonTestBody(const T& type) {
   ASSERT_NO_THROW(
-      json type_json;
+      nlohmann::json type_json;
       to_json(type_json, type);
       EXPECT_EQ(create_enum_json_string(type), dump(type_json));
   );
@@ -53,7 +50,7 @@ template<typename T>
 inline void EnumClassFromJsonTestBody(const T& type) {
   ASSERT_NO_THROW(
       T type_from_json;
-      json type_json = create_enum_json(type);
+      nlohmann::json type_json = create_enum_json(type);
       from_json(type_json, type_from_json);
       EXPECT_EQ(type, type_from_json);
   );
@@ -62,13 +59,13 @@ inline void EnumClassFromJsonTestBody(const T& type) {
 template<typename T>
 inline void ObjectToJsonTestBody(const T& object, const std::string& expected) {
   ASSERT_NO_THROW(
-      json object_json;
+      nlohmann::json object_json;
       to_json(object_json, object);
       EXPECT_EQ(expected, dump(object_json));
   );
 }
 template<typename T>
-inline void ObjectFromJsonTestBody(const json& object_json, const T& expected_object) {
+inline void ObjectFromJsonTestBody(const nlohmann::json& object_json, const T& expected_object) {
   ASSERT_NO_THROW(
       T object_from_json;
       from_json(object_json, object_from_json);
