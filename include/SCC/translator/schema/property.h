@@ -27,7 +27,7 @@ public:
   }
   friend void from_json(const nlohmann::json& j, PropertyConstraint& constraint) {
     j.at("name").get_to(constraint.name);
-    constraint.type = cypher::ConstraintType(j.at("type"));
+    constraint.type = cypher::ConstraintType(std::string(j.at("type")));
   }
 };
 
@@ -36,6 +36,7 @@ public:
   std::string name;
   cypher::PropertyType type;
 
+  explicit Property() = default;
   explicit Property(std::string name, cypher::PropertyType type);
   explicit Property(std::string name, cypher::PropertyType type,
                     std::vector<PropertyConstraint> constraints);
@@ -56,7 +57,7 @@ public:
   }
   friend void from_json(const nlohmann::json& j, Property& property) {
     j.at("name").get_to(property.name);
-    property.type = cypher::PropertyType(j.at("type"));
+    property.type = cypher::PropertyType(std::string(j.at("type")));
     j.at("constraints").get_to(property.constraints);
   }
 
