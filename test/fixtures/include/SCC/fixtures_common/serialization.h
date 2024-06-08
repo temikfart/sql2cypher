@@ -58,3 +58,20 @@ inline void EnumClassFromJsonTestBody(const T& type) {
       EXPECT_EQ(type, type_from_json);
   );
 }
+
+template<typename T>
+inline void ObjectToJsonTestBody(const T& object, const std::string& expected) {
+  ASSERT_NO_THROW(
+      json object_json;
+      to_json(object_json, object);
+      EXPECT_EQ(expected, dump(object_json));
+  );
+}
+template<typename T>
+inline void ObjectFromJsonTestBody(const json& object_json, const T& expected_object) {
+  ASSERT_NO_THROW(
+      T object_from_json;
+      from_json(object_json, object_from_json);
+      EXPECT_EQ(expected_object, object_from_json);
+  );
+}

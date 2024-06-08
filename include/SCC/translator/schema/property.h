@@ -20,16 +20,16 @@ public:
   inline bool operator==(const PropertyConstraint& other) const {
     return name == other.name && type == other.type;
   }
-};
 
-inline void to_json(nlohmann::json& j, const PropertyConstraint& constraint)  {
-  j["name"] = constraint.name;
-  j["type"] = constraint.type.ToString();
-}
-inline void from_json(const nlohmann::json& j, PropertyConstraint& constraint) {
-  j.at("name").get_to(constraint.name);
-  j.at("type").get_to(constraint.type);
-}
+  friend void to_json(nlohmann::json& j, const PropertyConstraint& constraint) {
+    j["name"] = constraint.name;
+    j["type"] = constraint.type.ToString();
+  }
+  friend void from_json(const nlohmann::json& j, PropertyConstraint& constraint) {
+    j.at("name").get_to(constraint.name);
+    constraint.type = cypher::ConstraintType(j.at("type"));
+  }
+};
 
 class Property {
 public:
@@ -44,6 +44,7 @@ public:
   void RemoveConstraintsByPrefix(const std::string& prefix);
   bool MustBeUnique() const;
   bool MustBeNotNull() const;
+  const std::vector<PropertyConstraint>& Constraints() const;
 
   bool operator==(const Property& other) const;
   bool operator!=(const Property& other) const;
@@ -55,7 +56,7 @@ public:
   }
   friend void from_json(const nlohmann::json& j, Property& property) {
     j.at("name").get_to(property.name);
-    j.at("type").get_to(property.type);
+    property.type = cypher::PropertyType(j.at("type"));
     j.at("constraints").get_to(property.constraints);
   }
 

@@ -27,6 +27,9 @@ bool Property::MustBeUnique() const {
 bool Property::MustBeNotNull() const {
   return HasConstraintType(ConstraintType::kExistence);
 }
+const std::vector<PropertyConstraint>& Property::Constraints() const {
+  return constraints;
+}
 
 bool Property::operator==(const Property& other) const {
   return name == other.name
