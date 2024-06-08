@@ -68,14 +68,4 @@ private:
   bool HasConstraint(const PropertyConstraint& constraint) const;
 };
 
-inline void to_json(nlohmann::json& j, const std::vector<Property>& properties) {
-  j = nlohmann::json::array();
-  for (const auto& property : properties) {
-    j.push_back(property);
-  }
-}
-inline void from_json(const nlohmann::json& j, std::vector<Property>& properties) {
-  properties = j.get<std::vector<Property>>();
-}
-
 } // scc::translator::schema
