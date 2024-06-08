@@ -8,7 +8,7 @@ PropertyType::PropertyType(Value value) {
   this->value_ = value;
 }
 PropertyType::PropertyType(const std::string_view& str_type) {
-  std::string type = scc::common::LowerCase(std::string(str_type));
+  std::string type = scc::common::UpperCase(std::string(str_type));
   if (type == kPT_Unknown)
     this->value_ = kUnknown;
   else if (type == kPT_Boolean)
