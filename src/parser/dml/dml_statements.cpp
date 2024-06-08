@@ -144,7 +144,29 @@ NodePtr<INode> Parser::ParseUpdateStatement() {
   return service_node;
 }
 NodePtr<INode> Parser::ParseDeleteStatement() {
-  return ASTUtils::CreateServiceNode(StmtType::kDeleteStmt);
+  auto service_node = ASTUtils::CreateServiceNode(StmtType::kDeleteStmt);
+
+  auto peeked_token = PeekToken();
+  ValidateIsWord(peeked_token);
+  std::string next_word = ASTUtils::CastToNodeType<StringNode>(peeked_token)->data;
+  try {
+    StmtType from_kw(next_word);
+    if (from_kw != StmtType::kFromKW) {
+      throw parsing_error(format("Expected \'FROM\' keyword at line {}", peeked_token->line));
+    }
+    NextToken();
+  } catch (const std::invalid_argument& ignored) {}
+
+  ValidateHasTokens(format("Missing table name at line {}", peeked_token->line));
+  auto table_name = ParseTableName();
+  ASTUtils::Link(service_node, table_name);
+
+  ValidateHasTokens(format("Incorrect \'DELETE\' statement: expected condition at line {}",
+                           table_name->line));
+  auto where_condition = ParseWhereStatement();
+  ASTUtils::Link(service_node, where_condition);
+
+  return service_node;
 }
 
 NodePtr<INode> Parser::ParseInsertValuesList() {
