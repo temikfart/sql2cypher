@@ -8,18 +8,13 @@
 #include "SCC/translator/cypher/graph/property_types.h"
 #include "SCC/translator/schema/property.h"
 
-constexpr int indent = 2;
-constexpr char indent_char = ' ';
-
 inline std::string dump(const nlohmann::json& j) {
-  return j.dump(indent, indent_char);
+  return j.dump();
 }
 
 template<typename T>
 inline std::string create_enum_json_string(const T& type) {
-  return std::format(R"({{
-  "value_": "{}"
-}})", type.ToString());
+  return std::format(R"({{"value_":"{}"}})", type.ToString());
 }
 template<typename T>
 inline nlohmann::json create_enum_json(const T& type) {
@@ -29,10 +24,7 @@ inline nlohmann::json create_enum_json(const T& type) {
 inline std::string create_json_string(
     const scc::translator::schema::PropertyConstraint& constraint
 ) {
-  return format(R"({{
-  "name": "{}",
-  "type": "{}"
-}})", constraint.name, constraint.type.ToString());
+  return format(R"({{"name":"{}","type":"{}"}})", constraint.name, constraint.type.ToString());
 }
 inline nlohmann::json create_json(const scc::translator::schema::PropertyConstraint& constraint) {
   return nlohmann::json::parse(create_json_string(constraint));
@@ -42,26 +34,14 @@ inline std::string create_json_string(const scc::translator::schema::Property& p
   std::string constraints_json_string;
   for (unsigned i = 0; i < property.Constraints().size(); ++i) {
     bool first = i == 0;
-    bool last = i == property.Constraints().size() - 1;
-    if (first) {
-      constraints_json_string += "\n";
-    }
     const auto& constraint = property.Constraints()[i];
-    std::string constraint_json_string = format(R"(    {{
-      "name": "{}",
-      "type": "{}"
-    }}{})", constraint.name, constraint.type.ToString(), (last  ? "" : ",\n"));
-    constraints_json_string += constraint_json_string;
-    if (last) {
-      constraints_json_string += "\n  ";
-    }
+    std::string constraint_json_string = format(R"({{"name":"{}","type":"{}"}})",
+                                                constraint.name, constraint.type.ToString());
+    constraints_json_string += (first ? "" : ",") + constraint_json_string;
   }
 
-  return format(R"({{
-  "constraints": [{}],
-  "name": "{}",
-  "type": "{}"
-}})", constraints_json_string, property.name, property.type.ToString());
+  return format(R"({{"constraints":[{}],"name":"{}","type":"{}"}})",
+                constraints_json_string, property.name, property.type.ToString());
 }
 inline nlohmann::json create_json(const scc::translator::schema::Property& property) {
   return nlohmann::json::parse(create_json_string(property));
