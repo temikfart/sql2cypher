@@ -18,6 +18,7 @@ public:
   std::string label;
   std::vector<Property> properties;
 
+  explicit Node() = default;
   explicit Node(std::string label);
   explicit Node(std::string label, std::vector<Property> properties);
 

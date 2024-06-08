@@ -7,6 +7,7 @@
 
 #include "SCC/translator/cypher/graph/property_types.h"
 #include "SCC/translator/schema/property.h"
+#include "SCC/translator/schema/node.h"
 
 inline std::string dump(const nlohmann::json& j) {
   return j.dump();
@@ -45,6 +46,21 @@ inline std::string create_json_string(const scc::translator::schema::Property& p
 }
 inline nlohmann::json create_json(const scc::translator::schema::Property& property) {
   return nlohmann::json::parse(create_json_string(property));
+}
+
+inline std::string create_json_string(const scc::translator::schema::Node& node) {
+  std::string properties_json_string;
+  for (unsigned i = 0; i < node.properties.size(); ++i) {
+    bool first = i == 0;
+    const auto& property = node.properties[i];
+    std::string property_json_string = create_json_string(property);
+    properties_json_string += (first ? "" : ",") + property_json_string;
+  }
+
+  return format(R"({{"label":"{}","properties":[{}]}})", node.label, properties_json_string);
+}
+inline nlohmann::json create_json(const scc::translator::schema::Node& node) {
+  return nlohmann::json::parse(create_json_string(node));
 }
 
 template<typename T>
