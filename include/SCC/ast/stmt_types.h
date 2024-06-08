@@ -34,6 +34,7 @@ constexpr std::string_view kST_DELETE = "delete";
 constexpr std::string_view kST_INSERT = "insert";
 constexpr std::string_view kST_UPDATE = "update";
 
+constexpr std::string_view kST_UPDATE_COLUMN = "update column";
 constexpr std::string_view kST_CONDITION = "condition";
 constexpr std::string_view kST_OR_CONDITION = "or condition";
 constexpr std::string_view kST_AND_CONDITION = "and condition";
@@ -106,6 +107,7 @@ public:
     kUpdateStmt,
 
     // DML Basic Statements
+    kUpdateColumn,
     kCondition,
     kORCondition,
     kANDCondition,

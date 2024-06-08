@@ -72,10 +72,11 @@ private:
   void ParseAlterDropConstraints(std::shared_ptr<ast::INode>& parent);
 
   std::shared_ptr<ast::INode> ParseInsertStatement();
-  std::shared_ptr<ast::INode> ParseDeleteStatement();
   std::shared_ptr<ast::INode> ParseUpdateStatement();
+  std::shared_ptr<ast::INode> ParseDeleteStatement();
 
   std::shared_ptr<ast::INode> ParseInsertValuesList();
+  std::shared_ptr<ast::INode> ParseUpdateColumnElement();
 
   std::shared_ptr<ast::INode> ParseCondition();
   std::shared_ptr<ast::INode> ParseORCondition();
@@ -118,17 +119,21 @@ private:
   std::shared_ptr<ast::INode> ParseName();
   std::shared_ptr<ast::INode> ParseIdentifier();
   std::shared_ptr<ast::INode> ParseExpressionOrNull();
+  std::shared_ptr<ast::INode> ParseWhereStatement();
 
   bool HasTokens(unsigned min_count = 1) const;
   void ValidateHasTokens(const std::string& details = "") const;
   void ValidateHasTokens(unsigned min_count = 1) const;
   void ValidateHasNotTokens() const;
+
   void ValidateIsWord(const std::shared_ptr<ast::INode>& node) const;
   void ValidateIsOpeningRoundBracket(const std::shared_ptr<ast::INode>& node) const;
   void ValidateIsClosingRoundBracket(const std::shared_ptr<ast::INode>& node) const;
   void ValidateIsSingleQuote(const std::shared_ptr<ast::INode>& node) const;
   void ValidateIsDoubleQuote(const std::shared_ptr<ast::INode>& node) const;
   void ValidateIsBinaryOperator(const std::shared_ptr<ast::INode>& node) const;
+
+  void ValidateIsAssignmentOperator(const std::shared_ptr<ast::INode>& node) const;
 };
 
 } // scc::parser

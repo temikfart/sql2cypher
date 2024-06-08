@@ -104,11 +104,47 @@ NodePtr<INode> Parser::ParseInsertStatement() {
 
   return service_node;
 }
+NodePtr<INode> Parser::ParseUpdateStatement() {
+  auto service_node = ASTUtils::CreateServiceNode(StmtType::kUpdateStmt);
+
+  NodePtr<INode> table_name = ParseTableName();
+  ASTUtils::Link(service_node, table_name);
+
+  auto peeked_token = PeekToken();
+  ValidateIsWord(peeked_token);
+  std::string next_word = ASTUtils::CastToNodeType<StringNode>(peeked_token)->data;
+  try {
+    StmtType set_kw(next_word);
+    if (set_kw != StmtType::kSetKW) {
+      throw parsing_error(format("Expected \'SET\' keyword at line {}", peeked_token->line));
+    }
+    NextToken();
+  } catch (const std::invalid_argument& ignored) {}
+
+  ValidateHasTokens(format("Missing update columns list at line {}", peeked_token->line));
+  while (HasTokens()) {
+    auto update_column_element = ParseUpdateColumnElement();
+    ASTUtils::Link(service_node, update_column_element);
+
+    if (HasTokens() && NodeDataClassifier::IsComma(PeekToken())) {
+      auto next_token = NextToken();
+      ValidateHasTokens(format("Missing update column statement after comma at line {}",
+                               next_token->line));
+      ValidateIsWord(PeekToken());
+    } else {
+      break;
+    }
+  }
+
+  if (HasTokens() && NodeDataTypeClassifier::IsWord(PeekToken())) {
+    auto where_condition = ParseWhereStatement();
+    ASTUtils::Link(service_node, where_condition);
+  }
+
+  return service_node;
+}
 NodePtr<INode> Parser::ParseDeleteStatement() {
   return ASTUtils::CreateServiceNode(StmtType::kDeleteStmt);
-}
-NodePtr<INode> Parser::ParseUpdateStatement() {
-  return ASTUtils::CreateServiceNode(StmtType::kUpdateStmt);
 }
 
 NodePtr<INode> Parser::ParseInsertValuesList() {
@@ -151,6 +187,23 @@ NodePtr<INode> Parser::ParseInsertValuesList() {
   }
 
   return values_list;
+}
+NodePtr<INode> Parser::ParseUpdateColumnElement() {
+  auto service_node = ASTUtils::CreateServiceNode(StmtType::kUpdateColumn);
+
+  auto column_name = ParseColumnName();
+
+  ValidateHasTokens(format("Missing assignment operator at line {}", column_name->line));
+  auto assignment_operator = NextToken();
+  ValidateIsAssignmentOperator(assignment_operator);
+  ASTUtils::Link(service_node, assignment_operator);
+  ASTUtils::Link(assignment_operator, column_name);
+
+  ValidateHasTokens(format("Missing value for column at line {}", assignment_operator->line));
+  auto expression_or_null = ParseExpressionOrNull();
+  ASTUtils::Link(assignment_operator, expression_or_null);
+
+  return service_node;
 }
 
 } // scc::parser

@@ -73,4 +73,11 @@ void Parser::ValidateIsBinaryOperator(const NodePtr<INode>& node) const {
   }
 }
 
+void Parser::ValidateIsAssignmentOperator(const NodePtr<INode>& node) const {
+  if (!NodeDataClassifier::IsAssignmentOperator(node)) {
+    std::string msg = format("Expected Assignment Operator at line {}", node->line);
+    throw parsing_error(msg);
+  }
+}
+
 } // scc::parser
