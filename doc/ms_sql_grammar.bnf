@@ -61,7 +61,7 @@ data_type       ::= 'float' | ('int' | 'integer') | 'varchar' | 'char' ;
 condition     ::= or_condition ;
 or_condition  ::= and_condition ['OR' and_condition] ;
 and_condition ::= not_condition ['AND' not_condition] ;
-not_condition ::= 'NOT' predicate ;
+not_condition ::= ['NOT'] predicate ;
 predicate     ::= expr binary_operator_ expr ;
 expr          ::= name_list_ | (unary_operator_ expr) | ('(' expr ')') | string | math_expr ;
 
