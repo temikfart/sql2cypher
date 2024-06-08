@@ -1,15 +1,10 @@
-#include <string>
-
 #include "gtest/gtest.h"
-
-#include "nlohmann/json.hpp"
 
 #include "SCC/fixtures_common/serialization.h"
 #include "SCC/translator/cypher/graph/constraint_types.h"
 
 using namespace scc::translator::cypher;
 using namespace testing;
-using nlohmann::json;
 
 TEST(CypherConstraintTypeSerializationTests, EnumToJsonTest) {
   EnumToJsonTestBody<ConstraintType::Value>(ConstraintType::Value::kNone, kCT_None);

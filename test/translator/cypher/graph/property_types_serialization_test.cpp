@@ -1,13 +1,10 @@
 #include "gtest/gtest.h"
 
-#include "nlohmann/json.hpp"
-
 #include "SCC/fixtures_common/serialization.h"
 #include "SCC/translator/cypher/graph/property_types.h"
 
 using namespace scc::translator::cypher;
 using namespace testing;
-using nlohmann::json;
 
 TEST(CypherPropertyTypeSerializationTests, EnumToJsonTest) {
   EnumToJsonTestBody<PropertyType::Value>(PropertyType::Value::kUnknown, kPT_Unknown);

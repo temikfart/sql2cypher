@@ -14,14 +14,15 @@ constexpr char indent_char = ' ';
 inline std::string dump(const json& j) {
   return j.dump(indent, indent_char);
 }
+
 template<typename T>
-inline std::string create_enum_json_string(T type) {
+inline std::string create_enum_json_string(const T& type) {
   return format(R"({{
   "value_": "{}"
 }})", type.ToString());
 }
 template<typename T>
-inline json create_enum_json(T type) {
+inline json create_enum_json(const T& type) {
   return json::parse(create_enum_json_string(type));
 }
 
