@@ -75,6 +75,8 @@ private:
   std::shared_ptr<ast::INode> ParseDeleteStatement();
   std::shared_ptr<ast::INode> ParseUpdateStatement();
 
+  std::shared_ptr<ast::INode> ParseInsertValuesList();
+
   std::shared_ptr<ast::INode> ParseCondition();
   std::shared_ptr<ast::INode> ParseORCondition();
   std::shared_ptr<ast::INode> ParseANDCondition();
@@ -115,6 +117,7 @@ private:
   std::shared_ptr<ast::INode> ParseString();
   std::shared_ptr<ast::INode> ParseName();
   std::shared_ptr<ast::INode> ParseIdentifier();
+  std::shared_ptr<ast::INode> ParseExpressionOrNull();
 
   bool HasTokens(unsigned min_count = 1) const;
   void ValidateHasTokens(const std::string& details = "") const;

@@ -306,5 +306,18 @@ NodePtr<INode> Parser::ParseIdentifier() {
 
   return service_node;
 }
+NodePtr<INode> Parser::ParseExpressionOrNull() {
+  try {
+    auto peeked_token = PeekToken();
+    if (NodeDataTypeClassifier::IsWord(peeked_token)) {
+      std::string null_word = ASTUtils::CastToNodeType<StringNode>(peeked_token)->data;
+      StmtType null_value(null_word);
+      if (null_value == StmtType::kNullValue) {
+        return ASTUtils::CreateServiceNode(StmtType::kNullValue, NextToken());
+      }
+    }
+  } catch (const std::invalid_argument& ignored) {}
+  return ParseExpression();
+}
 
 } // scc::parser
