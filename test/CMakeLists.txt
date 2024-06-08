@@ -32,6 +32,7 @@ set(DIRS
         config
         fixtures
         lexer
+        translator
 )
 foreach(DIR ${DIRS})
     add_subdirectory(${DIR})
