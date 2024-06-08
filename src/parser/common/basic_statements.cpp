@@ -245,8 +245,7 @@ NodePtr<INode> Parser::ParseString() {
   NodePtr<StringNode> string = ASTUtils::CastToNodeType<StringNode>(
       ASTUtils::CreateStringNode("", DataType::kString)
   );
-  auto peeked_token = PeekToken();
-  while (!NodeDataClassifier::IsSingleQuote(peeked_token)) {
+  while (!NodeDataClassifier::IsSingleQuote(PeekToken())) {
     NodePtr<INode> next_word = NextToken();
     if (!string->data.empty()) {
       string->data += " "; // TODO: Lexer should save whitespace characters.

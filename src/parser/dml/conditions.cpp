@@ -139,8 +139,6 @@ NodePtr<INode> Parser::ParseExpression() {
 
   // Is it string ?
   if (NodeDataClassifier::IsQuote(PeekToken())) {
-    NextToken();
-
     ValidateHasTokens(format("Incorrect expression at line {}:"
                              "expected string literal or closing quote", peeked_token->line));
     NodePtr<INode> string = ParseString();
