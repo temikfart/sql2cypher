@@ -57,6 +57,10 @@ bool NodeDataClassifier::IsSemicolon(const NodePtr<INode>& node) {
   return IsCorrectDataType(node, DataType::kPunctuation)
       && ASTUtils::CastToNodeType<CharNode>(node)->data == ';';
 }
+bool NodeDataClassifier::IsAssignmentOperator(const std::shared_ptr<ast::INode>& node) {
+  return IsCorrectDataType(node, DataType::kOperator)
+      && ASTUtils::CastToNodeType<StringNode>(node)->data  == "=";
+}
 
 bool NodeDataClassifier::IsCorrectDataType(const NodePtr<INode>& node_to_check,
                                            DataType correct_data_type) {

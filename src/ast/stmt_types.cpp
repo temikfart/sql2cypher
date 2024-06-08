@@ -61,6 +61,8 @@ StmtType::StmtType(const std::string_view& str_type) {
     this->value_ = kUpdateStmt;
 
   /* DML Basic Statements */
+  else if (type == kST_UPDATE_COLUMN)
+    this->value_ = kUpdateColumn;
   else if (type == kST_CONDITION)
     this->value_ = kCondition;
   else if (type == kST_OR_CONDITION)
@@ -192,6 +194,8 @@ std::string StmtType::ToString() const {
       return std::string(kST_UPDATE);
 
     /* DML Basic Statements */
+    case kUpdateColumn:
+      return std::string(kST_UPDATE_COLUMN);
     case kCondition:
       return std::string(kST_CONDITION);
     case kORCondition:

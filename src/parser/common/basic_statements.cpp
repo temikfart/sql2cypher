@@ -320,4 +320,22 @@ NodePtr<INode> Parser::ParseExpressionOrNull() {
   return ParseExpression();
 }
 
+NodePtr<INode> Parser::ParseWhereStatement() {
+  auto peeked_token = PeekToken();
+  std::string next_word = ASTUtils::CastToNodeType<StringNode>(peeked_token)->data;
+  std::string invalid_where_keyword_error = format("Expected \'WHERE\' keyword at line {}",
+                                                   peeked_token->line);
+  try {
+    StmtType where_kw(next_word);
+    if (where_kw != StmtType::kWhereKW) {
+      throw parsing_error(invalid_where_keyword_error);
+    }
+    NextToken();
+  } catch (const std::invalid_argument& ignored) {
+    throw parsing_error(invalid_where_keyword_error);
+  }
+
+  return ParseCondition();
+}
+
 } // scc::parser

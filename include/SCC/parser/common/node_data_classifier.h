@@ -18,6 +18,7 @@ public:
   static bool IsUnaryOperator(const std::shared_ptr<ast::INode>& node);
   static bool IsBinaryOperator(const std::shared_ptr<ast::INode>& node);
   static bool IsSemicolon(const std::shared_ptr<ast::INode>& node);
+  static bool IsAssignmentOperator(const std::shared_ptr<ast::INode>& node);
 
 private:
   static bool IsCorrectDataType(const std::shared_ptr<ast::INode>& node_to_check,
