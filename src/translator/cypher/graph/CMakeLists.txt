@@ -8,4 +8,5 @@ target_sources(scc_translator_cypher_graph PRIVATE
 )
 target_link_libraries(scc_translator_cypher_graph PRIVATE
         scc_include
+        scc_common
 )
