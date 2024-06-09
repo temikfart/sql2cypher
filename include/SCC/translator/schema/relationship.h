@@ -12,8 +12,8 @@
 namespace scc::translator::schema {
 
 struct ApplyCondition {
-  int spi;
-  int epi;
+  int spi = -1;
+  int epi = -1;
 };
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ApplyCondition, spi, epi)

@@ -25,6 +25,9 @@ void Relationship::RemoveConditionByEPI(int epi) {
     return condition.epi == epi;
   });
 }
+const std::vector<ApplyCondition>& Relationship::Conditions() const {
+  return conditions;
+}
 
 bool Relationship::operator==(const Relationship& other) const {
   if (type != other.type

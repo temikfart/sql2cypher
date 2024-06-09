@@ -6,8 +6,9 @@
 #include "nlohmann/json.hpp"
 
 #include "SCC/translator/cypher/graph/property_types.h"
-#include "SCC/translator/schema/property.h"
 #include "SCC/translator/schema/node.h"
+#include "SCC/translator/schema/property.h"
+#include "SCC/translator/schema/relationship.h"
 
 inline std::string dump(const nlohmann::json& j) {
   return j.dump();
@@ -22,10 +23,8 @@ inline nlohmann::json create_enum_json(const T& type) {
   return nlohmann::json::parse(create_enum_json_string(type));
 }
 
-inline std::string create_json_string(
-    const scc::translator::schema::PropertyConstraint& constraint
-) {
-  return format(R"({{"name":"{}","type":"{}"}})", constraint.name, constraint.type.ToString());
+inline std::string create_json_string(const scc::translator::schema::PropertyConstraint& constraint) {
+  return std::format(R"({{"name":"{}","type":"{}"}})", constraint.name, constraint.type.ToString());
 }
 inline nlohmann::json create_json(const scc::translator::schema::PropertyConstraint& constraint) {
   return nlohmann::json::parse(create_json_string(constraint));
@@ -36,13 +35,13 @@ inline std::string create_json_string(const scc::translator::schema::Property& p
   for (unsigned i = 0; i < property.Constraints().size(); ++i) {
     bool first = i == 0;
     const auto& constraint = property.Constraints()[i];
-    std::string constraint_json_string = format(R"({{"name":"{}","type":"{}"}})",
-                                                constraint.name, constraint.type.ToString());
+    std::string constraint_json_string = std::format(R"({{"name":"{}","type":"{}"}})",
+                                                     constraint.name, constraint.type.ToString());
     constraints_json_string += (first ? "" : ",") + constraint_json_string;
   }
 
-  return format(R"({{"constraints":[{}],"name":"{}","type":"{}"}})",
-                constraints_json_string, property.name, property.type.ToString());
+  return std::format(R"({{"constraints":[{}],"name":"{}","type":"{}"}})",
+                     constraints_json_string, property.name, property.type.ToString());
 }
 inline nlohmann::json create_json(const scc::translator::schema::Property& property) {
   return nlohmann::json::parse(create_json_string(property));
@@ -57,10 +56,17 @@ inline std::string create_json_string(const scc::translator::schema::Node& node)
     properties_json_string += (first ? "" : ",") + property_json_string;
   }
 
-  return format(R"({{"label":"{}","properties":[{}]}})", node.label, properties_json_string);
+  return std::format(R"({{"label":"{}","properties":[{}]}})", node.label, properties_json_string);
 }
 inline nlohmann::json create_json(const scc::translator::schema::Node& node) {
   return nlohmann::json::parse(create_json_string(node));
+}
+
+inline std::string create_json_string(const scc::translator::schema::ApplyCondition& condition) {
+  return std::format(R"({{"epi":{},"spi":{}}})", condition.epi, condition.spi);
+}
+inline nlohmann::json create_json(const scc::translator::schema::ApplyCondition& condition) {
+  return nlohmann::json::parse(create_json_string(condition));
 }
 
 template<typename T>
