@@ -91,6 +91,12 @@ Node& Schema::GetNodeOrThrow(const std::string& label) {
   }
   return node_res.value().get();
 }
+const std::vector<Node>& Schema::Nodes() const {
+  return nodes;
+}
+const std::vector<Relationship>& Schema::Relationships() const {
+  return relationships;
+}
 
 void Schema::RemoveNode(const std::string& label) {
   auto nodeIt = std::find_if(nodes.begin(), nodes.end(),
@@ -159,6 +165,21 @@ void Schema::RemovePropertyIdxFromConditions(const std::string& label, int pi) {
   }
 }
 
+bool operator==(const Schema& lhs, const Schema& rhs) {
+  if (lhs.database_name != rhs.database_name) {
+    return false;
+  }
+
+  if (lhs.Nodes() != rhs.Nodes()) {
+    return false;
+  }
+
+  if (lhs.Relationships() != rhs.Relationships()) {
+    return false;
+  }
+
+  return true;
+}
 std::ifstream& operator>>(std::ifstream& is, Schema& schema) {
   json json_data = json::parse(is);
   from_json(json_data, schema);

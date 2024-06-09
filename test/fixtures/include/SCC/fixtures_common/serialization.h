@@ -9,6 +9,7 @@
 #include "SCC/translator/schema/node.h"
 #include "SCC/translator/schema/property.h"
 #include "SCC/translator/schema/relationship.h"
+#include "SCC/translator/schema/schema.h"
 
 inline std::string dump(const nlohmann::json& j) {
   return j.dump();
@@ -78,11 +79,36 @@ inline std::string create_json_string(const scc::translator::schema::Relationshi
     conditions_json_string += (first ? "" : ",") + condition_json_string;
   }
 
-  return format(R"({{"conditions":[{}],"end":"{}","start":"{}","type":"{}"}})",
-                conditions_json_string, relationship.end, relationship.start, relationship.type);
+  return std::format(R"({{"conditions":[{}],"end":"{}","start":"{}","type":"{}"}})",
+                     conditions_json_string, relationship.end, relationship.start,
+                     relationship.type);
 }
 inline nlohmann::json create_json(const scc::translator::schema::Relationship& relationship) {
   return nlohmann::json::parse(create_json_string(relationship));
+}
+
+inline std::string create_json_string(const scc::translator::schema::Schema& schema) {
+  std::string nodes_json_string;
+  for (unsigned i = 0; i < schema.Nodes().size(); ++i) {
+    bool first = i == 0;
+    const auto& node = schema.Nodes()[i];
+    std::string node_json_string = create_json_string(node);
+    nodes_json_string += (first ? "" : ",") + node_json_string;
+  }
+
+  std::string relationships_json_string;
+  for (unsigned i = 0; i < schema.Relationships().size(); ++i) {
+    bool first = i == 0;
+    const auto& relationship = schema.Relationships()[i];
+    std::string relationship_json_string = create_json_string(relationship);
+    relationships_json_string += (first ? "" : ",") + relationship_json_string;
+  }
+
+  return std::format(R"({{"database_name":"{}","nodes":[{}],"relationships":[{}]}})",
+                     schema.database_name, nodes_json_string, relationships_json_string);
+}
+inline nlohmann::json create_json(const scc::translator::schema::Schema& schema) {
+  return nlohmann::json::parse(create_json_string(schema));
 }
 
 template<typename T>

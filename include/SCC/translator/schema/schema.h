@@ -34,6 +34,8 @@ public:
   const Node& FindNodeOrThrow(const std::string& label) const;
   std::optional<std::reference_wrapper<Node>> GetNode(const std::string& label);
   Node& GetNodeOrThrow(const std::string& label);
+  const std::vector<Node>& Nodes() const;
+  const std::vector<Relationship>& Relationships() const;
 
   void RemoveNode(const std::string& label);
   void RemoveNodeProperty(const std::string& label, const std::string& property_name);
@@ -52,6 +54,7 @@ private:
   void RemovePropertyIdxFromConditions(const std::string& label, int pi);
 };
 
+bool operator==(const Schema& lhs, const Schema& rhs);
 std::ifstream& operator>>(std::ifstream& is, Schema& schema);
 
 } // scc::translator::cypher
