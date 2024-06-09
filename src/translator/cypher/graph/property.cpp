@@ -6,7 +6,14 @@ Property::Property(std::string  name, std::string value, PropertyType type)
     : name(std::move(name)), type(type), value(std::move(value)) {}
 
 std::string Property::ToString() const {
-  return name + ": " + value;
+  std::stringstream ss;
+  ss << name << ": ";
+  if (type == PropertyType::kString)  {
+    ss << "\"" << value << "\"";
+  } else {
+    ss << value;
+  }
+  return ss.str();
 }
 
 bool operator==(const Property& lhs, const Property& rhs) {
