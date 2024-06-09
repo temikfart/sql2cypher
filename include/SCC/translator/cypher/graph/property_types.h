@@ -17,6 +17,7 @@ constexpr std::string_view kPT_Boolean = "BOOLEAN";
 constexpr std::string_view kPT_Float = "FLOAT";
 constexpr std::string_view kPT_Integer = "INTEGER";
 constexpr std::string_view kPT_String = "STRING";
+constexpr std::string_view kPT_Null = "NULL";
 
 class PropertyType {
 public:
@@ -26,6 +27,7 @@ public:
     kFloat,
     kInteger,
     kString,
+    kNull,
   };
 
   PropertyType() = default;

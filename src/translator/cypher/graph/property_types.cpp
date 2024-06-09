@@ -3,7 +3,7 @@
 namespace scc::translator::cypher {
 
 PropertyType::PropertyType(Value value) {
-  if (value > kString)
+  if (value > kNull)
     throw std::invalid_argument("Incorrect value for Cypher Property Type");
   this->value_ = value;
 }
@@ -19,6 +19,8 @@ PropertyType::PropertyType(const std::string_view& str_type) {
     this->value_ = kInteger;
   else if (type == kPT_String)
     this->value_ = kString;
+  else if (type == kPT_Null)
+    this->value_ = kNull;
   else
     throw std::invalid_argument("No Cypher Property Type for '" + std::string(str_type) + "'");
 }
@@ -35,6 +37,8 @@ std::string PropertyType::ToString() const {
       return std::string(kPT_Integer);
     case kString:
       return std::string(kPT_String);
+    case kNull:
+      return std::string(kPT_Null);
   }
 }
 
