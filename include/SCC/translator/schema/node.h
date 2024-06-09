@@ -31,6 +31,8 @@ public:
 
   bool Validate(const cypher::Node& node) const;
 
+  std::string ToJsonString(int indent = 2, char indent_char = ' ') const;
+
   bool operator==(const Node& other) const;
   bool operator!=(const Node& other) const;
 };

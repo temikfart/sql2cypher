@@ -41,9 +41,11 @@ void Translator::Translate() {
   }
   LOGI << "Translation is ended";
 
-  LOGI << "Serializing Neo4j schema to json...";
-  out_ << schema_.ToJsonString() << std::endl;
-  LOGI << "Serialized Neo4j schema saved at " << schema_path_.string();
+  if (translate_schema_) {
+    LOGI << "Serializing Neo4j schema to json...";
+    out_ << schema_.ToJsonString() << std::endl;
+    LOGI << "Serialized Neo4j schema saved at " << schema_path_.string();
+  }
 }
 
 void Translator::WriteCypherQuery(const std::string& query) {

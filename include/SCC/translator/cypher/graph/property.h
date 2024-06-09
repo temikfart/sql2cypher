@@ -18,6 +18,7 @@ public:
   PropertyType type;
   std::string value;
 
+  explicit Property() = default;
   explicit Property(std::string name, std::string value, PropertyType type);
 
   std::string ToString() const;
