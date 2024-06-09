@@ -28,6 +28,7 @@ public:
   std::string start;
   std::string end;
 
+  explicit Relationship() = default;
   explicit Relationship(std::string type, std::string start, std::string end);
   explicit Relationship(std::string type, std::string start, std::string end,
                         std::vector<ApplyCondition> conditions);
@@ -35,6 +36,7 @@ public:
   Relationship& AddCondition(ApplyCondition condition);
   void RemoveConditionBySPI(int spi);
   void RemoveConditionByEPI(int epi);
+  const std::vector<ApplyCondition>& Conditions() const;
 
   bool operator==(const Relationship& other) const;
   bool operator!=(const Relationship& other) const;

@@ -23,3 +23,25 @@ TEST(SchemaApplyConditionSerializationTests, FromJsonTest)  {
   ApplyCondition condition(4, 2);
   ObjectFromJsonTestBody(create_json(condition), condition);
 }
+
+TEST(SchemaRelationshipSerializationTests, ToJsonTest) {
+  Relationship empty_relationship;
+  ObjectToJsonTestBody(empty_relationship, create_json_string(empty_relationship));
+
+  Relationship relationship("LOVES", "Maxim", "Katya");
+  ObjectToJsonTestBody(relationship, create_json_string(relationship));
+
+  relationship.AddCondition(ApplyCondition(1, 2));
+  relationship.AddCondition(ApplyCondition(5, 7));
+  ObjectToJsonTestBody(relationship, create_json_string(relationship));
+}
+TEST(SchemaRelationshipSerializationTests, FromJsonTest)  {
+  Relationship empty_relationship;
+  ObjectFromJsonTestBody(create_json(empty_relationship), empty_relationship);
+
+  Relationship relationship("DIRECTED", "Nolan", "Batman");
+  ObjectFromJsonTestBody(create_json(relationship), relationship);
+
+  relationship.AddCondition(ApplyCondition(9, 0));
+  ObjectFromJsonTestBody(create_json(relationship), relationship);
+}

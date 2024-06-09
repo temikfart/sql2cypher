@@ -69,6 +69,22 @@ inline nlohmann::json create_json(const scc::translator::schema::ApplyCondition&
   return nlohmann::json::parse(create_json_string(condition));
 }
 
+inline std::string create_json_string(const scc::translator::schema::Relationship& relationship) {
+  std::string conditions_json_string;
+  for (unsigned i = 0; i < relationship.Conditions().size(); ++i) {
+    bool first = i == 0;
+    const auto& condition = relationship.Conditions()[i];
+    std::string condition_json_string = create_json_string(condition);
+    conditions_json_string += (first ? "" : ",") + condition_json_string;
+  }
+
+  return format(R"({{"conditions":[{}],"end":"{}","start":"{}","type":"{}"}})",
+                conditions_json_string, relationship.end, relationship.start, relationship.type);
+}
+inline nlohmann::json create_json(const scc::translator::schema::Relationship& relationship) {
+  return nlohmann::json::parse(create_json_string(relationship));
+}
+
 template<typename T>
 inline void EnumToJsonTestBody(const T& type, const std::string_view& expected) {
   ASSERT_NO_THROW(
