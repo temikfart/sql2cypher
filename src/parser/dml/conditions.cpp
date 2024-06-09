@@ -147,6 +147,13 @@ NodePtr<INode> Parser::ParseExpression() {
     return service_node;
   }
 
+  // Is it number?
+  if (NodeDataTypeClassifier::IsNumber(peeked_token)) {
+    auto number = NextToken();
+    ASTUtils::Link(service_node, number);
+    return service_node;
+  }
+
   // It is Math expression
   NodePtr<INode> math_expression = ParseMathExpression();
   ASTUtils::Link(service_node, math_expression);
