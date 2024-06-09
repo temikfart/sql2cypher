@@ -95,6 +95,9 @@ private:
   std::string GetName(const std::shared_ptr<ast::INode>& name_node) const;
   std::string GetIdentifier(const std::shared_ptr<ast::INode>& node) const;
 
+  std::pair<cypher::PropertyType, std::string>
+  TranslateExpression(const std::shared_ptr<ast::INode>& expr) const;
+
   std::string TranslateMathExpression(const std::shared_ptr<ast::INode>& expr) const;
   std::string TranslateMathSum(const std::shared_ptr<ast::INode>& sum) const;
   std::string TranslateMathProduct(const std::shared_ptr<ast::INode>& product) const;
