@@ -22,6 +22,16 @@ bool Node::HasProperty(const std::string& name) const {
   auto predicate = [name](const Property& property) { return property.name == name; };
   return std::any_of(properties.begin(), properties.end(), predicate);
 }
+const Property& Node::FindPropertyOrThrow(const std::string& name) const {
+  auto predicate = [name](const Property& property) { return property.name == name; };
+  auto propIt = std::find_if(properties.begin(), properties.end(), predicate);
+  if (propIt == properties.end())  {
+    std::string msg = format(R"(Property with name '{}' does not exist in node '{}')",
+                             name, label);
+    throw std::runtime_error(msg);
+  }
+  return *propIt;
+}
 int Node::PropertyIndex(const std::string& name) const {
   auto predicate = [name](const Property& property) { return property.name == name; };
   auto it = std::find_if(properties.begin(), properties.end(), predicate);
@@ -32,6 +42,26 @@ int Node::PropertyIndex(const std::string& name) const {
 }
 unsigned Node::PropertyCount() const {
   return properties.size();
+}
+
+bool Node::Validate(const cypher::Node& node) const {
+  if (label != node.label) {
+    return false;
+  }
+
+  if (PropertyCount() != node.PropertyCount())  {
+    return false;
+  }
+
+  for (unsigned i = 0; i < PropertyCount(); ++i) {
+    const auto& schema_property = properties[i];
+    const auto& property = node.properties[i];
+    if (!schema_property.Validate(property)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 bool Node::operator==(const Node& other) const {
