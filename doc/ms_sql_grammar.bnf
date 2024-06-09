@@ -63,7 +63,7 @@ or_condition  ::= and_condition ['OR' and_condition] ;
 and_condition ::= not_condition ['AND' not_condition] ;
 not_condition ::= ['NOT'] predicate ;
 predicate     ::= expr binary_operator_ expr ;
-expr          ::= name_list_ | (unary_operator_ expr) | ('(' expr ')') | string | math_expr ;
+expr          ::= name | (unary_operator_ expr) | ('(' expr ')') | string | math_expr | number;
 
 // Math Expressions (PEG)
 
@@ -71,10 +71,13 @@ math_expr ::= sum ;
 sum       ::= product [('+' | '-') product] ;
 product   ::= power [('*' | '/') power] ;
 power     ::= value ['^' power] ;
-value     ::= 'regexp:[0-9]+' | ('(' math_expr ')') ;
+value     ::= number | ('(' math_expr ')') ;
 
 // Base
 
+number     ::= integer | float ;
+integer    ::= 'regexp:[1-9][0-9]*'
+float      ::= 'regexp:[1-9][0-9]*.[0-9]'
 identifier ::= "regexp:[_a-zA-z0-9]+" ;
 string     ::= ("'" string_ "'") | ('"' string_ '"') ;
 
