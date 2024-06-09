@@ -115,7 +115,7 @@ template<typename T>
 inline void EnumToJsonTestBody(const T& type, const std::string_view& expected) {
   ASSERT_NO_THROW(
       nlohmann::json type_json = type;
-      EXPECT_EQ(expected, type_json);
+      EXPECT_EQ(nlohmann::json(expected), type_json);
   );
 }
 template<typename T>
