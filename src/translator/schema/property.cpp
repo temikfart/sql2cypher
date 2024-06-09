@@ -31,6 +31,22 @@ const std::vector<PropertyConstraint>& Property::Constraints() const {
   return constraints;
 }
 
+bool Property::Validate(const cypher::Property& property) const {
+  if (name != property.name) {
+    return false;
+  }
+
+  if (property.type == PropertyType::kNull) {
+    return true;
+  }
+
+  if (type != property.type) {
+    return false;
+  }
+
+  return true;
+}
+
 bool Property::operator==(const Property& other) const {
   return name == other.name
       && type == other.type

@@ -9,6 +9,7 @@
 
 #include "nlohmann/json.hpp"
 
+#include "SCC/translator/cypher/graph/node.h"
 #include "SCC/translator/schema/property.h"
 
 namespace scc::translator::schema {
@@ -24,8 +25,11 @@ public:
 
   Node& AddProperty(const Property& property);
   bool HasProperty(const std::string& name) const;
+  const Property& FindPropertyOrThrow(const std::string& name) const;
   int PropertyIndex(const std::string& name) const;
   unsigned PropertyCount() const;
+
+  bool Validate(const cypher::Node& node) const;
 
   bool operator==(const Node& other) const;
   bool operator!=(const Node& other) const;

@@ -8,6 +8,7 @@
 #include "nlohmann/json.hpp"
 
 #include "SCC/translator/cypher/graph/constraint_types.h"
+#include "SCC/translator/cypher/graph/property.h"
 #include "SCC/translator/cypher/graph/property_types.h"
 
 namespace scc::translator::schema {
@@ -46,6 +47,8 @@ public:
   bool MustBeUnique() const;
   bool MustBeNotNull() const;
   const std::vector<PropertyConstraint>& Constraints() const;
+
+  bool Validate(const cypher::Property& property) const;
 
   bool operator==(const Property& other) const;
   bool operator!=(const Property& other) const;
