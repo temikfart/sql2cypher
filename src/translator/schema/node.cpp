@@ -3,6 +3,7 @@
 namespace scc::translator::schema {
 
 using std::format;
+using nlohmann::json;
 
 Node::Node(std::string label)
     : label(std::move(label)) {}
@@ -62,6 +63,12 @@ bool Node::Validate(const cypher::Node& node) const {
   }
 
   return true;
+}
+
+std::string Node::ToJsonString(int indent, char indent_char) const {
+  json node_json;
+  to_json(node_json, *this);
+  return node_json.dump(indent, indent_char);
 }
 
 bool Node::operator==(const Node& other) const {
