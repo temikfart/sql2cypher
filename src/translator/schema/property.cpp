@@ -2,6 +2,7 @@
 
 namespace scc::translator::schema {
 
+using nlohmann::json;
 using cypher::ConstraintType;
 using cypher::PropertyType;
 
@@ -45,6 +46,12 @@ bool Property::Validate(const cypher::Property& property) const {
   }
 
   return true;
+}
+
+std::string Property::ToJsonString(int indent, char indent_char) const {
+  json property_json;
+  to_json(property_json, *this);
+  return property_json.dump(indent, indent_char);
 }
 
 bool Property::operator==(const Property& other) const {

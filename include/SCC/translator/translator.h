@@ -18,6 +18,7 @@
 #include "SCC/log/log.h"
 #include "SCC/parser/parser.h"
 #include "SCC/translator/cypher/clauses/create.h"
+#include "SCC/translator/cypher/clauses/set.h"
 #include "SCC/translator/cypher/graph/node.h"
 #include "SCC/translator/cypher/graph/property.h"
 #include "SCC/translator/schema/node.h"
@@ -85,8 +86,8 @@ private:
   // DML statements
 
   void TranslateInsertStatement(const std::shared_ptr<ast::INode>& stmt);
-  void TranslateDeleteStatement(const std::shared_ptr<ast::INode>& stmt);
   void TranslateUpdateStatement(const std::shared_ptr<ast::INode>& stmt);
+  void TranslateDeleteStatement(const std::shared_ptr<ast::INode>& stmt);
 
   // Basic statements
 

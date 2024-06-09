@@ -50,6 +50,8 @@ public:
 
   bool Validate(const cypher::Property& property) const;
 
+  std::string ToJsonString(int indent = 2, char indent_char = ' ') const;
+
   bool operator==(const Property& other) const;
   bool operator!=(const Property& other) const;
 
