@@ -33,14 +33,4 @@ public:
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Node, label, properties)
 
-inline void to_json(nlohmann::json& j, const std::vector<Node>& nodes) {
-  j = nlohmann::json::array();
-  for (const auto& node : nodes) {
-    j.push_back(node);
-  }
-}
-inline void from_json(const nlohmann::json& j, std::vector<Node>& nodes) {
-  nodes = j.get<std::vector<Node>>();
-}
-
 } // scc::translator::schema

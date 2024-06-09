@@ -47,14 +47,4 @@ private:
   std::vector<ApplyCondition> conditions;
 };
 
-inline void to_json(nlohmann::json& j, const std::vector<Relationship>& relationships) {
-  j = nlohmann::json::array();
-  for (const auto& relationship : relationships) {
-    j.push_back(relationship);
-  }
-}
-inline void from_json(const nlohmann::json& j, std::vector<Relationship>& relationships) {
-  relationships = j.get<std::vector<Relationship>>();
-}
-
 } // scc::translator::schema
