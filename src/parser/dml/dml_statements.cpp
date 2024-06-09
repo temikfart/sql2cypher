@@ -218,12 +218,11 @@ NodePtr<INode> Parser::ParseUpdateColumnElement() {
   ValidateHasTokens(format("Missing assignment operator at line {}", column_name->line));
   auto assignment_operator = NextToken();
   ValidateIsAssignmentOperator(assignment_operator);
-  ASTUtils::Link(service_node, assignment_operator);
-  ASTUtils::Link(assignment_operator, column_name);
+  ASTUtils::Link(service_node, column_name);
 
   ValidateHasTokens(format("Missing value for column at line {}", assignment_operator->line));
   auto expression_or_null = ParseExpressionOrNull();
-  ASTUtils::Link(assignment_operator, expression_or_null);
+  ASTUtils::Link(service_node, expression_or_null);
 
   return service_node;
 }
