@@ -3,7 +3,7 @@
 namespace scc::ast {
 
 StmtType::StmtType(Value value) {
-  if (value > kVarcharType)
+  if (value > kUnknownValue)
     throw std::invalid_argument("Incorrect value for Statement Type");
   this->value_ = value;
 }
@@ -63,6 +63,7 @@ StmtType::StmtType(const std::string_view& str_type) {
   /* DML Basic Statements */
   else if (type == kST_UPDATE_COLUMN)
     this->value_ = kUpdateColumn;
+
   else if (type == kST_CONDITION)
     this->value_ = kCondition;
   else if (type == kST_OR_CONDITION)
@@ -75,6 +76,17 @@ StmtType::StmtType(const std::string_view& str_type) {
     this->value_ = kPredicate;
   else if (type == kST_EXPRESSION)
     this->value_ = kExpression;
+
+  else if (type == kST_MATH_EXPRESSION)
+    this->value_ = kMathExpression;
+  else if (type == kST_SUM)
+    this->value_ = kSum;
+  else if (type == kST_PRODUCT)
+    this->value_ = kProduct;
+  else if (type == kST_POWER)
+    this->value_ = kPower;
+  else if (type == kST_VALUE)
+    this->value_ = kValue;
 
   /* Logical Operators */
   else if (type == kST_OR_OPERATOR)
@@ -196,6 +208,7 @@ std::string StmtType::ToString() const {
     /* DML Basic Statements */
     case kUpdateColumn:
       return std::string(kST_UPDATE_COLUMN);
+
     case kCondition:
       return std::string(kST_CONDITION);
     case kORCondition:
@@ -208,6 +221,17 @@ std::string StmtType::ToString() const {
       return std::string(kST_PREDICATE);
     case kExpression:
       return std::string(kST_EXPRESSION);
+
+    case kMathExpression:
+      return std::string(kST_MATH_EXPRESSION);
+    case kSum:
+      return std::string(kST_SUM);
+    case kProduct:
+      return std::string(kST_PRODUCT);
+    case kPower:
+      return std::string(kST_POWER);
+    case kValue:
+      return std::string(kST_VALUE);
 
     /* Logical Operators */
     case kOROperator:
@@ -264,6 +288,11 @@ std::string StmtType::ToString() const {
       return std::string(kST_CHAR_TYPE);
     case kVarcharType:
       return std::string(kST_VARCHAR_TYPE);
+
+    case kNullValue:
+      return std::string(kST_NULL_VALUE);
+    case kUnknownValue:
+      return std::string(kST_UNKNOWN_VALUE);
   }
 }
 

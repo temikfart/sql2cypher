@@ -35,12 +35,19 @@ constexpr std::string_view kST_INSERT = "insert";
 constexpr std::string_view kST_UPDATE = "update";
 
 constexpr std::string_view kST_UPDATE_COLUMN = "update column";
+
 constexpr std::string_view kST_CONDITION = "condition";
 constexpr std::string_view kST_OR_CONDITION = "or condition";
 constexpr std::string_view kST_AND_CONDITION = "and condition";
 constexpr std::string_view kST_NOT_CONDITION = "not condition";
 constexpr std::string_view kST_PREDICATE = "predicate";
 constexpr std::string_view kST_EXPRESSION = "expression";
+
+constexpr std::string_view kST_MATH_EXPRESSION = "math expression";
+constexpr std::string_view kST_SUM = "sum";
+constexpr std::string_view kST_PRODUCT = "product";
+constexpr std::string_view kST_POWER = "power";
+constexpr std::string_view kST_VALUE = "value";
 
 constexpr std::string_view kST_OR_OPERATOR = "or";
 constexpr std::string_view kST_AND_OPERATOR = "and";
@@ -108,12 +115,19 @@ public:
 
     // DML Basic Statements
     kUpdateColumn,
+
     kCondition,
     kORCondition,
     kANDCondition,
     kNOTCondition,
     kPredicate,
     kExpression,
+
+    kMathExpression,
+    kSum,
+    kProduct,
+    kPower,
+    kValue,
 
     // Logical Operators
     kOROperator,
