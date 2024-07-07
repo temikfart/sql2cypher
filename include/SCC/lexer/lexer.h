@@ -2,6 +2,7 @@
 
 #include <deque>
 #include <filesystem>
+#include <format>
 #include <sstream>
 
 #include "SCC/ast/nodes/inode.h"

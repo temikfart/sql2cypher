@@ -3,6 +3,7 @@
 namespace scc::lexer {
 
 using namespace ast;
+using std::format;
 
 Lexer::Lexer(const std::filesystem::path& input_path)
     : input_(input_path) {}
@@ -48,10 +49,7 @@ std::shared_ptr<INode> Lexer::GetToken(char symbol, SymbolType sym_type) {
     case SymbolType::kNullTerminator:
       return nullptr;
     default:
-      std::string msg = "Unknown symbol \'"
-          + std::to_string(symbol)
-          + "\' in line "
-          + std::to_string(line_);
+      std::string msg = format("Unknown symbol \'{}\' at line", symbol, line_);
       LOGE << msg;
       throw std::invalid_argument(msg);
   }
@@ -95,7 +93,8 @@ std::shared_ptr<INode> Lexer::GetWord() {
   char symbol = PeekSymbol();
   while (SymbolClassifier::IsAlpha(symbol)
       || SymbolClassifier::IsDigit(symbol)
-      || symbol == '_') {
+      || symbol == '_'
+      || symbol == '@') {
     data += GetSymbol();
     symbol = PeekSymbol();
   }
