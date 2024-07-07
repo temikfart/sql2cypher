@@ -26,13 +26,18 @@ public:
 
 class CreateConstraintClauseBuilder {
 public:
-  static std::string Build(const std::string& constraint_name, const Node& node,
-                           const Property& property, ConstraintType type);
+  static std::string Build(const std::string& constraint_name, const std::string& label,
+                           const std::string& property_name, ConstraintType type);
 };
 
 class CreateRelationshipClauseBuilder {
 public:
   static std::string Build(const Relationship& relationship);
+  static std::string Build(const std::string& start,
+                           const std::string& start_prop,
+                           const std::string& end,
+                           const std::string& end_prop,
+                           const std::string& relationship_type);
 };
 
 } // scc::translator::cypher

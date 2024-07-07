@@ -46,6 +46,39 @@ void Translator::Translate() {
     out_ << schema_.ToJsonString() << std::endl;
     LOGI << "Serialized Neo4j schema saved at " << schema_path_.string();
   }
+
+  if (translate_data_) {
+    for (const auto& node : schema_.Nodes()) {
+      for (const auto& property : node.properties) {
+        for (const auto& constraint : property.Constraints()) {
+          WriteCypherQuery(cypher::CreateConstraintClauseBuilder::Build(
+              constraint.name,
+              node.label,
+              property.name,
+              constraint.type
+          ));
+        }
+      }
+      FinishCypherQueriesGroup();
+    }
+
+    for (const auto& relationship : schema_.Relationships()) {
+      const auto& start_node = schema_.FindNodeOrThrow(relationship.start);
+      const auto& end_node = schema_.FindNodeOrThrow(relationship.end);
+      for (const auto& condition : relationship.Conditions()) {
+        const auto& start_prop = start_node.properties.at(condition.spi);
+        const auto& end_prop = end_node.properties.at(condition.epi);
+        WriteCypherQuery(cypher::CreateRelationshipClauseBuilder::Build(
+            start_node.label,
+            start_prop.name,
+            end_node.label,
+            end_prop.name,
+            relationship.type
+        ));
+      }
+      FinishCypherQueriesGroup();
+    }
+  }
 }
 
 void Translator::WriteCypherQuery(const std::string& query) {
