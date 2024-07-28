@@ -1,28 +1,21 @@
-#include <sstream>
-#include <stdexcept>
+#include <compare>
 
 #include "gtest/gtest.h"
 
 #include "SCC/ast/data_types.h"
+#include "SCC/fixtures_common/enum.h"
 
 using namespace scc::ast;
 using namespace testing;
 
+using UChar = unsigned char;
+
 TEST(DataTypeValueEnumTests, IsUnsignedCharTest) {
-  int N_0 = 0;
-  EXPECT_EQ((unsigned char) N_0, DataType::Value(N_0));
-
-  int N_neg1 = -1;
-  EXPECT_EQ((unsigned char) N_neg1, DataType::Value(N_neg1));
-
-  int N_50 = 50;
-  EXPECT_EQ((unsigned char) N_50, DataType::Value(N_50));
-
-  int N_128 = 128;
-  EXPECT_EQ((unsigned char) N_128, DataType::Value(N_128));
-
-  int N_256 = 256;
-  EXPECT_EQ((unsigned char) N_256, DataType::Value(N_256));
+  CastEnumTestBody<UChar, DataType::Value>(0);
+  CastEnumTestBody<UChar, DataType::Value>(-1);
+  CastEnumTestBody<UChar, DataType::Value>(50);
+  CastEnumTestBody<UChar, DataType::Value>(128);
+  CastEnumTestBody<UChar, DataType::Value>(256);
 }
 
 TEST(DataTypeCtorTests, DefaultValueTest) {
@@ -31,71 +24,70 @@ TEST(DataTypeCtorTests, DefaultValueTest) {
 }
 
 TEST(DataTypeCtorTests, ValueTest) {
-  EXPECT_EQ(DataType::kNone, (DataType::Value) DataType(DataType::kNone));
-  EXPECT_EQ(DataType::kRoot, (DataType::Value) DataType(DataType::kRoot));
-  EXPECT_EQ(DataType::kInt, (DataType::Value) DataType(DataType::kInt));
-  EXPECT_EQ(DataType::kBracket, (DataType::Value) DataType(DataType::kBracket));
-  EXPECT_EQ(DataType::kString, (DataType::Value) DataType(DataType::kString));
+  CastWrapperToValueTestBody<DataType, DataType::Value>(DataType::kNone);
+  CastWrapperToValueTestBody<DataType, DataType::Value>(DataType::kRoot);
+  CastWrapperToValueTestBody<DataType, DataType::Value>(DataType::kInt);
+  CastWrapperToValueTestBody<DataType, DataType::Value>(DataType::kBracket);
+  CastWrapperToValueTestBody<DataType, DataType::Value>(DataType::kString);
 }
 
 TEST(DataTypeCtorTests, InvalidValueTest) {
-  EXPECT_THROW(DataType(DataType::Value(-1)), std::invalid_argument);
-  EXPECT_THROW(DataType(DataType::Value(100)), std::invalid_argument);
-}
-
-TEST(DataTypeCtorTests, StringValueTest) {
-  DataType root(kDT_Root);
-  EXPECT_EQ(DataType::kRoot, (DataType::Value) root);
-
-  DataType punctuation(kDT_Punctuation);
-  EXPECT_EQ(DataType::kPunctuation, (DataType::Value) punctuation);
-
-  DataType mixed_case_service("serViCE");
-  EXPECT_EQ(DataType::kService, (DataType::Value) mixed_case_service);
+  CreateWithInvalidArgumentTestBody<DataType, DataType::Value>(-1);
+  CreateWithInvalidArgumentTestBody<DataType, DataType::Value>(100);
 }
 
 TEST(DataTypeCtorTests, InvalidStringValueTest) {
-  EXPECT_THROW(DataType("something wrong"), std::invalid_argument);
-  EXPECT_THROW(DataType("oa8sdg"), std::invalid_argument);
-  EXPECT_THROW(DataType("ro0t"), std::invalid_argument);
-  EXPECT_THROW(DataType("non"), std::invalid_argument);
-  EXPECT_THROW(DataType("braket"), std::invalid_argument);
+  CreateWithInvalidArgumentTestBody<DataType, DataType::Value>("something wrong");
+  CreateWithInvalidArgumentTestBody<DataType, DataType::Value>("oa8sdg");
+  CreateWithInvalidArgumentTestBody<DataType, DataType::Value>("ro0t");
+  CreateWithInvalidArgumentTestBody<DataType, DataType::Value>("non");
+  CreateWithInvalidArgumentTestBody<DataType, DataType::Value>("braket");
+}
+
+TEST(DataTypeCtorTests, StringValueTest) {
+  CreateFromStringTestBody<DataType>(kDT_None, DataType::kNone);
+  CreateFromStringTestBody<DataType>(kDT_Root, DataType::kRoot);
+  CreateFromStringTestBody<DataType>(kDT_Service, DataType::kService);
+  CreateFromStringTestBody<DataType>(kDT_Int, DataType::kInt);
+  CreateFromStringTestBody<DataType>(kDT_Float, DataType::kFloat);
+  CreateFromStringTestBody<DataType>(kDT_Bracket, DataType::kBracket);
+  CreateFromStringTestBody<DataType>(kDT_Punctuation, DataType::kPunctuation);
+  CreateFromStringTestBody<DataType>(kDT_Operator, DataType::kOperator);
+  CreateFromStringTestBody<DataType>(kDT_Word, DataType::kWord);
+  CreateFromStringTestBody<DataType>(kDT_String, DataType::kString);
+}
+
+TEST(DataTypeCtorTests, MixedCaseStringTest) {
+  CreateFromStringTestBody<DataType>("NoNe", DataType::kNone);
+  CreateFromStringTestBody<DataType>("RoOT", DataType::kRoot);
+  CreateFromStringTestBody<DataType>("service", DataType::kService);
+  CreateFromStringTestBody<DataType>("iNT", DataType::kInt);
+  CreateFromStringTestBody<DataType>("flOAT", DataType::kFloat);
+  CreateFromStringTestBody<DataType>("BRAcket", DataType::kBracket);
+  CreateFromStringTestBody<DataType>("PuNcTuAtIoN", DataType::kPunctuation);
+  CreateFromStringTestBody<DataType>("OperaTOR", DataType::kOperator);
+  CreateFromStringTestBody<DataType>("WORD", DataType::kWord);
+  CreateFromStringTestBody<DataType>("STRINg", DataType::kString);
 }
 
 TEST(DataTypeoStringTests, ToStringTest) {
-  EXPECT_EQ(kDT_None, DataType(DataType::kNone).ToString());
-  EXPECT_EQ(kDT_Root, DataType(DataType::kRoot).ToString());
-  EXPECT_EQ(kDT_Int, DataType(DataType::kInt).ToString());
-  EXPECT_EQ(kDT_Service, DataType(DataType::kService).ToString());
-  EXPECT_EQ(kDT_Word, DataType(DataType::kWord).ToString());
-}
-
-TEST(DataTypeCastTests, CastToValueTest) {
-  DataType bracket(DataType::kBracket);
-  auto bracket_val = (DataType::Value) bracket;
-  EXPECT_EQ(DataType::kBracket, bracket_val);
-
-  DataType punctuation(DataType::kPunctuation);
-  auto punctuation_val = (DataType::Value) punctuation;
-  EXPECT_EQ(DataType::kPunctuation, punctuation_val);
+  ToStringTestBody<DataType>(DataType::kNone, kDT_None);
+  ToStringTestBody<DataType>(DataType::kRoot, kDT_Root);
+  ToStringTestBody<DataType>(DataType::kService, kDT_Service);
+  ToStringTestBody<DataType>(DataType::kInt, kDT_Int);
+  ToStringTestBody<DataType>(DataType::kFloat, kDT_Float);
+  ToStringTestBody<DataType>(DataType::kBracket, kDT_Bracket);
+  ToStringTestBody<DataType>(DataType::kPunctuation, kDT_Punctuation);
+  ToStringTestBody<DataType>(DataType::kOperator, kDT_Operator);
+  ToStringTestBody<DataType>(DataType::kWord, kDT_Word);
+  ToStringTestBody<DataType>(DataType::kString, kDT_String);
 }
 
 TEST(DataTypeOperatorsTests, OutputTest) {
-  std::ostringstream oss_none;
-  oss_none << DataType(DataType::kNone);
-  EXPECT_EQ(kDT_None, oss_none.str());
-
-  std::ostringstream oss_punctuation;
-  oss_punctuation << DataType(DataType::kPunctuation);
-  EXPECT_EQ(kDT_Punctuation, oss_punctuation.str());
-
-  std::ostringstream oss_operator;
-  oss_operator << DataType(DataType::kOperator);
-  EXPECT_EQ(kDT_Operator, oss_operator.str());
-
-  std::ostringstream oss_string;
-  oss_string << DataType(DataType::kString);
-  EXPECT_EQ(kDT_String, oss_string.str());
+  OutputTestBody<DataType, DataType::Value>(DataType::kNone, kDT_None);
+  OutputTestBody<DataType, DataType::Value>(DataType::kPunctuation, kDT_Punctuation);
+  OutputTestBody<DataType, DataType::Value>(DataType::kOperator, kDT_Operator);
+  OutputTestBody<DataType, DataType::Value>(DataType::kString, kDT_String);
 }
 
 TEST(DataTypeOperatorsTests, CompareTwoEqualTypesTest) {
