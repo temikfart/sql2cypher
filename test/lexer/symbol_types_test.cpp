@@ -1,28 +1,21 @@
-#include <sstream>
-#include <stdexcept>
+#include <compare>
 
 #include "gtest/gtest.h"
 
+#include "SCC/fixtures_common/enum.h"
 #include "SCC/lexer/symbol_types.h"
 
 using namespace scc::lexer;
 using namespace testing;
 
+using UChar = unsigned char;
+
 TEST(SymbolTypeValueEnumTests, IsUnsignedCharTest) {
-  int N_0 = 0;
-  EXPECT_EQ((unsigned char) N_0, SymbolType::Value(N_0));
-
-  int N_neg1 = -1;
-  EXPECT_EQ((unsigned char) N_neg1, SymbolType::Value(N_neg1));
-
-  int N_50 = 50;
-  EXPECT_EQ((unsigned char) N_50, SymbolType::Value(N_50));
-
-  int N_128 = 128;
-  EXPECT_EQ((unsigned char) N_128, SymbolType::Value(N_128));
-
-  int N_256 = 256;
-  EXPECT_EQ((unsigned char) N_256, SymbolType::Value(N_256));
+  CastEnumTestBody<UChar, SymbolType::Value>(0);
+  CastEnumTestBody<UChar, SymbolType::Value>(-1);
+  CastEnumTestBody<UChar, SymbolType::Value>(50);
+  CastEnumTestBody<UChar, SymbolType::Value>(128);
+  CastEnumTestBody<UChar, SymbolType::Value>(256);
 }
 
 TEST(SymbolTypeCtorTests, DefaultValueTest) {
@@ -31,71 +24,67 @@ TEST(SymbolTypeCtorTests, DefaultValueTest) {
 }
 
 TEST(SymbolTypeCtorTests, ValueTest) {
-  EXPECT_EQ(SymbolType::kUnknown, (SymbolType::Value) SymbolType(SymbolType::kUnknown));
-  EXPECT_EQ(SymbolType::kSpace, (SymbolType::Value) SymbolType(SymbolType::kSpace));
-  EXPECT_EQ(SymbolType::kAlpha, (SymbolType::Value) SymbolType(SymbolType::kAlpha));
-  EXPECT_EQ(SymbolType::kBracket, (SymbolType::Value) SymbolType(SymbolType::kBracket));
-  EXPECT_EQ(SymbolType::kEOF, (SymbolType::Value) SymbolType(SymbolType::kEOF));
+  CastWrapperToValueTestBody<SymbolType, SymbolType::Value>(SymbolType::kUnknown);
+  CastWrapperToValueTestBody<SymbolType, SymbolType::Value>(SymbolType::kSpace);
+  CastWrapperToValueTestBody<SymbolType, SymbolType::Value>(SymbolType::kAlpha);
+  CastWrapperToValueTestBody<SymbolType, SymbolType::Value>(SymbolType::kBracket);
+  CastWrapperToValueTestBody<SymbolType, SymbolType::Value>(SymbolType::kEOF);
 }
 
 TEST(SymbolTypeCtorTests, InvalidValueTest) {
-  EXPECT_THROW(SymbolType(SymbolType::Value(-1)), std::invalid_argument);
-  EXPECT_THROW(SymbolType(SymbolType::Value(100)), std::invalid_argument);
-}
-
-TEST(SymbolTypeCtorTests, StringValueTest) {
-  SymbolType space(kSYMT_Space);
-  EXPECT_EQ(SymbolType::kSpace, (SymbolType::Value) space);
-
-  SymbolType operator_(kSYMT_Operator);
-  EXPECT_EQ(SymbolType::kOperator, (SymbolType::Value) operator_);
-
-  SymbolType mixed_case_bracket("brAcKEt");
-  EXPECT_EQ(SymbolType::kBracket, (SymbolType::Value) mixed_case_bracket);
+  CreateWithInvalidArgumentTestBody<SymbolType, SymbolType::Value>(-1);
+  CreateWithInvalidArgumentTestBody<SymbolType, SymbolType::Value>(100);
 }
 
 TEST(SymbolTypeCtorTests, InvalidStringValueTest) {
-  EXPECT_THROW(SymbolType("invalid value"), std::invalid_argument);
-  EXPECT_THROW(SymbolType("asd9g8"), std::invalid_argument);
-  EXPECT_THROW(SymbolType("br@cket"), std::invalid_argument);
-  EXPECT_THROW(SymbolType("abcd"), std::invalid_argument);
-  EXPECT_THROW(SymbolType("punctuatio"), std::invalid_argument);
+  CreateWithInvalidArgumentTestBody<SymbolType, SymbolType::Value>("invalid value");
+  CreateWithInvalidArgumentTestBody<SymbolType, SymbolType::Value>("asd9g8");
+  CreateWithInvalidArgumentTestBody<SymbolType, SymbolType::Value>("br@cket");
+  CreateWithInvalidArgumentTestBody<SymbolType, SymbolType::Value>("abcd");
+  CreateWithInvalidArgumentTestBody<SymbolType, SymbolType::Value>("punctuatio");
+}
+
+TEST(SymbolTypeCtorTests, StringValueTest) {
+  CreateFromStringTestBody<SymbolType>(kSYMT_Unknown, SymbolType::kUnknown);
+  CreateFromStringTestBody<SymbolType>(kSYMT_Space, SymbolType::kSpace);
+  CreateFromStringTestBody<SymbolType>(kSYMT_Digit, SymbolType::kDigit);
+  CreateFromStringTestBody<SymbolType>(kSYMT_Alpha, SymbolType::kAlpha);
+  CreateFromStringTestBody<SymbolType>(kSYMT_Operator, SymbolType::kOperator);
+  CreateFromStringTestBody<SymbolType>(kSYMT_Bracket, SymbolType::kBracket);
+  CreateFromStringTestBody<SymbolType>(kSYMT_Punctuation, SymbolType::kPunctuation);
+  CreateFromStringTestBody<SymbolType>(kSYMT_EOF, SymbolType::kEOF);
+  CreateFromStringTestBody<SymbolType>(kSYMT_NullTerminator, SymbolType::kNullTerminator);
+}
+
+TEST(DataTypeCtorTests, MixedCaseStringTest) {
+  CreateFromStringTestBody<SymbolType>("unKNOWN", SymbolType::kUnknown);
+  CreateFromStringTestBody<SymbolType>("SpAcE", SymbolType::kSpace);
+  CreateFromStringTestBody<SymbolType>("DIGIT", SymbolType::kDigit);
+  CreateFromStringTestBody<SymbolType>("alpha", SymbolType::kAlpha);
+  CreateFromStringTestBody<SymbolType>("OPERator", SymbolType::kOperator);
+  CreateFromStringTestBody<SymbolType>("brAcKEt", SymbolType::kBracket);
+  CreateFromStringTestBody<SymbolType>("PUNCTuation", SymbolType::kPunctuation);
+  CreateFromStringTestBody<SymbolType>("Eof", SymbolType::kEOF);
+  CreateFromStringTestBody<SymbolType>("NULl", SymbolType::kNullTerminator);
 }
 
 TEST(SymbolTypeoStringTests, ToStringTest) {
-  EXPECT_EQ(kSYMT_Unknown, SymbolType(SymbolType::kUnknown).ToString());
-  EXPECT_EQ(kSYMT_Alpha, SymbolType(SymbolType::kAlpha).ToString());
-  EXPECT_EQ(kSYMT_Bracket, SymbolType(SymbolType::kBracket).ToString());
-  EXPECT_EQ(kSYMT_NullTerminator, SymbolType(SymbolType::kNullTerminator).ToString());
-  EXPECT_EQ(kSYMT_EOF, SymbolType(SymbolType::kEOF).ToString());
-}
-
-TEST(SymbolTypeCastTests, CastToValueTest) {
-  SymbolType eof(SymbolType::kEOF);
-  auto eof_val = (SymbolType::Value) eof;
-  EXPECT_EQ(SymbolType::kEOF, eof_val);
-
-  SymbolType operator_(SymbolType::kOperator);
-  auto operator_val = (SymbolType::Value) operator_;
-  EXPECT_EQ(SymbolType::kOperator, operator_val);
+  ToStringTestBody<SymbolType>(SymbolType::kUnknown, kSYMT_Unknown);
+  ToStringTestBody<SymbolType>(SymbolType::kSpace, kSYMT_Space);
+  ToStringTestBody<SymbolType>(SymbolType::kDigit, kSYMT_Digit);
+  ToStringTestBody<SymbolType>(SymbolType::kAlpha, kSYMT_Alpha);
+  ToStringTestBody<SymbolType>(SymbolType::kOperator, kSYMT_Operator);
+  ToStringTestBody<SymbolType>(SymbolType::kBracket, kSYMT_Bracket);
+  ToStringTestBody<SymbolType>(SymbolType::kPunctuation, kSYMT_Punctuation);
+  ToStringTestBody<SymbolType>(SymbolType::kEOF, kSYMT_EOF);
+  ToStringTestBody<SymbolType>(SymbolType::kNullTerminator, kSYMT_NullTerminator);
 }
 
 TEST(SymbolTypeOperatorsTests, OutputTest) {
-  std::ostringstream oss_unknown;
-  oss_unknown << SymbolType(SymbolType::kUnknown);
-  EXPECT_EQ(kSYMT_Unknown, oss_unknown.str());
-
-  std::ostringstream oss_digit;
-  oss_digit << SymbolType(SymbolType::kDigit);
-  EXPECT_EQ(kSYMT_Digit, oss_digit.str());
-
-  std::ostringstream oss_space;
-  oss_space << SymbolType(SymbolType::kSpace);
-  EXPECT_EQ(kSYMT_Space, oss_space.str());
-
-  std::ostringstream oss_alpha;
-  oss_alpha << SymbolType(SymbolType::kAlpha);
-  EXPECT_EQ(kSYMT_Alpha, oss_alpha.str());
+  OutputTestBody<SymbolType, SymbolType::Value>(SymbolType::kUnknown, kSYMT_Unknown);
+  OutputTestBody<SymbolType, SymbolType::Value>(SymbolType::kDigit, kSYMT_Digit);
+  OutputTestBody<SymbolType, SymbolType::Value>(SymbolType::kSpace, kSYMT_Space);
+  OutputTestBody<SymbolType, SymbolType::Value>(SymbolType::kAlpha, kSYMT_Alpha);
 }
 
 TEST(SymbolTypeOperatorsTests, CompareTwoEqualTypesTest) {
