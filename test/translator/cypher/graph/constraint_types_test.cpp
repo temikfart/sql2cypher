@@ -52,7 +52,7 @@ TEST(ConstraintTypeCtorTests, MixedCaseStringTest) {
   CreateFromStringTestBody<ConstraintType>("not NULL", ConstraintType::kExistence);
 }
 
-TEST(ConstraintTypeoStringTests, ToStringTest) {
+TEST(ConstraintTypeStringTests, ToStringTest) {
   ToStringTestBody<ConstraintType>(ConstraintType::kNone, kCT_None);
   ToStringTestBody<ConstraintType>(ConstraintType::kUniqueness, kCT_Uniqueness);
   ToStringTestBody<ConstraintType>(ConstraintType::kExistence, kCT_Existence);

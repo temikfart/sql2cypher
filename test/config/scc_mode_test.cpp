@@ -43,12 +43,12 @@ TEST(SCCModeCtorTests, StringValueTest) {
   CreateFromStringTestBody<SCCMode>(kMode_Daemon, SCCMode::kDaemon);
 }
 
-TEST(DataTypeCtorTests, MixedCaseStringTest) {
+TEST(SCCModeCtorTests, MixedCaseStringTest) {
   CreateFromStringTestBody<SCCMode>("DaeMON", SCCMode::kDaemon);
   CreateFromStringTestBody<SCCMode>("interACTIVE", SCCMode::kInteractive);
 }
 
-TEST(SCCModeoStringTests, ToStringTest) {
+TEST(SCCModeStringTests, ToStringTest) {
   ToStringTestBody<SCCMode>(SCCMode::kDaemon, kMode_Daemon);
   ToStringTestBody<SCCMode>(SCCMode::kInteractive, kMode_Interactive);
 }
