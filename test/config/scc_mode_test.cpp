@@ -1,29 +1,21 @@
 #include <compare>
-#include <sstream>
-#include <stdexcept>
 
 #include "gtest/gtest.h"
 
 #include "SCC/config/scc_mode.h"
+#include "SCC/fixtures_common/enum.h"
 
 using namespace scc::config;
 using namespace testing;
 
+using UChar = unsigned char;
+
 TEST(SCCModeValueEnumTests, IsUnsignedCharTest) {
-  int N_0 = 0;
-  EXPECT_EQ((unsigned char) N_0, SCCMode::Value(N_0));
-
-  int N_neg1 = -1;
-  EXPECT_EQ((unsigned char) N_neg1, SCCMode::Value(N_neg1));
-
-  int N_50 = 50;
-  EXPECT_EQ((unsigned char) N_50, SCCMode::Value(N_50));
-
-  int N_128 = 128;
-  EXPECT_EQ((unsigned char) N_128, SCCMode::Value(N_128));
-
-  int N_256 = 256;
-  EXPECT_EQ((unsigned char) N_256, SCCMode::Value(N_256));
+  CastEnumTestBody<UChar, SCCMode::Value>(0);
+  CastEnumTestBody<UChar, SCCMode::Value>(-1);
+  CastEnumTestBody<UChar, SCCMode::Value>(50);
+  CastEnumTestBody<UChar, SCCMode::Value>(128);
+  CastEnumTestBody<UChar, SCCMode::Value>(256);
 }
 
 TEST(SCCModeCtorTests, DefaultValueTest) {
@@ -32,54 +24,38 @@ TEST(SCCModeCtorTests, DefaultValueTest) {
 }
 
 TEST(SCCModeCtorTests, ValueTest) {
-  EXPECT_EQ(SCCMode::kDaemon, (SCCMode::Value) SCCMode(SCCMode::kDaemon));
-  EXPECT_EQ(SCCMode::kInteractive, (SCCMode::Value) SCCMode(SCCMode::Value(0)));
+  CastWrapperToValueTestBody<SCCMode, SCCMode::Value>(SCCMode::kDaemon);
+  CastWrapperToValueTestBody<SCCMode, SCCMode::Value>(SCCMode::kInteractive);
 }
 
 TEST(SCCModeCtorTests, InvalidValueTest) {
-  EXPECT_THROW(SCCMode(SCCMode::Value(-1)), std::invalid_argument);
-  EXPECT_THROW(SCCMode(SCCMode::Value(10)), std::invalid_argument);
-}
-
-TEST(SCCModeCtorTests, StringValueTest) {
-  SCCMode interactive(kMode_Interactive);
-  EXPECT_EQ(SCCMode::kInteractive, (SCCMode::Value) interactive);
-
-  SCCMode daemon(kMode_Daemon);
-  EXPECT_EQ(SCCMode::kDaemon, (SCCMode::Value) daemon);
-
-  SCCMode mixed_case_daemon("DaeMON");
-  EXPECT_EQ(SCCMode::kDaemon, (SCCMode::Value) mixed_case_daemon);
+  CreateWithInvalidArgumentTestBody<SCCMode, SCCMode::Value>(-1);
+  CreateWithInvalidArgumentTestBody<SCCMode, SCCMode::Value>(10);
 }
 
 TEST(SCCModeCtorTests, InvalidStringValueTest) {
-  EXPECT_THROW(SCCMode("invalid mode"), std::invalid_argument);
-  EXPECT_THROW(SCCMode("dakmon"), std::invalid_argument);
+  CreateWithInvalidArgumentTestBody<SCCMode, SCCMode::Value>("invalid mode");
+  CreateWithInvalidArgumentTestBody<SCCMode, SCCMode::Value>("dakmon");
+}
+
+TEST(SCCModeCtorTests, StringValueTest) {
+  CreateFromStringTestBody<SCCMode>(kMode_Interactive, SCCMode::kInteractive);
+  CreateFromStringTestBody<SCCMode>(kMode_Daemon, SCCMode::kDaemon);
+}
+
+TEST(DataTypeCtorTests, MixedCaseStringTest) {
+  CreateFromStringTestBody<SCCMode>("DaeMON", SCCMode::kDaemon);
+  CreateFromStringTestBody<SCCMode>("interACTIVE", SCCMode::kInteractive);
 }
 
 TEST(SCCModeoStringTests, ToStringTest) {
-  EXPECT_EQ(kMode_Daemon, SCCMode(SCCMode::kDaemon).ToString());
-  EXPECT_EQ(kMode_Interactive, SCCMode(SCCMode::kInteractive).ToString());
-}
-
-TEST(SCCModeCastTests, CastToValueTest) {
-  SCCMode interactive(SCCMode::kInteractive);
-  auto interactive_val = (SCCMode::Value) interactive;
-  EXPECT_EQ(SCCMode::kInteractive, interactive_val);
-
-  SCCMode daemon(SCCMode::kDaemon);
-  auto daemon_val = (SCCMode::Value) daemon;
-  EXPECT_EQ(SCCMode::kDaemon, daemon_val);
+  ToStringTestBody<SCCMode>(SCCMode::kDaemon, kMode_Daemon);
+  ToStringTestBody<SCCMode>(SCCMode::kInteractive, kMode_Interactive);
 }
 
 TEST(SCCModeOperatorsTests, OutputTest) {
-  std::ostringstream oss_interactive;
-  oss_interactive << SCCMode(SCCMode::kInteractive);
-  EXPECT_EQ(kMode_Interactive, oss_interactive.str());
-
-  std::ostringstream oss_daemon;
-  oss_daemon << SCCMode(SCCMode::kDaemon);
-  EXPECT_EQ(kMode_Daemon, oss_daemon.str());
+  OutputTestBody<SCCMode, SCCMode::Value>(SCCMode::kInteractive, kMode_Interactive);
+  OutputTestBody<SCCMode, SCCMode::Value>(SCCMode::kDaemon, kMode_Daemon);
 }
 
 TEST(SCCModeOperatorsTests, CompareTwoEqualModesTest) {
