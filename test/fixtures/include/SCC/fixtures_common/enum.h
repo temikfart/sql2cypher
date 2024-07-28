@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <stdexcept>
 #include <string>
 #include <sstream>
 
