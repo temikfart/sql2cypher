@@ -101,6 +101,8 @@ StmtType::StmtType(const std::string_view& str_type) {
     this->value_ = kPrimaryKey;
   else if (type == kST_FOREIGN_KEY)
     this->value_ = kForeignKey;
+  else if (type == kST_NAME)
+    this->value_ = kName;
   else if (type == kST_IDENTIFIER)
     this->value_ = kIdentifier;
   else if (type == kST_DOT_DELIMITER)
