@@ -56,7 +56,7 @@ TEST(SymbolTypeCtorTests, StringValueTest) {
   CreateFromStringTestBody<SymbolType>(kSYMT_NullTerminator, SymbolType::kNullTerminator);
 }
 
-TEST(DataTypeCtorTests, MixedCaseStringTest) {
+TEST(SymbolTypeCtorTests, MixedCaseStringTest) {
   CreateFromStringTestBody<SymbolType>("unKNOWN", SymbolType::kUnknown);
   CreateFromStringTestBody<SymbolType>("SpAcE", SymbolType::kSpace);
   CreateFromStringTestBody<SymbolType>("DIGIT", SymbolType::kDigit);
@@ -68,7 +68,7 @@ TEST(DataTypeCtorTests, MixedCaseStringTest) {
   CreateFromStringTestBody<SymbolType>("NULl", SymbolType::kNullTerminator);
 }
 
-TEST(SymbolTypeoStringTests, ToStringTest) {
+TEST(SymbolTypeStringTests, ToStringTest) {
   ToStringTestBody<SymbolType>(SymbolType::kUnknown, kSYMT_Unknown);
   ToStringTestBody<SymbolType>(SymbolType::kSpace, kSYMT_Space);
   ToStringTestBody<SymbolType>(SymbolType::kDigit, kSYMT_Digit);

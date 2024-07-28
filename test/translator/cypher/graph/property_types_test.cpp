@@ -58,7 +58,7 @@ TEST(PropertyTypeCtorTests, MixedCaseStringTest) {
   CreateFromStringTestBody<PropertyType>("null", PropertyType::kNull);
 }
 
-TEST(PropertyTypeoStringTests, ToStringTest) {
+TEST(PropertyTypeStringTests, ToStringTest) {
   ToStringTestBody<PropertyType>(PropertyType::kUnknown, kPT_Unknown);
   ToStringTestBody<PropertyType>(PropertyType::kBoolean, kPT_Boolean);
   ToStringTestBody<PropertyType>(PropertyType::kFloat, kPT_Float);

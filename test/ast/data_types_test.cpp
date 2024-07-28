@@ -70,7 +70,7 @@ TEST(DataTypeCtorTests, MixedCaseStringTest) {
   CreateFromStringTestBody<DataType>("STRINg", DataType::kString);
 }
 
-TEST(DataTypeoStringTests, ToStringTest) {
+TEST(DataTypeStringTests, ToStringTest) {
   ToStringTestBody<DataType>(DataType::kNone, kDT_None);
   ToStringTestBody<DataType>(DataType::kRoot, kDT_Root);
   ToStringTestBody<DataType>(DataType::kService, kDT_Service);
