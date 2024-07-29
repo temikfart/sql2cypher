@@ -15,7 +15,7 @@ template<typename T, typename U>
 using Pair = std::pair<T, U>;
 
 Pair<PropertyType, std::string>
-Translator::TranslateExpression(const ASTNodePtr<INode>& expr) const {
+Translator::TranslateExpression(const ASTNodePtr<INode>& expr) {
   auto value_node = expr->Child(0);
 
   if (IsCorrectStmtType(value_node, StmtType::kName)) {

@@ -75,9 +75,9 @@ private:
   void TranslateAlterTableActionDrop(const std::shared_ptr<ast::INode>& action_node,
                                      std::string& table_name);
 
-  std::vector<schema::Property> TranslateColumnDefinitions(
+  static std::vector<schema::Property> TranslateColumnDefinitions(
       const std::shared_ptr<ast::INode>& column_definition);
-  schema::Property TranslateColumnDefinition(const std::shared_ptr<ast::INode>& node);
+  static schema::Property TranslateColumnDefinition(const std::shared_ptr<ast::INode>& node);
   void TranslateTableConstraint(const std::shared_ptr<ast::INode>& constraint_definition,
                                 const std::string& table_name);
 
@@ -96,17 +96,17 @@ private:
   void TranslateForeignKey(const std::shared_ptr<ast::INode>& foreign_key,
                            const std::string& constraint_name, const std::string& table_name);
 
-  std::string GetName(const std::shared_ptr<ast::INode>& name_node) const;
-  std::string GetIdentifier(const std::shared_ptr<ast::INode>& node) const;
+  static std::string GetName(const std::shared_ptr<ast::INode>& name_node);
+  static std::string GetIdentifier(const std::shared_ptr<ast::INode>& node);
 
   std::pair<cypher::PropertyType, std::string>
-  TranslateExpression(const std::shared_ptr<ast::INode>& expr) const;
+  static TranslateExpression(const std::shared_ptr<ast::INode>& expr);
 
-  std::string TranslateMathExpression(const std::shared_ptr<ast::INode>& expr) const;
-  std::string TranslateMathSum(const std::shared_ptr<ast::INode>& sum) const;
-  std::string TranslateMathProduct(const std::shared_ptr<ast::INode>& product) const;
-  std::string TranslateMathPower(const std::shared_ptr<ast::INode>& power) const;
-  std::string TranslateMathValue(const std::shared_ptr<ast::INode>& value) const;
+  static std::string TranslateMathExpression(const std::shared_ptr<ast::INode>& expr);
+  static std::string TranslateMathSum(const std::shared_ptr<ast::INode>& sum);
+  static std::string TranslateMathProduct(const std::shared_ptr<ast::INode>& product);
+  static std::string TranslateMathPower(const std::shared_ptr<ast::INode>& power);
+  static std::string TranslateMathValue(const std::shared_ptr<ast::INode>& value);
 
   void AddPropertyConstraints(const std::string& constraint_name_prefix, const std::string& label,
                               const std::string& property_name,
@@ -120,21 +120,22 @@ private:
       const std::string& end_label, const std::vector<std::string>& end_node_props
   );
   std::string CreateRelationshipType(const std::string& type_prefix);
-  std::string CreatePKConstraintPrefix(const std::string& table_name) const;
-  std::string CreateFKConstraintPrefix(const std::string& table_name,
-                                       const std::string& ref_table_name) const;
+  static std::string CreatePKConstraintPrefix(const std::string& table_name);
+  static std::string CreateFKConstraintPrefix(const std::string& table_name,
+                                              const std::string& ref_table_name);
 
   const schema::Node& GetNodeFromSchema(const std::string& label) const;
 
   // Validation
 
-  bool HasChildren(const std::shared_ptr<ast::INode>& node, unsigned min_children_count = 1) const;
-  bool IsCorrectStmtType(const std::shared_ptr<ast::INode>& node, ast::StmtType stmt_type) const;
+  static bool HasChildren(const std::shared_ptr<ast::INode>& node, unsigned min_children_count = 1);
+  static bool IsCorrectStmtType(const std::shared_ptr<ast::INode>& node, ast::StmtType stmt_type);
 
-  void ValidateHasChildren(const std::shared_ptr<ast::INode>& node, unsigned min_children_count = 1,
-                           const std::string& details = "") const;
-  void ValidateIsCorrectStmtType(const std::shared_ptr<ast::INode>& node,
-                                 ast::StmtType stmt_type) const;
+  static void ValidateHasChildren(const std::shared_ptr<ast::INode>& node, 
+                                  unsigned min_children_count = 1,
+                                  const std::string& details = "");
+  static void ValidateIsCorrectStmtType(const std::shared_ptr<ast::INode>& node,
+                                        ast::StmtType stmt_type);
 };
 
 } // scc::translator

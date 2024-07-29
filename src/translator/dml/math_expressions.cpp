@@ -11,7 +11,7 @@ template<typename ASTNodeType,
     typename std::enable_if<std::is_base_of<INode, ASTNodeType>::value>::type* = nullptr>
 using ASTNodePtr = std::shared_ptr<ASTNodeType>;
 
-std::string Translator::TranslateMathExpression(const ASTNodePtr<INode>& expr) const {
+std::string Translator::TranslateMathExpression(const ASTNodePtr<INode>& expr) {
   std::stringstream ss;
 
   auto sum_node = expr->Child(0);
@@ -22,7 +22,7 @@ std::string Translator::TranslateMathExpression(const ASTNodePtr<INode>& expr) c
 
   return ss.str();
 }
-std::string Translator::TranslateMathSum(const ASTNodePtr<INode>& sum) const {
+std::string Translator::TranslateMathSum(const ASTNodePtr<INode>& sum) {
   std::stringstream ss;
 
   auto left_product_node = sum->Child(0);
@@ -45,7 +45,7 @@ std::string Translator::TranslateMathSum(const ASTNodePtr<INode>& sum) const {
 
   return ss.str();
 }
-std::string Translator::TranslateMathProduct(const ASTNodePtr<INode>& product) const {
+std::string Translator::TranslateMathProduct(const ASTNodePtr<INode>& product) {
   std::stringstream ss;
 
   auto left_power_node = product->Child(0);
@@ -68,7 +68,7 @@ std::string Translator::TranslateMathProduct(const ASTNodePtr<INode>& product) c
 
   return ss.str();
 }
-std::string Translator::TranslateMathPower(const ASTNodePtr<INode>& power) const {
+std::string Translator::TranslateMathPower(const ASTNodePtr<INode>& power) {
   std::stringstream ss;
 
   auto value_node = power->Child(0);
@@ -91,7 +91,7 @@ std::string Translator::TranslateMathPower(const ASTNodePtr<INode>& power) const
 
   return ss.str();
 }
-std::string Translator::TranslateMathValue(const ASTNodePtr<INode>& value) const {
+std::string Translator::TranslateMathValue(const ASTNodePtr<INode>& value) {
   std::stringstream ss;
 
   auto node = value->Child(0);
