@@ -36,44 +36,44 @@ void Parser::ValidateHasNotTokens() const {
     throw parsing_error("Unexpected non empty tokens array");
   }
 }
-void Parser::ValidateIsWord(const NodePtr<INode>& node) const {
+void Parser::ValidateIsWord(const NodePtr<INode>& node) {
   if (!NodeDataTypeClassifier::IsWord(node)) {
     std::string msg = format("Expected Word at line {}", node->line);
     throw parsing_error(msg);
   }
 }
-void Parser::ValidateIsOpeningRoundBracket(const NodePtr<INode>& node) const {
+void Parser::ValidateIsOpeningRoundBracket(const NodePtr<INode>& node) {
   if (!NodeDataClassifier::IsOpeningRoundBracket(node)) {
     std::string msg = format("Expected Opening Round Bracket at line {}", node->line);
     throw parsing_error(msg);
   }
 }
-void Parser::ValidateIsClosingRoundBracket(const NodePtr<INode>& node) const {
+void Parser::ValidateIsClosingRoundBracket(const NodePtr<INode>& node) {
   if (!NodeDataClassifier::IsClosingRoundBracket(node)) {
     std::string msg = format("Expected Closing Round Bracket at line {}", node->line);
     throw parsing_error(msg);
   }
 }
-void Parser::ValidateIsSingleQuote(const NodePtr<INode>& node) const {
+void Parser::ValidateIsSingleQuote(const NodePtr<INode>& node) {
   if (!NodeDataClassifier::IsSingleQuote(node)) {
     std::string msg = format("Expected Single Quote at line {}", node->line);
     throw parsing_error(msg);
   }
 }
-void Parser::ValidateIsDoubleQuote(const NodePtr<INode>& node) const {
+void Parser::ValidateIsDoubleQuote(const NodePtr<INode>& node) {
   if (!NodeDataClassifier::IsSingleQuote(node)) {
     std::string msg = format("Expected Double Quote at line {}", node->line);
     throw parsing_error(msg);
   }
 }
-void Parser::ValidateIsBinaryOperator(const NodePtr<INode>& node) const {
+void Parser::ValidateIsBinaryOperator(const NodePtr<INode>& node) {
   if (!NodeDataClassifier::IsBinaryOperator(node)) {
     std::string msg = format("Expected Binary Operator at line {}", node->line);
     throw parsing_error(msg);
   }
 }
 
-void Parser::ValidateIsAssignmentOperator(const NodePtr<INode>& node) const {
+void Parser::ValidateIsAssignmentOperator(const NodePtr<INode>& node) {
   if (!NodeDataClassifier::IsAssignmentOperator(node)) {
     std::string msg = format("Expected Assignment Operator at line {}", node->line);
     throw parsing_error(msg);
