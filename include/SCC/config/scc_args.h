@@ -39,11 +39,11 @@ public:
   explicit no_argument_error(const std::string& message);
 };
 
-class SCCArgs : public argparse::ArgumentParser {
+class SCCArgumentParser : public argparse::ArgumentParser {
 public:
-  explicit SCCArgs();
+  explicit SCCArgumentParser(std::string_view program_name);
 
-  void ParseArgs(int argc, const char* const argv[]);
+  argparse::ArgumentParser& subparser(std::string_view name);
 
   template<typename T = std::string>
   auto Get(const std::string& arg_name) const
@@ -55,14 +55,19 @@ public:
     }
   }
 
-  argparse::ArgumentParser& subparser(std::string_view name);
-
   template<typename T = std::string>
   std::optional<T> Present(const std::string& arg_name) const {
     return present<T>(arg_name);
   }
 
   [[nodiscard]] bool IsUsed(const std::string& arg_name) const;
+};
+
+class SCCArgs : public SCCArgumentParser {
+public:
+  explicit SCCArgs();
+
+  void ParseArgs(int argc, const char* const argv[]);
 
 private:
   void PrintHelpAndExit(int exit_code) const;

@@ -7,9 +7,24 @@ using namespace argparse;
 no_argument_error::no_argument_error(const std::string& message)
     : std::runtime_error(message) {}
 
-SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, default_arguments::none) {
+SCCArgumentParser::SCCArgumentParser(std::string_view program_name)
+    : ArgumentParser(std::string(program_name), VERSION, default_arguments::none) {
   set_assign_chars("= ");
+}
 
+ArgumentParser& SCCArgumentParser::subparser(std::string_view name) {
+  try {
+    return at<argparse::ArgumentParser>(name);
+  } catch (const std::logic_error&) {
+    throw no_argument_error(std::format("No such subcommand: {}", name));
+  }
+}
+
+bool SCCArgumentParser::IsUsed(const std::string& arg_name) const {
+  return is_used(arg_name);
+}
+
+SCCArgs::SCCArgs() : SCCArgumentParser(PROGRAM_NAME) {
   add_description("Translates SQL queries for MS SQL Server into queries for Neo4j DBMS.");
   add_epilog("Contribute to SCC: " CONTRIBUTE_LINK);
 
@@ -98,18 +113,6 @@ void SCCArgs::ParseArgs(int argc, const char* const argv[]) {
     std::cerr << e.what() << std::endl;
     PrintHelpAndExit(EXIT_FAILURE);
   }
-}
-
-ArgumentParser& SCCArgs::subparser(std::string_view name) {
-  try {
-    return at<argparse::ArgumentParser>(name);
-  } catch (const std::logic_error&) {
-    throw no_argument_error(std::format("No such subcommand: {}", name));
-  }
-}
-
-bool SCCArgs::IsUsed(const std::string& arg_name) const {
-  return is_used(arg_name);
 }
 
 void SCCArgs::PrintHelpAndExit(int exit_code) const {
