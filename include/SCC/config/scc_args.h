@@ -60,7 +60,7 @@ public:
     return present<T>(arg_name);
   }
 
-  bool IsUsed(const std::string& arg_name) const;
+  [[nodiscard]] bool IsUsed(const std::string& arg_name) const;
 
 private:
   void PrintHelpAndExit(int exit_code) const;
