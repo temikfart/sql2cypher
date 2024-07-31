@@ -63,6 +63,8 @@ public:
   }
 
   [[nodiscard]] bool IsUsed(const std::string& arg_name) const;
+
+  void PrintHelpAndExit(int exit_code) const;
 };
 
 class SCCArgs : public SCCArgumentParser {
@@ -70,9 +72,6 @@ public:
   explicit SCCArgs();
 
   void ParseArgs(int argc, const char* const argv[]);
-
-private:
-  void PrintHelpAndExit(int exit_code) const;
 };
 
 class SCCSubcommand : public SCCArgumentParser {

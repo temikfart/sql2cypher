@@ -21,6 +21,11 @@ bool SCCArgumentParser::IsUsed(const std::string& arg_name) const {
   return is_used(arg_name);
 }
 
+void SCCArgumentParser::PrintHelpAndExit(int exit_code) const {
+  std::cout << help().str();
+  exit(exit_code);
+}
+
 SCCArgs::SCCArgs() : SCCArgumentParser(PROGRAM_NAME) {
   add_description("Translates SQL queries for MS SQL Server into queries for Neo4j DBMS.");
   add_epilog("Contribute to SCC: " CONTRIBUTE_LINK);
@@ -75,15 +80,21 @@ void SCCArgs::ParseArgs(int argc, const char* const argv[]) {
 
   try {
     parse_args(argc, argv);
+
+    if (argc == 2) {
+      if (is_subcommand_used(SCC_SCHEMA_SUBCOMMAND)) {
+        auto& schema_subparser = subparser(SCC_SCHEMA_SUBCOMMAND);
+        schema_subparser.PrintHelpAndExit(EXIT_SUCCESS);
+      }
+      if (is_subcommand_used(SCC_DATA_SUBCOMMAND)) {
+        auto& data_subparser = subparser(SCC_DATA_SUBCOMMAND);
+        data_subparser.PrintHelpAndExit(EXIT_SUCCESS);
+      }
+    }
   } catch (const std::runtime_error& e) {
     std::cerr << e.what() << std::endl;
     PrintHelpAndExit(EXIT_FAILURE);
   }
-}
-
-void SCCArgs::PrintHelpAndExit(int exit_code) const {
-  std::cout << help().str();
-  exit(exit_code);
 }
 
 SCCSubcommand::SCCSubcommand(std::string_view name, const std::string& description)
