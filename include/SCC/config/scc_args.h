@@ -72,4 +72,10 @@ private:
   void PrintHelpAndExit(int exit_code) const;
 };
 
+class SCCSubcommand : public SCCArgumentParser {
+public:
+  explicit SCCSubcommand(std::string_view subcommand, const std::string& description);
+  virtual ~SCCSubcommand() = default;
+};
+
 } // scc::config

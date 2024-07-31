@@ -120,4 +120,29 @@ void SCCArgs::PrintHelpAndExit(int exit_code) const {
   exit(exit_code);
 }
 
+SCCSubcommand::SCCSubcommand(std::string_view name, const std::string& description)
+    : SCCArgumentParser(name) {
+  add_description(description);
+
+  add_argument("-h", "--help")
+      .action([this](const std::string& /*unused*/) {
+        std::cout << help().str();
+        exit(EXIT_SUCCESS);
+      })
+      .help("Show this info")
+      .default_value(false)
+      .implicit_value(true)
+      .nargs(0);
+
+  add_argument("-v", "--version")
+      .action([](const std::string& /*unused*/) {
+        std::cout << "scc version " VERSION << std::endl;
+        exit(EXIT_SUCCESS);
+      })
+      .help("Show version info")
+      .default_value(false)
+      .implicit_value(true)
+      .nargs(0);
+}
+
 } // scc::config
