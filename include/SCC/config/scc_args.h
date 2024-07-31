@@ -34,6 +34,9 @@
 
 namespace scc::config {
 
+constexpr std::string_view SCC_SCHEMA_SUBCOMMAND = "schema";
+constexpr std::string_view SCC_DATA_SUBCOMMAND = "data";
+
 class no_argument_error : private std::runtime_error {
 public:
   explicit no_argument_error(const std::string& message);
@@ -43,7 +46,7 @@ class SCCArgumentParser : public argparse::ArgumentParser {
 public:
   explicit SCCArgumentParser(std::string_view program_name);
 
-  const argparse::ArgumentParser& subparser(std::string_view name);
+  SCCArgumentParser& subparser(std::string_view name);
 
   template<typename T = std::string>
   T Get(const std::string& arg_name) const {
@@ -76,6 +79,18 @@ class SCCSubcommand : public SCCArgumentParser {
 public:
   explicit SCCSubcommand(std::string_view subcommand, const std::string& description);
   virtual ~SCCSubcommand() = default;
+};
+
+class SCCSubcommandSchema : public SCCSubcommand {
+public:
+  explicit SCCSubcommandSchema();
+  ~SCCSubcommandSchema() override = default;
+};
+
+class SCCSubcommandData : public SCCSubcommand {
+public:
+  explicit SCCSubcommandData();
+  ~SCCSubcommandData() override = default;
 };
 
 } // scc::config

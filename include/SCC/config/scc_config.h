@@ -24,7 +24,7 @@ public:
   bool translate_schema;
   bool translate_data;
 
-  explicit SCCConfig(const SCCArgs& args);
+  explicit SCCConfig(SCCArgs& args);
 
   static SCCConfig* Get();
 
@@ -42,6 +42,6 @@ private:
   std::filesystem::path ast_dump_file_;
 };
 
-void InitConfig(const SCCArgs& args);
+void InitConfig(SCCArgs& args);
 
 } // scc::config
