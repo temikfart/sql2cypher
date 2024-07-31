@@ -2,10 +2,12 @@
 
 namespace scc::config {
 
+using namespace argparse;
+
 no_argument_error::no_argument_error(const std::string& message)
     : std::runtime_error(message) {}
 
-SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, argparse::default_arguments::none) {
+SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, default_arguments::none) {
   set_assign_chars("= ");
 
   add_description("Translates SQL queries for MS SQL Server into queries for Neo4j DBMS.");
@@ -95,6 +97,14 @@ void SCCArgs::ParseArgs(int argc, const char* const argv[]) {
   } catch (const std::runtime_error& e) {
     std::cerr << e.what() << std::endl;
     PrintHelpAndExit(EXIT_FAILURE);
+  }
+}
+
+ArgumentParser& SCCArgs::subparser(std::string_view name) {
+  try {
+    return at<argparse::ArgumentParser>(name);
+  } catch (const std::logic_error&) {
+    throw no_argument_error(std::format("No such subcommand: {}", name));
   }
 }
 

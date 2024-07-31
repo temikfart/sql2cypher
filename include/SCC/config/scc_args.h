@@ -55,6 +55,8 @@ public:
     }
   }
 
+  argparse::ArgumentParser& subparser(std::string_view name);
+
   template<typename T = std::string>
   std::optional<T> Present(const std::string& arg_name) const {
     return present<T>(arg_name);
