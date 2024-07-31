@@ -43,11 +43,10 @@ class SCCArgumentParser : public argparse::ArgumentParser {
 public:
   explicit SCCArgumentParser(std::string_view program_name);
 
-  argparse::ArgumentParser& subparser(std::string_view name);
+  const argparse::ArgumentParser& subparser(std::string_view name);
 
   template<typename T = std::string>
-  auto Get(const std::string& arg_name) const
-  -> std::conditional_t<argparse::details::IsContainer<T>, T, const T&> {
+  T Get(const std::string& arg_name) const {
     try {
       return get<T>(arg_name);
     } catch (const std::logic_error& e) {

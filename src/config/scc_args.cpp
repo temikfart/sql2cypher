@@ -12,7 +12,7 @@ SCCArgumentParser::SCCArgumentParser(std::string_view program_name)
   set_assign_chars("= ");
 }
 
-ArgumentParser& SCCArgumentParser::subparser(std::string_view name) {
+const ArgumentParser& SCCArgumentParser::subparser(std::string_view name) {
   try {
     return at<argparse::ArgumentParser>(name);
   } catch (const std::logic_error&) {
