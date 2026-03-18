@@ -257,7 +257,7 @@ sql2cypher/ $ doxygen doc/doxygen-config.dox
 Artyom Fartygin ([temikfart](https://github.com/temikfart)) —
 Undergraduate student at [MIPT](https://mipt.ru) [PAMI](https://mipt.ru/education/departments/fpmi/)
 
-Roman Korostinskiy ([RomanKorostinskiy](https://github.com/RomanKorostinskiy)) —
+Roman Korostinskiy ([RomanKorostinskiy](https://github.com/c71n93)) —
 Undergraduate student at [MIPT](https://mipt.ru) [PRCT](https://mipt.ru/education/departments/frkt/)
 
 ## Mentors
