@@ -2,12 +2,31 @@
 
 namespace scc::config {
 
+using namespace argparse;
+
 no_argument_error::no_argument_error(const std::string& message)
     : std::runtime_error(message) {}
 
-SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, argparse::default_arguments::none) {
+SCCArgumentParser::SCCArgumentParser(std::string_view program_name)
+    : ArgumentParser(std::string(program_name), VERSION, default_arguments::none) {
   set_assign_chars("= ");
+}
 
+SCCArgumentParser& SCCArgumentParser::subparser(std::string_view name) {
+  auto& subparser = at<ArgumentParser>(name);
+  return static_cast<SCCArgumentParser&>(subparser);
+}
+
+bool SCCArgumentParser::IsUsed(const std::string& arg_name) const {
+  return is_used(arg_name);
+}
+
+void SCCArgumentParser::PrintHelpAndExit(int exit_code) const {
+  std::cout << help().str();
+  exit(exit_code);
+}
+
+SCCArgs::SCCArgs() : SCCArgumentParser(PROGRAM_NAME) {
   add_description("Translates SQL queries for MS SQL Server into queries for Neo4j DBMS.");
   add_epilog("Contribute to SCC: " CONTRIBUTE_LINK);
 
@@ -29,37 +48,6 @@ SCCArgs::SCCArgs() : ArgumentParser(PROGRAM_NAME, VERSION, argparse::default_arg
       .default_value(false)
       .implicit_value(true)
       .nargs(0);
-
-  add_argument("--translate-schema")
-      .help("Use this option to translate SQL schema migration queries into Cypher")
-      .default_value(false)
-      .implicit_value(true);
-
-  add_argument("--sql-schema")
-      .help("Specify path to the file with SQL schema migration queries to be converted")
-      .metavar("FILENAME");
-
-  std::string default_graph_schema_file =
-      (std::filesystem::current_path() / "schema.json").string();
-  add_argument("--graph-schema")
-      .help("Specify path to the file with Neo4j graph schema")
-      .metavar("FILENAME")
-      .default_value(default_graph_schema_file);
-
-  add_argument("--translate-data")
-      .help("Use this option to translate SQL data migration queries into Cypher")
-      .default_value(false)
-      .implicit_value(true);
-
-  add_argument("--sql")
-      .help("Specify path to the file with SQL data migration queries to be converted")
-      .metavar("FILENAME");
-
-  std::string default_cypher_file = (std::filesystem::current_path() / "out.cql").string();
-  add_argument("--cypher")
-      .help("Specify path to the file with the result CypherQL queries")
-      .metavar("FILENAME")
-      .default_value(default_cypher_file);
 
   add_argument("--dump")
       .help("Specify path to the PNG image with the dump of SQL AST")
@@ -92,19 +80,77 @@ void SCCArgs::ParseArgs(int argc, const char* const argv[]) {
 
   try {
     parse_args(argc, argv);
+
+    if (argc == 2) {
+      if (is_subcommand_used(SCC_SCHEMA_SUBCOMMAND)) {
+        auto& schema_subparser = subparser(SCC_SCHEMA_SUBCOMMAND);
+        schema_subparser.PrintHelpAndExit(EXIT_SUCCESS);
+      }
+      if (is_subcommand_used(SCC_DATA_SUBCOMMAND)) {
+        auto& data_subparser = subparser(SCC_DATA_SUBCOMMAND);
+        data_subparser.PrintHelpAndExit(EXIT_SUCCESS);
+      }
+    }
   } catch (const std::runtime_error& e) {
     std::cerr << e.what() << std::endl;
     PrintHelpAndExit(EXIT_FAILURE);
   }
 }
 
-bool SCCArgs::IsUsed(const std::string& arg_name) const {
-  return is_used(arg_name);
+SCCSubcommand::SCCSubcommand(std::string_view name, const std::string& description)
+    : SCCArgumentParser(name) {
+  add_description(description);
+
+  add_argument("-h", "--help")
+      .action([this](const std::string& /*unused*/) {
+        std::cout << help().str();
+        exit(EXIT_SUCCESS);
+      })
+      .help("Show this info")
+      .default_value(false)
+      .implicit_value(true)
+      .nargs(0);
+
+  add_argument("-v", "--version")
+      .action([](const std::string& /*unused*/) {
+        std::cout << "scc version " VERSION << std::endl;
+        exit(EXIT_SUCCESS);
+      })
+      .help("Show version info")
+      .default_value(false)
+      .implicit_value(true)
+      .nargs(0);
 }
 
-void SCCArgs::PrintHelpAndExit(int exit_code) const {
-  std::cout << help().str();
-  exit(exit_code);
+SCCSubcommandSchema::SCCSubcommandSchema()
+    : SCCSubcommand(SCC_SCHEMA_SUBCOMMAND, "Translate SQL schema migration queries into Cypher.") {
+  add_argument("--sql")
+      .help("Specify path to the file with SQL schema migration queries to be converted")
+      .metavar("FILENAME");
+
+  std::string default_graph_schema_file =
+      (std::filesystem::current_path() / "schema.json").string();
+  add_argument("--graph-schema")
+      .help("Specify path to the file with Neo4j graph schema")
+      .metavar("FILENAME")
+      .default_value(default_graph_schema_file);
+}
+
+SCCSubcommandData::SCCSubcommandData()
+    : SCCSubcommand(SCC_DATA_SUBCOMMAND, "Translate SQL data migration queries into Cypher.") {
+  add_argument("--graph-schema")
+      .help("Specify path to the file with Neo4j graph schema")
+      .metavar("FILENAME");
+
+  add_argument("--sql")
+      .help("Specify path to the file with SQL data migration queries to be converted")
+      .metavar("FILENAME");
+
+  std::string default_cypher_file = (std::filesystem::current_path() / "out.cql").string();
+  add_argument("--cypher")
+      .help("Specify path to the file with the result CypherQL queries")
+      .metavar("FILENAME")
+      .default_value(default_cypher_file);
 }
 
 } // scc::config

@@ -12,7 +12,7 @@ template<typename NodeType,
     typename std::enable_if<std::is_base_of<INode, NodeType>::value>::type* = nullptr>
 using NodePtr = std::shared_ptr<NodeType>;
 
-StmtType Parser::DetermineConstraintType(const std::string& keyword) const {
+StmtType Parser::DetermineConstraintType(const std::string& keyword) {
   if (DetermineIsPrimaryKey(keyword)) {
     return StmtType::kPrimaryKey;
   } else if (DetermineIsForeignKey(keyword)) {
@@ -20,7 +20,7 @@ StmtType Parser::DetermineConstraintType(const std::string& keyword) const {
   }
   return StmtType::kNone;
 }
-StmtType Parser::DetermineAlterTableActionType(const std::string& keyword) const {
+StmtType Parser::DetermineAlterTableActionType(const std::string& keyword) {
   std::string keyword_lower = scc::common::LowerCase(keyword);
   if (kST_ADD_KW.find(keyword_lower) == 0) {
     return StmtType::kAddKW;
@@ -29,7 +29,7 @@ StmtType Parser::DetermineAlterTableActionType(const std::string& keyword) const
   }
   return StmtType::kNone;
 }
-StmtType Parser::DetermineDropElementType(const std::string& keyword) const {
+StmtType Parser::DetermineDropElementType(const std::string& keyword) {
   std::string keyword_lower = scc::common::LowerCase(keyword);
   if (kST_CONSTRAINT_KW.find(keyword_lower) == 0) {
     return StmtType::kDropConstraint;
@@ -38,7 +38,7 @@ StmtType Parser::DetermineDropElementType(const std::string& keyword) const {
   }
   return StmtType::kNone;
 }
-StmtType Parser::DetermineLogicalOperatorType(const std::string& keyword) const {
+StmtType Parser::DetermineLogicalOperatorType(const std::string& keyword) {
   if (DetermineIsOROperator(keyword)) {
     return StmtType::kOROperator;
   } else if (DetermineIsANDOperator(keyword)) {
@@ -49,28 +49,28 @@ StmtType Parser::DetermineLogicalOperatorType(const std::string& keyword) const 
   return StmtType::kNone;
 }
 
-bool Parser::DetermineIsFullConstraintDefinition(const std::string& keyword) const {
+bool Parser::DetermineIsFullConstraintDefinition(const std::string& keyword) {
   return DetermineIsPrefix(kST_CONSTRAINT_KW, keyword);
 }
-bool Parser::DetermineIsPrimaryKey(const std::string& keyword) const {
+bool Parser::DetermineIsPrimaryKey(const std::string& keyword) {
   return DetermineIsPrefix(kST_PRIMARY_KEY, keyword);
 }
-bool Parser::DetermineIsForeignKey(const std::string& keyword) const {
+bool Parser::DetermineIsForeignKey(const std::string& keyword) {
   return DetermineIsPrefix(kST_FOREIGN_KEY, keyword);
 }
-bool Parser::DetermineIsReferences(const std::string& keyword) const {
+bool Parser::DetermineIsReferences(const std::string& keyword) {
   return DetermineIsPrefix(kST_REFERENCES_KW, keyword);
 }
-bool Parser::DetermineIsOROperator(const std::string& keyword) const {
+bool Parser::DetermineIsOROperator(const std::string& keyword) {
   return DetermineIsPrefix(kST_OR_OPERATOR, keyword);
 }
-bool Parser::DetermineIsANDOperator(const std::string& keyword) const {
+bool Parser::DetermineIsANDOperator(const std::string& keyword) {
   return DetermineIsPrefix(kST_AND_OPERATOR, keyword);
 }
-bool Parser::DetermineIsNOTOperator(const std::string& keyword) const {
+bool Parser::DetermineIsNOTOperator(const std::string& keyword) {
   return DetermineIsPrefix(kST_NOT_OPERATOR, keyword);
 }
-bool Parser::DetermineIsPrefix(const std::string_view& string, const std::string& prefix) const {
+bool Parser::DetermineIsPrefix(const std::string_view& string, const std::string& prefix) {
   return string.find(scc::common::LowerCase(prefix)) == 0;
 }
 

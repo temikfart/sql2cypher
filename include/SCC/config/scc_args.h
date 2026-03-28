@@ -34,20 +34,22 @@
 
 namespace scc::config {
 
+constexpr std::string_view SCC_SCHEMA_SUBCOMMAND = "schema";
+constexpr std::string_view SCC_DATA_SUBCOMMAND = "data";
+
 class no_argument_error : private std::runtime_error {
 public:
   explicit no_argument_error(const std::string& message);
 };
 
-class SCCArgs : public argparse::ArgumentParser {
+class SCCArgumentParser : public argparse::ArgumentParser {
 public:
-  explicit SCCArgs();
+  explicit SCCArgumentParser(std::string_view program_name);
 
-  void ParseArgs(int argc, const char* const argv[]);
+  SCCArgumentParser& subparser(std::string_view name);
 
   template<typename T = std::string>
-  auto Get(const std::string& arg_name) const
-  -> std::conditional_t<argparse::details::IsContainer<T>, T, const T&> {
+  T Get(const std::string& arg_name) const {
     try {
       return get<T>(arg_name);
     } catch (const std::logic_error& e) {
@@ -60,10 +62,34 @@ public:
     return present<T>(arg_name);
   }
 
-  bool IsUsed(const std::string& arg_name) const;
+  [[nodiscard]] bool IsUsed(const std::string& arg_name) const;
 
-private:
   void PrintHelpAndExit(int exit_code) const;
+};
+
+class SCCArgs : public SCCArgumentParser {
+public:
+  explicit SCCArgs();
+
+  void ParseArgs(int argc, const char* const argv[]);
+};
+
+class SCCSubcommand : public SCCArgumentParser {
+public:
+  explicit SCCSubcommand(std::string_view subcommand, const std::string& description);
+  virtual ~SCCSubcommand() = default;
+};
+
+class SCCSubcommandSchema : public SCCSubcommand {
+public:
+  explicit SCCSubcommandSchema();
+  ~SCCSubcommandSchema() override = default;
+};
+
+class SCCSubcommandData : public SCCSubcommand {
+public:
+  explicit SCCSubcommandData();
+  ~SCCSubcommandData() override = default;
 };
 
 } // scc::config

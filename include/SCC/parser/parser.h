@@ -94,19 +94,19 @@ private:
   std::shared_ptr<ast::INode> ParseMathPower();
   std::shared_ptr<ast::INode> ParseMathValue();
 
-  ast::StmtType DetermineConstraintType(const std::string& keyword) const;
-  ast::StmtType DetermineAlterTableActionType(const std::string& keyword) const;
-  ast::StmtType DetermineDropElementType(const std::string& keyword) const;
-  ast::StmtType DetermineLogicalOperatorType(const std::string& keyword) const;
+  static ast::StmtType DetermineConstraintType(const std::string& keyword);
+  static ast::StmtType DetermineAlterTableActionType(const std::string& keyword);
+  static ast::StmtType DetermineDropElementType(const std::string& keyword);
+  static ast::StmtType DetermineLogicalOperatorType(const std::string& keyword);
 
-  bool DetermineIsFullConstraintDefinition(const std::string& keyword) const;
-  bool DetermineIsPrimaryKey(const std::string& keyword) const;
-  bool DetermineIsForeignKey(const std::string& keyword) const;
-  bool DetermineIsReferences(const std::string& keyword) const;
-  bool DetermineIsOROperator(const std::string& keyword) const;
-  bool DetermineIsANDOperator(const std::string& keyword) const;
-  bool DetermineIsNOTOperator(const std::string& keyword) const;
-  bool DetermineIsPrefix(const std::string_view& string, const std::string& prefix) const;
+  static bool DetermineIsFullConstraintDefinition(const std::string& keyword);
+  static bool DetermineIsPrimaryKey(const std::string& keyword);
+  static bool DetermineIsForeignKey(const std::string& keyword);
+  static bool DetermineIsReferences(const std::string& keyword);
+  static bool DetermineIsOROperator(const std::string& keyword);
+  static bool DetermineIsANDOperator(const std::string& keyword);
+  static bool DetermineIsNOTOperator(const std::string& keyword);
+  static bool DetermineIsPrefix(const std::string_view& string, const std::string& prefix);
 
   std::shared_ptr<ast::INode> ParsePrimaryKey();
   std::shared_ptr<ast::INode> ParseForeignKey();
@@ -127,14 +127,14 @@ private:
   void ValidateHasTokens(unsigned min_count = 1) const;
   void ValidateHasNotTokens() const;
 
-  void ValidateIsWord(const std::shared_ptr<ast::INode>& node) const;
-  void ValidateIsOpeningRoundBracket(const std::shared_ptr<ast::INode>& node) const;
-  void ValidateIsClosingRoundBracket(const std::shared_ptr<ast::INode>& node) const;
-  void ValidateIsSingleQuote(const std::shared_ptr<ast::INode>& node) const;
-  void ValidateIsDoubleQuote(const std::shared_ptr<ast::INode>& node) const;
-  void ValidateIsBinaryOperator(const std::shared_ptr<ast::INode>& node) const;
-
-  void ValidateIsAssignmentOperator(const std::shared_ptr<ast::INode>& node) const;
+  static void ValidateIsWord(const std::shared_ptr<ast::INode>& node);
+  static void ValidateIsOpeningRoundBracket(const std::shared_ptr<ast::INode>& node);
+  static void ValidateIsClosingRoundBracket(const std::shared_ptr<ast::INode>& node);
+  static void ValidateIsSingleQuote(const std::shared_ptr<ast::INode>& node);
+  static void ValidateIsDoubleQuote(const std::shared_ptr<ast::INode>& node);
+  static void ValidateIsBinaryOperator(const std::shared_ptr<ast::INode>& node);
+  
+  static void ValidateIsAssignmentOperator(const std::shared_ptr<ast::INode>& node);
 };
 
 } // scc::parser

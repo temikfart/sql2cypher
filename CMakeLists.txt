@@ -61,7 +61,7 @@ FetchContent_MakeAvailable(logger)
 FetchContent_Declare(
         argparse
         GIT_REPOSITORY https://github.com/p-ranav/argparse.git
-        GIT_TAG 997da9255618311d1fcb0135ce86022729d1f1cb # release-2.9
+        GIT_TAG 68fd0277eea5412aff9b91c0b70efc698359dae0 # release-3.1
 )
 FetchContent_MakeAvailable(argparse)
 FetchContent_Declare(

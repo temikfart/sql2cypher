@@ -85,7 +85,7 @@ void Translator::TranslateForeignKey(const ASTNodePtr<INode>& foreign_key,
   AddRelationship(relationship_type, table_name, ref_table_name, apply_conditions);
 }
 
-std::string Translator::GetName(const ASTNodePtr<INode>& name_node) const {
+std::string Translator::GetName(const ASTNodePtr<INode>& name_node) {
   std::ostringstream name;
   ValidateHasChildren(name_node);
   for (unsigned i = 0; HasChildren(name_node, i + 1); ++i) {
@@ -95,7 +95,7 @@ std::string Translator::GetName(const ASTNodePtr<INode>& name_node) const {
   }
   return name.str();
 }
-std::string Translator::GetIdentifier(const ASTNodePtr<INode>& node) const {
+std::string Translator::GetIdentifier(const ASTNodePtr<INode>& node) {
   return ASTUtils::CastToNodeType<StringNode>(node->Child(0))->data;
 }
 
@@ -135,11 +135,11 @@ std::string Translator::CreateRelationshipType(const std::string& type_prefix) {
   relationship_counter++;
   return type;
 }
-std::string Translator::CreatePKConstraintPrefix(const std::string& table_name) const {
+std::string Translator::CreatePKConstraintPrefix(const std::string& table_name) {
   return format("{}_pk_", table_name);
 }
 std::string Translator::CreateFKConstraintPrefix(const std::string& table_name,
-                                                 const std::string& ref_table_name) const {
+                                                 const std::string& ref_table_name) {
   return format("fk_{}_to_{}_", table_name, ref_table_name);
 }
 

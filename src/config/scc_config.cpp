@@ -16,45 +16,50 @@ namespace scc::config {
 
 namespace fs = std::filesystem;
 
-SCCConfig::SCCConfig(const SCCArgs& args) {
+SCCConfig::SCCConfig(SCCArgs& args) {
   try {
-    if (args.IsUsed("--log-severity"))
-      log_severity = logger::to_severity(args.Get("--log-severity"));
-    else
-      log_severity = args.Get<logger::Severity>("--log-severity");
-
+    log_severity = args.IsUsed("--log-severity")
+                   ? logger::to_severity(args.Get("--log-severity"))
+                   : args.Get<logger::Severity>("--log-severity");
     log_directory = fs::weakly_canonical(args.Get("--log-directory"));
 
-    if (args.IsUsed("--mode"))
-      mode = SCCMode(args.Get("--mode"));
-    else
-      mode = args.Get<SCCMode>("--mode");
+    mode = args.IsUsed("--mode")
+           ? SCCMode(args.Get("--mode"))
+           : args.Get<SCCMode>("--mode");
 
-    translate_schema = args.Get<bool>("--translate-schema");
-    if (translate_schema) {
-      std::string sql_schema_file_path = args.Get("--sql-schema");
+    if (args.IsUsed("--dump")) {
+      ast_dump_file_ = fs::weakly_canonical(args.Get("--dump"));
+    }
+
+    if (args.is_subcommand_used(SCC_SCHEMA_SUBCOMMAND)) {
+      translate_schema = true;
+      SCCArgumentParser& schema_subparser = args.subparser(SCC_SCHEMA_SUBCOMMAND);
+
+      std::string sql_schema_file_path = schema_subparser.Get("--sql");
       scc::common::ValidateFileExists(sql_schema_file_path);
       sql_schema_file_ = fs::canonical(sql_schema_file_path);
-    }
-    graph_schema_file_ = fs::weakly_canonical(args.Get("--graph-schema"));
 
-    translate_data = args.Get<bool>("--translate-data");
-    if (translate_data) {
-      if (!translate_schema) {
-        scc::common::ValidateFileExists(graph_schema_file_);
-      }
-      std::string sql_file_path = args.Get("--sql");
+      graph_schema_file_ = fs::weakly_canonical(schema_subparser.Get("--graph-schema"));
+    }
+
+    if (args.is_subcommand_used(SCC_DATA_SUBCOMMAND)) {
+      translate_data = true;
+      SCCArgumentParser& data_subparser = args.subparser(SCC_DATA_SUBCOMMAND);
+
+      std::string graph_schema_file_path = data_subparser.Get("--graph-schema");
+      scc::common::ValidateFileExists(graph_schema_file_path);
+      graph_schema_file_ = fs::canonical(graph_schema_file_path);
+
+      std::string sql_file_path = data_subparser.Get("--sql");
       scc::common::ValidateFileExists(sql_file_path);
       sql_file_ = fs::canonical(sql_file_path);
-      cypher_file_ = fs::weakly_canonical(args.Get("--cypher"));
+
+      cypher_file_ = fs::weakly_canonical(data_subparser.Get("--cypher"));
     }
 
     if (!(translate_schema || translate_data)) {
       throw std::logic_error("Either --translate-schema or --translate-data must be specified");
     }
-
-    if (args.IsUsed("--dump"))
-      ast_dump_file_ = fs::weakly_canonical(args.Get("--dump"));
   } catch (const std::logic_error& e) {
     ThrowFailedConfigCreation(e);
   } catch (const std::runtime_error& e) {
@@ -85,7 +90,7 @@ const fs::path& SCCConfig::get_ast_dump_file() const {
   return ast_dump_file_;
 }
 
-void InitConfig(const SCCArgs& args) {
+void InitConfig(SCCArgs& args) {
   static SCCConfig scc_config(args);
 }
 

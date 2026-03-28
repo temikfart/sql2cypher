@@ -3,6 +3,11 @@
 int main(int argc, char* argv[]) {
   try {
     scc::config::SCCArgs scc_args;
+    scc::config::SCCSubcommandSchema scc_schema_subcommand;
+    scc_args.add_subparser(scc_schema_subcommand);
+    scc::config::SCCSubcommandData scc_data_subcommand;
+    scc_args.add_subparser(scc_data_subcommand);
+
     scc_args.ParseArgs(argc, argv);
 
     scc::config::InitConfig(scc_args);
