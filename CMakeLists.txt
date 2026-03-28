@@ -40,14 +40,20 @@ if (PACKAGE)
     set(MACROS_PACKAGE_FLAGS "-DCREATE_PACKAGE ${PACKAGE_TYPE_FLAG}")
 endif ()
 
-set(MACROS_FLAGS "-DSCC_VERSION=\"\\\"${PRJ_VERSION}\\\"\" \
--DSCC_MAINTAINERS=\"\\\"${PRJ_MAINTAINERS}\\\"\" ${MACROS_PACKAGE_FLAGS}")
-set(COMPILATION_FLAGS "-Wall -Wextra -g ${MACROS_FLAGS}")
-if (COVERAGE)
-    set(COMPILATION_FLAGS "${COMPILATION_FLAGS} --coverage")
+if (NOT WIN32)
+    set(MACROS_FLAGS "-DSCC_VERSION=\"\\\"${PRJ_VERSION}\\\"\" \
+    -DSCC_MAINTAINERS=\"\\\"${PRJ_MAINTAINERS}\\\"\" ${MACROS_PACKAGE_FLAGS}")
+    set(COMPILATION_FLAGS "-Wall -Wextra -g ${MACROS_FLAGS}")
+    if (COVERAGE)
+        set(COMPILATION_FLAGS "${COMPILATION_FLAGS} --coverage")
+    endif()
+    set(CMAKE_C_FLAGS ${COMPILATION_FLAGS})
+    if (EXPERIMENTAL)
+        message("Adding -fexperimental-library flag to C++ compilation")
+        set(COMPILATION_FLAGS "${COMPILATION_FLAGS} -fexperimental-library")
+    endif()
+    set(CMAKE_CXX_FLAGS ${COMPILATION_FLAGS})
 endif()
-set(CMAKE_C_FLAGS ${COMPILATION_FLAGS})
-set(CMAKE_CXX_FLAGS ${COMPILATION_FLAGS})
 
 ## Download dependencies
 
